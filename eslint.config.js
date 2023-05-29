@@ -1,13 +1,17 @@
-module.exports = {
-  root: true,
-  env: {
-    node: true
+const react = require('eslint-plugin-react');
+
+module.exports = [{
+  files: ['src/**/*.js'],
+  plugins: {
+    react
   },
-  extends: [
-    'plugin:vue/strongly-recommended',
-    'eslint:recommended',
-    'plugin:jest/recommended'
-  ],
+  languageOptions: {
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+      }
+    }
+  },
   rules: {
     'arrow-spacing': 'error',
     'comma-dangle': ['error', 'never'],
@@ -21,16 +25,5 @@ module.exports = {
     'no-var': 'warn',
     'object-curly-spacing': ['warn', 'always'],
     'semi': 'warn'
-  },
-  parserOptions: {
-    parser: '@babel/eslint-parser'
-  },
-  overrides: [
-    {
-      files: ['*.spec.js'],
-      env: {
-        jest: true
-      }
-    }
-  ]
-};
+  }
+}];
