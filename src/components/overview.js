@@ -1,12 +1,53 @@
 import { gameList } from './games/gameList';
+import { Listbox } from '@headlessui/react';
+import { useState } from 'react';
 
 export const Overview = () => {
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const shouldShow = game => {
+    if (game.isHiddenFromOverview) return false;
+    return selectedCategories.includes(game.category) || selectedCategories.length === 0;
+  };
+
   return <main className="p-2">
     <OverviewHeader></OverviewHeader>
+    <div class="flex flex-wrap align-baseline">
+      <CategoryFilter
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+      ></CategoryFilter>
+    </div>
     <div className="flex flex-wrap">
-      {Object.keys(gameList).map(gameId => Game(gameId, gameList[gameId]))}
+      {Object.keys(gameList).filter(id => shouldShow(gameList[id])).map(id => Game(id, gameList[id]))}
     </div>
   </main>;
+};
+
+const CategoryFilter = ({ selectedCategories, setSelectedCategories }) => {
+  const allCategories = ['A', 'B', 'C', 'C+', 'D', 'D+', 'E', 'E+'];
+
+  return <Listbox
+    value={selectedCategories} onChange={setSelectedCategories}
+    as="div" multiple horizontal
+    class="mb-2 w-96 inline-block"
+  >
+    <label for="category-selector" className="block">Kategória szűrő:</label>
+    <Listbox.Button id="category-selector" className="border-2 border-slate-600 rounded w-full">
+      {selectedCategories.sort().join(', ') || 'Válassz kategóriákat'}
+    </Listbox.Button>
+    <Listbox.Options className="text-center mt-1">
+      {allCategories.map(category => <Listbox.Option
+        key={category}
+        value={category}
+        className="inline-block"
+      >{({ active, selected }) =>
+        <span className={`border-2 rounded px-1 mx-1 inline-block ${selected ? 'bg-blue-200' : ''} ${active ? 'outline' : ''}`}>
+          <span className={selected ? '' : 'text-transparent'}>✓</span>{category}
+        </span>
+      }</Listbox.Option>)}
+    </Listbox.Options>
+  </Listbox>;
 };
 
 const OverviewHeader = () => {
