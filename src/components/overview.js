@@ -1,4 +1,4 @@
-import { gameList } from './games/gameList'
+import { gameList } from './games/gameList';
 
 export const Overview = () => {
   return <main className="p-2">
@@ -6,8 +6,8 @@ export const Overview = () => {
     <div className="flex flex-wrap">
       {Object.keys(gameList).map(gameId => Game(gameId, gameList[gameId]))}
     </div>
-  </main>
-}
+  </main>;
+};
 
 const OverviewHeader = () => {
   return <div className="flex flex-wrap items-baseline">
@@ -18,11 +18,11 @@ const OverviewHeader = () => {
         target="_blank"
         className="px-4"
       >
-        Hibabejelentő    
+        Hibabejelentő
       </a>
     </span>
-  </div>
-}
+  </div>;
+};
 
 const Game = (gameId, gameProps) => {
   return <span
@@ -40,5 +40,5 @@ const Game = (gameId, gameProps) => {
         className="cta-button rounded-lg py-0 px-1 underline m-0.5 text-base w-auto"
       >Kipróbálom!</button>
     </div>
-  </span>
-}
+  </span>;
+};
