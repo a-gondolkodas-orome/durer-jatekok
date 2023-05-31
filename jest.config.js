@@ -6,9 +6,6 @@ module.exports = {
   testMatch: [
     '**/src/**/*.spec.js'
   ],
-  transformIgnorePatterns: [
-    '/node_modules/(?!lodash-es)'
-  ],
   testPathIgnorePatterns: [
     '/node_modules/',
     '/vue_archive/'

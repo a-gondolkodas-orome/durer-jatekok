@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { gameList } from '../games/gameList';
 import { Listbox } from '@headlessui/react';
-import { uniq } from 'lodash-es';
+import { uniq } from 'lodash';
 
 export const Overview = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
