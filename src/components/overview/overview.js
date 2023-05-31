@@ -1,6 +1,6 @@
-import { gameList } from './games/gameList';
+import React, { useState } from 'react';
+import { gameList } from '../games/gameList';
 import { Listbox } from '@headlessui/react';
-import { useState } from 'react';
 import { uniq } from 'lodash-es';
 
 export const Overview = () => {
