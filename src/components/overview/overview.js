@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { gameList } from '../games/gameList';
 import { Listbox } from '@headlessui/react';
 import { uniq } from 'lodash';
+import { Link } from 'react-router-dom';
 
 export const Overview = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -38,7 +39,7 @@ const CategoryFilter = ({ selectedCategories, setSelectedCategories }) => {
   return <Listbox
     value={selectedCategories} onChange={setSelectedCategories}
     as="div" multiple horizontal
-    className="mb-2 w-96 inline-block px-1"
+    className="mb-2 w-[28rem] inline-block px-1"
   >
     <label htmlFor="category-selector" className="block">Kategória szűrő:</label>
     <Listbox.Button
@@ -68,7 +69,7 @@ const YearFilter = ({ selectedYears, setSelectedYears }) => {
   return <Listbox
     value={selectedYears} onChange={setSelectedYears}
     as="div" multiple horizontal
-    className="mb-2 w-96 inline-block px-1"
+    className="mb-2 w-[28rem] inline-block px-1"
   >
     <label htmlFor="year-selector" className="block">Kategória szűrő:</label>
     <Listbox.Button id="year-selector" className="border-2 border-slate-600 rounded w-full">
@@ -115,9 +116,10 @@ const Game = (gameId, gameProps) => {
       <span className="rounded-lg bg-blue-200 px-1 m-0.5">{gameProps.category}</span>
       <span className="rounded-lg bg-amber-200 px-1 m-0.5">{gameProps.round}</span>
       <span className="grow"></span>
-      <button
-        className="cta-button rounded-lg py-0 px-1 underline m-0.5 text-base w-auto"
-      >Kipróbálom!</button>
+      <Link
+        to={`/game/${gameId}`}
+        className="cta-button rounded-lg py-0 px-1 underline m-0.5 text-base w-auto text-black"
+      >Kipróbálom!</Link>
     </div>
   </span>;
 };

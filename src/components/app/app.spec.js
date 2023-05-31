@@ -1,12 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { Overview } from './overview';
+import { App } from './app';
 import { gameList } from '../games/gameList';
-import { HashRouter } from 'react-router-dom';
 
-describe('Overview', () => {
+describe('App', () => {
   it('should show a list of available games', async () => {
-    const { container } = render(<HashRouter><Overview /></HashRouter>);
+    const { container } = render(<App />);
 
     const gamesToShow = Object.values(gameList).filter(game => !game.isHiddenFromOverview);
 
