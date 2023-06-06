@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { GameRule } from '../game-rule';
-import { GameSidebar } from '../game-sidebar';
+import {
+  GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
+} from '../game-parts';
 
 const rule = <>
   <span className='text-slate-600'>Ez egy példa játék.</span>
@@ -13,20 +14,16 @@ export const Demonstration = () => {
   const [phase, setPhase] = useState('roleSelection');
   const [playerIndex, setPlayerIndex] = useState(null);
   const [next, setNext] = useState(null);
+  const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
 
   const turn = useRef(0);
+  const hasPlayerWon = phase === 'gameEnd' && turn.current === 5;
 
   const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
 
-  const ctaText = (() => {
-    if (phase === 'roleSelection') return 'Válassz szerepet, utána indul a játék!';
-    if (phase === 'play') return shouldPlayerMoveNext ? 'Te jössz' : 'Mi jövünk';
-    if (phase === 'gameEnd') return turn.current === 5 ? 'Gratulálunk, nyertél!' : 'Sajnos vesztettél';
-  })();
-
   const makeAiMove = () => {
     turn.current += 1;
-    const time = Math.floor(Math.random() * 750 + 750);
+    const time = Math.floor(Math.random() * 250 + 250);
     setTimeout(() => {
       setNext(next => 1 - next);
     }, time);
@@ -36,6 +33,7 @@ export const Demonstration = () => {
     turn.current += 1;
     if (turn.current >= 5) {
       setPhase('gameEnd');
+      setIsGameEndDialogOpen(true);
       return;
     }
     setNext(next => 1 - next);
@@ -58,29 +56,43 @@ export const Demonstration = () => {
     setPhase('roleSelection');
     setPlayerIndex(null);
     setNext(null);
+    setIsGameEndDialogOpen(false);
   };
 
+  const GameBoard = () => (
+    <section className="p-2 shrink-0 grow basis-2/3">
+      {shouldPlayerMoveNext && (
+        <button
+          className="cta-button"
+          onClick={endPlayerTurn}
+        >Lépek!</button>
+      )}
+    </section>
+  );
+
   return (
-  <div className="flex justify-center">
-    <div className="max-w-[100ch] w-full">
-      <GameRule ruleDescription={rule} />
-      <div className="flex flex-wrap">
-        <section className="p-2 shrink-0 grow basis-2/3">
-          {shouldPlayerMoveNext && (
-            <button
-              className="cta-button"
-              onClick={endPlayerTurn}
-            >Lépek!</button>
-          )}
-        </section>
-        <GameSidebar
-          stepDescription={'Kattints a \'Lépek\' gombra, hogy lépj.'}
-          ctaText={ctaText}
-          ctx={{ phase, shouldPlayerMoveNext }}
-          moves={{ chooseRole, startNewGame }}
-        />
+  <main className="p-2">
+    <GameHeader title='Példa játék' />
+    <div className="flex justify-center">
+      <div className="max-w-[100ch] w-full">
+        <GameRule ruleDescription={rule} />
+        <div className="flex flex-wrap">
+          <GameBoard />
+          <GameSidebar
+            stepDescription={'Kattints a \'Lépek\' gombra, hogy lépj.'}
+            ctx={{ phase, shouldPlayerMoveNext, hasPlayerWon }}
+            moves={{ chooseRole, startNewGame }}
+          />
+        </div>
       </div>
     </div>
-  </div>
+    <GameFooter />
+    <GameEndDialog
+      isOpen={isGameEndDialogOpen}
+      setIsOpen={setIsGameEndDialogOpen}
+      startNewGame={startNewGame}
+      hasPlayerWon={hasPlayerWon}
+    />
+  </main>
   );
 };
