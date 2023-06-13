@@ -30,6 +30,8 @@ import ChessRook from './chess-rook/chess-rook';
 import * as chessRookStrategy from './chess-rook/strategy/strategy';
 import ChessBishops from './chess-bishops/chess-bishops';
 import * as chessBishopsStrategy from './chess-bishops/strategy/strategy';
+import AddReduceDouble from './add-reduce-double/add-reduce-double';
+import * as addReduceDoubleStrategy from './add-reduce-double/strategy/strategy';
 
 
 export const gameComponents = {
@@ -48,10 +50,19 @@ export const gameComponents = {
   TicTacToeDoubleStart,
   AntiTicTacToe,
   ChessRook,
-  ChessBishops
+  ChessBishops,
+  AddReduceDouble
 };
 
 export const gameList = {
+  AddReduceDouble: {
+    year: 16,
+    round: 'döntő',
+    category: 'D',
+    component: 'AddReduceDouble',
+    name: 'Kettőt vesz, egyet kap',
+    strategy: addReduceDoubleStrategy
+  },
   ChessBishops: {
     year: 1,
     round: 'döntő',
