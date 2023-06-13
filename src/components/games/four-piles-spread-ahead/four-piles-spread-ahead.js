@@ -5,7 +5,7 @@ import { mapActions, mapState } from 'pinia';
 import { useGameStore } from '../../../stores/game';
 
 export default {
-  template: require('./add-reduce-double.html'),
+  template: require('./four-piles-spread-ahead.html'),
   components: { GameSidebar, GameRule },
   data: () => ({
     hoveredPiece: null
@@ -23,7 +23,7 @@ export default {
       return true;
     },
     isDisabled({ pileId, pieceId }) {
-      return !this.shouldPlayerMoveNext || pieceId % 2==0 || (pieceId>this.board[pileId]-1);
+      return !this.shouldPlayerMoveNext || pieceId>pileId-1 || (pieceId>this.board[pileId]-1);
     },
     clickPiece({ pileId, pieceId }) {
       if (this.isDisabled({ pileId, pieceId })) return;
@@ -38,9 +38,8 @@ export default {
     },
     toAppear({ pileId, pieceId }) {
       if (this.hoveredPiece === null) return false;
-      if(pileId == this.hoveredPiece.pileId) return false;
-      if(pieceId>this.board[pileId]+(this.hoveredPiece.pieceId+1)/2-1) return false;
-      return true;
+      return (pileId<this.hoveredPiece.pileId) && (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2) && (pieceId==this.board[pileId]);
+      
 
     },
     currentChoiceDescription(pileId) {
@@ -52,14 +51,14 @@ export default {
         this.isGameReadyToStart ||
         !this.shouldPlayerMoveNext ||
         !this.hoveredPiece
-      ) return pieceCountInPile 
-      if (this.hoveredPiece.pileId !== pileId) return `${pieceCountInPile} → ${pieceCountInPile + (this.hoveredPiece.pieceId+1)/2 }`;
-
-      return `${pieceCountInPile} → ${pieceCountInPile - this.hoveredPiece.pieceId - 1}`;
+      ) return `${pileId+1}. kupac: ${pieceCountInPile} `;
+      if (pileId==this.hoveredPiece.pileId) return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile - this.hoveredPiece.pieceId - 1}`;
+      if ((pileId<this.hoveredPiece.pileId) && (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2)) return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile + 1}`
+      return `${pileId+1}. kupac: ${pieceCountInPile} `;
     }
   },
   created() {
-    this.initializeGame('AddReduceDouble');
+    this.initializeGame('FourPilesSpreadAhead');
   }
 };
 
