@@ -23,7 +23,7 @@ export default {
       return true;
     },
     isDisabled({ pileId, pieceId }) {
-      return !this.shouldPlayerMoveNext || pieceId % 2==0 || (pieceId>this.board[pileId]-1);
+      return !this.shouldPlayerMoveNext || pieceId % 2 === 0 || (pieceId>this.board[pileId]-1);
     },
     clickPiece({ pileId, pieceId }) {
       if (this.isDisabled({ pileId, pieceId })) return;
@@ -38,7 +38,7 @@ export default {
     },
     toAppear({ pileId, pieceId }) {
       if (this.hoveredPiece === null) return false;
-      if(pileId == this.hoveredPiece.pileId) return false;
+      if(pileId === this.hoveredPiece.pileId) return false;
       if(pieceId>this.board[pileId]+(this.hoveredPiece.pieceId+1)/2-1) return false;
       return true;
 
@@ -52,7 +52,7 @@ export default {
         this.isGameReadyToStart ||
         !this.shouldPlayerMoveNext ||
         !this.hoveredPiece
-      ) return pieceCountInPile 
+      ) return pieceCountInPile;
       if (this.hoveredPiece.pileId !== pileId) return `${pieceCountInPile} → ${pieceCountInPile + (this.hoveredPiece.pieceId+1)/2 }`;
 
       return `${pieceCountInPile} → ${pieceCountInPile - this.hoveredPiece.pieceId - 1}`;
@@ -62,4 +62,3 @@ export default {
     this.initializeGame('AddReduceDouble');
   }
 };
-

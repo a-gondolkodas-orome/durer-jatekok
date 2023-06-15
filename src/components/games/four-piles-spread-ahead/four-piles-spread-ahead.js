@@ -38,9 +38,11 @@ export default {
     },
     toAppear({ pileId, pieceId }) {
       if (this.hoveredPiece === null) return false;
-      return (pileId<this.hoveredPiece.pileId) && (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2) && (pieceId==this.board[pileId]);
-      
-
+      return (
+        (pileId<this.hoveredPiece.pileId) &&
+        (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2) &&
+        (pieceId===this.board[pileId])
+      );
     },
     currentChoiceDescription(pileId) {
       if (this.isGameFinished) return '';
@@ -52,8 +54,12 @@ export default {
         !this.shouldPlayerMoveNext ||
         !this.hoveredPiece
       ) return `${pileId+1}. kupac: ${pieceCountInPile} `;
-      if (pileId==this.hoveredPiece.pileId) return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile - this.hoveredPiece.pieceId - 1}`;
-      if ((pileId<this.hoveredPiece.pileId) && (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2)) return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile + 1}`
+      if (pileId===this.hoveredPiece.pileId) {
+        return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile - this.hoveredPiece.pieceId - 1}`;
+      }
+      if ((pileId<this.hoveredPiece.pileId) && (pileId>this.hoveredPiece.pileId-this.hoveredPiece.pieceId-2)) {
+        return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile + 1}`;
+      }
       return `${pileId+1}. kupac: ${pieceCountInPile} `;
     }
   },
@@ -61,4 +67,3 @@ export default {
     this.initializeGame('FourPilesSpreadAhead');
   }
 };
-

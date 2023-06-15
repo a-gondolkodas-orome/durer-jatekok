@@ -58,7 +58,6 @@ export const gameComponents = {
 };
 
 export const gameList = {
-  
   ChessBishops: {
     year: 1,
     round: 'döntő',
