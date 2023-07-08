@@ -29,10 +29,6 @@ export const gameList = {
     category: ['B'],
     name: 'Kupac kettéosztó 3 kupaccal'
   },
-  Demonstration: {
-    name: 'Demonstráló játék',
-    isHiddenFromOverview: true
-  },
   TicTacToeDoubleStart: {
     year: 12,
     round: 'döntő',

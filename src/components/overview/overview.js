@@ -9,7 +9,6 @@ export const Overview = () => {
   const [selectedYears, setSelectedYears] = useState([]);
 
   const shouldShow = game => {
-    if (game.isHiddenFromOverview) return false;
     if (selectedCategories.length > 0 && every(game.category, c => !selectedCategories.includes(c))) return false;
     if (selectedYears.length > 0 && !selectedYears.includes(game.year)) return false;
     return true;
@@ -63,7 +62,7 @@ const CategoryFilter = ({ selectedCategories, setSelectedCategories }) => {
 };
 
 const YearFilter = ({ selectedYears, setSelectedYears }) => {
-  const allGames = Object.values(gameList).filter(game => !game.isHiddenFromOverview);
+  const allGames = Object.values(gameList);
   const allYears = uniq(allGames.map(game => game.year)).sort((a, b) => Number(a) - Number(b));
 
   return <Listbox

@@ -8,8 +8,6 @@ describe('Overview', () => {
   it('should show a list of available games', async () => {
     const { container } = render(<HashRouter><Overview /></HashRouter>);
 
-    const gamesToShow = Object.values(gameList).filter(game => !game.isHiddenFromOverview);
-
-    expect(container.querySelectorAll('.js-game-card')).toHaveLength(gamesToShow.length);
+    expect(container.querySelectorAll('.js-game-card')).toHaveLength(Object.values(gameList).length);
   });
 });
