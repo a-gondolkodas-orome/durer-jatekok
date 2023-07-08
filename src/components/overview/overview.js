@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { gameList } from '../games/gameList';
 import { Listbox } from '@headlessui/react';
-import { uniq } from 'lodash';
+import { uniq, every } from 'lodash';
 import { Link } from 'react-router-dom';
 
 export const Overview = () => {
@@ -10,7 +10,7 @@ export const Overview = () => {
 
   const shouldShow = game => {
     if (game.isHiddenFromOverview) return false;
-    if (selectedCategories.length > 0 && !selectedCategories.includes(game.category)) return false;
+    if (selectedCategories.length > 0 && every(game.category, c => !selectedCategories.includes(c))) return false;
     if (selectedYears.length > 0 && !selectedYears.includes(game.year)) return false;
     return true;
   };
@@ -113,7 +113,7 @@ const Game = (gameId, gameProps) => {
     <div className="grow"></div>
     <div className="flex items-baseline">
       <span className="rounded-lg bg-orange-200 px-1 m-0.5">{gameProps.year}.</span>
-      <span className="rounded-lg bg-blue-200 px-1 m-0.5">{gameProps.category}</span>
+      <span className="rounded-lg bg-blue-200 px-1 m-0.5">{gameProps.category.join(', ')}</span>
       <span className="rounded-lg bg-amber-200 px-1 m-0.5">{gameProps.round}</span>
       <span className="grow"></span>
       <Link
