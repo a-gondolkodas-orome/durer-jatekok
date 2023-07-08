@@ -27,13 +27,13 @@ export const GameSidebar = ({
         <span className="basis-[6rem]">
           <button
             className="cta-button js-first-player"
-            onClick={() => moves.chooseRole({ isFirst: true })}
+            onClick={() => moves.chooseRole(0)}
           >
             Kezdő leszek
           </button>
           <button
             className="cta-button js-second-player"
-            onClick={() => moves.chooseRole({ isFirst: false })}
+            onClick={() => moves.chooseRole(1)}
           >
             Második leszek
           </button>
@@ -108,7 +108,7 @@ export const GameRule = ({ ruleDescription }) => {
   </section>;
 };
 
-export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, hasPlayerWon }) => {
+export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isPlayerWinner }) => {
   return (
     <Dialog
       open={isOpen}
@@ -128,7 +128,7 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, hasPlayerWon })
             >×</button>
           </header>
           <Dialog.Description className="text-lg block text-justify">
-            {getResultDescription(hasPlayerWon)}
+            {getResultDescription(isPlayerWinner)}
           </Dialog.Description>
 
           <button onClick={() => startNewGame()} className="cta-button mt-2">
@@ -140,12 +140,12 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, hasPlayerWon })
   );
 };
 
-const getCtaText = ({ phase, shouldPlayerMoveNext, hasPlayerWon }) => {
+const getCtaText = ({ phase, shouldPlayerMoveNext, isPlayerWinner }) => {
   if (phase === 'roleSelection') return 'Válassz szerepet, utána indul a játék!';
   if (phase === 'play') return shouldPlayerMoveNext ? 'Te jössz' : 'Mi jövünk';
-  if (phase === 'gameEnd') return getResultDescription(hasPlayerWon);
+  if (phase === 'gameEnd') return getResultDescription(isPlayerWinner);
 };
 
-const getResultDescription = hasPlayerWon => hasPlayerWon
+const getResultDescription = isPlayerWinner => isPlayerWinner
   ? 'Nyertél. Gratulálunk! :)'
   : 'Sajnos, most nem nyertél, de ne add fel.';
