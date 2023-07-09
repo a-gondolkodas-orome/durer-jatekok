@@ -92,11 +92,16 @@ const GameBoard = ({ board, ctx }) => {
   };
 
   return (
-  <section class="p-2 shrink-0 grow basis-2/3">
+  <section className="p-2 shrink-0 grow basis-2/3">
     {[0, 1, 2].map(pileId => (
       <div
         key={pileId}
-        className={`js-pile w-[50%] pl-1 inline-block text-center py-2 ${pileId < 2 ? 'border-t-2': ''} ${pileId === 0 && board[0] >= board[1] ? 'border-r-2' : ''} ${pileId === 1 && board[0] < board[1] ? 'border-l-2' : ''}`}
+        className={`
+          js-pile w-[50%] pl-1 inline-block text-center py-2
+          ${pileId < 2 ? 'border-t-2': ''}
+          ${pileId === 0 && board[0] >= board[1] ? 'border-r-2' : ''}
+          ${pileId === 1 && board[0] < board[1] ? 'border-l-2' : ''}
+        `}
         style={{ transform: 'scaleY(-1)' }}
       >
         <p className="text-xl" style={{ transform: 'scaleY(-1)' }}>
@@ -106,7 +111,12 @@ const GameBoard = ({ board, ctx }) => {
             <button
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
-              className={`js-pebble inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5 ${pileId === removedPileId ? 'bg-red-600' : ''} ${pileId === removedPileId ? 'opacity-50' : ''} ${toBeLeft({ pileId, pieceId }) ? 'bg-blue-900' : ''}`}
+              className={`
+                js-pebble inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5
+                ${pileId === removedPileId ? 'bg-red-600' : ''}
+                ${pileId === removedPileId ? 'opacity-50' : ''}
+                ${toBeLeft({ pileId, pieceId }) ? 'bg-blue-900' : ''}
+              `}
               onClick={() => clickPiece({ pileId, pieceId })}
               onFocus={() => setHoveredPiece({ pileId, pieceId })}
               onBlur={() => setHoveredPiece(null)}

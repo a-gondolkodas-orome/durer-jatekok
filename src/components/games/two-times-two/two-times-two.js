@@ -40,7 +40,10 @@ const GameBoard = ({ board, ctx }) => (
           {range(board[id]).map((i) =>
             <span
               key={i}
-              className={`m-[3%] aspect-square inline-block bg-blue-600 rounded-full ${board[id] <= 4 ? 'w-[40%]' : 'w-[25%]'}`}
+              className={`
+                m-[3%] aspect-square inline-block bg-blue-600 rounded-full
+                ${board[id] <= 4 ? 'w-[40%]' : 'w-[25%]'}
+              `}
             >
             </span>
           )}
