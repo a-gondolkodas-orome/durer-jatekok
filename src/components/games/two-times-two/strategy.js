@@ -1,19 +1,6 @@
 'use strict';
 
-import { sum, isEqual, random } from 'lodash';
-
-export const generateNewBoard = () => [0, 0, 0, 0];
-
-export const isGameEnd = board => sum(board) === 6;
-
-export const hasPlayerWon = ({ board, playerIndex }) => {
-  if (!isGameEnd(board)) return false;
-  const isAllDifferent = isEqual([...board].sort(), [0, 1, 2, 3]);
-  return (
-    (playerIndex === 0 && !isAllDifferent) ||
-    (playerIndex === 1 && isAllDifferent)
-  );
-};
+import { sum, random } from 'lodash';
 
 export const getOptimalTileIndex = (board) => {
   const pieces = sum(board);
