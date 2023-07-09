@@ -9,35 +9,37 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
     const [playerIndex, setPlayerIndex] = useState(null);
     const [next, setNext] = useState(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
+    const [winnerIndex, setWinnerIndex] = useState(null);
 
     const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
-    const isPlayerWinner = G.hasPlayerWon === null
-      ? G.isGameEnd(board) && (next === 1 - playerIndex)
-      : G.hasPlayerWon({ board: board, playerIndex });
+    const isPlayerWinner = winnerIndex === playerIndex;
 
-    const endGame = () => {
+    const endGame = (winnerIndex) => {
       setPhase('gameEnd');
+      setWinnerIndex(winnerIndex);
       setIsGameEndDialogOpen(true);
     };
 
     const makeAiMove = ({ currentBoard }) => {
-      const newBoard = G.aiStep(currentBoard);
+      const { newBoard, isGameEnd, winnerIndex } = G.aiStep({ board: currentBoard, playerIndex });
       const time = Math.floor(Math.random() * 500 + 500);
       setTimeout(() => {
         setBoard(newBoard);
         setNext(next => 1 - next);
-        if (G.isGameEnd(newBoard)) {
-          endGame();
+        if (isGameEnd) {
+          // default: last player to move is the winner
+          endGame(winnerIndex === null ? (1 - playerIndex) : winnerIndex);
         }
       }, time);
     };
 
-    const endPlayerTurn = (newBoard) => {
+    const endPlayerTurn = ({ newBoard, isGameEnd, winnerIndex }) => {
       setBoard(newBoard);
       setNext(next => 1 - next);
 
-      if (G.isGameEnd(newBoard)) {
-        endGame();
+      if (isGameEnd) {
+        // default: last player to move is the winner
+        endGame(winnerIndex === null ? playerIndex : winnerIndex);
         return;
       }
 
@@ -70,14 +72,17 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
           <div className="flex flex-wrap">
             <GameBoard
               board={board}
+              setBoard={setBoard}
               ctx={{
                 shouldPlayerMoveNext,
                 endPlayerTurn,
-                isGameEnd: phase === 'gameEnd'
+                playerIndex,
+                isGameEnd: phase === 'gameEnd',
+                isEnemyMoveInProgress: phase === 'play' && next === (1-playerIndex)
               }}
             />
             <GameSidebar
-              stepDescription={G.stepDescription()}
+              stepDescription={G.stepDescription({ playerIndex })}
               ctx={{ phase, shouldPlayerMoveNext, isPlayerWinner }}
               moves={{ chooseRole, startNewGame }}
             />

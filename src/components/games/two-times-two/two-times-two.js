@@ -7,13 +7,10 @@ const generateNewBoard = () => [0, 0, 0, 0];
 
 const isGameEnd = board => sum(board) === 6;
 
-const hasPlayerWon = ({ board, playerIndex }) => {
-  if (!isGameEnd(board)) return false;
+const getWinnerIndex = (board) => {
+  if (!isGameEnd(board)) return null;
   const isAllDifferent = isEqual([...board].sort(), [0, 1, 2, 3]);
-  return (
-    (playerIndex === 0 && !isAllDifferent) ||
-    (playerIndex === 1 && isAllDifferent)
-  );
+  return isAllDifferent ? 1 : 0;
 };
 
 const addPiece = (board, pileId) => {
@@ -22,19 +19,32 @@ const addPiece = (board, pileId) => {
   return newBoard;
 };
 
-const aiStep = (board) => {
+const getGameState = newBoard => ({
+  newBoard,
+  isGameEnd: isGameEnd(newBoard),
+  winnerIndex: getWinnerIndex(newBoard)
+});
+
+const aiStep = ({ board }) => {
   const pileId = getOptimalTileIndex(board);
-  return addPiece(board, pileId);
+  const newBoard = addPiece(board, pileId);
+  return getGameState(newBoard);
 };
 
-const GameBoard = ({ board, ctx }) => (
+const GameBoard = ({ board, ctx }) => {
+  const placePiece = id => {
+    const newBoard = addPiece(board, id);
+    ctx.endPlayerTurn(getGameState(newBoard));
+  };
+
+  return (
   <section className="p-2 shrink-0 grow basis-2/3">
     <div className="grid grid-cols-2 gap-0 border-2">
       {range(board.length).map(id =>
         <button
           key={id}
           disabled={!ctx.shouldPlayerMoveNext}
-          onClick={() => ctx.endPlayerTurn(addPiece(board, id))}
+          onClick={() => placePiece(id)}
           className="aspect-square border-2 p-[4%]"
         >
           {range(board[id]).map((i) =>
@@ -51,7 +61,8 @@ const GameBoard = ({ board, ctx }) => (
       )}
     </div>
   </section>
-);
+  );
+};
 
 const stepDescription = () => 'Kattints arra a mezőre, ahova korongot szeretnél lerakni.';
 
@@ -73,9 +84,7 @@ const Game = strategyGameFactory({
   G: {
     stepDescription,
     generateNewBoard,
-    aiStep,
-    isGameEnd,
-    hasPlayerWon
+    aiStep
   }
 });
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { range, isEqual, random } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
-import { aiStep } from './strategy';
+import { getBoardAfterAiMove } from './strategy';
 
 const generateNewBoard = () => {
   const x = random(4, 20);
@@ -10,6 +10,11 @@ const generateNewBoard = () => {
 };
 
 const isGameEnd = (board) => isEqual(board, [1, 1, 1]);
+
+const aiStep = ({ board }) => {
+  const newBoard = getBoardAfterAiMove(board);
+  return { newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null };
+};
 
 const getBoardAfterMove = (board, { removedPileId, splitPileId, pieceId }) => {
   const newBoard = [...board];
@@ -56,7 +61,7 @@ const GameBoard = ({ board, ctx }) => {
       splitPileId: pileId,
       pieceId
     });
-    ctx.endPlayerTurn(newBoard);
+    ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null });
     resetTurnState();
   };
 
@@ -150,9 +155,7 @@ const Game = strategyGameFactory({
   G: {
     stepDescription,
     generateNewBoard,
-    aiStep,
-    isGameEnd,
-    hasPlayerWon: null
+    aiStep
   }
 });
 
