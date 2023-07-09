@@ -27,14 +27,14 @@ const aiStep = (board) => {
   return addPiece(board, pileId);
 };
 
-const GameBoard = ({ board, shouldPlayerMoveNext, endPlayerTurn }) => (
+const GameBoard = ({ board, ctx }) => (
   <section className="p-2 shrink-0 grow basis-2/3">
     <div className="grid grid-cols-2 gap-0 border-2">
       {range(board.length).map(id =>
         <button
           key={id}
-          disabled={!shouldPlayerMoveNext}
-          onClick={() => endPlayerTurn(addPiece(board, id))}
+          disabled={!ctx.shouldPlayerMoveNext}
+          onClick={() => ctx.endPlayerTurn(addPiece(board, id))}
           className="aspect-square border-2 p-[4%]"
         >
           {range(board[id]).map((i) =>

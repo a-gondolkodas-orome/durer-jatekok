@@ -11,7 +11,9 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
 
     const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
-    const isPlayerWinner = G.hasPlayerWon({ board: board, playerIndex });
+    const isPlayerWinner = G.hasPlayerWon === null
+      ? G.isGameEnd(board) && (next === 1 - playerIndex)
+      : G.hasPlayerWon({ board: board, playerIndex });
 
     const endGame = () => {
       setPhase('gameEnd');
@@ -68,8 +70,11 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
           <div className="flex flex-wrap">
             <GameBoard
               board={board}
-              shouldPlayerMoveNext={shouldPlayerMoveNext}
-              endPlayerTurn={endPlayerTurn}
+              ctx={{
+                shouldPlayerMoveNext,
+                endPlayerTurn,
+                isGameEnd: phase === 'gameEnd'
+              }}
             />
             <GameSidebar
               stepDescription={G.stepDescription()}
