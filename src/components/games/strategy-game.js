@@ -13,6 +13,16 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
     const [winnerIndex, setWinnerIndex] = useState(null);
     const [gameUuid, setGameUuid] = useState(uuidv4());
 
+    const startNewGame = () => {
+      setBoard(G.generateNewBoard());
+      setPhase('roleSelection');
+      setPlayerIndex(null);
+      setNext(null);
+      setIsGameEndDialogOpen(false);
+      setWinnerIndex(null);
+      setGameUuid(uuidv4());
+    };
+
     const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
     const isPlayerWinner = winnerIndex === playerIndex;
 
@@ -55,15 +65,6 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
       if (playerIdx === 1) {
         makeAiMove({ currentBoard: board });
       }
-    };
-
-    const startNewGame = () => {
-      setBoard(G.generateNewBoard());
-      setPhase('roleSelection');
-      setPlayerIndex(null);
-      setNext(null);
-      setIsGameEndDialogOpen(false);
-      setGameUuid(uuidv4());
     };
 
     return (
