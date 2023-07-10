@@ -2,7 +2,7 @@
 
 import { random } from 'lodash';
 
-export const getBoardAfterAiMove = (board) => {
+export const getBoardAfterAiTurn = (board) => {
   const { pileId, pieceId } = getAiStep(board);
   return [pieceId + 1, board[pileId] - pieceId - 1];
 };
