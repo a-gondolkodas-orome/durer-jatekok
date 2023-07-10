@@ -14,7 +14,6 @@ export const GameSidebar = ({
       </p>
       {ctx.phase === 'play' && ctx.shouldPlayerMoveNext === false && (
         <div
-          v-show="isEnemyMoveInProgress"
           className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-[4rem]"
         ></div>
       )}

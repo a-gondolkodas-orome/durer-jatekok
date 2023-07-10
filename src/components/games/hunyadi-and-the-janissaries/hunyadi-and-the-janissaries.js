@@ -75,7 +75,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       ))}
       {isPlayerSultan && (
         <button
-          className={`cta-button ${ctx.isEnemyMoveInProgress ? 'opacity-50' : ''}`}
+          className={`cta-button ${ctx.shouldPlayerMoveNext ? '' : 'opacity-50' }`}
           onClick={() => ctx.endPlayerTurn({ newBoard: board, isGameEnd: false })}
         >
           Befejezem a kettéosztást

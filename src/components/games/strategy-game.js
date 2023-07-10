@@ -81,9 +81,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
               ctx={{
                 shouldPlayerMoveNext,
                 endPlayerTurn,
-                playerIndex,
-                isGameEnd: phase === 'gameEnd',
-                isEnemyMoveInProgress: phase === 'play' && next === (1-playerIndex)
+                playerIndex
               }}
             />
             <GameSidebar

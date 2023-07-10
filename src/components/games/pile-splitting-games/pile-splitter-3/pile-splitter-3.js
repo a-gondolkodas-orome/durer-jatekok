@@ -73,8 +73,6 @@ const GameBoard = ({ board, ctx }) => {
   };
 
   const currentChoiceDescription = (pileId) => {
-    if (ctx.isGameEnd) return '';
-
     const pieceCountInPile = board[pileId];
 
     if (!ctx.shouldPlayerMoveNext) return pieceCountInPile;
