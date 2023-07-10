@@ -9,7 +9,7 @@ import {
 } from './strategy/strategy';
 import { cloneDeep } from 'lodash';
 
-const aiStep = ({ board, playerIndex }) => {
+const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   return getGameStateAfterAiMove(board, playerIndex === 0);
 };
 
@@ -101,7 +101,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   );
 };
 
-const stepDescription = ({ playerIndex }) => {
+const getPlayerStepDescription = ({ playerIndex }) => {
   return playerIndex === 0
   ? 'Kattints a katonákra és válaszd két részre a seregedet'
   : 'Kattints egy katonára, hogy megsemmisítsd a vele azonos színű sereget.';
@@ -124,9 +124,9 @@ const Game = strategyGameFactory({
   title: 'Hunyadi és a janicsárok',
   GameBoard,
   G: {
-    stepDescription,
+    getPlayerStepDescription,
     generateNewBoard,
-    aiStep
+    getGameStateAfterAiTurn
   }
 });
 

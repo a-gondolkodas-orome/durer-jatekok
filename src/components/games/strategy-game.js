@@ -32,8 +32,8 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
       setIsGameEndDialogOpen(true);
     };
 
-    const makeAiMove = ({ currentBoard }) => {
-      const { newBoard, isGameEnd, winnerIndex } = G.aiStep({ board: currentBoard, playerIndex });
+    const doAiTurn = ({ currentBoard }) => {
+      const { newBoard, isGameEnd, winnerIndex } = G.getGameStateAfterAiTurn({ board: currentBoard, playerIndex });
       const time = Math.floor(Math.random() * 500 + 500);
       setTimeout(() => {
         setBoard(newBoard);
@@ -55,7 +55,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
         return;
       }
 
-      makeAiMove({ currentBoard: newBoard });
+      doAiTurn({ currentBoard: newBoard });
     };
 
     const chooseRole = (playerIdx) => {
@@ -63,7 +63,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
       setNext(0);
       setPlayerIndex(playerIdx);
       if (playerIdx === 1) {
-        makeAiMove({ currentBoard: board });
+        doAiTurn({ currentBoard: board });
       }
     };
 
@@ -87,7 +87,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
               }}
             />
             <GameSidebar
-              stepDescription={G.stepDescription({ playerIndex })}
+              stepDescription={G.getPlayerStepDescription({ playerIndex })}
               ctx={{ phase, shouldPlayerMoveNext, isPlayerWinner }}
               moves={{ chooseRole, startNewGame }}
             />

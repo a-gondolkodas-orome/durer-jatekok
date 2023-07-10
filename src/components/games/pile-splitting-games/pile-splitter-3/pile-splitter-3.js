@@ -11,7 +11,7 @@ const generateNewBoard = () => {
 
 const isGameEnd = (board) => isEqual(board, [1, 1, 1]);
 
-const aiStep = ({ board }) => {
+const getGameStateAfterAiTurn = ({ board }) => {
   const newBoard = getBoardAfterAiMove(board);
   return { newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null };
 };
@@ -135,7 +135,8 @@ const GameBoard = ({ board, ctx }) => {
   );
 };
 
-const stepDescription = () => 'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.';
+const getPlayerStepDescription = () =>
+  'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.';
 
 const rule = <>
   A pályán kezdetben 37 korong van, három kupacban.
@@ -153,9 +154,9 @@ const Game = strategyGameFactory({
   title: 'Kupac kettéosztó 3 kupaccal',
   GameBoard,
   G: {
-    stepDescription,
+    getPlayerStepDescription,
     generateNewBoard,
-    aiStep
+    getGameStateAfterAiTurn
   }
 });
 

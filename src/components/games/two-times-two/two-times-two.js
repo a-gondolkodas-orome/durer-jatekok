@@ -25,7 +25,7 @@ const getGameState = newBoard => ({
   winnerIndex: getWinnerIndex(newBoard)
 });
 
-const aiStep = ({ board }) => {
+const getGameStateAfterAiTurn = ({ board }) => {
   const pileId = getOptimalTileIndex(board);
   const newBoard = addPiece(board, pileId);
   return getGameState(newBoard);
@@ -64,7 +64,8 @@ const GameBoard = ({ board, ctx }) => {
   );
 };
 
-const stepDescription = () => 'Kattints arra a mezőre, ahova korongot szeretnél lerakni.';
+const getPlayerStepDescription = () =>
+  'Kattints arra a mezőre, ahova korongot szeretnél lerakni.';
 
 const rule = <>
   Adott egy 2 × 2-es táblázat, és hozzá mindkét játékosnak van 3 db korongja. A
@@ -82,9 +83,9 @@ const Game = strategyGameFactory({
   title: '2x2-es játék',
   GameBoard,
   G: {
-    stepDescription,
+    getPlayerStepDescription,
     generateNewBoard,
-    aiStep
+    getGameStateAfterAiTurn
   }
 });
 
