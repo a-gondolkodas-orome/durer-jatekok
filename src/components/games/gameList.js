@@ -47,12 +47,12 @@ export const gameList = {
     category: ['A'],
     name: '2x2-es játék'
   },
-  // FiveSquares: {
-  //   year: 13,
-  //   round: 'döntő',
-  //   category: ['B'],
-  //   name: '5 mezős játék'
-  // },
+  FiveSquares: {
+    year: 13,
+    round: 'döntő',
+    category: ['B'],
+    name: '5 mezős játék'
+  },
   // TicTacToe: {
   //   year: 13,
   //   round: 'döntő',
@@ -88,5 +88,17 @@ export const gameList = {
   //   round: 'döntő',
   //   category: ['B'],
   //   name: '3, 2, 1 érmék'
+  // }
+  // AddReduceDouble: {
+  //   year: 16,
+  //   round: 'döntő',
+  //   category: ['D'],
+  //   name: 'Kettőt vesz, egyet kap'
+  // },
+  // FourPilesSpreadAhead: {
+  //   year: 16,
+  //   round: 'döntő',
+  //   category: ['E', 'E+'],
+  //   name: '4 kupacban előrepakolás'
   // }
 };
