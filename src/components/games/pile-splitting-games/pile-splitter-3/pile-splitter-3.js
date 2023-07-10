@@ -32,11 +32,6 @@ const GameBoard = ({ board, ctx }) => {
   const [removedPileId, setRemovedPileId] = useState(null);
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
-  const resetTurnState = () => {
-    setRemovedPileId(null);
-    setHoveredPiece(null);
-  };
-
   const isDisabled = ({ pileId, pieceId }) => {
     if (!ctx.shouldPlayerMoveNext) return true;
     if (removedPileId === null) return false;
@@ -62,7 +57,9 @@ const GameBoard = ({ board, ctx }) => {
       pieceId
     });
     ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null });
-    resetTurnState();
+
+    setRemovedPileId(null);
+    setHoveredPiece(null);
   };
 
   const toBeLeft = ({ pileId, pieceId }) => {

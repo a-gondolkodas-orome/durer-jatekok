@@ -5,13 +5,9 @@ import { SoldierSvg } from './soldier-svg';
 import {
   generateNewBoard,
   getGameStateAfterKillingGroup,
-  getGameStateAfterAiMove
+  getGameStateAfterAiTurn
 } from './strategy/strategy';
 import { cloneDeep } from 'lodash';
-
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
-  return getGameStateAfterAiMove(board, playerIndex === 0);
-};
 
 const GameBoard = ({ board, setBoard, ctx }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
@@ -27,28 +23,16 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     return group === groupOfHoveredPiece;
   };
 
-  const toggleGroup = (rowIndex, pieceIndex) => {
-    if (!ctx.shouldPlayerMoveNext || !isPlayerSultan) return;
-    const newBoard = cloneDeep(board);
-    newBoard[rowIndex][pieceIndex] = board[rowIndex][pieceIndex] === 'blue' ? 'red' : 'blue';
-    setBoard(newBoard);
-  };
-
-  const finalizeSoldierGrouping = () => {
-    ctx.endPlayerTurn({ newBoard: board, isGameEnd: false });
-  };
-
-  const killGroup = (group) => {
-    ctx.endPlayerTurn(getGameStateAfterKillingGroup(board, group));
-  };
-
   const clickOnSoldier = (rowIndex, pieceIndex) => {
     if (!ctx.shouldPlayerMoveNext) return;
-    if (ctx.playerIndex === 0) {
-      toggleGroup(rowIndex, pieceIndex);
-      return;
+
+    if (isPlayerSultan) {
+      const newBoard = cloneDeep(board);
+      newBoard[rowIndex][pieceIndex] = board[rowIndex][pieceIndex] === 'blue' ? 'red' : 'blue';
+      setBoard(newBoard);
     } else {
-      killGroup(board[rowIndex][pieceIndex]);
+      const group = board[rowIndex][pieceIndex];
+      ctx.endPlayerTurn(getGameStateAfterKillingGroup(board, group));
     }
   };
 
@@ -92,7 +76,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       {isPlayerSultan && (
         <button
           className={`cta-button ${ctx.isEnemyMoveInProgress ? 'opacity-50' : ''}`}
-          onClick={() => finalizeSoldierGrouping()}
+          onClick={() => ctx.endPlayerTurn({ newBoard: board, isGameEnd: false })}
         >
           Befejezem a kettéosztást
         </button>

@@ -1,6 +1,6 @@
 'use strict';
 
-import { generateNewBoard, getGameStateAfterKillingGroup, getGameStateAfterAiMove } from './strategy';
+import { generateNewBoard, getGameStateAfterKillingGroup, getGameStateAfterAiTurn } from './strategy';
 import { uniq, flatten } from 'lodash';
 // import * as random from 'lodash/random';
 
@@ -39,10 +39,11 @@ describe('HunyadiAndTheJanissaries strategy', () => {
     });
   });
 
-  describe('getGameStateAfterAiMove', () => {
+  describe('getGameStateAfterAiTurn', () => {
     describe('when player is the first player', () => {
       it('should kill the group of the first soldier if there is any in the first row', () => {
-        expect(getGameStateAfterAiMove([['blue', 'red', 'red'], ['red']], true)).toEqual({
+        const board = [['blue', 'red', 'red'], ['red']];
+        expect(getGameStateAfterAiTurn({ board, playerIndex: 0 })).toEqual({
           newBoard: [['red'], []],
           isGameEnd: true,
           hasFirstPlayerWon: true
@@ -50,7 +51,8 @@ describe('HunyadiAndTheJanissaries strategy', () => {
       });
 
       it('should kill the group with the bigger combined weight', () => {
-        expect(getGameStateAfterAiMove([[], ['red'], ['blue', 'blue'], ['blue']], true)).toEqual({
+        const board = [[], ['red'], ['blue', 'blue'], ['blue']];
+        expect(getGameStateAfterAiTurn({ board, playerIndex: 0 })).toEqual({
           newBoard: [['red'], [], [], []],
           isGameEnd: false
         });
@@ -59,7 +61,8 @@ describe('HunyadiAndTheJanissaries strategy', () => {
 
     describe('when player is the second player', () => {
       it('should split first row evenly if there are more soldiers', () => {
-        expect(getGameStateAfterAiMove([['blue', 'blue']], false)).toEqual({
+        const board = [['blue', 'blue']];
+        expect(getGameStateAfterAiTurn({ board, playerIndex: 1 })).toEqual({
           newBoard: [expect.toIncludeSameMembers(['blue', 'red'])],
           isGameEnd: false
         });
@@ -74,7 +77,7 @@ describe('HunyadiAndTheJanissaries strategy', () => {
       //     [],
       //     ['blue', 'blue', 'blue', 'blue']
       //   ];
-      //   expect(getGameStateAfterAiMove(board, false)).toEqual({
+      //   expect(getGameStateAfterAiTurn({ board, playerIndex: 1 })).toEqual({
       //     newBoard: [['blue'], ['red'], [], ['red', 'red', 'red', 'red']],
       //     isGameEnd: false
       //   });
@@ -88,7 +91,7 @@ describe('HunyadiAndTheJanissaries strategy', () => {
       //     ['blue'],
       //     ['blue', 'blue']
       //   ];
-      //   expect(getGameStateAfterAiMove(board, false)).toEqual({
+      //   expect(getGameStateAfterAiTurn({ board, playerIndex: 1 })).toEqual({
       //     newBoard: [['blue'], ['red', 'red', 'blue'], ['red'], ['red', 'red']],
       //     isGameEnd: false
       //   });
