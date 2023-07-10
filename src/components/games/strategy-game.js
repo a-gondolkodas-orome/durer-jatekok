@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
+import { v4 as uuidv4 } from 'uuid';
 
 export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
   return ({ board, setBoard }) => {
@@ -10,6 +11,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
     const [next, setNext] = useState(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
     const [winnerIndex, setWinnerIndex] = useState(null);
+    const [gameUuid, setGameUuid] = useState(uuidv4());
 
     const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
     const isPlayerWinner = winnerIndex === playerIndex;
@@ -61,6 +63,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
       setPlayerIndex(null);
       setNext(null);
       setIsGameEndDialogOpen(false);
+      setGameUuid(uuidv4());
     };
 
     return (
@@ -71,6 +74,7 @@ export const strategyGameFactory = ({ rule, title, GameBoard, G }) => {
           <GameRule ruleDescription={rule} />
           <div className="flex flex-wrap">
             <GameBoard
+              key={gameUuid}
               board={board}
               setBoard={setBoard}
               ctx={{
