@@ -66,48 +66,50 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
     <table className="m-2 border-collapse table-fixed w-full">
-      <tr>
-        <th>1-es</th>
-        <th>2-es</th>
-        <th>3-as</th>
-      </tr>
-      <tr>
-        {[0, 1, 2].map(coinValue => (
-          <td
-            key={coinValue}
-            onClick={() => clickPile(coinValue)}
-            className={`
-              text-center border-4
-              ${isCoinActionInvalid(coinValue) ? 'bg-gray-300 cursor-not-allowed' : ''}
-            `}
-            >
-            <button
-              className="min-h-[25vh] w-full p-[5%]"
-              disabled={!isMoveAllowed(coinValue)}
-              onMouseOver={() => setHoveredPile(coinValue)}
-              onMouseOut={() => setHoveredPile(null)}
-              onFocus={() => setHoveredPile(coinValue)}
-              onBlur={() => setHoveredPile(null)}
-            >
-              {range(board[coinValue]).map(i => (
-                <span
-                  key={i}
-                  className={`
-                    w-[30%] aspect-square inline-block rounded-full mr-0.5
-                    ${getCoinColor(coinValue)}
-                    ${shouldShowCoinToBeRemoved(coinValue) && i === 1 ? 'opacity-50' : ''}
-                  `}
-                ></span>
-              ))}
-              {shouldShowCoinToBeAdded(coinValue) && (
-                <span
-                  className={`w-[30%] aspect-square inline-block rounded-full mr-0.5 opacity-50 ${getCoinColor(coinValue)}`}
-                ></span>
-              )}
-            </button>
-          </td>
-        ))}
-      </tr>
+      <tbody>
+        <tr>
+          <th>1-es</th>
+          <th>2-es</th>
+          <th>3-as</th>
+        </tr>
+        <tr>
+          {[0, 1, 2].map(coinValue => (
+            <td
+              key={coinValue}
+              onClick={() => clickPile(coinValue)}
+              className={`
+                text-center border-4
+                ${isCoinActionInvalid(coinValue) ? 'bg-gray-300 cursor-not-allowed' : ''}
+              `}
+              >
+              <button
+                className="min-h-[25vh] w-full p-[5%]"
+                disabled={!isMoveAllowed(coinValue)}
+                onMouseOver={() => setHoveredPile(coinValue)}
+                onMouseOut={() => setHoveredPile(null)}
+                onFocus={() => setHoveredPile(coinValue)}
+                onBlur={() => setHoveredPile(null)}
+              >
+                {range(board[coinValue]).map(i => (
+                  <span
+                    key={i}
+                    className={`
+                      w-[30%] aspect-square inline-block rounded-full mr-0.5
+                      ${getCoinColor(coinValue)}
+                      ${shouldShowCoinToBeRemoved(coinValue) && i === 1 ? 'opacity-50' : ''}
+                    `}
+                  ></span>
+                ))}
+                {shouldShowCoinToBeAdded(coinValue) && (
+                  <span
+                    className={`w-[30%] aspect-square inline-block rounded-full mr-0.5 opacity-50 ${getCoinColor(coinValue)}`}
+                  ></span>
+                )}
+              </button>
+            </td>
+          ))}
+        </tr>
+      </tbody>
     </table>
     {valueOfRemovedCoin && (
       <button className="cta-button" onClick={() => endTurn(board)}>

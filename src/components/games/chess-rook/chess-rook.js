@@ -21,36 +21,38 @@ const GameBoard = ({ board, ctx }) => {
   <section className="p-2 shrink-0 grow basis-2/3">
     <ChessRookSvg />
     <table className="m-2 border-collapse w-full table-fixed">
-      {range(8).map(row => (
-        <tr key={row}>
-          {range(8).map(col => (
-            <td
-              key={col}
-              onClick={() => clickField({ row, col })}
-              className={`border-4 ${board.chessBoard[row][col] === 'visited' ? 'bg-slate-300' : ''}`}
-            >
-              <div className="aspect-square p-[5%] w-full">
-                <button className="w-full aspect-square" disabled={!isMoveAllowed({ row, col })}>
-                  {isMoveAllowed({ row, col }) && (
-                    <span>
-                      <svg className="w-full aspect-square opacity-25 inline-block">
-                        <use xlinkHref="#game-chess-rook" />
-                      </svg>
-                    </span>
-                  )}
-                  {board.chessBoard[row][col] === 'rook' && (
-                    <span>
-                      <svg className="w-full aspect-square inline-block">
-                        <use xlinkHref="#game-chess-rook" />
-                      </svg>
-                    </span>
-                  )}
-                </button>
-              </div>
-            </td>
-          ))}
-        </tr>
-      ))}
+      <tbody>
+        {range(8).map(row => (
+          <tr key={row}>
+            {range(8).map(col => (
+              <td
+                key={col}
+                onClick={() => clickField({ row, col })}
+                className={`border-4 ${board.chessBoard[row][col] === 'visited' ? 'bg-slate-300' : ''}`}
+              >
+                <div className="aspect-square p-[5%] w-full">
+                  <button className="w-full aspect-square" disabled={!isMoveAllowed({ row, col })}>
+                    {isMoveAllowed({ row, col }) && (
+                      <span>
+                        <svg className="w-full aspect-square opacity-25 inline-block">
+                          <use xlinkHref="#game-chess-rook" />
+                        </svg>
+                      </span>
+                    )}
+                    {board.chessBoard[row][col] === 'rook' && (
+                      <span>
+                        <svg className="w-full aspect-square inline-block">
+                          <use xlinkHref="#game-chess-rook" />
+                        </svg>
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
     </table>
   </section>
   );

@@ -43,44 +43,46 @@ const GameBoard = ({ board, ctx }) => {
   <section className="p-2 shrink-0 grow basis-2/3">
     <ChessBishopSvg />
     <table className="m-2 w-full border-collapse table-fixed">
-      {range(8).map(row => (
-        <tr key={row}>
-          {range(8).map(col => (
-            <td
-              key={col}
-              onClick={() => clickField({ row, col })}
-              className={`
-                border-4 ${isForbidden({ row, col }) ? 'bg-slate-400 cursor-not-allowed' : ''}
-                ${wouldBeForbidden({ row, col }) ? 'bg-slate-200' : ''}
-              `}
-            >
-              <button
-                className="aspect-square w-full p-[5%]"
-                disabled={!isMoveAllowed({ row, col })}
-                onMouseOver={() => setHoveredField({ row, col })}
-                onMouseOut={() => setHoveredField(null)}
-                onFocus={() => setHoveredField({ row, col })}
-                onBlur={() => setHoveredField(null)}
+      <tbody>
+        {range(8).map(row => (
+          <tr key={row}>
+            {range(8).map(col => (
+              <td
+                key={col}
+                onClick={() => clickField({ row, col })}
+                className={`
+                  border-4 ${isForbidden({ row, col }) ? 'bg-slate-400 cursor-not-allowed' : ''}
+                  ${wouldBeForbidden({ row, col }) ? 'bg-slate-200' : ''}
+                `}
               >
-                {isBishop({ row, col }) && (
-                  <span>
-                    <svg className="inline-block w-full aspect-square">
-                      <use xlinkHref="#game-chess-bishop" />
-                    </svg>
-                  </span>
-                )}
-                {isPotentialNextStep({ row, col }) && (
-                  <span>
-                    <svg className="inline-block w-full aspect-square opacity-50">
-                      <use xlinkHref="#game-chess-bishop" />
-                    </svg>
-                  </span>
-                )}
-              </button>
-            </td>
-          ))}
-        </tr>
-      ))}
+                <button
+                  className="aspect-square w-full p-[5%]"
+                  disabled={!isMoveAllowed({ row, col })}
+                  onMouseOver={() => setHoveredField({ row, col })}
+                  onMouseOut={() => setHoveredField(null)}
+                  onFocus={() => setHoveredField({ row, col })}
+                  onBlur={() => setHoveredField(null)}
+                >
+                  {isBishop({ row, col }) && (
+                    <span>
+                      <svg className="inline-block w-full aspect-square">
+                        <use xlinkHref="#game-chess-bishop" />
+                      </svg>
+                    </span>
+                  )}
+                  {isPotentialNextStep({ row, col }) && (
+                    <span>
+                      <svg className="inline-block w-full aspect-square opacity-50">
+                        <use xlinkHref="#game-chess-bishop" />
+                      </svg>
+                    </span>
+                  )}
+                </button>
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
     </table>
   </section>
   );
