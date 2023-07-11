@@ -59,12 +59,12 @@ export const gameList = {
   //   category: ['C'],
   //   name: 'Átszínezős Tic Tac Toe'
   // },
-  // SuperstitiousCounting: {
-  //   year: 13,
-  //   round: 'döntő',
-  //   category: ['D', 'E'],
-  //   name: 'Babonás számoló'
-  // },
+  SuperstitiousCounting: {
+    year: 13,
+    round: 'döntő',
+    category: ['D', 'E'],
+    name: 'Babonás számoló'
+  },
   PileSplitter4: {
     year: 13,
     round: 'döntő',

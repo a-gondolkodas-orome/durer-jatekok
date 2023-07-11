@@ -9,6 +9,7 @@ import { HunyadiAndTheJanissaries } from '../games/hunyadi-and-the-janissaries/h
 import { PileSplitter } from '../games/pile-splitting-games/pile-splitter/pile-splitter';
 import { PileSplitter3 } from '../games/pile-splitting-games/pile-splitter-3/pile-splitter-3';
 import { PileSplitter4 } from '../games/pile-splitting-games/pile-splitter-4/pile-splitter-4';
+import { SuperstitiousCounting } from '../games/superstitious-counting/superstitious-counting';
 import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
 
 export const App = () => {
@@ -21,6 +22,7 @@ export const App = () => {
     { path: '/game/PileSplitter', element: <PileSplitter /> },
     { path: '/game/PileSplitter3', element: <PileSplitter3 /> },
     { path: '/game/PileSplitter4', element: <PileSplitter4 /> },
+    { path: '/game/SuperstitiousCounting', element: <SuperstitiousCounting /> },
     { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> }
   ]);
   return <StrictMode>
