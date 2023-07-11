@@ -3,6 +3,7 @@ import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Overview } from '../overview/overview';
 import { ErrorPage } from '../error-page';
 import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
+import { CubeColoring } from '../games/cube-coloring/cube-coloring';
 import { FiveSquares } from '../games/five-squares/five-squares';
 import { FourPilesSpreadAhead } from '../games/four-piles-spread-ahead/four-piles-spread-ahead';
 import { HunyadiAndTheJanissaries } from '../games/hunyadi-and-the-janissaries/hunyadi-and-the-janissaries';
@@ -16,6 +17,7 @@ export const App = () => {
   const router = createHashRouter([
     { path: '/', element: <Overview />, errorElement: <ErrorPage /> },
     { path: '/game/AddReduceDouble', element: <AddReduceDouble /> },
+    { path: '/game/CubeColoring', element: <CubeColoring /> },
     { path: '/game/FiveSquares', element: <FiveSquares /> },
     { path: '/game/FourPilesSpreadAhead', element: <FourPilesSpreadAhead /> },
     { path: '/game/HunyadiAndTheJanissaries', element: <HunyadiAndTheJanissaries /> },

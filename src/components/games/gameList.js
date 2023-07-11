@@ -71,12 +71,12 @@ export const gameList = {
     category: ['E+'],
     name: 'Kupac kettéosztó 4 kupaccal'
   },
-  // CubeColoring: {
-  //   year: 15,
-  //   round: 'döntő',
-  //   category: ['C'],
-  //   name: 'Kockaszínezés'
-  // },
+  CubeColoring: {
+    year: 15,
+    round: 'döntő',
+    category: ['C'],
+    name: 'Kockaszínezés'
+  },
   // Coin357: {
   //   year: 15,
   //   round: 'döntő',
