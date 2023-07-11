@@ -77,18 +77,18 @@ export const gameList = {
     category: ['C'],
     name: 'Kockaszínezés'
   },
-  // Coin357: {
-  //   year: 15,
-  //   round: 'döntő',
-  //   category: ['A'],
-  //   name: '3 db 1, 5 db 2 és 7 db 3 pengős'
-  // },
-  // Coin123: {
-  //   year: 15,
-  //   round: 'döntő',
-  //   category: ['B'],
-  //   name: '3, 2, 1 érmék'
-  // }
+  Coin357: {
+    year: 15,
+    round: 'döntő',
+    category: ['A'],
+    name: '3 db 1, 5 db 2 és 7 db 3 pengős'
+  },
+  Coin123: {
+    year: 15,
+    round: 'döntő',
+    category: ['B'],
+    name: '3, 2, 1 érmék'
+  },
   AddReduceDouble: {
     year: 16,
     round: 'döntő',

@@ -4,6 +4,8 @@ import { Overview } from '../overview/overview';
 import { ErrorPage } from '../error-page';
 import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
 import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
+import { Coin123 } from '../games/coin123/coin123';
+import { Coin357 } from '../games/coin357/coin357';
 import { CubeColoring } from '../games/cube-coloring/cube-coloring';
 import { FiveSquares } from '../games/five-squares/five-squares';
 import { FourPilesSpreadAhead } from '../games/four-piles-spread-ahead/four-piles-spread-ahead';
@@ -21,6 +23,8 @@ export const App = () => {
     { path: '/', element: <Overview />, errorElement: <ErrorPage /> },
     { path: '/game/AddReduceDouble', element: <AddReduceDouble /> },
     { path: '/game/AntiTicTacToe', element: <AntiTicTacToe /> },
+    { path: '/game/Coin123', element: <Coin123 /> },
+    { path: '/game/Coin357', element: <Coin357 /> },
     { path: '/game/CubeColoring', element: <CubeColoring /> },
     { path: '/game/FiveSquares', element: <FiveSquares /> },
     { path: '/game/FourPilesSpreadAhead', element: <FourPilesSpreadAhead /> },
