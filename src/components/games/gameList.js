@@ -70,7 +70,7 @@ export const gameList = {
     round: 'döntő',
     category: ['E+'],
     name: 'Kupac kettéosztó 4 kupaccal'
-  }
+  },
   // CubeColoring: {
   //   year: 15,
   //   round: 'döntő',
@@ -89,12 +89,12 @@ export const gameList = {
   //   category: ['B'],
   //   name: '3, 2, 1 érmék'
   // }
-  // AddReduceDouble: {
-  //   year: 16,
-  //   round: 'döntő',
-  //   category: ['D'],
-  //   name: 'Kettőt vesz, egyet kap'
-  // },
+  AddReduceDouble: {
+    year: 16,
+    round: 'döntő',
+    category: ['D'],
+    name: 'Kettőt vesz, egyet kap'
+  }
   // FourPilesSpreadAhead: {
   //   year: 16,
   //   round: 'döntő',
