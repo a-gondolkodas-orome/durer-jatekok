@@ -1,16 +1,16 @@
 export const gameList = {
-  // ChessBishops: {
-  //   year: 1,
-  //   round: 'döntő',
-  //   category: ['B'],
-  //   name: 'Sakktáblán futók'
-  // },
-  // ChessRook: {
-  //   year: 1,
-  //   round: 'döntő',
-  //   category: ['C'],
-  //   name: 'Sakktáblán egy bástya'
-  // },
+  ChessBishops: {
+    year: 1,
+    round: 'döntő',
+    category: ['B'],
+    name: 'Sakktáblán futók'
+  },
+  ChessRook: {
+    year: 1,
+    round: 'döntő',
+    category: ['C'],
+    name: 'Sakktáblán egy bástya'
+  },
   HunyadiAndTheJanissaries: {
     year: 6,
     round: 'döntő',

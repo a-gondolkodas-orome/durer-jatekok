@@ -106,7 +106,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
           onKeyUp={(event) => {
             if (event.key === 'Enter') setVertexColor(nodeId);
           }}
-          tabindex={isMoveAllowed(nodeId) ? 0 : 'none'}
+          tabIndex={isMoveAllowed(nodeId) ? 0 : 'none'}
           fill={board[nodeId] || (isMoveAllowed(nodeId) || !show ? 'white' : 'gray')}
         />
       ))}

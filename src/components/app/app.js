@@ -4,6 +4,8 @@ import { Overview } from '../overview/overview';
 import { ErrorPage } from '../error-page';
 import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
 import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
+import { ChessBishops } from '../games/chess-bishops/chess-bishops';
+import { ChessRook } from '../games/chess-rook/chess-rook';
 import { Coin123 } from '../games/coin123/coin123';
 import { Coin357 } from '../games/coin357/coin357';
 import { CubeColoring } from '../games/cube-coloring/cube-coloring';
@@ -23,6 +25,8 @@ export const App = () => {
     { path: '/', element: <Overview />, errorElement: <ErrorPage /> },
     { path: '/game/AddReduceDouble', element: <AddReduceDouble /> },
     { path: '/game/AntiTicTacToe', element: <AntiTicTacToe /> },
+    { path: '/game/ChessBishops', element: <ChessBishops /> },
+    { path: '/game/ChessRook', element: <ChessRook /> },
     { path: '/game/Coin123', element: <Coin123 /> },
     { path: '/game/Coin357', element: <Coin357 /> },
     { path: '/game/CubeColoring', element: <CubeColoring /> },
