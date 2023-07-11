@@ -29,18 +29,18 @@ export const gameList = {
     category: ['B'],
     name: 'Kupac kettéosztó 3 kupaccal'
   },
-  // TicTacToeDoubleStart: {
-  //   year: 12,
-  //   round: 'döntő',
-  //   category: ['A'],
-  //   name: 'Duplán kezdő 3x3 amőba'
-  // },
-  // AntiTicTacToe: {
-  //   year: 12,
-  //   round: 'döntő',
-  //   category: ['B'],
-  //   name: '3x3 Anti-amőba'
-  // },
+  TicTacToeDoubleStart: {
+    year: 12,
+    round: 'döntő',
+    category: ['A'],
+    name: 'Duplán kezdő 3x3 amőba'
+  },
+  AntiTicTacToe: {
+    year: 12,
+    round: 'döntő',
+    category: ['B'],
+    name: '3x3 Anti-amőba'
+  },
   TwoTimesTwo: {
     year: 13,
     round: 'döntő',
@@ -53,12 +53,12 @@ export const gameList = {
     category: ['B'],
     name: '5 mezős játék'
   },
-  // TicTacToe: {
-  //   year: 13,
-  //   round: 'döntő',
-  //   category: ['C'],
-  //   name: 'Átszínezős Tic Tac Toe'
-  // },
+  TicTacToe: {
+    year: 13,
+    round: 'döntő',
+    category: ['C'],
+    name: 'Átszínezős Tic Tac Toe'
+  },
   SuperstitiousCounting: {
     year: 13,
     round: 'döntő',
