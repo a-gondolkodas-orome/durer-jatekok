@@ -94,11 +94,11 @@ export const gameList = {
     round: 'döntő',
     category: ['D'],
     name: 'Kettőt vesz, egyet kap'
+  },
+  FourPilesSpreadAhead: {
+    year: 16,
+    round: 'döntő',
+    category: ['E', 'E+'],
+    name: '4 kupacban előrepakolás'
   }
-  // FourPilesSpreadAhead: {
-  //   year: 16,
-  //   round: 'döntő',
-  //   category: ['E', 'E+'],
-  //   name: '4 kupacban előrepakolás'
-  // }
 };
