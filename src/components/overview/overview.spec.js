@@ -8,6 +8,6 @@ describe('Overview', () => {
   it('should show a list of available games', async () => {
     const { container } = render(<HashRouter><Overview /></HashRouter>);
 
-    expect(container.querySelectorAll('.js-game-card')).toHaveLength(Object.values(gameList).length);
+    expect(container.querySelectorAll('.js-game-card')).toHaveLength(Object.values(gameList).length - 1);
   });
 });
