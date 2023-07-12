@@ -18,6 +18,7 @@ import { PileSplitter4 } from '../games/pile-splitting-games/pile-splitter-4/pil
 import { SuperstitiousCounting } from '../games/superstitious-counting/superstitious-counting';
 import { TicTacToe } from '../games/tictactoe-alikes/tictactoe/tictactoe';
 import { TicTacToeDoubleStart } from '../games/tictactoe-alikes/tictactoe-doublestart/tictactoe-doublestart';
+import { TriangularGridRopes } from '../games/triangular-grid-ropes/triangular-grid-ropes';
 import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
 
 export const App = () => {
@@ -39,6 +40,7 @@ export const App = () => {
     { path: '/game/SuperstitiousCounting', element: <SuperstitiousCounting /> },
     { path: '/game/TicTacToe', element: <TicTacToe /> },
     { path: '/game/TicTacToeDoubleStart', element: <TicTacToeDoubleStart /> },
+    { path: '/game/TriangularGridRopes', element: <TriangularGridRopes /> },
     { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> }
   ]);
   return <StrictMode>
