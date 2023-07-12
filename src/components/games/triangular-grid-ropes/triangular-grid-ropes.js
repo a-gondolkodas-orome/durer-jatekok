@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { isEqual, range } from 'lodash';
 
 //    0
 //   1 2
@@ -23,17 +22,12 @@ const vertices = [
 const isParallel = (nodeA, nodeB) => {
   const vertexA = vertices[nodeA];
   const vertexB = vertices[nodeB];
-  return vertexA.x === vertexB.x || vertexA.y === vertexB.y || vertexA.y === vertexB.y;
+  return vertexA.x === vertexB.x || vertexA.y === vertexB.y || vertexA.z === vertexB.z;
 };
 
 const GameBoard = ({ board, setBoard, ctx }) => {
   const [firstNode, setFirstNode] = useState(null);
-
-  const isConnected = (nodeA, nodeB) => {
-    return board.some(edge =>
-      isEqual(edge, ({ from: nodeA, to: nodeB })) || isEqual(edge, ({ from: nodeB, to: nodeA }))
-    );
-  };
+  const [hoveredNode, setHoveredNode] = useState(null);
 
   const connectNode = id => {
     if (!ctx.shouldPlayerMoveNext) return;
@@ -52,26 +46,34 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
   <svg className="aspect-square">
+
+    {board.map(({ from, to }) => (
+      <line
+        x1={vertices[from].cx} y1={vertices[from].cy}
+        x2={vertices[to].cx} y2={vertices[to].cy}
+        stroke="blue" strokeWidth="2"
+      />
+    ))}
+
+    {firstNode !== null && hoveredNode !== null && (
+      <line
+      x1={vertices[firstNode].cx} y1={vertices[firstNode].cy}
+      x2={vertices[hoveredNode].cx} y2={vertices[hoveredNode].cy}
+      stroke={isParallel(firstNode, hoveredNode) ? 'black' : 'red'}
+      strokeWidth="1" strokeDasharray="4"
+      />
+    )}
+
     {vertices.map(vertex => (
       <circle
         key={vertex.id}
         cx={vertex.cx} cy={vertex.cy} r="2%" fill="black"
         className={`${vertex.id === firstNode ? 'fill-slate-600' : ''}`}
         onClick={() => connectNode(vertex.id)}
+        onMouseOver={() => setHoveredNode(vertex.id)}
+        onMouseOut={() => setHoveredNode(null)}
       />
     ))}
-
-    {range(10).map(from => <>
-      {range(10).map(to => <>
-        {isConnected(from, to) && (
-          <line
-            x1={vertices[from].cx} y1={vertices[from].cy}
-            x2={vertices[to].cx} y2={vertices[to].cy}
-            stroke="black" strokeWidth="2"
-          />
-        )}
-      </>)}
-    </>)}
   </svg>
   </section>
   );
