@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { every, range } from 'lodash';
+import { every, range, last } from 'lodash';
 
 //    0
 //   1 2
@@ -20,6 +20,30 @@ const vertices = [
   { id: 8, x: 3, y: 2, z: 1, cx: "58.375%", cy: "57.5%" },
   { id: 9, x: 3, y: 3, z: 0, cx: "75%", cy: "57.5%" }
 ];
+
+const superSets = {
+  '0-1': [[0, 3], [0, 6]],
+  '0-3': [[0, 6]],
+  '1-3': [[0, 3], [1, 6]],
+  '1-6': [[0, 6]],
+  '3-6': [[1, 6], [0, 6]],
+  '0-2': [[0, 5], [0, 9]],
+  '0-5': [[0, 9]],
+  '2-5': [[0, 5], [2, 9]],
+  '2-9': [[0, 9]],
+  '5-9': [[2, 9], [0, 9]],
+  '6-7': [[6, 8], [6, 9]],
+  '6-8': [[6, 9]],
+  '7-8': [[7, 9]],
+  '7-9': [[6, 9]],
+  '8-9': [[7, 9], [6, 9]],
+  '3-4': [[3, 5]],
+  '4-5': [[3, 5]],
+  '1-4': [[1, 8]],
+  '4-8': [[1, 8]],
+  '2-4': [[2, 7]],
+  '4-7': [[2, 7]]
+};
 
 const edgeDirection = (nodeA, nodeB) => {
   const vertexA = vertices[nodeA];
@@ -83,12 +107,24 @@ const isGameEnd = board => {
   return !anyAllowed;
 };
 
+const getAllowedSuperset = (board, { from, to }) => {
+  if (from === null || to === null || from === to) return null;
+  if (!isAllowed(board, { from, to })) return { from, to };
+  const edgeSupsersets = superSets[`${from}-${to}`] || superSets[`${to}-${from}`] || [];
+  const allowedSupersets = edgeSupsersets.filter(e => isAllowed(board, { from: e[0], to: e[1] }));
+  if (allowedSupersets.length > 0) {
+    const e = last(allowedSupersets);
+    return { from: e[0], to: e[1] };
+  }
+  return { from, to };
+};
+
 const GameBoard = ({ board, setBoard, ctx }) => {
   const [firstNode, setFirstNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
 
   const connectNode = node => {
-    if (!ctx.shouldPlayerMoveNext) return;
+    // if (!ctx.shouldPlayerMoveNext) return;
     if (firstNode === null) {
       setFirstNode(node);
     } else if (node === firstNode) {
@@ -96,7 +132,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     } else {
       if (!isAllowed(board, { from: firstNode, to: node })) return;
       const newBoard = [...board];
-      newBoard.push({ from: firstNode, to: node });
+      newBoard.push(getAllowedSuperset(board, { from: firstNode, to: node }));
       ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(board), winnerIndex: null });
       setFirstNode(null);
     }
@@ -107,27 +143,35 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     isAllowed(board, { from: firstNode, to: hoveredNode })
   );
 
+  const candidateEdge = getAllowedSuperset(board, { from: firstNode, to: hoveredNode });
+  const candidateFromV = candidateEdge ? vertices[candidateEdge.from] : null;
+  const candidateToV = candidateEdge ? vertices[candidateEdge.to] : null;
+
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
   <svg className="aspect-square">
 
+    {/* edges */}
     {board.map(({ from, to }) => (
       <line
+        key={`${from}-${to}`}
         x1={vertices[from].cx} y1={vertices[from].cy}
         x2={vertices[to].cx} y2={vertices[to].cy}
         stroke="blue" strokeWidth="2"
       />
     ))}
 
-    {firstNode !== null && hoveredNode !== null && (
+    {/* candidate next edge */}
+    {firstNode !== null && hoveredNode !== null && firstNode !== hoveredNode && (
       <line
-      x1={vertices[firstNode].cx} y1={vertices[firstNode].cy}
-      x2={vertices[hoveredNode].cx} y2={vertices[hoveredNode].cy}
+      x1={candidateFromV.cx} y1={candidateFromV.cy}
+      x2={candidateToV.cx} y2={candidateToV.cy}
       stroke={isCandidateAllowed ? 'black' : 'red'}
       strokeWidth="1" strokeDasharray="4"
       />
     )}
 
+    {/* grid nodes */}
     {vertices.map(vertex => (
       <circle
         key={vertex.id}
