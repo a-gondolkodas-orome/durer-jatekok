@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { every, range, last } from 'lodash';
+import { every, range, last, uniqWith, isEqual, sample } from 'lodash';
 
 //    0
 //   1 2
@@ -95,16 +95,21 @@ const isAllowed = (board, { from, to }) => {
   return every(middlePoints, p => !nodesWithRope.includes(p));
 };
 
-const isGameEnd = board => {
-  let anyAllowed = false;
+const getAllowedMoves = board => {
+  const moves = [];
   range(10).map(from => {
     range(10).map(to => {
       if (isAllowed(board, { from, to }) && from !== to) {
-        anyAllowed = true;
+        moves.push(getAllowedSuperset(board, { from, to }));
       }
     });
   });
-  return !anyAllowed;
+  return uniqWith(moves, isEqual);
+};
+
+const isGameEnd = board => {
+  const allowedMoves = getAllowedMoves(board);
+  return allowedMoves.length === 0;
 };
 
 const getAllowedSuperset = (board, { from, to }) => {
@@ -133,7 +138,7 @@ const GameBoard = ({ board, ctx }) => {
       if (!isAllowed(board, { from: firstNode, to: node })) return;
       const newBoard = [...board];
       newBoard.push(getAllowedSuperset(board, { from: firstNode, to: node }));
-      ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(board), winnerIndex: null });
+      ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null });
       setFirstNode(null);
     }
   };
@@ -197,6 +202,14 @@ const GameBoard = ({ board, ctx }) => {
   );
 };
 
+const getGameStateAfterAiTurn = ({ board }) => {
+  const newBoard = [...board];
+  const allowedMoves = getAllowedMoves(board);
+  const aiMove = sample(allowedMoves);
+  newBoard.push(aiMove);
+  return { newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null };
+};
+
 const rule = <>
   Egy indiánrezervátumban 10 totemoszlopot állítottak fel a bal oldali ábrán látható háromszögrács szerint.
   Csendes Patak és Vörös Tűz a következő játékot szokták itt játszani: felváltva feszítenek ki köteleket két-két oszlop
@@ -217,7 +230,7 @@ const Game = strategyGameFactory({
   G: {
     getPlayerStepDescription: () => 'Kattints két oszlopra, amik között kötelet szeretnél kifeszíteni.',
     generateNewBoard: () => [],
-    getGameStateAfterAiTurn: ({ board }) => ({ newBoard: board, isGameEnd: isGameEnd(board) })
+    getGameStateAfterAiTurn
   }
 });
 
