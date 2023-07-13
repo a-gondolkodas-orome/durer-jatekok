@@ -21,6 +21,12 @@ const vertices = [
   { id: 9, x: 3, y: 3, z: 0, cx: "75%", cy: "57.5%" }
 ];
 
+const mirrorNodes = {
+  'x': [0, 2, 1, 5, 4, 3, 9, 8, 7, 6],
+  'y': [9, 8, 5, 7, 4, 2, 6, 3, 1, 0],
+  'z': [6, 3, 7, 1, 4, 8, 0, 2, 5, 9]
+};
+
 const superSets = {
   '0-1': [[0, 3], [0, 6]],
   '0-3': [[0, 6]],
@@ -202,11 +208,21 @@ const GameBoard = ({ board, ctx }) => {
   );
 };
 
-const getGameStateAfterAiTurn = ({ board }) => {
+const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const newBoard = [...board];
   const allowedMoves = getAllowedMoves(board);
-  const aiMove = sample(allowedMoves);
-  newBoard.push(aiMove);
+  if (playerIndex === 1 && board.length > 0) {
+    const symDir = edgeDirection(board[0].from, board[0].to);
+    const lastMove = last(board);
+    if (edgeDirection(lastMove.from, lastMove.to) === symDir) {
+      newBoard.push(allowedMoves.filter(e => edgeDirection(e.from, e.to) === symDir)[0]);
+    } else {
+      const mirrorOfLastMove = { from: mirrorNodes[symDir][lastMove.from], to: mirrorNodes[symDir][lastMove.to] };
+      newBoard.push(mirrorOfLastMove);
+    }
+  } else {
+    newBoard.push(sample(allowedMoves));
+  }
   return { newBoard, isGameEnd: isGameEnd(newBoard), winnerIndex: null };
 };
 
