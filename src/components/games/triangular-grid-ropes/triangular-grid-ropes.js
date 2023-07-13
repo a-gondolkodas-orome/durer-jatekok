@@ -124,7 +124,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   const [hoveredNode, setHoveredNode] = useState(null);
 
   const connectNode = node => {
-    // if (!ctx.shouldPlayerMoveNext) return;
+    if (!ctx.shouldPlayerMoveNext) return;
     if (firstNode === null) {
       setFirstNode(node);
     } else if (node === firstNode) {
@@ -178,6 +178,12 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         cx={vertex.cx} cy={vertex.cy} r="2%" fill="black"
         className={`${vertex.id === firstNode ? 'fill-slate-600' : ''}`}
         onClick={() => connectNode(vertex.id)}
+        onKeyUp={(event) => {
+          if (event.key === 'Enter') connectNode(vertex.id);
+        }}
+        tabIndex={0}
+        onFocus={() => setHoveredNode(vertex.id)}
+        onBlur={() => setHoveredNode(null)}
         onMouseOver={() => setHoveredNode(vertex.id)}
         onMouseOut={() => setHoveredNode(null)}
       />
