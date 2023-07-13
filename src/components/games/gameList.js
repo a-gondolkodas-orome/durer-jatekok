@@ -74,7 +74,7 @@ export const gameList = {
   TriangularGridRopes: {
     year: 14,
     round: 'döntő',
-    category: ['C'],
+    category: ['C', 'D'],
     name: '10 totemoszlop'
   },
   Coin357: {
