@@ -53,6 +53,14 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     }
   };
 
+  const isPartOfExistingRope = (nodeA, nodeB) => {
+    return board.some(e => {
+      const middlePoints = getMiddlePoints(e);
+      const edgePoints = [...middlePoints, e.from, e.to];
+      return edgePoints.includes(nodeA) && edgePoints.includes(nodeB);
+    });
+  };
+
   const getMiddlePoints = ({ from, to }) => {
     const dir = edgeDirection(from, to);
     if (dir === null) return [];
@@ -74,6 +82,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   const isAllowed = (from, to) => {
     if (!isParallel(from, to)) return false;
+    if (isPartOfExistingRope(from, to)) return false;
     const middlePoints = getMiddlePoints({ from, to });
     return every(middlePoints, p => !nodesWithRope.includes(p));
   };
