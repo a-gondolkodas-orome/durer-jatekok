@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
+import { every, range } from 'lodash';
 
 //    0
 //   1 2
 //  3 4 5
 // 6 7 8 9
 
+// x, y, z: 3 "axis" showing parallel lines to triangle sides
 const vertices = [
   { id: 0, x: 0, y: 3, z: 3, cx: "50%", cy: "12.5%" },
   { id: 1, x: 1, y: 2, z: 3, cx: "41.625%", cy: "27.5%" },
@@ -19,10 +21,17 @@ const vertices = [
   { id: 9, x: 3, y: 3, z: 0, cx: "75%", cy: "57.5%" }
 ];
 
-const isParallel = (nodeA, nodeB) => {
+const edgeDirection = (nodeA, nodeB) => {
   const vertexA = vertices[nodeA];
   const vertexB = vertices[nodeB];
-  return vertexA.x === vertexB.x || vertexA.y === vertexB.y || vertexA.z === vertexB.z;
+  if (vertexA.x === vertexB.x) return 'x';
+  if (vertexA.y === vertexB.y) return 'y';
+  if (vertexA.z === vertexB.z) return 'z';
+  return null;
+};
+
+const isParallel = (nodeA, nodeB) => {
+  return edgeDirection(nodeA, nodeB) !== null;
 };
 
 const GameBoard = ({ board, setBoard, ctx }) => {
@@ -36,13 +45,39 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     } else if (id === firstNode) {
       setFirstNode(null);
     } else {
-      if (!isParallel(firstNode, id)) return;
+      if (!isAllowed(firstNode, id)) return;
       const newBoard = [...board];
       newBoard.push({ from: firstNode, to: id });
       setBoard(newBoard);
       setFirstNode(null);
     }
   };
+
+  const getMiddlePoints = ({ from, to }) => {
+    const dir = edgeDirection(from, to);
+    if (dir === null) return [];
+    return range(10).filter(id => {
+      return vertices[from][dir] === vertices[id][dir] && (
+        (from > id && id > to) ||
+        (from < id && id < to)
+      );
+    });
+  };
+
+  const nodesWithRope = range(10).filter(id => {
+    return board.some(e => {
+      const isEndpoint = e.from === id || e.to === id;
+      const isMiddlePoint = getMiddlePoints(e).includes(id);
+      return isEndpoint || isMiddlePoint;
+    });
+  });
+
+  const isAllowed = (from, to) => {
+    if (!isParallel(from, to)) return false;
+    const middlePoints = getMiddlePoints({ from, to });
+    return every(middlePoints, p => !nodesWithRope.includes(p));
+  };
+
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
   <svg className="aspect-square">
@@ -59,7 +94,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       <line
       x1={vertices[firstNode].cx} y1={vertices[firstNode].cy}
       x2={vertices[hoveredNode].cx} y2={vertices[hoveredNode].cy}
-      stroke={isParallel(firstNode, hoveredNode) ? 'black' : 'red'}
+      stroke={isAllowed(firstNode, hoveredNode) ? 'black' : 'red'}
       strokeWidth="1" strokeDasharray="4"
       />
     )}
