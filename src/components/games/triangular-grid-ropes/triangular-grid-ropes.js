@@ -34,58 +34,78 @@ const isParallel = (nodeA, nodeB) => {
   return edgeDirection(nodeA, nodeB) !== null;
 };
 
-const GameBoard = ({ board, setBoard, ctx }) => {
-  const [firstNode, setFirstNode] = useState(null);
-  const [hoveredNode, setHoveredNode] = useState(null);
+const isPartOfExistingRope = (board, { from, to }) => {
+  return board.some(e => {
+    const middlePoints = getMiddlePoints(e);
+    const edgePoints = [...middlePoints, e.from, e.to];
+    return edgePoints.includes(from) && edgePoints.includes(to);
+  });
+};
 
-  const connectNode = id => {
-    if (!ctx.shouldPlayerMoveNext) return;
-    if (firstNode === null) {
-      setFirstNode(id);
-    } else if (id === firstNode) {
-      setFirstNode(null);
-    } else {
-      if (!isAllowed(firstNode, id)) return;
-      const newBoard = [...board];
-      newBoard.push({ from: firstNode, to: id });
-      setBoard(newBoard);
-      setFirstNode(null);
-    }
-  };
+const getMiddlePoints = ({ from, to }) => {
+  const dir = edgeDirection(from, to);
+  if (dir === null) return [];
+  return range(10).filter(id => {
+    return vertices[from][dir] === vertices[id][dir] && (
+      (from > id && id > to) ||
+      (from < id && id < to)
+    );
+  });
+};
 
-  const isPartOfExistingRope = (nodeA, nodeB) => {
-    return board.some(e => {
-      const middlePoints = getMiddlePoints(e);
-      const edgePoints = [...middlePoints, e.from, e.to];
-      return edgePoints.includes(nodeA) && edgePoints.includes(nodeB);
-    });
-  };
-
-  const getMiddlePoints = ({ from, to }) => {
-    const dir = edgeDirection(from, to);
-    if (dir === null) return [];
-    return range(10).filter(id => {
-      return vertices[from][dir] === vertices[id][dir] && (
-        (from > id && id > to) ||
-        (from < id && id < to)
-      );
-    });
-  };
-
-  const nodesWithRope = range(10).filter(id => {
+const getNodesWithRope = board => {
+  return range(10).filter(id => {
     return board.some(e => {
       const isEndpoint = e.from === id || e.to === id;
       const isMiddlePoint = getMiddlePoints(e).includes(id);
       return isEndpoint || isMiddlePoint;
     });
   });
+};
 
-  const isAllowed = (from, to) => {
-    if (!isParallel(from, to)) return false;
-    if (isPartOfExistingRope(from, to)) return false;
-    const middlePoints = getMiddlePoints({ from, to });
-    return every(middlePoints, p => !nodesWithRope.includes(p));
+const isAllowed = (board, { from, to }) => {
+  if (!isParallel(from, to)) return false;
+  if (isPartOfExistingRope(board, { from, to })) return false;
+  const middlePoints = getMiddlePoints({ from, to });
+  const nodesWithRope = getNodesWithRope(board);
+  return every(middlePoints, p => !nodesWithRope.includes(p));
+};
+
+const isGameEnd = board => {
+  let anyAllowed = false;
+  range(10).map(from => {
+    range(10).map(to => {
+      if (isAllowed(board, { from, to }) && from !== to) {
+        anyAllowed = true;
+      }
+    });
+  });
+  return !anyAllowed;
+};
+
+const GameBoard = ({ board, setBoard, ctx }) => {
+  const [firstNode, setFirstNode] = useState(null);
+  const [hoveredNode, setHoveredNode] = useState(null);
+
+  const connectNode = node => {
+    if (!ctx.shouldPlayerMoveNext) return;
+    if (firstNode === null) {
+      setFirstNode(node);
+    } else if (node === firstNode) {
+      setFirstNode(null);
+    } else {
+      if (!isAllowed(board, { from: firstNode, to: node })) return;
+      const newBoard = [...board];
+      newBoard.push({ from: firstNode, to: node });
+      ctx.endPlayerTurn({ newBoard, isGameEnd: isGameEnd(board), winnerIndex: null });
+      setFirstNode(null);
+    }
   };
+
+  const isCandidateAllowed = (
+    firstNode !== null && hoveredNode !== null &&
+    isAllowed(board, { from: firstNode, to: hoveredNode })
+  );
 
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
@@ -103,7 +123,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       <line
       x1={vertices[firstNode].cx} y1={vertices[firstNode].cy}
       x2={vertices[hoveredNode].cx} y2={vertices[hoveredNode].cy}
-      stroke={isAllowed(firstNode, hoveredNode) ? 'black' : 'red'}
+      stroke={isCandidateAllowed ? 'black' : 'red'}
       strokeWidth="1" strokeDasharray="4"
       />
     )}
@@ -143,7 +163,7 @@ const Game = strategyGameFactory({
   G: {
     getPlayerStepDescription: () => 'Kattints két oszlopra, amik között kötelet szeretnél kifeszíteni.',
     generateNewBoard: () => [],
-    getGameStateAfterAiTurn: ({ board }) => ({ newBoard: board, isGameEnd: false })
+    getGameStateAfterAiTurn: ({ board }) => ({ newBoard: board, isGameEnd: isGameEnd(board) })
   }
 });
 
