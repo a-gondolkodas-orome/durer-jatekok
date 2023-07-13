@@ -24,17 +24,17 @@ const vertices = [
 const superSets = {
   '0-1': [[0, 3], [0, 6]],
   '0-3': [[0, 6]],
-  '1-3': [[0, 3], [1, 6]],
+  '1-3': [[0, 3], [1, 6], [0, 6]],
   '1-6': [[0, 6]],
   '3-6': [[1, 6], [0, 6]],
   '0-2': [[0, 5], [0, 9]],
   '0-5': [[0, 9]],
-  '2-5': [[0, 5], [2, 9]],
+  '2-5': [[0, 5], [2, 9], [0, 9]],
   '2-9': [[0, 9]],
   '5-9': [[2, 9], [0, 9]],
   '6-7': [[6, 8], [6, 9]],
   '6-8': [[6, 9]],
-  '7-8': [[7, 9]],
+  '7-8': [[7, 9], [6, 8], [6, 9]],
   '7-9': [[6, 9]],
   '8-9': [[7, 9], [6, 9]],
   '3-4': [[3, 5]],
@@ -119,7 +119,7 @@ const getAllowedSuperset = (board, { from, to }) => {
   return { from, to };
 };
 
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, ctx }) => {
   const [firstNode, setFirstNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
 
@@ -152,12 +152,13 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   <svg className="aspect-square">
 
     {/* edges */}
-    {board.map(({ from, to }) => (
+    {board.map(({ from, to }, idx) => (
       <line
         key={`${from}-${to}`}
         x1={vertices[from].cx} y1={vertices[from].cy}
         x2={vertices[to].cx} y2={vertices[to].cy}
-        stroke="blue" strokeWidth="2"
+        stroke={idx % 2 === ctx.playerIndex ? 'blue' : 'green'}
+        strokeWidth="4"
       />
     ))}
 
@@ -166,8 +167,8 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       <line
       x1={candidateFromV.cx} y1={candidateFromV.cy}
       x2={candidateToV.cx} y2={candidateToV.cy}
-      stroke={isCandidateAllowed ? 'black' : 'red'}
-      strokeWidth="1" strokeDasharray="4"
+      stroke={isCandidateAllowed ? 'blue' : 'red'}
+      strokeWidth="2" strokeDasharray="4"
       />
     )}
 
@@ -176,12 +177,15 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       <circle
         key={vertex.id}
         cx={vertex.cx} cy={vertex.cy} r="2%" fill="black"
-        className={`${vertex.id === firstNode ? 'fill-slate-600' : ''}`}
+        className={`
+          ${vertex.id === firstNode ? 'fill-blue-500' : ''}
+          ${firstNode !== null && vertex.id === hoveredNode && firstNode !== hoveredNode && !isCandidateAllowed ? 'fill-red-400 cursor-not-allowed' : ''}
+        `}
         onClick={() => connectNode(vertex.id)}
         onKeyUp={(event) => {
           if (event.key === 'Enter') connectNode(vertex.id);
         }}
-        tabIndex={0}
+        tabIndex={ctx.shouldPlayerMoveNext ? 0 : 'none'}
         onFocus={() => setHoveredNode(vertex.id)}
         onBlur={() => setHoveredNode(null)}
         onMouseOver={() => setHoveredNode(vertex.id)}
