@@ -20,6 +20,9 @@ import { TicTacToe } from '../games/tictactoe-alikes/tictactoe/tictactoe';
 import { TicTacToeDoubleStart } from '../games/tictactoe-alikes/tictactoe-doublestart/tictactoe-doublestart';
 import { TriangularGridRopes } from '../games/triangular-grid-ropes/triangular-grid-ropes';
 import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
+import { NumberCovering8 } from '../games/number-covering-1-8/number-covering-1-8';
+import { NumberCovering10 } from '../games/number-covering-1-10/number-covering-1-10';
+import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
 
 export const App = () => {
   const router = createHashRouter([
@@ -41,7 +44,10 @@ export const App = () => {
     { path: '/game/TicTacToe', element: <TicTacToe /> },
     { path: '/game/TicTacToeDoubleStart', element: <TicTacToeDoubleStart /> },
     { path: '/game/TriangularGridRopes', element: <TriangularGridRopes /> },
-    { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> }
+    { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> },
+    { path: '/game/NumberCovering8', element: <NumberCovering8 /> },
+    { path: '/game/NumberCovering10', element: <NumberCovering10 /> },
+    { path: '/game/TwelveSquares', element: <TwelveSquares />}
   ]);
   return <StrictMode>
     <RouterProvider router={router}></RouterProvider>
