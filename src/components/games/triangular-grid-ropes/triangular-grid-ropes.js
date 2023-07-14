@@ -51,17 +51,17 @@ const superSets = {
   '4-7': [[2, 7]]
 };
 
-const edgeDirection = (nodeA, nodeB) => {
-  const vertexA = vertices[nodeA];
-  const vertexB = vertices[nodeB];
+const edgeDirection = ({ from, to }) => {
+  const vertexA = vertices[from];
+  const vertexB = vertices[to];
   if (vertexA.x === vertexB.x) return 'x';
   if (vertexA.y === vertexB.y) return 'y';
   if (vertexA.z === vertexB.z) return 'z';
   return null;
 };
 
-const isParallel = (nodeA, nodeB) => {
-  return edgeDirection(nodeA, nodeB) !== null;
+const isParallel = (edge) => {
+  return edgeDirection(edge) !== null;
 };
 
 const isPartOfExistingRope = (board, { from, to }) => {
@@ -73,7 +73,7 @@ const isPartOfExistingRope = (board, { from, to }) => {
 };
 
 const getMiddlePoints = ({ from, to }) => {
-  const dir = edgeDirection(from, to);
+  const dir = edgeDirection({ from, to });
   if (dir === null) return [];
   return range(10).filter(id => {
     return vertices[from][dir] === vertices[id][dir] && (
@@ -94,7 +94,7 @@ const getNodesWithRope = board => {
 };
 
 const isAllowed = (board, { from, to }) => {
-  if (!isParallel(from, to)) return false;
+  if (!isParallel({ from, to })) return false;
   if (isPartOfExistingRope(board, { from, to })) return false;
   const middlePoints = getMiddlePoints({ from, to });
   const nodesWithRope = getNodesWithRope(board);
@@ -216,10 +216,10 @@ const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
       const goodFirstMove = sample([{ from: 3, to: 5 }, { from: 1, to: 8 }, { from: 2, to: 7 }]);
       newBoard.push(goodFirstMove);
     } else {
-      const symDir = edgeDirection(board[0].from, board[0].to);
+      const symDir = edgeDirection(board[0]);
       const lastMove = last(board);
-      if (edgeDirection(lastMove.from, lastMove.to) === symDir) {
-        newBoard.push(allowedMoves.filter(e => edgeDirection(e.from, e.to) === symDir)[0]);
+      if (edgeDirection(lastMove) === symDir) {
+        newBoard.push(allowedMoves.filter(e => edgeDirection(e) === symDir)[0]);
       } else {
         const mirrorOfLastMove = { from: mirrorNodes[symDir][lastMove.from], to: mirrorNodes[symDir][lastMove.to] };
         if (!isAllowed(board, mirrorOfLastMove)) {
