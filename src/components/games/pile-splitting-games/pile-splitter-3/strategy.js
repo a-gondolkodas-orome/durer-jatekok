@@ -40,7 +40,7 @@ const getOptimalDivision = function (board, first, second) {
   if (sum === 2) {
     newBoard[first] = 1;
     newBoard[second] = 1;
-    return newBoard;
+    return { newBoard, intermediateBoard };
   }
 
   const firstPile = 1 + 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
