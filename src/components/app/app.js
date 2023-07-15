@@ -23,8 +23,7 @@ import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
 import { RockPaperScissor } from '../games/rockPaperScissor/rockPaperScissor';
 import { NumberCovering8, NumberCovering10 } from '../games/number-covering/number-covering';
 import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
-import { SixDiscs } from '../games/six-discs/six-discs';
-import { TenDiscs } from '../games/ten-discs/ten-discs';
+import { SixDiscs, TenDiscs } from '../games/discs-turn-or-remove/discs-turn-or-remove';
 import { PrimeExponentials } from '../games/prime-exponentials/prime-exponentials';
 
 export const App = () => {
