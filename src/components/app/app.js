@@ -21,8 +21,7 @@ import { TicTacToeDoubleStart } from '../games/tictactoe-alikes/tictactoe-double
 import { TriangularGridRopes } from '../games/triangular-grid-ropes/triangular-grid-ropes';
 import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
 import { RockPaperScissor } from '../games/rockPaperScissor/rockPaperScissor';
-import { NumberCovering8 } from '../games/number-covering-1-8/number-covering-1-8';
-import { NumberCovering10 } from '../games/number-covering-1-10/number-covering-1-10';
+import { NumberCovering8, NumberCovering10 } from '../games/number-covering/number-covering';
 import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
 import { SixDiscs } from '../games/six-discs/six-discs';
 import { TenDiscs } from '../games/ten-discs/ten-discs';
