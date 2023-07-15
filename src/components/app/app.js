@@ -6,8 +6,8 @@ import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double
 import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
 import { ChessBishops } from '../games/chess-bishops/chess-bishops';
 import { ChessRook } from '../games/chess-rook/chess-rook';
-import { Coin123 } from '../games/coin123/coin123';
-import { Coin357 } from '../games/coin357/coin357';
+import { Coin123 } from '../games/coin-3-piles/coin123';
+import { Coin357 } from '../games/coin-3-piles/coin357';
 import { CubeColoring } from '../games/cube-coloring/cube-coloring';
 import { FiveSquares } from '../games/five-squares/five-squares';
 import { FourPilesSpreadAhead } from '../games/four-piles-spread-ahead/four-piles-spread-ahead';
