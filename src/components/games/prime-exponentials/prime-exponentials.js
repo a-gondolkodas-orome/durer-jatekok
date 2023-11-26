@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range } from 'lodash';
+import { range, sample } from 'lodash';
 
 const primeList = [
   2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
@@ -20,7 +20,7 @@ const generateNewBoard = () => {
   return Math.floor(Math.random()*1000+1);
 };
 
-const GameBoard = ({board, setBoard, ctx}) => {
+const GameBoard = ({ board, ctx }) => {
   const [firstTurnPhase, setFirstTurnPhase] = useState(true);
   const [playerPrime, setPlayerPrime] = useState(null);
   const [hovered, setHovered] = useState(null);
@@ -47,6 +47,7 @@ const GameBoard = ({board, setBoard, ctx}) => {
     for(let e = 0; playerPrime**e <= board; e++) {
       const cell = <td
         className={`border-4 aspect-square ${hovered === e ? 'bg-gray-300' : ''}`}
+        key={e}
         onClick={() => chooseExponential(e)}>
         <button
             className={`w-full p-[5%] aspect-square`}
@@ -114,11 +115,12 @@ const GameBoard = ({board, setBoard, ctx}) => {
       : <>{firstTurnPhase ?
         <table className={`m-2 border-collapse table-fixed max-w-full ${widthClassName}`}><tbody>
           {range(Math.floor(choosablePrimesList.length/10)+1).map(i => (
-            <tr>
+            <tr key={i}>
               {range(Math.min(10, choosablePrimesList.slice(i*10, choosablePrimesList.length).length)).map(j => (
                 <td
                   className={`max-w-[10%] border-4 ${hovered===primeList[10*i+j] ? `bg-gray-300` : ''}`}
                   onClick={() => choosePrime(primeList[10*i+j])}
+                  key={`${primeList[10*i+j]}`}
                 >
                   <button
                     className='w-full p-[5%] aspect-square'
@@ -144,37 +146,38 @@ const getGameStateAfterMove = (newBoard) => {
 }
 
 const getGameStateAfterAiTurn = ({ board }) => {
-  let newBoard = board;
-  let choosenPrime;
-  let choosenExponential;
-  if (newBoard%6 === 0) {
-    choosenPrime = primeList[Math.floor(Math.random()*primeList.filter(i => i<newBoard).length)];
-    choosenExponential = Math.floor(Math.random()*(Math.floor(Math.log(newBoard)/Math.log(choosenPrime))+1));
-  } else if (newBoard === 1)  {
-    choosenPrime = 2;
-    choosenExponential = 0;
+  if (board === 1) return getGameStateAfterMove(0);
+
+  const availablePrimes = primeList.filter(p => p <= board);
+
+  let chosenPrime;
+  let chosenExponent;
+
+  if (board % 6 === 0) {
+    chosenPrime = sample(availablePrimes);
+    chosenExponent = sample(availableExponents(board, chosenPrime));
   } else {
     let possibleMoves = [];
-    for (let i = 0; i < primeList.length; i++) {
-      if (primeList[i] > newBoard) {
-        break;
-      }
-      for (let j = 0; primeList[i]**j <= newBoard; j++) {
-        if((newBoard - primeList[i]**j) % 6 === 0) {
-          possibleMoves.push([primeList[i], j]);
+    for (p of availablePrimes) {
+      for (e of availableExponents(board, p)) {
+        if((board - p ** e) % 6 === 0) {
+          possibleMoves.push([p, e]);
         }
       }
     }
-    const rnd = Math.floor(Math.random()*possibleMoves.length);
-    choosenPrime = possibleMoves[rnd][0];
-    choosenExponential = possibleMoves[rnd][1];
+    [chosenPrime, chosenExponent] = sample(possibleMoves);
   }
-  newBoard -= choosenPrime**choosenExponential;
-  return getGameStateAfterMove(newBoard);
+  return getGameStateAfterMove(board - chosenPrime**chosenExponent);
+}
+
+const availableExponents = (num, prime) => {
+  const baseLog = Math.log(num) / Math.log(prime);
+  const maxExponent = Math.floor(baseLog);
+  return range(0, maxExponent + 1);
 }
 
 const getPlayerStepDescription = ({ turnStage }) => {
-  return !(turnStage==="e")
+  return !(turnStage === "e")
     ? 'Válaszd ki a prímet, aminek a hatványát ki szeretnéd vonni.'
     : 'Válaszd ki a kitevőt, amelyre a prímet emelnéd.';
 }
