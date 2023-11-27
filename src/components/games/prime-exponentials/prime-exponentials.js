@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, sample } from 'lodash';
+import { range, sample, random } from 'lodash';
 
 const primeList = [
   2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
@@ -17,7 +17,11 @@ const primeList = [
 ];
 
 const generateNewBoard = () => {
-  return Math.floor(Math.random()*1000+1);
+  if (random(0, 1)) {
+    return random(1, 166) * 6;
+  } else {
+    return random(1, 166) * 6 + random(1, 5);
+  }
 };
 
 const GameBoard = ({ board, ctx }) => {
@@ -183,7 +187,7 @@ const getPlayerStepDescription = ({ turnStage }) => {
 }
 
 const rule = <>
-Egy adott számtól kezdődik a játék, (a gép 1 és 1000 között véletlenszerűen generál egy számot),
+Egy 1000-nél kisebb, (gép által meghatározott) pozitív egész számtól kezdődik a játék,
 ebből a játékosok felváltva vonnak le egy tetszőleges
 prímhatványt. Az nyer, aki a nullát mondja!
 </>
