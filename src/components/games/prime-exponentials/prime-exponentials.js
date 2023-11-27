@@ -37,12 +37,10 @@ const GameBoard = ({ board, ctx }) => {
   }
 
   const chooseExponential = (e) => {
-    let newBoard = board;
-    newBoard -= playerPrime ** e;
     setPlayerPrime(null);
     setFirstTurnPhase(true);
     ctx.setTurnStage("p");
-    ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
+    ctx.endPlayerTurn(getGameStateAfterMove(board - playerPrime ** e));
   }
 
   const generateTable = () => {
@@ -54,50 +52,32 @@ const GameBoard = ({ board, ctx }) => {
         key={e}
         onClick={() => chooseExponential(e)}>
         <button
-            className={`w-full p-[5%] aspect-square`}
-            onMouseOver={() => setHovered(e)}
-            onMouseOut={() => setHovered(null)}
-            onFocus={() => setHovered(e)}
-            onBlur={() => setHovered(null)}
+          className={`w-full p-[5%] aspect-square`}
+          onMouseOver={() => setHovered(e)}
+          onMouseOut={() => setHovered(null)}
+          onFocus={() => setHovered(e)}
+          onBlur={() => setHovered(null)}
         >{e}
         </button>
       </td>
       exponentCells.push(cell);
     }
 
-    let widthClassNames;
-
-    switch (exponentCells.length*10) {
-      case 10:
-        widthClassNames = "w-[10%] min-w-[10%]";
-        break;
-      case 20:
-        widthClassNames = "w-[20%] min-w-[20%]";
-        break;
-      case 30:
-        widthClassNames = "w-[30%] min-w-[30%]";
-        break;
-      case 40:
-        widthClassNames = "w-[40%] min-w-[40%]";
-        break;
-      case 50:
-        widthClassNames = "w-[50%] min-w-[50%]";
-        break;
-      case 60:
-        widthClassNames = "w-[60%] min-w-[60%]";
-        break;
-      case 70:
-        widthClassNames = "w-[70%] min-w-[70%]";
-        break;
-      case 80:
-        widthClassNames = "w-[80%] min-w-[80%]";
-        break;
-      case 90:
-        widthClassNames = "w-[90%] min-w-[90%]";
-        break;
-      default:
-        widthClassNames = "w-[100%] min-w-[100%]";
-    }
+    // https://tailwindcss.com/docs/content-configuration#dynamic-class-names
+    // if we dynamically generate, tailwind won't recognize them :(
+    const widthClassNames = [
+      "",
+      "w-[10%] min-w-[10%]",
+      "w-[20%] min-w-[20%]",
+      "w-[30%] min-w-[30%]",
+      "w-[40%] min-w-[40%]",
+      "w-[50%] min-w-[50%]",
+      "w-[60%] min-w-[60%]",
+      "w-[70%] min-w-[70%]",
+      "w-[80%] min-w-[80%]",
+      "w-[90%] min-w-[90%]",
+      "w-[100%] min-w-[100%]"
+    ][exponentCells.length]
 
     return (<table className={`m-2 border-collapse table-fixed ${widthClassNames}`}>
       <tbody><tr>
@@ -110,6 +90,7 @@ const GameBoard = ({ board, ctx }) => {
   if (choosablePrimesList.length === 0) {
     choosablePrimesList = [2];
   }
+
   const widthClassName = `w-[${(Math.min(choosablePrimesList.length, 10))*10}%]`;
 
   return (
