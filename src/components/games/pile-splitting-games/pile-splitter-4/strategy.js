@@ -50,6 +50,23 @@ export const getBoardAfterAiTurn = (board) => {
   }
 };
 
+export const isWinningState = board => {
+  const oddPileIndices = range(0, 4).filter(i => board[i] % 2 === 1);
+  const oddPileCount = oddPileIndices.length;
+
+  if (oddPileCount === 4) return true;
+  if (oddPileCount === 3 || oddPileCount === 2) return false;
+
+  if (oddPileCount === 1) {
+    const modifiedBoard = [...board];
+    modifiedBoard[oddPileIndices[0]] += 1;
+    return isWinningState(modifiedBoard);
+  }
+  if (oddPileCount === 0) {
+    return isWinningState(board.map(x => x / 2));
+  }
+}
+
 const getOptimalDivision = function (board, first, second) {
   const sum = board[first];
 
