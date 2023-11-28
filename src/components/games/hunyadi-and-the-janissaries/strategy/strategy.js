@@ -1,6 +1,6 @@
 'use strict';
 
-import { random, flatten, cloneDeep } from 'lodash';
+import { random, flatten, cloneDeep, sum } from 'lodash';
 
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   if (playerIndex === 0) {
@@ -29,6 +29,12 @@ export const generateNewBoard = () => {
         board[i + 1].push('blue', 'blue');
       }
     }
+  }
+
+  const soldierCount = sum(board.map(row => row.length));
+  if (soldierCount < 4 || board[0].length === 2) {
+    // generate a more complex situation
+    return generateNewBoard();
   }
 
   return board;
