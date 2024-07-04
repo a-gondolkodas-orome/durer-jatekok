@@ -45,6 +45,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   }
 
   const clickField = ({row, col}) => {
+    if (!ctx.shouldPlayerMoveNext) return;
     const defend = ctx.playerIndex === 1, occupied = board[row][col] > 0;
     const shift = attackRow === row && Math.abs(attackCol-col) === 1;
     const spread = row === attackRow + 1 && (col === attackCol || col === attackCol + (-1)**(1+attackRow));
@@ -104,7 +105,10 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
-      <table className="m-2 w-[95%] border-collapse table-fixed">
+      <table
+        className="m-2 w-[95%] table-fixed"
+        style={{ transform: 'scaleY(-1)' }}
+      >
         <tbody>
           {range(9).map(row => (
             <tr style={{transform: `translateX(${row % 2 === 0 ? '0px' : `${100/(2*sizeOfBoard)}%` })`}} key={row}>
@@ -114,9 +118,17 @@ const GameBoard = ({ board, setBoard, ctx }) => {
                   onClick={() => clickField({ row, col })}
                 >
                   <button
-                    className={`aspect-square w-full p-[5%] ${row % 2 === 1 && col === sizeOfBoard-1 ? "" : "border-4"}`}
-                    style={{backgroundColor: board[row][col] < 0 ? "red" : ((row === attackRow && col === attackCol) ? "green" : "white")}}
-                  > {board[row][col] < 0 ? ("") : (board[row][col])}
+                    className={`
+                      aspect-square w-full ${row % 2 === 1 && col === sizeOfBoard-1 ? "" : "border-2"}
+                      ${board[row][col] < 0 ? "bg-red-800" : ""}
+                      ${((row === attackRow && col === attackCol) ? "border-green-800" : "")}
+                    `}
+                    style={{ transform: 'scaleY(-1)' }}
+                  > {board[row][col] < 0
+                    ? ("C")
+                    : (board[row][col]
+                      ? "B"
+                      : (row % 2 === 1 && col === sizeOfBoard-1 ? "" : "-"))}
                   </button>
                 </td>
               ))}
