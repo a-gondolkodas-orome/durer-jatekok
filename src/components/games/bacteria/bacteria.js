@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
-import { range, sampleSize, cloneDeep } from 'lodash';
+import { range, sampleSize, cloneDeep, random } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterAiTurn  } from './strategy/strategy';
 
-const sizeOfBoard = 17;
+const sizeOfBoard = 11;
 const adjGoals = true;
 
 const generateNewBoard = () => {
     const board = Array(9).fill([]);
-    board.forEach((row, index) => board[index] = Array(sizeOfBoard - 0.5 - 0.5*((-1)**(1+ index))).fill(0));
-    const numOfGoals = Math.ceil(Math.random()*sizeOfBoard);
+    range(9).forEach(rowIndex => {
+      const rowSize = rowIndex % 2 === 0 ? sizeOfBoard - 1 : sizeOfBoard;
+      board[rowIndex] = Array(rowSize).fill(0);
+    })
+
+    const numOfGoals = random(1, sizeOfBoard - 1);
     if (adjGoals) {
-        const goalStart = Math.floor(Math.random()*(sizeOfBoard-numOfGoals));
+        const goalStart = random(sizeOfBoard - numOfGoals);
         for (let i = goalStart; i<goalStart + numOfGoals; i++) {
             board[8][i] = -1;
         }
     } else {
-        const indices = range(sizeOfBoard);
-        const goals = sampleSize(indices,numOfGoals);
+        const goals = sampleSize(range(sizeOfBoard),numOfGoals);
         goals.forEach(index => board[8][index] = -1);
     }
-    const numOfBacteria = Math.ceil(Math.random()*sizeOfBoard);
-    const indices = range(sizeOfBoard);
-    const bacteria = sampleSize(indices,numOfBacteria);
+
+    const numOfBacteria = random(1, sizeOfBoard - 1);
+    const bacteria = sampleSize(range(sizeOfBoard), numOfBacteria);
     bacteria.forEach(index => board[0][index] = 1);
+
     return board;
 };
 
