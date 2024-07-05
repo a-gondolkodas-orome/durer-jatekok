@@ -160,5 +160,11 @@ export const gameList = {
     round: 'döntő',
     category: ['D'],
     name: 'Prímhatványok kivonása'
+  },
+  SharkChase: {
+    year: 17,
+    round: 'döntő',
+    category: ['C'],
+    name: 'Cápa üldözés'
   }
 };
