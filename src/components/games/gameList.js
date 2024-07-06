@@ -160,5 +160,11 @@ export const gameList = {
     round: 'döntő',
     category: ['D'],
     name: 'Prímhatványok kivonása'
+  },
+  Policemanthief: {
+    year: 9,
+    round: 'döntő',
+    category: ['A', 'B'],
+    name: 'rendőr, rabló'
   }
 };

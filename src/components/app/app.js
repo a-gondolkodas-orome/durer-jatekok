@@ -27,6 +27,7 @@ import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
 import { Bacteria } from '../games/bacteria/bacteria';
 import { SixDiscs, TenDiscs } from '../games/discs-turn-or-remove/discs-turn-or-remove';
 import { PrimeExponentials } from '../games/prime-exponentials/prime-exponentials';
+import { Policemanthief } from '../games/policeman-thief/policeman-thief';
 
 export const App = () => {
   const router = createHashRouter([
@@ -57,7 +58,8 @@ export const App = () => {
     { path: '/game/Bacteria', element: <Bacteria />},
     { path: '/game/SixDiscs', element: <SixDiscs />},
     { path: '/game/TenDiscs', element: <TenDiscs />},
-    { path: '/game/PrimeExponentials', element: <PrimeExponentials />}
+    { path: '/game/PrimeExponentials', element: <PrimeExponentials />},
+    { path: '/game/Policemanthief', element: <Policemanthief />}
   ]);
   return <StrictMode>
     <RouterProvider router={router}></RouterProvider>
