@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { range, sampleSize, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { getGameStateAfterAiTurn, areAllBacteriaRemoved } from "./strategy/strategy";
+import { getGameStateAfterAiTurn, areAllBacteriaRemoved, boardHeight } from "./strategy/strategy";
 
 const boardWidth = 11;
-const boardHeight = 9;
 const adjGoals = true;
 
 const generateNewBoard = () => {
   const board = Array(boardHeight).fill([]);
-  range(boardHeight).forEach((rowIndex) => {
+  range(board.length).forEach((rowIndex) => {
     const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
     board[rowIndex] = Array(rowSize).fill(0);
   });
@@ -120,7 +119,7 @@ const GameBoard = ({ board, ctx }) => {
         style={{ transform: "scaleY(-1)" }}
       >
         <tbody>
-          {range(boardHeight).map((row) => (
+          {range(board.length).map((row) => (
             <tr
               style={{
                 transform: `translateX(${

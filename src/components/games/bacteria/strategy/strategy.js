@@ -2,6 +2,8 @@
 
 import { cloneDeep, sample, range } from 'lodash';
 
+export const boardHeight = 9;
+const goalRowIdx = boardHeight - 1;
 
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
 
@@ -28,10 +30,10 @@ const whoWins = (board) => {
         let freeBoard = cloneDeep(board);
         const goals = getGoals(board);
         goals.forEach(goal => {
-            freeBoard[8][Math.max(0,goal-1)] = -4;
-            freeBoard[8][Math.min(getSizeOfBoard(board),goal+1)] = -4;
+            freeBoard[goalRowIdx][Math.max(0,goal-1)] = -4;
+            freeBoard[goalRowIdx][Math.min(getSizeOfBoard(board),goal+1)] = -4;
         })
-        goals.forEach(goal => {freeBoard[8][goal] = -1;});
+        goals.forEach(goal => {freeBoard[goalRowIdx][goal] = -1;});
         for(let row = 7; row >= 0; row--) {
             for(let col = 0; col < getSizeOfBoard(board)-1; col++) {
                 if (freeBoard[row+1][col]* freeBoard[row+1][col + (-1)**(row+1)] < 0) {
@@ -142,8 +144,8 @@ const getBacteria = (board) => {
 
 const getGoals = (board) => {
     let goals = [];
-    for (let col = 0; col < board[8].length; col++) {
-        if (board[8][col] < 0) { goals.push(col); }
+    for (let col = 0; col < board[goalRowIdx].length; col++) {
+        if (board[goalRowIdx][col] < 0) { goals.push(col); }
     }
     return goals;
 }
