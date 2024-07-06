@@ -9,7 +9,7 @@ const adjGoals = true;
 const generateNewBoard = () => {
   const board = Array(9).fill([]);
   range(9).forEach((rowIndex) => {
-    const rowSize = rowIndex % 2 === 0 ? sizeOfBoard - 1 : sizeOfBoard;
+    const rowSize = rowIndex % 2 === 0 ? sizeOfBoard : sizeOfBoard - 1;
     board[rowIndex] = Array(rowSize).fill(0);
   });
 
@@ -158,11 +158,10 @@ const GameBoard = ({ board, ctx }) => {
                     `}
                     style={{ transform: "scaleY(-1)" }}
                   >
-                    {" "}
                     {board[row][col] < 0
                       ? "C"
                       : board[row][col]
-                      ? `${board[row][col]}B`
+                      ? "B".repeat(board[row][col])
                       : row % 2 === 1 && col === sizeOfBoard - 1
                       ? ""
                       : "-"}
