@@ -31,15 +31,14 @@ const generateNewBoard = () => {
   return board;
 };
 
-const GameBoard = ({ board, setBoard, ctx }) => {
-  let newBoard = cloneDeep(board);
+const GameBoard = ({ board, ctx }) => {
+  const [attackRow, setAttackRow] = useState(-1);
+  const [attackCol, setAttackCol] = useState(-1);
 
-  let [selected, setSelected] = useState(false);
+  const newBoard = cloneDeep(board);
+  const isPlayerAttacker = ctx.playerIndex === 0;
 
-  let [attackRow, setAttackRow] = useState(-1);
-  let [attackCol, setAttackCol] = useState(-1);
-
-  const emptyBoard = () => {
+  const areAllBacteriaRemoved = () => {
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < sizeOfBoard - 0.5 - 0.5 * (-1) ** row; col++) {
         if (newBoard[row][col] > 0) return false;
@@ -48,73 +47,78 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     return true;
   };
 
+  const isShift = ({ row, col }) => {
+    return attackRow === row && Math.abs(attackCol - col) === 1;
+  };
+
+  const isSpread = ({ row, col }) => {
+    return (
+      row === attackRow + 1 &&
+      (col === attackCol || col === attackCol + (-1) ** (1 + attackRow))
+    );
+  };
+
+  const isJump = ({ row, col }) => {
+    return row === attackRow + 2 && col === attackCol;
+  };
+
+  const isAllowedAttack = ({ row, col }) => {
+    return isShift({ row, col }) || isSpread({ row, col }) || isJump({ row, col });
+  }
+
   const clickField = ({ row, col }) => {
     if (!ctx.shouldPlayerMoveNext) return;
-    const defend = ctx.playerIndex === 1,
-      occupied = board[row][col] > 0;
-    const shift = attackRow === row && Math.abs(attackCol - col) === 1;
-    const spread =
-      row === attackRow + 1 &&
-      (col === attackCol || col === attackCol + (-1) ** (1 + attackRow));
-    const spreadInBoard =
-      attackRow % 2 === 1 ||
-      (attackCol - 1 >= 0 && attackCol <= sizeOfBoard - 2);
-    const spreadSame = attackCol === col;
-    const jump = row === attackRow + 2 && col === attackCol;
-    const attack = shift || spread || jump;
+    if (attackRow === -1 && board[row][col] < 1) return;
+    if (attackRow !== -1 && !isAllowedAttack({ row, col })) return;
+
+    if (isPlayerAttacker && attackRow === -1) {
+      setAttackRow(row);
+      setAttackCol(col);
+      return;
+    }
+
+    if (!isPlayerAttacker) {
+      newBoard[row][col] -= 1;
+      if (areAllBacteriaRemoved()) {
+        ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnerIndex: 1 });
+        return;
+      }
+      ctx.endPlayerTurn({ newBoard, isGameEnd: false });
+      return;
+    }
+
+    if (isJump({ row, col })) {
+      newBoard[row][col] += 1;
+      newBoard[attackRow][attackCol] -= 1;
+    } else {
+      newBoard[row][col] += board[attackRow][attackCol];
+      newBoard[attackRow][attackCol] = 0;
+
+      const spreadInBoard =
+        attackRow % 2 === 1 ||
+        (attackCol >= 1 && attackCol <= sizeOfBoard - 2);
+      if (isSpread({ row, col }) && spreadInBoard) {
+        if (attackCol === col) {
+          newBoard[row][col + (-1) ** row] += board[attackRow][attackCol];
+        } else {
+          newBoard[row][attackCol] += board[attackRow][attackCol];
+        }
+      }
+    }
+
     const goalReached =
       board[row][col] === -1 ||
-      (spreadSame && board[row][col + (-1) ** row] === -1) ||
-      (!spreadSame && board[row][attackCol] === -1);
-    let winnerIndex = -1;
-    let endPlayerTurn = true;
+      (attackCol === col && board[row][col + (-1) ** row] === -1) ||
+      (attackCol !== col && board[row][attackCol] === -1);
 
-    if (defend) {
-      if (occupied) {
-        newBoard[row][col] -= 1;
-        if (emptyBoard()) {
-          winnerIndex = 1;
-        }
-      } else {
-        endPlayerTurn = false;
-      }
+    if (goalReached) {
+      ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnderIndex: 0 });
     } else {
-      if (selected) {
-        if (attack) {
-          if (shift || spread) {
-            newBoard[row][col] += board[attackRow][attackCol];
-            newBoard[attackRow][attackCol] = 0;
-            if (spread && spreadInBoard) {
-              if (spreadSame) {
-                newBoard[row][col + (-1) ** row] += board[attackRow][attackCol];
-              } else {
-                newBoard[row][attackCol] += board[attackRow][attackCol];
-              }
-            }
-          } else {
-            newBoard[row][col] += 1;
-            newBoard[attackRow][attackCol] -= 1;
-          }
-          if (goalReached) winnerIndex = 0;
-          setSelected(false);
-        } else {
-          endPlayerTurn = false;
-        }
-      } else {
-        if (occupied) {
-          setSelected(true);
-          setAttackRow(row);
-          setAttackCol(col);
-        }
-        endPlayerTurn = false;
-      }
+      ctx.endPlayerTurn({ newBoard, isGameEnd: false });
     }
-    const isGameEnd = winnerIndex >= 0;
-    if (endPlayerTurn) {
-      ctx.endPlayerTurn({ newBoard, isGameEnd, winnerIndex });
-      setAttackRow(-1);
-      setAttackCol(-1);
-    }
+
+    setAttackRow(-1);
+    setAttackCol(-1);
   };
 
   return (
@@ -142,12 +146,15 @@ const GameBoard = ({ board, setBoard, ctx }) => {
                           ? ""
                           : "border-2"
                       }
-                      ${board[row][col] < 0 ? "bg-red-800" : ""}
+                      ${board[row][col] < 0 ? "bg-blue-800" : ""}
                       ${
                         row === attackRow && col === attackCol
                           ? "border-green-800"
                           : ""
                       }
+                      ${attackRow !== -1 && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
+                      ${attackRow !== -1 && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}
+                      ${attackRow === -1 && board[row][col] < 1 ? "cursor-not-allowed" : ""}
                     `}
                     style={{ transform: "scaleY(-1)" }}
                   >
@@ -155,7 +162,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
                     {board[row][col] < 0
                       ? "C"
                       : board[row][col]
-                      ? "B"
+                      ? `${board[row][col]}B`
                       : row % 2 === 1 && col === sizeOfBoard - 1
                       ? ""
                       : "-"}
