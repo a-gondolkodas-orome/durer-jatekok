@@ -14,7 +14,7 @@ const generateNewBoard = () => {
     board[rowIndex] = Array(rowSize).fill(0);
   });
 
-  const numOfGoals = random(1, boardWidth - 1);
+  const numOfGoals = random(1, boardWidth);
   if (adjGoals) {
     const goalStart = random(boardWidth - numOfGoals);
     for (let i = goalStart; i < goalStart + numOfGoals; i++) {
@@ -113,7 +113,7 @@ const GameBoard = ({ board, ctx }) => {
       (attackCol !== col && board[row][attackCol] === -1);
 
     if (goalReached) {
-      ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnderIndex: 0 });
+      ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnerIndex: 0 });
     } else {
       ctx.endPlayerTurn({ newBoard, isGameEnd: false });
     }
