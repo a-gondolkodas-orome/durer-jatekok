@@ -3,7 +3,10 @@ import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy/strategy';
 //import { generateEmptyTicTacToeBoard } from '../helpers';
-import { SharkSvg } from './shark_svg';
+//import { SharkSvg } from './shark_svg';
+import { SharkSvg } from './strategy/shark-chase-shark-svg';
+import { SubmarineSvg } from './strategy/shark-chase-submarine-svg';
+
 
 
 export const generateStartBoard = () => {
@@ -16,15 +19,32 @@ export const generateStartBoard = () => {
 }
 
 
-const GameBoard = ({ board, ctx }) => {
-  
-  const [playerState, setPlayerState] = useState('choosePiece');
-  const [chosenPiece, setChosenPiece] = useState(12);
+const GameBoard = ({ board, setBoard, ctx }) => {
+const [playerState, setPlayerState] = useState('choosePiece');
+const [chosenPiece, setChosenPiece] = useState(12);
+
+  possibleMoves=[]
+  if (ctx.playerIndex===1) {
+    for (let i = 0; i < 16; i++) {
+      if ((Math.abs(board.shark%4-i%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(i/4)))<=2 && board.board[i]!=='blue' && board.board[i]!=='red')
+      {
+        possibleMoves.push(i);
+      }
+    }
+  }
+  else if (ctx.playerIndex===0 && playerState === 'movePiece') {
+    for (let i = 0; i < 16; i++) {
+      if ((Math.abs(chosenPiece%4-i%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(i/4)))<=1 && board.board[i]!=='red')
+      {
+        possibleMoves.push(i);
+      }
+    }
+  }
+
 
   const distanceFromChosenPiece = (id) => {
     return Math.abs(chosenPiece%4-id%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(id/4));
   }
-
 
   const isAllowed_choosePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
@@ -46,44 +66,69 @@ const GameBoard = ({ board, ctx }) => {
     }
     else if (ctx.playerIndex === 1 || playerState === 'movePiece')
     {
-      if (!isAllowed_movePiece(id)) return;
-      const newBoard = cloneDeep(board);
-      newBoard.board[chosenPiece] = null;
-      newBoard.board[id] = playerColor(ctx.playerIndex);
-      newBoard.turn = board.turn+1;
-      if (ctx.playerIndex === 1) newBoard.shark = id;
-      if (ctx.playerIndex === 0 && board.shark === id)
-      {
-        newBoard.shark = -1;
-        console.log('el van fogva a cápa');
+      if (board.board[id]==='red' && ctx.playerIndex === 0){
+        setChosenPiece(id);
       } 
-      setPlayerState('choosePiece');
-      setChosenPiece(id);
-      ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
+      else if (!isAllowed_movePiece(id)) return;
+      else{
+        const newBoard = cloneDeep(board);
+        newBoard.board[chosenPiece] = null;
+        newBoard.board[id] = playerColor(ctx.playerIndex);
+        newBoard.turn = board.turn+1;
+              if (ctx.playerIndex === 1) newBoard.shark = id;
+        if (ctx.playerIndex === 0 && board.shark === id)
+        {
+          newBoard.shark = -1;
+        } 
+        setPlayerState('choosePiece');
+        setChosenPiece(id);
+        ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
+      }
     }
+
+
     
   };
-  const pieceColor = (id) => {
-    const colorCode = board.board[id];
-    if (colorCode === 'red') return 'bg-red-600';
-    return 'bg-blue-600';
-  };
-
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
+    <SubmarineSvg/>
+    <SharkSvg/>
     <div className="grid grid-cols-4 gap-0 border-2">
       {range(16).map(id => (
         <button
           key={id}
-          //disabled={!isMoveAllowed(id)}
           onClick={() => clickField(id)}
-          className="aspect-square p-[15%] border-2"
-        >
-          {board.board[id] && (
-            <span
-            className={`w-full aspect-square inline-block rounded-full mb-[-0.5rem] ${pieceColor(id)}`}
-            ></span>
+          className="aspect-square p-[0%] border-2"
+        > {(possibleMoves.includes(id) && ctx.playerIndex===0) && (
+            <span>
+            <svg className="w-full aspect-square opacity-30 inline-block">
+              <use xlinkHref="#submarine" />
+            </svg>
+            </span>
           )}
+         {(possibleMoves.includes(id) && ctx.playerIndex===1) && (
+            <span>
+            <svg className="w-full aspect-square opacity-30 inline-block">
+              <use xlinkHref="#shark" />
+            </svg>
+            </span>
+          )}
+          {board.board[id]==='red' && (
+            <span>
+            <svg className="w-full aspect-square inline-block">
+              <use xlinkHref="#submarine" />
+            </svg>
+            </span>
+          )}
+          {board.board[id]==='blue' && (
+            <span>
+            <svg className="w-full aspect-square inline-block">
+              <use xlinkHref="#shark" />
+            </svg>
+            </span>
+            
+          )}
+
       </button>
       ))}
     </div>
