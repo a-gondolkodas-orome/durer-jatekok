@@ -12,6 +12,15 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   }
 };
 
+export const areAllBacteriaRemoved = (board) => {
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[0].length - 0.5 - 0.5 * (-1) ** row; col++) {
+        if (board[row][col] > 0) return false;
+        }
+    }
+    return true;
+};
+
 const whoWins = (board) => {
     if (getSizeOfBoard(board) + 2*4 - getGoals(board).length < getBacteria(board).length) {
         return 0;
@@ -66,7 +75,7 @@ const aiDefense = (board) => {
         const [randomRow, randomCol] = sample(getBacteria(board));
         newBoard[randomRow][randomCol] -= 1;
     }
-    const isGameEnd = getOccupied(newBoard).length === 0;
+    const isGameEnd = areAllBacteriaRemoved(newBoard);
     return { newBoard, isGameEnd };
 }
 
@@ -129,16 +138,6 @@ const getBacteria = (board) => {
         }
     }
     return bacteria;
-}
-
-const getOccupied = (board) => {
-    let occupied = [];
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board[row].length; col++) {
-            if (board[row][col] > 0) { occupied.push([row,col]); }
-        }
-    }
-    return occupied;
 }
 
 const getGoals = (board) => {

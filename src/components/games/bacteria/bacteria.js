@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { range, sampleSize, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { getGameStateAfterAiTurn } from "./strategy/strategy";
+import { getGameStateAfterAiTurn, areAllBacteriaRemoved } from "./strategy/strategy";
 
 const boardWidth = 11;
 const boardHeight = 9;
@@ -38,15 +38,6 @@ const GameBoard = ({ board, ctx }) => {
 
   const newBoard = cloneDeep(board);
   const isPlayerAttacker = ctx.playerIndex === 0;
-
-  const areAllBacteriaRemoved = (newBoard) => {
-    for (let row = 0; row < boardHeight; row++) {
-      for (let col = 0; col < boardWidth - 0.5 - 0.5 * (-1) ** row; col++) {
-        if (newBoard[row][col] > 0) return false;
-      }
-    }
-    return true;
-  };
 
   const isShift = ({ row, col }) => {
     return attackRow === row && Math.abs(attackCol - col) === 1;
