@@ -3,29 +3,30 @@ import { range, sampleSize, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
 import { getGameStateAfterAiTurn } from "./strategy/strategy";
 
-const sizeOfBoard = 11;
+const boardWidth = 11;
+const boardHeight = 9;
 const adjGoals = true;
 
 const generateNewBoard = () => {
-  const board = Array(9).fill([]);
-  range(9).forEach((rowIndex) => {
-    const rowSize = rowIndex % 2 === 0 ? sizeOfBoard : sizeOfBoard - 1;
+  const board = Array(boardHeight).fill([]);
+  range(boardHeight).forEach((rowIndex) => {
+    const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
     board[rowIndex] = Array(rowSize).fill(0);
   });
 
-  const numOfGoals = random(1, sizeOfBoard - 1);
+  const numOfGoals = random(1, boardWidth - 1);
   if (adjGoals) {
-    const goalStart = random(sizeOfBoard - numOfGoals);
+    const goalStart = random(boardWidth - numOfGoals);
     for (let i = goalStart; i < goalStart + numOfGoals; i++) {
-      board[8][i] = -1;
+      board[boardHeight - 1][i] = -1;
     }
   } else {
-    const goals = sampleSize(range(sizeOfBoard), numOfGoals);
+    const goals = sampleSize(range(boardWidth), numOfGoals);
     goals.forEach((index) => (board[8][index] = -1));
   }
 
-  const numOfBacteria = random(1, sizeOfBoard - 1);
-  const bacteria = sampleSize(range(sizeOfBoard), numOfBacteria);
+  const numOfBacteria = random(1, boardWidth - 1);
+  const bacteria = sampleSize(range(boardWidth), numOfBacteria);
   bacteria.forEach((index) => (board[0][index] = 1));
 
   return board;
@@ -38,9 +39,9 @@ const GameBoard = ({ board, ctx }) => {
   const newBoard = cloneDeep(board);
   const isPlayerAttacker = ctx.playerIndex === 0;
 
-  const areAllBacteriaRemoved = () => {
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < sizeOfBoard - 0.5 - 0.5 * (-1) ** row; col++) {
+  const areAllBacteriaRemoved = (newBoard) => {
+    for (let row = 0; row < boardHeight; row++) {
+      for (let col = 0; col < boardWidth - 0.5 - 0.5 * (-1) ** row; col++) {
         if (newBoard[row][col] > 0) return false;
       }
     }
@@ -79,7 +80,7 @@ const GameBoard = ({ board, ctx }) => {
 
     if (!isPlayerAttacker) {
       newBoard[row][col] -= 1;
-      if (areAllBacteriaRemoved()) {
+      if (areAllBacteriaRemoved(newBoard)) {
         ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnerIndex: 1 });
         return;
       }
@@ -96,7 +97,7 @@ const GameBoard = ({ board, ctx }) => {
 
       const spreadInBoard =
         attackRow % 2 === 1 ||
-        (attackCol >= 1 && attackCol <= sizeOfBoard - 2);
+        (attackCol >= 1 && attackCol <= boardWidth - 2);
       if (isSpread({ row, col }) && spreadInBoard) {
         if (attackCol === col) {
           newBoard[row][col + (-1) ** row] += board[attackRow][attackCol];
@@ -128,21 +129,21 @@ const GameBoard = ({ board, ctx }) => {
         style={{ transform: "scaleY(-1)" }}
       >
         <tbody>
-          {range(9).map((row) => (
+          {range(boardHeight).map((row) => (
             <tr
               style={{
                 transform: `translateX(${
-                  row % 2 === 0 ? "0px" : `${100 / (2 * sizeOfBoard)}%`
+                  row % 2 === 0 ? "0px" : `${100 / (2 * boardWidth)}%`
                 })`
               }}
               key={row}
             >
-              {range(sizeOfBoard).map((col) => (
+              {range(boardWidth).map((col) => (
                 <td key={col} onClick={() => clickField({ row, col })}>
                   <button
                     className={`
                       aspect-square w-full ${
-                        row % 2 === 1 && col === sizeOfBoard - 1
+                        row % 2 === 1 && col === boardWidth - 1
                           ? ""
                           : "border-2"
                       }
@@ -162,7 +163,7 @@ const GameBoard = ({ board, ctx }) => {
                       ? "C"
                       : board[row][col]
                       ? "B".repeat(board[row][col])
-                      : row % 2 === 1 && col === sizeOfBoard - 1
+                      : row % 2 === 1 && col === boardWidth - 1
                       ? ""
                       : "-"}
                   </button>
