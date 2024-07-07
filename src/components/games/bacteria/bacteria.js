@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { range, sampleSize, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { getGameStateAfterAiTurn, areAllBacteriaRemoved, boardHeight } from "./strategy/strategy";
+import { getGameStateAfterAiTurn, areAllBacteriaRemoved } from "./strategy";
+import { isJump, reachedFieldsAfterClick, isAllowedAttackClick } from "./helpers";
 
 const boardWidth = 11;
 const adjGoals = true;
 
 const generateNewBoard = () => {
-  const board = Array(boardHeight).fill([]);
+  const board = Array(9).fill([]);
   range(board.length).forEach((rowIndex) => {
     const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
     board[rowIndex] = Array(rowSize).fill(0);
@@ -17,7 +18,7 @@ const generateNewBoard = () => {
   if (adjGoals) {
     const goalStart = random(boardWidth - numOfGoals);
     for (let i = goalStart; i < goalStart + numOfGoals; i++) {
-      board[boardHeight - 1][i] = -1;
+      board[8][i] = -1;
     }
   } else {
     const goals = sampleSize(range(boardWidth), numOfGoals);
@@ -38,24 +39,10 @@ const GameBoard = ({ board, ctx }) => {
   const newBoard = cloneDeep(board);
   const isPlayerAttacker = ctx.playerIndex === 0;
 
-  const isShift = ({ row, col }) => {
-    return attackRow === row && Math.abs(attackCol - col) === 1;
-  };
-
-  const isSpread = ({ row, col }) => {
-    return (
-      row === attackRow + 1 &&
-      (col === attackCol || col === attackCol + (-1) ** (1 + attackRow))
-    );
-  };
-
-  const isJump = ({ row, col }) => {
-    return row === attackRow + 2 && col === attackCol;
-  };
-
   const isAllowedAttack = ({ row, col }) => {
-    return isShift({ row, col }) || isSpread({ row, col }) || isJump({ row, col });
-  }
+    if (board[row][col] === undefined) return false;
+    return isAllowedAttackClick({ attackRow, attackCol, row, col });
+  };
 
   const clickField = ({ row, col }) => {
     if (!ctx.shouldPlayerMoveNext) return;
@@ -78,31 +65,29 @@ const GameBoard = ({ board, ctx }) => {
       return;
     }
 
-    if (isJump({ row, col })) {
+    const reachedFields = reachedFieldsAfterClick({
+      board,
+      attackRow,
+      attackCol,
+      row,
+      col
+    });
+
+    const goalsReached = reachedFields.filter(([row, col]) => {
+      board[row][col] === -1;
+    });
+
+    if (isJump({ attackRow, attackCol, row, col })) {
       newBoard[row][col] += 1;
       newBoard[attackRow][attackCol] -= 1;
     } else {
-      newBoard[row][col] += board[attackRow][attackCol];
       newBoard[attackRow][attackCol] = 0;
-
-      const spreadInBoard =
-        attackRow % 2 === 1 ||
-        (attackCol >= 1 && attackCol <= boardWidth - 2);
-      if (isSpread({ row, col }) && spreadInBoard) {
-        if (attackCol === col) {
-          newBoard[row][col + (-1) ** row] += board[attackRow][attackCol];
-        } else {
-          newBoard[row][attackCol] += board[attackRow][attackCol];
-        }
-      }
+      reachedFields.forEach(([row, col]) => {
+        newBoard[row][col] += board[attackRow][attackCol];
+      });
     }
 
-    const goalReached =
-      board[row][col] === -1 ||
-      (attackCol === col && board[row][col + (-1) ** row] === -1) ||
-      (attackCol !== col && board[row][attackCol] === -1);
-
-    if (goalReached) {
+    if (goalsReached.length >= 1) {
       ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnerIndex: 0 });
     } else {
       ctx.endPlayerTurn({ newBoard, isGameEnd: false });
