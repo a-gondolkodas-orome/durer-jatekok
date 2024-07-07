@@ -12,7 +12,7 @@ const neighbours = {
     6: [2, 4, 7],
     7: [3, 5, 6]
   };
-  
+
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   let newBoard = {...board};
   // TODO: instead of using let, make below functions not changing their argument
@@ -74,7 +74,7 @@ const makeOptimalStepAsFirst = (board) => {
       let piece1 = { blue1: index1 };
       newBoard = { ...newBoard, ...piece1 };
     }
-    
+
 
   //blue2Step
   let index2 = board.blue2;
@@ -110,12 +110,13 @@ const makeOptimalStepAsSecond = (board) =>{
   for(let i = 0; i < 3; i++){
     if (neighbours[board.red][i] !== board.blue1 && neighbours[board.red][i] !== board.blue2){
       for(let j = 0; j < 3; j++){
-        if(neighbours[neighbours[board.red][i]][j] !== board.blue1 && neighbours[neighbours[board.red][i]][j] !== board.blue2){
+        const fieldToCheck = neighbours[neighbours[board.red][i]][j]
+        if(fieldToCheck !== board.blue1 && fieldToCheck !== board.blue2){
           index = neighbours[board.red][i];
         }
       }
     }
-  } 
+  }
   if(index === board.red){
     index = neighbours[board.red][getRandomInt(3)];
   }

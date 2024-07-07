@@ -55,7 +55,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   const currentPlayer = () => {
     return ctx.playerIndex === 0 ? 'blue' : 'red';
   };
-      
+
   const [isBlue1Moved, setIsBlue1Moved] = useState(false);
   const [isBlue2Moved, setIsBlue2Moved] = useState(false);
   const [turnState, setTurnstate] = useState("choose");
@@ -77,7 +77,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       ctx.endPlayerTurn(getGameStateAfterMove(newboard));
     }else{
       setBoard(newboard);
-    }  
+    }
   };
 
   const handleCircleClick = (vertex) => {
@@ -112,7 +112,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     }
     }
     };
-    
+
   const getColor = (nodeId) => {
     if (board.blue1 === nodeId){
         return "blue";
@@ -153,11 +153,14 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
 const rule = <>
   Az ábrán egy kisváros úthálózata látható, ahol az útkereszteződéseket
-  pöttyök jelölik. A játék kezdetén a szervezők az egyik útkereszteződésbe letesznek egy tolvajt ábrázoló (piros) korongot, egy másikba pedig két rendőrt ábrázoló
-  (kék) korongot. Egy körben előbb a rendőrök mennek át egy-egy szomszédos útkereszteződésbe egy út mentén (szét is válhatnak), majd a tolvaj is hasonlóan
+  pöttyök jelölik. A játék kezdetén a szervezők az egyik útkereszteződésbe letesznek egy tolvajt
+  ábrázoló (piros) korongot, egy másikba pedig két rendőrt ábrázoló
+  (kék) korongot. Egy körben előbb a rendőrök mennek át egy-egy szomszédos útkereszteződésbe egy
+  út mentén (szét is válhatnak), majd a tolvaj is hasonlóan
   lép. Minden körben kötelező mindenkinek helyet változtatnia, és a két rendőr
   különválhat.
-  A rendőrök nyernek, ha a rabló bármikor azonos kereszteződésben van egy rendőrrel. A tolvaj nyer, ha a harmadik kör végéig nem kapták el.
+  A rendőrök nyernek, ha a rabló bármikor azonos kereszteződésben van egy rendőrrel. A tolvaj nyer,
+  ha a harmadik kör végéig nem kapták el.
 </>;
 
 const Game = strategyGameFactory({
