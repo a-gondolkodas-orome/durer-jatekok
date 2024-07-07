@@ -2,19 +2,7 @@
 
 import { isNull, some, range, groupBy, sample, cloneDeep } from 'lodash';
 import { some, difference } from 'lodash';
-//import { hasWinningSubset } from '../../helpers';
 
-/*
-export const hasWinningSubset = (indices) => {
-  const winningIndexSets = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],
-    [0, 4, 8], [2, 4, 6]
-  ];
-  const isSubsetOfIndices = s => difference(s, indices).length === 0;
-  return some(winningIndexSets, isSubsetOfIndices);
-};
-*/
 const roleColors = ['red', 'blue'];
 
 export const playerColor = playerIndex => playerIndex === 0 ? roleColors[0] : roleColors[1];
@@ -31,10 +19,12 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const findSubmarineNextToShark = () => {
     if (board.shark+4 < 16 && board.board[board.shark+4] === 'red') return board.shark+4;
     if (board.shark-4 >= 0 && board.board[board.shark-4] === 'red') return board.shark-4;
-    if (board.shark+1 < 16 && board.board[board.shark+1] === 'red') return board.shark+1;
-    if (board.shark-1 >= 0 && board.board[board.shark-1] === 'red') return board.shark-1;
+    if (board.shark+1 < 16 && board.shark%4 !== 3 && board.board[board.shark+1] === 'red') return board.shark+1;
+    if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.board[board.shark-1] === 'red') return board.shark-1;
     return -1;
   }
+
+  
 
   const moveSubmarine = (from,to) => {
     const newBoard = cloneDeep(board);
@@ -46,7 +36,7 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   if (playerIndex === 0)
   {
     const newMove = getOptimalAiPlacingPositionShark(board, playerIndex);
-    console.log(newMove);
+    //console.log(newMove);
     const newBoard = cloneDeep(board);
     newBoard.board[board.shark] = null;
     newBoard.board[newMove] = aiColor(playerIndex);
@@ -137,20 +127,97 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
   const isNextToSubmarine = (id) => {
     if (id+4 < 16 && board.board[id+4] === 'red') return true;
     if (id-4 >= 0 && board.board[id-4] === 'red') return true;
-    if (id+1 < 16 && board.board[id+1] === 'red') return true;
-    if (id-1 >= 0 && board.board[id-1] === 'red') return true;
+    if (id+1 < 16 && id%4 !== 3 && board.board[id+1] === 'red') return true;
+    if (id-1 >= 0 && id%4 !== 0 && board.board[id-1] === 'red') return true;
+    if (board.board[id] === 'red') return true;
     return false;
   }
   const distanceFromShark = (id) => {
     return Math.abs(board.shark%4-id%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(id/4));
+  } 
+
+  const visited = Array(16).fill(false);
+  const visited2 = Array(16).fill(false);
+  const componentSizes = Array(16).fill(0);
+  const queue = [];
+
+  for (let i = 0; i<16; i++)
+  {
+    if (!visited[i] && !isNextToSubmarine(i))
+    {
+      queue.push(i);
+      visited[i] = true;
+      counter = 0;
+      while(queue.length > 0)
+      {
+        counter++;
+        first = queue.shift();
+        //console.log(first);
+        //visited[first] = true;
+        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited[first+4] == false) {queue.push(first+4); visited[first+4]=true}
+        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited[first-4] == false) {queue.push(first-4); visited[first-4]=true}
+        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited[first+1] == false) {queue.push(first+1); visited[first+1]=true}
+        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited[first-1] == false) {queue.push(first-1); visited[first-1]=true}
+      }
+      queue.push(i);
+      visited2[i] = true;
+      while(queue.length > 0)
+      {
+        first = queue.shift();
+        //visited2[first] = true;
+        componentSizes[first] = counter;
+        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited2[first+4] == false) {queue.push(first+4); visited2[first+4] = true;}
+        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited2[first-4] == false) {queue.push(first-4); visited2[first-4] = true;}
+        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited2[first+1] == false) {queue.push(first+1); visited2[first+1] = true;}
+        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited2[first-1] == false) {queue.push(first-1); visited2[first-1] = true;}
+      }
+    }
   }
 
-  for (let i = 0; i <16; i++)
+  maxi = 1;
+  for (let i = 0; i < 16; i++)
   {
-    if (distanceFromShark(i) <=2 && 
-        board.board[i] !== 'red' &&
-        !isNextToSubmarine(i)
-        ) possibleMoves.push(i);
+    if (distanceFromShark(i) <=2)
+    {
+      if(maxi < componentSizes[i])
+      {
+        maxi = componentSizes[i];
+      }
+    }
+  }
+
+  for (let ind = 0; ind < 4; ind++)
+  {
+    let i = [5,6,9,10][ind];
+    //console.log(i);
+    //if(distanceFromShark(i) <=2) console.log("asdasdsadsa")
+    if (componentSizes[i] === maxi && distanceFromShark(i) <=2)
+    {
+      //console.log("első");
+      possibleMoves.push(i);
+    }
+  }
+  if (possibleMoves.length === 0)
+  {
+    for (let ind = 0; ind < 8; ind++)
+    {
+      let i = [1,2,4,7,8,11,13,14][ind];
+      if (componentSizes[i] == maxi && distanceFromShark(i) <=2)
+      {
+        possibleMoves.push(i);
+      }
+    }
+  }
+  if (possibleMoves.length === 0)
+  {
+    for (let ind = 0; ind < 4; ind++)
+    {
+      let i = [0,3,12,15][ind];
+      if (componentSizes[i] == maxi && distanceFromShark(i) <=2)
+      {
+        possibleMoves.push(i);
+      }
+    }
   }
   if (possibleMoves.length === 0)
   {
@@ -160,57 +227,9 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
         board.board[i] !== 'red') possibleMoves.push(i);
     }
   }
+
+  //console.log(componentSizes);
+
   return possibleMoves[Math.floor(Math.random()*(possibleMoves.length))];
 }
 
-
-/*
-const getOptimalAiPlacingPosition = (board, playerIndex) => {
-  const allowedPlaces = range(0, 9).filter(i => isNull(board.baord[i]));
-
-  // start with middle place as a first step
-  if (allowedPlaces.length === 9) return 4;
-
-  // as a first player, proceed with placing at an empty place symmetrical to player's piece
-  if (playerIndex === 1) {
-    // pairs symmetric to middle place
-    const pairs = [[0, 8], [1, 7], [2, 6], [3, 5], [5, 3], [6, 2],  [7, 1] [8, 0]];
-    for (const p of pairs) {
-      // first is occupied, second is not from given pair
-      if (!isNull(board.board[p[0]]) && isNull(board.board[p[1]])) {
-        return p[1];
-      }
-    }
-  }
-
-  // as a second player still try to win if first player may not play optimally
-  const optimalPlaces = allowedPlaces.filter(i => {
-    const boardCopy = cloneDeep(board);
-    boardCopy.baord[i] = aiColor(playerIndex);
-    return isWinningState(boardCopy, playerIndex === 1);
-  });
-
-  if (optimalPlaces.length > 0) return sample(optimalPlaces);
-
-  // even if we are gonna lose, try to prolong it
-  const aiPieces = range(0, 9).filter(i => board.board[i] === aiColor(playerIndex));
-  const notInstantLosingPlaces = allowedPlaces.filter(i => !hasWinningSubset([...aiPieces, i]));
-  if (notInstantLosingPlaces.length > 0) return sample(notInstantLosingPlaces);
-
-  return sample(allowedPlaces);
-};
-
-// given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIFirst) => {
-  if (isGameEnd(board)) {
-    return amIFirst === hasFirstPlayerWon(board);
-  }
-  const allowedPlaces = range(0, 9).filter(i => isNull(board.board[i]));
-  const optimalPlaceForOther = allowedPlaces.find(i => {
-    const boardCopy = cloneDeep(board);
-    boardCopy.baord[i] = roleColors[amIFirst ? 1 : 0];
-    return isWinningState(boardCopy, !amIFirst);
-  });
-  return optimalPlaceForOther === undefined;
-};
-*/

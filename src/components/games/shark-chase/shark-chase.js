@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy/strategy';
-//import { generateEmptyTicTacToeBoard } from '../helpers';
-//import { SharkSvg } from './shark_svg';
 import { SharkSvg } from './strategy/shark-chase-shark-svg';
 import { SubmarineSvg } from './strategy/shark-chase-submarine-svg';
 
@@ -20,8 +18,8 @@ export const generateStartBoard = () => {
 
 
 const GameBoard = ({ board, setBoard, ctx }) => {
-const [playerState, setPlayerState] = useState('choosePiece');
-const [chosenPiece, setChosenPiece] = useState(12);
+  const [playerState, setPlayerState] = useState('choosePiece');
+  const [chosenPiece, setChosenPiece] = useState(12);
 
   possibleMoves=[]
   if (ctx.playerIndex===1) {
@@ -29,12 +27,12 @@ const [chosenPiece, setChosenPiece] = useState(12);
       if ((Math.abs(board.shark%4-i%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(i/4)))<=2 && board.board[i]!=='blue' && board.board[i]!=='red')
       {
         possibleMoves.push(i);
-      }
+      }npm
     }
   }
   else if (ctx.playerIndex===0 && playerState === 'movePiece') {
     for (let i = 0; i < 16; i++) {
-      if ((Math.abs(chosenPiece%4-i%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(i/4)))<=1 && board.board[i]!=='red')
+      if ((Math.abs(chosenPiece%4-i%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(i/4)))<=1 && board.board[i]!=='red'  && board.board[i]!=='blue')
       {
         possibleMoves.push(i);
       }
@@ -90,7 +88,7 @@ const [chosenPiece, setChosenPiece] = useState(12);
     
   };
   return (
-  <section className="p-2 shrink-0 grow basis-2/3">
+  <section className="p-2 shrink-0 grow basis-2/3"> <b><font size="4">Hátralévő lépések száma: {12-board.turn}</font></b>
     <SubmarineSvg/>
     <SharkSvg/>
     <div className="grid grid-cols-4 gap-0 border-2">
@@ -106,7 +104,7 @@ const [chosenPiece, setChosenPiece] = useState(12);
             </svg>
             </span>
           )}
-         {(possibleMoves.includes(id) && ctx.playerIndex===1) && (
+         {(possibleMoves.includes(id) && ctx.playerIndex===1 && board.shark!=-1) && (
             <span>
             <svg className="w-full aspect-square opacity-30 inline-block">
               <use xlinkHref="#shark" />
@@ -157,7 +155,18 @@ const Game = strategyGameFactory({
   secondRoleLabel: 'Cápa leszek!',
   GameBoard,
   G: {
-    getPlayerStepDescription: () => 'Válassz ki egy piros korongot, majd válassz egy szomszédos mezőt.',
+    getPlayerStepDescription: (data) => 
+    {
+      if (data.playerIndex === 0)
+      {
+        return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.';// Jelenlegi kör: ' + data.board.turn + '.';
+      }
+      else
+      {
+        return 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';// Jelenlegi kör: ' + data.board.turn + '.';
+      }
+    },
+      
     generateNewBoard: generateStartBoard,
     getGameStateAfterAiTurn
   }
