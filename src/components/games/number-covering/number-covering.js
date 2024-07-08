@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range } from 'lodash';
+import { range, sum } from 'lodash';
 
 const GameBoard = ({ board, ctx }) => {
 
@@ -19,15 +19,16 @@ const GameBoard = ({ board, ctx }) => {
             <tr>
                 {range(board.length).map(i => (
                     board[i]!==-1 ?
-                    <td className='text-center border-4 aspect-square'
+                    <td className={`text-center border-4 aspect-square ${ctx.shouldPlayerMoveNext && 'hover:bg-gray-400'}`}
                     key = {i}
                     onClick={() => clickNumber(i+1)}>
                     {board[i]}</td> :
-                    <td className='text-center border-4 bg-blue-300'
+                    <td className='text-center border-4 bg-gray-600'
                     key = {i}>X</td>
                 ))}
             </tr>
         </tbody></table>
+        Megmaradt számok összege: {sum(board.filter(i => i > 0))}
     </section>
     );
 };
@@ -64,14 +65,14 @@ const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
 };
 
 const rule8 = <>
-Egy táblázatban 1-től 8-ig szerepelnek a számok. Két játékos felválva takar le 1-1
-számot addig, amíg csak 2 szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
+Egy táblázatban 1-től 8-ig szerepelnek a számok. Két játékos felváltva takar le egy-egy
+számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
 nyer, ha pedig páratlan, akkor a második.
 </>;
 
 const rule10 = <>
-Egy táblázatban 1-től 10-ig szerepelnek a számok. Két játékos felválva takar le 1-1
-számot addig, amíg csak 2 szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
+Egy táblázatban 1-től 10-ig szerepelnek a számok. Két játékos felválva takar le egy-egy
+számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
 nyer, ha pedig páratlan, akkor a második.
 </>;
 
