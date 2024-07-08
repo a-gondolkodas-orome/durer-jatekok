@@ -1,7 +1,6 @@
 'use strict';
 
-import { isNull, some, range, groupBy, sample, cloneDeep } from 'lodash';
-import { some, difference } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 const roleColors = ['red', 'blue'];
 
@@ -23,8 +22,6 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
     if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.board[board.shark-1] === 'red') return board.shark-1;
     return -1;
   }
-
-  
 
   const moveSubmarine = (from,to) => {
     const newBoard = cloneDeep(board);
@@ -134,7 +131,7 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
   }
   const distanceFromShark = (id) => {
     return Math.abs(board.shark%4-id%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(id/4));
-  } 
+  }
 
   const visited = Array(16).fill(false);
   const visited2 = Array(16).fill(false);
@@ -152,24 +149,37 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
       {
         counter++;
         first = queue.shift();
-        //console.log(first);
-        //visited[first] = true;
-        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited[first+4] == false) {queue.push(first+4); visited[first+4]=true}
-        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited[first-4] == false) {queue.push(first-4); visited[first-4]=true}
-        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited[first+1] == false) {queue.push(first+1); visited[first+1]=true}
-        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited[first-1] == false) {queue.push(first-1); visited[first-1]=true}
+        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited[first+4] == false) {
+          queue.push(first+4); visited[first+4]=true
+        }
+        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited[first-4] == false) {
+          queue.push(first-4); visited[first-4]=true
+        }
+        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited[first+1] == false) {
+          queue.push(first+1); visited[first+1]=true
+        }
+        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited[first-1] == false) {
+          queue.push(first-1); visited[first-1]=true
+        }
       }
       queue.push(i);
       visited2[i] = true;
       while(queue.length > 0)
       {
         first = queue.shift();
-        //visited2[first] = true;
         componentSizes[first] = counter;
-        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited2[first+4] == false) {queue.push(first+4); visited2[first+4] = true;}
-        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited2[first-4] == false) {queue.push(first-4); visited2[first-4] = true;}
-        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited2[first+1] == false) {queue.push(first+1); visited2[first+1] = true;}
-        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited2[first-1] == false) {queue.push(first-1); visited2[first-1] = true;}
+        if (first+4 < 16 && !isNextToSubmarine(first+4) && visited2[first+4] == false) {
+          queue.push(first+4); visited2[first+4] = true;
+        }
+        if (first-4 >= 0 && !isNextToSubmarine(first-4) && visited2[first-4] == false) {
+          queue.push(first-4); visited2[first-4] = true;
+        }
+        if (first+1 < 16 && first%4 !== 3 && !isNextToSubmarine(first+1) && visited2[first+1] == false) {
+          queue.push(first+1); visited2[first+1] = true;
+        }
+        if (first-1 >= 0 && first%4 !== 0 && !isNextToSubmarine(first-1) && visited2[first-1] == false) {
+          queue.push(first-1); visited2[first-1] = true;
+        }
       }
     }
   }
@@ -189,11 +199,8 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
   for (let ind = 0; ind < 4; ind++)
   {
     let i = [5,6,9,10][ind];
-    //console.log(i);
-    //if(distanceFromShark(i) <=2) console.log("asdasdsadsa")
     if (componentSizes[i] === maxi && distanceFromShark(i) <=2)
     {
-      //console.log("első");
       possibleMoves.push(i);
     }
   }
@@ -223,13 +230,9 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
   {
     for (let i = 0; i <16; i++)
     {
-      if (distanceFromShark(i) <=2 && 
-        board.board[i] !== 'red') possibleMoves.push(i);
+      if (distanceFromShark(i) <=2 && board.board[i] !== 'red') possibleMoves.push(i);
     }
   }
 
-  //console.log(componentSizes);
-
   return possibleMoves[Math.floor(Math.random()*(possibleMoves.length))];
 }
-

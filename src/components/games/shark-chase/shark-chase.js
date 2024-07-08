@@ -6,7 +6,6 @@ import { SharkSvg } from './strategy/shark-chase-shark-svg';
 import { SubmarineSvg } from './strategy/shark-chase-submarine-svg';
 
 
-
 export const generateStartBoard = () => {
   startboard = Array(16).fill(null);
   startboard[2] = 'red';
@@ -27,7 +26,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       if ((Math.abs(board.shark%4-i%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(i/4)))<=2 && board.board[i]!=='blue' && board.board[i]!=='red')
       {
         possibleMoves.push(i);
-      }npm
+      }
     }
   }
   else if (ctx.playerIndex===0 && playerState === 'movePiece') {
@@ -66,7 +65,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     {
       if (board.board[id]==='red' && ctx.playerIndex === 0){
         setChosenPiece(id);
-      } 
+      }
       else if (!isAllowed_movePiece(id)) return;
       else{
         const newBoard = cloneDeep(board);
@@ -77,7 +76,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         if (ctx.playerIndex === 0 && board.shark === id)
         {
           newBoard.shark = -1;
-        } 
+        }
         setPlayerState('choosePiece');
         setChosenPiece(id);
         ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
@@ -85,10 +84,10 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     }
 
 
-    
   };
   return (
-  <section className="p-2 shrink-0 grow basis-2/3"> <b><font size="4">Hátralévő lépések száma: {12-board.turn}</font></b>
+  <section className="p-2 shrink-0 grow basis-2/3">
+    <b><font size="4">Hátralévő lépések száma: {12-board.turn}</font></b>
     <SubmarineSvg/>
     <SharkSvg/>
     <div className="grid grid-cols-4 gap-0 border-2">
@@ -104,7 +103,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
             </svg>
             </span>
           )}
-         {(possibleMoves.includes(id) && ctx.playerIndex===1 && board.shark!=-1) && (
+         {(ctx.shouldPlayerMoveNext && possibleMoves.includes(id) && ctx.playerIndex===1 && board.shark!=-1) && (
             <span>
             <svg className="w-full aspect-square opacity-30 inline-block">
               <use xlinkHref="#shark" />
@@ -124,7 +123,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
               <use xlinkHref="#shark" />
             </svg>
             </span>
-            
+
           )}
 
       </button>
@@ -135,8 +134,10 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 };
 
 const rule = <>
-  Kutatók a Dürerencicás-tóban felfedezték a kihalófélben lévő egyenesenmozgó macskacápa faj egy nőstény példányát. Az állat a víz mélyén mozog, így
-  befogásához három tengeralattjárót használnak. A kutatók kommunikálnak egymással és látják a cápát, továbbá a cápa is látja a kutatókat. A tó négyzet alakú és
+  Kutatók a Dürerencicás-tóban felfedezték a kihalófélben lévő egyenesenmozgó macskacápa faj
+  egy nőstény példányát. Az állat a víz mélyén mozog, így
+  befogásához három tengeralattjárót használnak. A kutatók kommunikálnak egymással
+  és látják a cápát, továbbá a cápa is látja a kutatókat. A tó négyzet alakú és
   fel van osztva 4 × 4 darab négyzet alakú szektorra. Minden nap délben az egyik
   tengeralattjáró átúszik egy oldalszomszédos szektorba. A cápa 11 nap múlva nyugodt
   körülmények között tenné le a tojását, így addig menekülni próbál, ehhez minden
@@ -155,18 +156,18 @@ const Game = strategyGameFactory({
   secondRoleLabel: 'Cápa leszek!',
   GameBoard,
   G: {
-    getPlayerStepDescription: (data) => 
+    getPlayerStepDescription: (data) =>
     {
       if (data.playerIndex === 0)
       {
-        return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.';// Jelenlegi kör: ' + data.board.turn + '.';
+        return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.';
       }
       else
       {
-        return 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';// Jelenlegi kör: ' + data.board.turn + '.';
+        return 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';
       }
     },
-      
+
     generateNewBoard: generateStartBoard,
     getGameStateAfterAiTurn
   }
