@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { range, cloneDeep } from 'lodash';
+import { range, random } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterAiTurn, getGameStateAfterMove } from './strategy';
 
 const generateNewBoard = () => {
-  const blueStartPosition = getRandomInt(7);
-  let redStartPosition = getRandomInt(7);
+  const blueStartPosition = random(0, 7);
+  let redStartPosition = random(0, 7);
   while (blueStartPosition === redStartPosition){
-    redStartPosition = getRandomInt(7);
+    redStartPosition = random(0, 7);
   }
   return {
-    board: Array(8).fill(null),
     turnCount: 0,
     blue1: blueStartPosition, // Start positions for blue pieces
     blue2: blueStartPosition,
@@ -18,10 +17,6 @@ const generateNewBoard = () => {
   };
 };
 
-
-const getRandomInt = (max) => {
-  return Math.floor(Math.random() * max);
-}
 
 const cubeCoords = [
   { cx: '30%', cy: '30%' },
@@ -45,9 +40,8 @@ const neighbours = {
   7: [3, 5, 6]
 };
 
-const isAllowedStep = (currentVertex, targetVertex, board) => {
+const isAllowedStep = (currentVertex, targetVertex) => {
   if (!neighbours[currentVertex] || !neighbours[currentVertex].includes(targetVertex)) return false;
-  if (board[targetVertex] !== null) return false;
   return true;
 };
 
@@ -58,60 +52,67 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   const [isBlue1Moved, setIsBlue1Moved] = useState(false);
   const [isBlue2Moved, setIsBlue2Moved] = useState(false);
-  const [turnState, setTurnstate] = useState("choose");
+  const [turnStage, setTurnStage] = useState("choose");
 
   const handleMove = (circle, targetVertex, currentVertex) => {
     if (!isAllowedStep(currentVertex, targetVertex, board.board)) {
       return null;
     }
-    setTurnstate("choose");
-    let newboard = cloneDeep(board);
-    newboard = {...newboard, ...circle};
-    if (isBlue1Moved && isBlue2Moved){
-      newboard.turnCount++;
-      setIsBlue1Moved(false);
-      setIsBlue2Moved(false);
-      ctx.endPlayerTurn(getGameStateAfterMove(newboard));
-    }else if( currentPlayer() === 'red'){
+
+    const newboard = {...board, ...circle};
+    if( currentPlayer() === 'red'){
       newboard.turnCount++;
       ctx.endPlayerTurn(getGameStateAfterMove(newboard));
-    }else{
+    } else {
+      let isTurnEnd = false;
       setBoard(newboard);
+      setTurnStage("choose");
+      if (currentVertex === board.blue1) {
+        setIsBlue1Moved(true);
+        if (isBlue2Moved) {
+          isTurnEnd = true;
+        }
+      } else if (currentVertex === board.blue2) {
+        setIsBlue2Moved(true);
+        if (isBlue1Moved) {
+          isTurnEnd = true;
+        }
+      }
+      if (isTurnEnd) {
+        newboard.turnCount++;
+        setIsBlue1Moved(false);
+        setIsBlue2Moved(false);
+        setTurnStage("choose");
+        ctx.endPlayerTurn(getGameStateAfterMove(newboard));
+      }
     }
   };
 
   const handleCircleClick = (vertex) => {
-    if(ctx.shouldPlayerMoveNext){
-      if (turnState === "choose"){
-      if(currentPlayer() === 'red' && board.red === vertex){
-        setTurnstate("move");
+    if (!ctx.shouldPlayerMoveNext) return;
+    if (currentPlayer() === 'red' && board.red !== vertex) {
+      handleMove({red: vertex}, vertex, board.red);
+    }
+    if (turnStage === "choose"){
+      if((board.blue1 === vertex) && !isBlue1Moved){
+        setTurnStage("move1");
       }
-      else if(currentPlayer() === 'blue' && (board.blue1 === vertex) && isBlue1Moved === false){
-        setTurnstate("move1");
-        setIsBlue1Moved(true);
-      }
-      else if(currentPlayer() === 'blue' && (board.blue2 === vertex) && isBlue2Moved === false){
-        setTurnstate("move2");
-        setIsBlue2Moved(true);
+      else if((board.blue2 === vertex) && !isBlue2Moved){
+        setTurnStage("move2");
       }
       return;
-    }else{
-    if(turnState === "move"){
-      if (currentPlayer() === 'red' && board.red !== vertex) {
-        handleMove({red: vertex}, vertex, board.red);
-      }
-    }else if(turnState === "move1"){
-      if (currentPlayer() === 'blue' && board.blue1 !== vertex) {
-        handleMove({blue1: vertex}, vertex, board.blue1);
-      }
-    }else if(turnState === "move2"){
-      if (currentPlayer() === 'blue' && board.blue2 !== vertex) {
-        handleMove({blue2: vertex}, vertex, board.blue2);
+    } else {
+      if(turnStage === "move1"){
+        if (currentPlayer() === 'blue' && board.blue1 !== vertex) {
+          handleMove({blue1: vertex}, vertex, board.blue1);
+        }
+      }else if(turnStage === "move2"){
+        if (currentPlayer() === 'blue' && board.blue2 !== vertex) {
+          handleMove({blue2: vertex}, vertex, board.blue2);
+        }
       }
     }
-    }
-    }
-    };
+  };
 
   const getColor = (nodeId) => {
     if (board.blue1 === nodeId){
@@ -125,6 +126,20 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     }
   };
 
+  const toBeChosenToMove = (nodeId) => {
+    if (!ctx.shouldPlayerMoveNext) return false;
+    if (ctx.playerIndex !== 0) return false;
+    if (board.blue1 === nodeId && turnStage === "choose" && !isBlue1Moved) return true;
+    if (board.blue2 === nodeId && turnStage === "choose" && !isBlue2Moved) return true;
+  }
+
+  const isDuringMove = (nodeId) => {
+    if (!ctx.shouldPlayerMoveNext) return false;
+    if (ctx.playerIndex !== 0) return false;
+    if (board.blue1 === nodeId && turnStage === "move1" && !isBlue1Moved) return true;
+    if (board.blue2 === nodeId && turnStage === "move2" && !isBlue2Moved) return true;
+  }
+
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <svg className="aspect-square stroke-black stroke-[3]">
@@ -136,15 +151,24 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         <line x1="10%" y1="90%" x2="30%" y2="70%" />
         <line x1="90%" y1="10%" x2="70%" y2="30%" />
 
-        {range(8).map(nodeId => (
+        {range(8).map(nodeId => (<>
           <circle
             key={nodeId}
             cx={cubeCoords[nodeId].cx}
             cy={cubeCoords[nodeId].cy}
+            className={isDuringMove(nodeId) && board.blue1 !== board.blue2 && "opacity-50"}
             r="4%"
+            stroke={toBeChosenToMove(nodeId) ? "orange" : ""}
             fill={getColor(nodeId)}
             onClick={() => handleCircleClick(nodeId)}
           />
+          {nodeId === board.blue1 && nodeId === board.blue2 &&
+          <text
+            style={{ transform: "translate(-1%,1%)"}}
+            x={cubeCoords[nodeId].cx}
+            y={cubeCoords[nodeId].cy}
+          >2x</text>}
+        </>
         ))}
       </svg>
     </section>
@@ -170,7 +194,13 @@ const Game = strategyGameFactory({
   secondRoleLabel: 'Tolvaj',
   GameBoard,
   G: {
-    getPlayerStepDescription: () => 'Lépj egyet',
+    getPlayerStepDescription: ({ playerIndex }) => {
+      if (playerIndex === 0) {
+        return 'Kattints először az egyik rendőrre, majd arra az útkereszteződésre, ahová lépni szeretnél vele, majd hasonlóan a másik rendőrrel.'
+      } else {
+        return 'Kattints arra az útkereszteződésre, ahová a tolvajjal lépni szeretnél.'
+      }
+    },
     generateNewBoard,
     getGameStateAfterAiTurn
   }

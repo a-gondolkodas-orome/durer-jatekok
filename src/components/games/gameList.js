@@ -164,7 +164,7 @@ export const gameList = {
   Policemanthief: {
     year: 9,
     round: 'döntő',
-    category: ['A', 'B'],
+    category: ['A'],
     name: 'rendőr, rabló'
   }
 };
