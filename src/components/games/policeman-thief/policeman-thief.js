@@ -197,6 +197,15 @@ const GameBoard = ({ board, setBoard, ctx }) => {
                 2x
               </text>
             )}
+            {nodeId === board.red && (nodeId === board.blue1 || nodeId === board.blue2) && (
+              <text
+                style={{ transform: "translate(-2%,1%)" }}
+                x={cubeCoords[nodeId].cx}
+                y={cubeCoords[nodeId].cy}
+              >
+                T+R
+              </text>
+            )}
           </>
         ))}
       </svg>
