@@ -12,22 +12,26 @@ export const GameBoard = ({ board, setBoard, ctx }) => {
     if (!ctx.shouldPlayerMoveNext) return false;
     return !isCoinActionInvalid(coinValue);
   };
-  const clickPile = (coinValue) => {
+
+  const removeFromPile = coinValue => {
     if (!isMoveAllowed(coinValue)) return;
 
-    if (!wasCoinAlreadyRemovedInTurn) {
-      setValueOfRemovedCoin(coinValue);
-      ctx.setTurnStage('placeBack');
-      const newBoard = [...board];
-      newBoard[coinValue] -= 1;
-      setBoard(newBoard);
-      if (coinValue === 0) endTurn(newBoard);
-    } else {
-      const newBoard = [...board];
-      newBoard[coinValue] += 1;
-      endTurn(newBoard);
-    }
+    setValueOfRemovedCoin(coinValue);
+    ctx.setTurnStage('placeBack');
+    const newBoard = [...board];
+    newBoard[coinValue] -= 1;
+    setBoard(newBoard);
+    if (coinValue === 0) endTurn(newBoard);
   };
+
+  const addToPile = (coinValue) => {
+    if (!isMoveAllowed(coinValue)) return;
+
+    const newBoard = [...board];
+    newBoard[coinValue] += 1;
+    endTurn(newBoard);
+  };
+
   const resetTurnState = () => {
     setHoveredPile(null);
     setValueOfRemovedCoin(null);
@@ -39,7 +43,7 @@ export const GameBoard = ({ board, setBoard, ctx }) => {
   };
   const getCoinColor = (coinValue) => {
     if (coinValue === 0) return 'bg-yellow-700';
-    if (coinValue === 1) return 'bg-slate-700';
+    if (coinValue === 1) return 'bg-slate-500';
     return 'bg-yellow-400';
   };
   const shouldShowCoinToBeRemoved = (coinValue) => {
@@ -60,64 +64,77 @@ export const GameBoard = ({ board, setBoard, ctx }) => {
 
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
-    <table className="m-2 border-collapse table-fixed w-full">
+    <div className="text-center" style={{ transform: 'scaleY(-1)' }}>
+    {[0, 1, 2].map(coinValue => (
+      <span key={coinValue}>
+        {range(board[coinValue]).map(i => (
+          <span
+            key={`${i}-${shouldShowCoinToBeAdded(coinValue)}`}
+            className={`
+              w-[15%] aspect-square inline-block rounded-full mr-0.5 mt-0.5
+              ${getCoinColor(coinValue)}
+              ${shouldShowCoinToBeRemoved(coinValue) && i === (board[coinValue] - 1) ? 'opacity-50' : ''}
+            `}
+            style={{ transform: 'scaleY(-1)' }}
+            onClick={() => removeFromPile(coinValue)}
+            onMouseOver={() => {if (!wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
+            onMouseOut={() => setHoveredPile(null)}
+            onFocus={() => {if (!wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
+            onBlur={() => setHoveredPile(null)}
+          ><span className='relative top-[25%]'>{coinValue+1}</span></span>
+        ))}
+        {shouldShowCoinToBeAdded(coinValue) && (
+          <span
+            key="to-be-added"
+            className={`
+              w-[15%] aspect-square inline-block rounded-full mr-0.5 mt-0.5 opacity-50
+              ${getCoinColor(coinValue)}
+            `}
+            style={{ transform: 'scaleY(-1)' }}
+          ><span className='relative top-[25%]'>{coinValue+1}</span></span>
+        )}
+      </span>))}
+    </div>
+    <hr className="my-4"></hr>
+    <table className="mx-2 table-fixed w-full">
       <tbody>
         <tr>
-          <th>1-es</th>
-          <th>2-es</th>
-          <th>3-as</th>
-        </tr>
-        <tr>
-          {[0, 1, 2].map(coinValue => (
-            <td
-              key={coinValue}
-              onClick={() => clickPile(coinValue)}
-              className={`
-                text-center border-4
-                ${isCoinActionInvalid(coinValue) ? 'bg-gray-300 cursor-not-allowed' : ''}
-              `}
-              >
+          {[0, 1].map(coinValue =>
+            <td key={coinValue} className="text-center">
               <button
-                className="min-h-[25vh] w-full p-[5%]"
-                disabled={!isMoveAllowed(coinValue)}
-                onMouseOver={() => setHoveredPile(coinValue)}
+                className={`
+                  inline-block w-[30%] aspect-square rounded-full mx-0.5
+                  ${getCoinColor(coinValue)}
+                  ${(!wasCoinAlreadyRemovedInTurn || valueOfRemovedCoin <= coinValue) && 'opacity-50 cursor-not-allowed'}
+                `}
+                disabled={!wasCoinAlreadyRemovedInTurn || valueOfRemovedCoin <= coinValue}
+                onClick={() => addToPile(coinValue)}
+                onMouseOver={() => {if (wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
                 onMouseOut={() => setHoveredPile(null)}
-                onFocus={() => setHoveredPile(coinValue)}
+                onFocus={() => {if (wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
                 onBlur={() => setHoveredPile(null)}
-              >
-                {range(board[coinValue]).map(i => (
-                  <span
-                    key={i}
-                    className={`
-                      w-[30%] aspect-square inline-block rounded-full mr-0.5
-                      ${getCoinColor(coinValue)}
-                      ${shouldShowCoinToBeRemoved(coinValue) && i === 1 ? 'opacity-50' : ''}
-                    `}
-                  ></span>
-                ))}
-                {shouldShowCoinToBeAdded(coinValue) && (
-                  <span
-                    className={`w-[30%] aspect-square inline-block rounded-full mr-0.5 opacity-50 ${getCoinColor(coinValue)}`}
-                  ></span>
-                )}
-              </button>
+              >{coinValue+1}</button>
             </td>
-          ))}
+          )}
+          <td key="nothing" className="px-2">
+            <button
+              disabled={!wasCoinAlreadyRemovedInTurn}
+              className="cta-button"
+              onClick={() => endTurn(board)}
+            >
+              Semmit se rakok be
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
-    {valueOfRemovedCoin && (
-      <button className="cta-button" onClick={() => endTurn(board)}>
-        Semmit se rakok be
-      </button>
-    )}
   </section>
   );
 };
 
 export const getPlayerStepDescription = ({ turnStage }) => {
   if (turnStage === 'placeBack') {
-    return 'Kattints egy mezőre, hogy visszatégy egy olyan pénzérmét';
+    return 'Kattints egy érmére a kupac alatt, hogy visszatégy egy olyan pénzérmét';
   }
-  return 'Kattints egy mezőre, hogy elvegyél egy olyan pénzérmét';
+  return 'Kattints egy érmére, hogy elvegyél egy olyan pénzérmét';
 };

@@ -40,8 +40,8 @@ npm ci
 npm run dev
 ```
 
-Known issue: sometimes weird bugs happen which disappear if you delete the `.parcel-cache`
-directory manually and re-load.
+Known issue: sometimes weird bugs happen (i.e. the app does not start at all with `npm run dev`) which disappear if you delete the `.parcel-cache`
+directory manually and re-load or you can use the slightly slower but more robust `npm run dev:nocache` command to start the app.
 
 If you are using Windows and you see `Error: The specified module could not be found. ... code: 'ERR_DLOPEN_FAILED'`
 https://github.com/parcel-bundler/parcel/issues/7104#issuecomment-967260755 might help you.
@@ -55,10 +55,6 @@ npm run test # lint and tests (as GA)
 Simple formatting errors such as trailing spaces can be automatically fixed with
 ```bash
 npm run lint:fix
-```
-
-```bash
-npm run test:watch # unit tests in watch mode
 ```
 
 ### Build for prod
@@ -84,14 +80,24 @@ The common parts of all games (showing rules, alternating turns, buttons for cho
 to a `strategyGameFactory` which is highly recommended (but not a must). The below documentation is about creating a new game
 with this factory (so that you can focus on game logic and designing the board interactions.)
 
-If you need a new, common parameter, just pass it down from `strategyGameFactory`.
+If you need a new, common parameter, you can create it and pass it down from `strategyGameFactory`.
 
 ## Must have for a new game
 
 *It is recommended to copy and modify an existing, similar game.*
 
+GameBoard: a React component with `board`, `setBoard`, `ctx` props which calls `ctx.endPlayerTurn`,
+typically following a click from the user. Typically the user clicks, new state is calculated within
+the GameBoard component and then as a final step `ctx.endPlayerTurn` is called with a
+`{ newBoard, isGameEnd }` object (see more details in section "Game end, determining winner")
+
+Concept: `board` holds the state necessary to know the game state, that the next player
+needs to know. Additional state variables may be created within the `GameBoard` component
+that is relevant only during a turn, not between turns, such as reacting to hover events.
+
+You should use `setBoard` if you need to change the board before ending player turn.
+
 ```js
-// a React component with `board`, `setBoard`, `ctx` props
 // `ctx` is an object and will contain the following (extendable):
 // - `shouldPlayerMoveNext: boolean
 // - endPlayerTurn: a function, see below
@@ -108,7 +114,9 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     </section>
   );
 };
+```
 
+```js
 const Game = strategyGameFactory({
   // a React component (can be text in <></>)
   rule,
@@ -152,6 +160,7 @@ such an object.
 - is it easy to guess the winning strategy from wathing the AI play?
 - do not allow the player interacting with the game while the other player's step is in progress, use `ctx.shouldPlayerMoveNext`
 - never modify react state (e.g. the board) in place
+- check for console errors/warnings as well, i.e. missing keys on react components
 
 ## Technologies used
 
