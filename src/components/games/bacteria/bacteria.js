@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { range, sampleSize, cloneDeep, random } from "lodash";
+import { range, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { getGameStateAfterAiTurn, areAllBacteriaRemoved } from "./strategy";
-import { isJump, reachedFieldsAfterClick, isAllowedAttackClick } from "./helpers";
+import { getGameStateAfterAiTurn } from "./strategy";
+import { isJump, reachedFieldsAfterClick, isAllowedAttackClick, areAllBacteriaRemoved } from "./helpers";
 
 const boardWidth = 11;
-const adjGoals = true;
 
 const generateNewBoard = () => {
   const board = Array(9).fill([]);
@@ -14,20 +13,26 @@ const generateNewBoard = () => {
     board[rowIndex] = Array(rowSize).fill(0);
   });
 
-  const numOfGoals = random(1, boardWidth);
-  if (adjGoals) {
-    const goalStart = random(boardWidth - numOfGoals);
-    for (let i = goalStart; i < goalStart + numOfGoals; i++) {
-      board[8][i] = -1;
-    }
-  } else {
-    const goals = sampleSize(range(boardWidth), numOfGoals);
-    goals.forEach((index) => (board[8][index] = -1));
+  const boardVariantId = random(1, 6);
+  if (boardVariantId === 1) {
+    [3, 4, 5, 6, 7].forEach(g => board[8][g] = -1);
+    [2, 4, 6, 8].forEach(b => board[2][b] = 1);
+  } else if (boardVariantId === 2) {
+    [3, 4, 5, 6, 7].forEach(g => board[8][g] = -1);
+    [3, 5, 7].forEach(b => board[2][b] = 1);
+  } else if (boardVariantId === 3) {
+    [0, 1, 2, 3, 4, 5].forEach(g => board[8][g] = -1);
+    [1, 2, 3, 4].forEach(b => board[1][b] = 1);
+  } else if (boardVariantId === 4) {
+    [0, 1, 2, 3, 4, 5].forEach(g => board[8][g] = -1);
+    [0, 1, 3].forEach(b => board[2][b] = 1);
+  } else if (boardVariantId === 5) {
+    range(0, 11).forEach(g => board[8][g] = -1);
+    [2, 3, 7, 9].forEach(b => board[0][b] = 1);
+  } else if (boardVariantId === 6) {
+    range(0, 11).forEach(g => board[8][g] = -1);
+    [1, 2, 4, 8].forEach(b => board[0][b] = 1);
   }
-
-  const numOfBacteria = random(1, boardWidth - 1);
-  const bacteria = sampleSize(range(boardWidth), numOfBacteria);
-  bacteria.forEach((index) => (board[0][index] = 1));
 
   return board;
 };
@@ -165,8 +170,8 @@ const getPlayerStepDescription = (ctx) => {
 
 const rule = (
   <>
-    A tábla alsó sorában a kijelölt mezőkön 1-1 baktérium található, a tábla
-    felső sorában a kijelölt mezők CÉL mezők. A játékban egy Támadó és Védekező
+    A tábla B betűvel jelölt mezőin 1-1 baktérium található, a tábla
+    felső sorában a kijelölt (szomszédos) mezők CÉL mezők. A játékban egy Támadó és Védekező
     játékos felváltva lép. A Védekező játékos minden körében levesz pontosan 1
     baktériumot bármely általa választott mezőről. Ez a baktérium lekerül a
     pályáról. A Támadó játékos a következő háromféle lépés egyikét választhatja:
