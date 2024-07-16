@@ -65,7 +65,9 @@ export const areAllBacteriaRemoved = (bacteria) => {
   return true;
 };
 
-export const isGoal = (board, row, col) => row === 8 && board.goals.includes(col);
+export const isGoal = (board, row, col) => {
+  return row === (board.bacteria.length - 1) && board.goals.includes(col);
+};
 
 export const lastCol = (bacteria, row) => bacteria[0].length - 0.5 - 0.5 * (-1) ** row;
 

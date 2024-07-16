@@ -23,7 +23,9 @@ const aiDefense = (board) => {
   const newBoard = cloneDeep(board);
 
   const bacteriaCoords = getBacteriaCoords(board.bacteria);
-  const dangerousBacteria = bacteriaCoords.filter(([row, col]) => isDangerous(board, { row, col }));
+  const dangerousBacteria = bacteriaCoords.filter(
+    ([row, col]) => isDangerous(board, { row, col })
+  );
   if (dangerousBacteria.length >= 1) {
     const [defenseRow, defenseCol] = sample(dangerousBacteria);
     newBoard.bacteria[defenseRow][defenseCol] -= 1;
@@ -40,8 +42,11 @@ const aiAttack = (board) => {
   const newBoard = cloneDeep(board);
   const { bacteria, goals } = board;
 
+  const goalRowIdx = bacteria.length - 1;
   const bacteriaCoords = getBacteriaCoords(bacteria);
-  const dangerousBacteria = bacteriaCoords.filter(([row, col]) => isDangerous(board, { row, col }));
+  const dangerousBacteria = bacteriaCoords.filter(
+    ([row, col]) => isDangerous(board, { row, col })
+  );
   let attackRow, attackCol;
   let attackChoice;
 
@@ -49,10 +54,10 @@ const aiAttack = (board) => {
     // TODO: still try to be as dangerous as possible?
     [attackRow, attackCol] = sample(bacteriaCoords);
     let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread"];
-    if (attackRow >= 7) {
+    if (attackRow >= goalRowIdx - 1) {
       attackOptions = difference(attackOptions, ["jump"]);
     }
-    if (attackRow === 8) {
+    if (attackRow === goalRowIdx) {
       attackOptions = difference(attackOptions, ["spread"]);
     }
     attackChoice = sample(attackOptions);
@@ -63,7 +68,7 @@ const aiAttack = (board) => {
     }
   } else {
     [attackRow, attackCol] = sample(dangerousBacteria);
-    if (attackRow === 8) {
+    if (attackRow === goalRowIdx) {
       attackChoice = (attackCol === goals[0] - 1) ? "shiftRight" : "shiftLeft";
     } else {
       attackChoice = "spread";
