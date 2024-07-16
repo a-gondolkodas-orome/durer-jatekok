@@ -130,17 +130,10 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
                 <td key={col} onClick={() => clickField({ row, col })}>
                   <button
                     className={`
-                      aspect-square w-full ${
-                        row % 2 === 1 && col === boardWidth - 1
-                          ? ""
-                          : "border-2"
-                      }
+                      aspect-square w-full
+                      ${row % 2 === 1 && col === boardWidth - 1 ? "" : "border-2"}
                       ${isGoal({ row, col }) ? "bg-blue-800" : ""}
-                      ${
-                        row === attackRow && col === attackCol
-                          ? "border-green-800"
-                          : ""
-                      }
+                      ${row === attackRow && col === attackCol ? "border-green-800": ""}
                       ${attackRow !== null && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
                       ${attackRow !== null && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}
                       ${attackRow === null && bacteria[row][col] < 1 ? "cursor-not-allowed" : ""}

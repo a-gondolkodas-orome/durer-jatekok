@@ -1,6 +1,6 @@
 'use strict';
 
-import { cloneDeep } from "lodash";
+import { cloneDeep, last } from "lodash";
 
 export const reachedFieldsWithAttack = (move, { bacteria, attackRow, attackCol }) => {
   if (move === "shiftRight") return [[attackRow, attackCol + 1]];
@@ -83,4 +83,14 @@ export const makeShiftOrSpread = (bacteria, attackRow, attackCol, reachedFields)
     newBacteria[row][col] += bacteria[attackRow][attackCol];
   });
   return newBacteria;
+}
+
+export const isDangerous = (board, { row, col }) => {
+  const boardWidth = board.bacteria[0].length;
+  const goalRowIdx = board.bacteria.length - 1;
+  const finalLeft = board.goals[0] === 0 ? 0 : board.goals[0] - 1;
+  const leftEdge = finalLeft + Math.floor((goalRowIdx - row)/2);
+  const finalRight = last(board.goals) === boardWidth - 1 ? boardWidth - 1 : last(board.goals) + 1;
+  const rightEdge = finalRight - Math.ceil((goalRowIdx - row)/2);
+  return col >= leftEdge && col <= rightEdge;
 }

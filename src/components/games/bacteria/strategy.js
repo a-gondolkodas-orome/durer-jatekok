@@ -7,7 +7,8 @@ import {
   lastCol,
   makeJump,
   makeShiftOrSpread,
-  reachedFieldsWithAttack
+  reachedFieldsWithAttack,
+  isDangerous
 } from "./helpers";
 
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
@@ -21,8 +22,15 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
 const aiDefense = (board) => {
   const newBoard = cloneDeep(board);
 
-  const [defenseRow, defenseCol] = sample(getBacteriaCoords(board.bacteria));
-  newBoard.bacteria[defenseRow][defenseCol] -= 1;
+  const bacteriaCoords = getBacteriaCoords(board.bacteria);
+  const dangerousBacteria = bacteriaCoords.filter(([row, col]) => isDangerous(board, { row, col }));
+  if (dangerousBacteria.length >= 1) {
+    const [defenseRow, defenseCol] = sample(dangerousBacteria);
+    newBoard.bacteria[defenseRow][defenseCol] -= 1;
+  } else {
+    const [defenseRow, defenseCol] = sample(bacteriaCoords);
+    newBoard.bacteria[defenseRow][defenseCol] -= 1;
+  }
 
   const isGameEnd = areAllBacteriaRemoved(newBoard.bacteria);
   return { newBoard, isGameEnd };
