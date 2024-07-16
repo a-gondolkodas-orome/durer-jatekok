@@ -38,23 +38,38 @@ const aiDefense = (board) => {
 
 const aiAttack = (board) => {
   const newBoard = cloneDeep(board);
-  const { bacteria } = board;
+  const { bacteria, goals } = board;
 
-  const [attackRow, attackCol] = sample(getBacteriaCoords(bacteria));
+  const bacteriaCoords = getBacteriaCoords(bacteria);
+  const dangerousBacteria = bacteriaCoords.filter(([row, col]) => isDangerous(board, { row, col }));
+  let attackRow, attackCol;
+  let attackChoice;
 
-  let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread"];
-  if (attackRow >= 7) {
-    attackOptions = difference(attackOptions, ["jump"]);
+  if (dangerousBacteria.length === 0) {
+    // TODO: still try to be as dangerous as possible?
+    [attackRow, attackCol] = sample(bacteriaCoords);
+    let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread"];
+    if (attackRow >= 7) {
+      attackOptions = difference(attackOptions, ["jump"]);
+    }
+    if (attackRow === 8) {
+      attackOptions = difference(attackOptions, ["spread"]);
+    }
+    attackChoice = sample(attackOptions);
+    if (attackChoice === "shiftRight" && attackCol === lastCol(bacteria, attackRow)) {
+      attackChoice = "shiftLeft";
+    } else if (attackChoice === "shiftLeft" && attackCol === 0) {
+      attackChoice = "shiftRight";
+    }
+  } else {
+    [attackRow, attackCol] = sample(dangerousBacteria);
+    if (attackRow === 8) {
+      attackChoice = (attackCol === goals[0] - 1) ? "shiftRight" : "shiftLeft";
+    } else {
+      attackChoice = "spread";
+    }
   }
-  if (attackRow === 8) {
-    attackOptions = difference(attackOptions, ["spread"]);
-  }
-  let attackChoice = sample(attackOptions);
-  if (attackChoice === "shiftRight" && attackCol === lastCol(bacteria, attackRow)) {
-    attackChoice = "shiftLeft";
-  } else if (attackChoice === "shiftLeft" && attackCol === 0) {
-    attackChoice = "shiftRight";
-  }
+
 
   const reachedFields = reachedFieldsWithAttack(attackChoice, { bacteria, attackRow, attackCol });
   const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
