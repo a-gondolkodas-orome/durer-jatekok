@@ -2,67 +2,81 @@ import React, { useState } from "react";
 import { range, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
 import { getGameStateAfterAiTurn } from "./strategy";
-import { isJump, reachedFieldsAfterClick, isAllowedAttackClick, areAllBacteriaRemoved } from "./helpers";
+import {
+  isJump,
+  reachedFieldsAfterClick,
+  isAllowedAttackClick,
+  areAllBacteriaRemoved,
+  makeJump,
+  makeShiftOrSpread
+} from "./helpers";
 
 const boardWidth = 11;
 
 const generateNewBoard = () => {
-  const board = Array(9).fill([]);
-  range(board.length).forEach((rowIndex) => {
+  const bacteria = Array(9).fill([]);
+  range(bacteria.length).forEach((rowIndex) => {
     const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
-    board[rowIndex] = Array(rowSize).fill(0);
+    bacteria[rowIndex] = Array(rowSize).fill(0);
   });
 
   const boardVariantId = random(1, 6);
-  if (boardVariantId === 1) {
-    [3, 4, 5, 6, 7].forEach(g => board[8][g] = -1);
-    [2, 4, 6, 8].forEach(b => board[2][b] = 1);
-  } else if (boardVariantId === 2) {
-    [3, 4, 5, 6, 7].forEach(g => board[8][g] = -1);
-    [3, 5, 7].forEach(b => board[2][b] = 1);
-  } else if (boardVariantId === 3) {
-    [0, 1, 2, 3, 4, 5].forEach(g => board[8][g] = -1);
-    [1, 2, 3, 4].forEach(b => board[1][b] = 1);
-  } else if (boardVariantId === 4) {
-    [0, 1, 2, 3, 4, 5].forEach(g => board[8][g] = -1);
-    [0, 1, 3].forEach(b => board[2][b] = 1);
-  } else if (boardVariantId === 5) {
-    range(0, 11).forEach(g => board[8][g] = -1);
-    [2, 3, 7, 9].forEach(b => board[0][b] = 1);
-  } else if (boardVariantId === 6) {
-    range(0, 11).forEach(g => board[8][g] = -1);
-    [1, 2, 4, 8].forEach(b => board[0][b] = 1);
+  switch (boardVariantId) {
+    case 1: {
+      [2, 4, 6, 8].forEach(b => bacteria[2][b] = 1);
+      return { bacteria, goals: [3, 4, 5, 6, 7] };
+    }
+    case 2: {
+      [3, 5, 7].forEach(b => bacteria[2][b] = 1);
+      return { bacteria, goals: [3, 4, 5, 6, 7] };
+    }
+    case 3: {
+      [1, 2, 3, 4].forEach(b => bacteria[1][b] = 1);
+      return { bacteria, goals: [0, 1, 2, 3, 4, 5] };
+    }
+    case 4: {
+      [0, 1, 3].forEach(b => bacteria[2][b] = 1);
+      return { bacteria, goals: [0, 1, 2, 3, 4, 5] };
+    }
+    case 5: {
+      [2, 3, 7, 9].forEach(b => bacteria[0][b] = 1);
+      return { bacteria, goals: range(0, 11) };
+    }
+    case 6: {
+      [1, 2, 4, 8].forEach(b => bacteria[0][b] = 1);
+      return { bacteria, goals: range(0, 11) };
+    }
   }
-
-  return board;
 };
 
-const GameBoard = ({ board, ctx }) => {
-  const [attackRow, setAttackRow] = useState(-1);
-  const [attackCol, setAttackCol] = useState(-1);
+const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
+  const [attackRow, setAttackRow] = useState(null);
+  const [attackCol, setAttackCol] = useState(null);
 
-  const newBoard = cloneDeep(board);
+  const newBoard = { bacteria: cloneDeep(bacteria), goals };
   const isPlayerAttacker = ctx.playerIndex === 0;
 
   const isAllowedAttack = ({ row, col }) => {
-    if (board[row][col] === undefined) return false;
+    if (bacteria[row][col] === undefined) return false;
     return isAllowedAttackClick({ attackRow, attackCol, row, col });
   };
 
+  const isGoal = ({ row, col }) => row === 8 && goals.includes(col);
+
   const clickField = ({ row, col }) => {
     if (!ctx.shouldPlayerMoveNext) return;
-    if (attackRow === -1 && board[row][col] < 1) return;
-    if (attackRow !== -1 && !isAllowedAttack({ row, col })) return;
+    if (attackRow === null && !bacteria[row][col] >= 1) return;
+    if (attackRow !== null && !isAllowedAttack({ row, col })) return;
 
-    if (isPlayerAttacker && attackRow === -1) {
+    if (isPlayerAttacker && attackRow === null) {
       setAttackRow(row);
       setAttackCol(col);
       return;
     }
 
     if (!isPlayerAttacker) {
-      newBoard[row][col] -= 1;
-      if (areAllBacteriaRemoved(newBoard)) {
+      newBoard.bacteria[row][col] -= 1;
+      if (areAllBacteriaRemoved(newBoard.bacteria)) {
         ctx.endPlayerTurn({ newBoard, isGameEnd: true, winnerIndex: 1 });
         return;
       }
@@ -71,25 +85,19 @@ const GameBoard = ({ board, ctx }) => {
     }
 
     const reachedFields = reachedFieldsAfterClick({
-      board,
+      bacteria,
       attackRow,
       attackCol,
       row,
       col
     });
 
-    const goalsReached = reachedFields.filter(([row, col]) => {
-      board[row][col] === -1;
-    });
+    const goalsReached = reachedFields.filter(([row, col]) => isGoal({ row, col }));
 
     if (isJump({ attackRow, attackCol, row, col })) {
-      newBoard[row][col] += 1;
-      newBoard[attackRow][attackCol] -= 1;
+      newBoard.bacteria = makeJump(bacteria, attackRow, attackCol);
     } else {
-      newBoard[attackRow][attackCol] = 0;
-      reachedFields.forEach(([row, col]) => {
-        newBoard[row][col] += board[attackRow][attackCol];
-      });
+      newBoard.bacteria = makeShiftOrSpread(bacteria, attackRow, attackCol, reachedFields);
     }
 
     if (goalsReached.length >= 1) {
@@ -98,8 +106,8 @@ const GameBoard = ({ board, ctx }) => {
       ctx.endPlayerTurn({ newBoard, isGameEnd: false });
     }
 
-    setAttackRow(-1);
-    setAttackCol(-1);
+    setAttackRow(null);
+    setAttackCol(null);
   };
 
   return (
@@ -109,7 +117,7 @@ const GameBoard = ({ board, ctx }) => {
         style={{ transform: "scaleY(-1)" }}
       >
         <tbody>
-          {range(board.length).map((row) => (
+          {range(bacteria.length).map((row) => (
             <tr
               style={{
                 transform: `translateX(${
@@ -127,22 +135,22 @@ const GameBoard = ({ board, ctx }) => {
                           ? ""
                           : "border-2"
                       }
-                      ${board[row][col] < 0 ? "bg-blue-800" : ""}
+                      ${isGoal({ row, col }) ? "bg-blue-800" : ""}
                       ${
                         row === attackRow && col === attackCol
                           ? "border-green-800"
                           : ""
                       }
-                      ${attackRow !== -1 && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
-                      ${attackRow !== -1 && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}
-                      ${attackRow === -1 && board[row][col] < 1 ? "cursor-not-allowed" : ""}
+                      ${attackRow !== null && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
+                      ${attackRow !== null && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}
+                      ${attackRow === null && bacteria[row][col] < 1 ? "cursor-not-allowed" : ""}
                     `}
                     style={{ transform: "scaleY(-1)" }}
                   >
-                    {board[row][col] < 0
-                      ? "C"
-                      : board[row][col]
-                      ? "B".repeat(board[row][col])
+                    {isGoal({ row, col })
+                      ? (bacteria[row][col] ? `C: ${"B".repeat(bacteria[row][col])}` : "C")
+                      : bacteria[row][col]
+                      ? "B".repeat(bacteria[row][col])
                       : row % 2 === 1 && col === boardWidth - 1
                       ? ""
                       : "-"}
