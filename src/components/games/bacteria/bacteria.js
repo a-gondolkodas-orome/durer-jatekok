@@ -8,7 +8,8 @@ import {
   isAllowedAttackClick,
   areAllBacteriaRemoved,
   makeJump,
-  makeShiftOrSpread
+  makeShiftOrSpread,
+  isDangerous
 } from "./helpers";
 
 const boardWidth = 11;
@@ -133,6 +134,7 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
                       aspect-square w-full
                       ${row % 2 === 1 && col === boardWidth - 1 ? "" : "border-2"}
                       ${isGoal({ row, col }) ? "bg-blue-800" : ""}
+                      ${isDangerous(newBoard, { row, col }) ? "" : ""}
                       ${row === attackRow && col === attackCol ? "border-green-800": ""}
                       ${attackRow !== null && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
                       ${attackRow !== null && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}

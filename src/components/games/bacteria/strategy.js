@@ -1,6 +1,6 @@
 "use strict";
 
-import { cloneDeep, sample, difference } from "lodash";
+import { cloneDeep, sample, minBy, shuffle } from "lodash";
 import {
   areAllBacteriaRemoved,
   isGoal,
@@ -8,9 +8,11 @@ import {
   makeJump,
   makeShiftOrSpread,
   reachedFieldsWithAttack,
-  isDangerous
+  isDangerous,
+  distanceFromDangerousAttackZone
 } from "./helpers";
 
+/* Currently only implemented for the case of adjacent goal fields */
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   if (playerIndex === 0) {
     return aiDefense(board);
@@ -30,7 +32,10 @@ const aiDefense = (board) => {
     const [defenseRow, defenseCol] = sample(dangerousBacteria);
     newBoard.bacteria[defenseRow][defenseCol] -= 1;
   } else {
-    const [defenseRow, defenseCol] = sample(bacteriaCoords);
+    const [defenseRow, defenseCol] = minBy(
+      shuffle(bacteriaCoords),
+      ([row, col]) => distanceFromDangerousAttackZone(board, { row, col })
+    );
     newBoard.bacteria[defenseRow][defenseCol] -= 1;
   }
 
@@ -51,14 +56,18 @@ const aiAttack = (board) => {
   let attackChoice;
 
   if (dangerousBacteria.length === 0) {
-    // TODO: still try to be as dangerous as possible?
-    [attackRow, attackCol] = sample(bacteriaCoords);
-    let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread"];
-    if (attackRow >= goalRowIdx - 1) {
-      attackOptions = difference(attackOptions, ["jump"]);
+    // Currently AI is moderately dangerous: not random but not as dangerous as possible either
+    [attackRow, attackCol] = minBy(
+      shuffle(bacteriaCoords),
+      ([row, col]) => distanceFromDangerousAttackZone(board, { row, col })
+    );
+    let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread", "spread", "spread", "spread"];
+    if (attackRow === goalRowIdx - 1) {
+      attackOptions = ["spread"];
     }
     if (attackRow === goalRowIdx) {
-      attackOptions = difference(attackOptions, ["spread"]);
+      if (attackCol <= goals[0]) attackOptions = ["shiftRight"]
+      else attackOptions = ["shiftLeft"]
     }
     attackChoice = sample(attackOptions);
     if (attackChoice === "shiftRight" && attackCol === lastCol(bacteria, attackRow)) {
