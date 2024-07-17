@@ -58,7 +58,7 @@ export const isAllowedAttackClick = (attack) => {
 
 export const areAllBacteriaRemoved = (bacteria) => {
   for (let row = 0; row < bacteria.length; row++) {
-    for (let col = 0; col < lastCol(bacteria, row); col++) {
+    for (let col = 0; col <= lastCol(bacteria, row); col++) {
       if (bacteria[row][col] > 0) return false;
     }
   }
