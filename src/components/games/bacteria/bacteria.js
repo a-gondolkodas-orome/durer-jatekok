@@ -21,6 +21,7 @@ const generateNewBoard = () => {
     bacteria[rowIndex] = Array(rowSize).fill(0);
   });
 
+  // using isDangerous we could generate random but interesting boards instead of hardcoding a few
   const boardVariantId = random(1, 6);
   switch (boardVariantId) {
     case 1: {
@@ -62,7 +63,7 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
     return isAllowedAttackClick({ attackRow, attackCol, row, col });
   };
 
-  const isGoal = ({ row, col }) => row === 8 && goals.includes(col);
+  const isGoal = ({ row, col }) => row === (bacteria.length - 1) && goals.includes(col);
 
   const clickField = ({ row, col }) => {
     if (!ctx.shouldPlayerMoveNext) return;
@@ -111,6 +112,24 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
     setAttackCol(null);
   };
 
+  const rowShift = row => row % 2 === 0 ? "0px" : `${100 / (2 * boardWidth)}%`;
+
+  const cellLabel = ({ row, col }) => {
+    if (isGoal({ row, col })) {
+      return bacteria[row][col] ? `C: ${"B".repeat(bacteria[row][col])}` : "C";
+    }
+    if (!bacteria[row][col]) {
+      return row % 2 === 1 && col === boardWidth - 1 ? "" : "-";
+    }
+    return "B".repeat(bacteria[row][col]);
+  }
+
+  const isForbidden = ({ row, col }) => {
+    if (attackRow !== null && !isAllowedAttack({ row, col })) return true;
+    if (attackRow === null && bacteria[row][col] < 1) return true;
+    return false;
+  }
+
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <table
@@ -120,35 +139,24 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
         <tbody>
           {range(bacteria.length).map((row) => (
             <tr
-              style={{
-                transform: `translateX(${
-                  row % 2 === 0 ? "0px" : `${100 / (2 * boardWidth)}%`
-                })`
-              }}
+              style={{ transform: `translateX(${rowShift(row)})`}}
               key={row}
             >
               {range(boardWidth).map((col) => (
                 <td key={col} onClick={() => clickField({ row, col })}>
                   <button
                     className={`
-                      aspect-square w-full
+                      aspect-[4/3] w-full
                       ${row % 2 === 1 && col === boardWidth - 1 ? "" : "border-2"}
                       ${isGoal({ row, col }) ? "bg-blue-800" : ""}
                       ${isDangerous(newBoard, { row, col }) ? "" : ""}
                       ${row === attackRow && col === attackCol ? "border-green-800": ""}
                       ${attackRow !== null && isAllowedAttack({ row, col }) ? "bg-teal-400" : ""}
-                      ${attackRow !== null && !isAllowedAttack({ row, col }) ? "cursor-not-allowed" : ""}
-                      ${attackRow === null && bacteria[row][col] < 1 ? "cursor-not-allowed" : ""}
+                      ${isForbidden({ row, col }) ? "cursor-not-allowed" : ""}
                     `}
                     style={{ transform: "scaleY(-1)" }}
                   >
-                    {isGoal({ row, col })
-                      ? (bacteria[row][col] ? `C: ${"B".repeat(bacteria[row][col])}` : "C")
-                      : bacteria[row][col]
-                      ? "B".repeat(bacteria[row][col])
-                      : row % 2 === 1 && col === boardWidth - 1
-                      ? ""
-                      : "-"}
+                    {cellLabel({ row, col })}
                   </button>
                 </td>
               ))}
