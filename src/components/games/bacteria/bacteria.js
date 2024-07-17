@@ -122,13 +122,13 @@ const GameBoard = ({ board: { bacteria, goals }, ctx }) => {
       return row % 2 === 1 && col === boardWidth - 1 ? "" : "-";
     }
     return "B".repeat(bacteria[row][col]);
-  }
+  };
 
   const isForbidden = ({ row, col }) => {
     if (attackRow !== null && !isAllowedAttack({ row, col })) return true;
     if (attackRow === null && bacteria[row][col] < 1) return true;
     return false;
-  }
+  };
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
