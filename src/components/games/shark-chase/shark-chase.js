@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy/strategy';
-import { SharkSvg } from './strategy/shark-chase-shark-svg';
-import { SubmarineSvg } from './strategy/shark-chase-submarine-svg';
+import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy';
+import { SharkSvg } from './shark-chase-shark-svg';
+import { SubmarineSvg } from './shark-chase-submarine-svg';
 
 
 export const generateStartBoard = () => {
