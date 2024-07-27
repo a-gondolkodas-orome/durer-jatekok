@@ -1,80 +1,71 @@
 import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy';
+import { getGameStateAfterMove, getGameStateAfterAiTurn, playerRole } from './strategy';
 import { SharkSvg } from './shark-chase-shark-svg';
 import { SubmarineSvg } from './shark-chase-submarine-svg';
 
 
 export const generateStartBoard = () => {
   let startboard = Array(16).fill(null);
-  startboard[2] = 'red';
-  startboard[3] = 'red';
-  startboard[7] = 'red';
-  startboard[12] = 'blue';
+  startboard[2] = 'submarine';
+  startboard[3] = 'submarine';
+  startboard[7] = 'submarine';
+  startboard[12] = 'shark';
   return {board: startboard, shark: 12, turn: 1};
 }
 
+const distance = (fieldA, fieldB) => {
+  return Math.abs(fieldA%4-fieldB%4) + Math.abs(Math.floor(fieldA/4)-Math.floor(fieldB/4))
+}
 
 const GameBoard = ({ board, setBoard, ctx }) => {
   const [playerState, setPlayerState] = useState('choosePiece');
   const [chosenPiece, setChosenPiece] = useState(12);
 
+  const distanceFromShark = (id) => distance(board.shark, id);
+
+  const distanceFromChosenPiece = (id) => distance(chosenPiece, id);
+
   let possibleMoves=[]
   if (ctx.playerIndex===1) {
-    for (let i = 0; i < 16; i++) {
-      if ((Math.abs(board.shark%4-i%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(i/4)))<=2 && board.board[i]!=='blue' && board.board[i]!=='red')
-      {
-        possibleMoves.push(i);
-      }
-    }
-  }
-  else if (ctx.playerIndex===0 && playerState === 'movePiece') {
-    for (let i = 0; i < 16; i++) {
-      if ((Math.abs(chosenPiece%4-i%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(i/4)))<=1 && board.board[i]!=='red'  && board.board[i]!=='blue')
-      {
-        possibleMoves.push(i);
-      }
-    }
-  }
-
-
-  const distanceFromChosenPiece = (id) => {
-    return Math.abs(chosenPiece%4-id%4) + Math.abs(Math.floor(chosenPiece/4)-Math.floor(id/4));
+    possibleMoves = range(16).filter(
+      i => distanceFromShark(i) <= 2 && board.board[i]!=='shark' && board.board[i]!=='submarine'
+    )
+  } else if (ctx.playerIndex===0 && playerState === 'movePiece') {
+    possibleMoves = range(16).filter(
+      i => distanceFromChosenPiece(i) <= 1 && board.board[i]!=='shark' && board.board[i]!=='submarine'
+    )
   }
 
   const isAllowed_choosePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    return board.board[id] === playerColor(ctx.playerIndex);
+    return board.board[id] === playerRole(ctx.playerIndex);
   }
   const isAllowed_movePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    if (board.board[id] === 'red') return false;
+    if (board.board[id] === 'submarine') return false;
     if (ctx.playerIndex === 0) return distanceFromChosenPiece(id) <=1;
     else return distanceFromChosenPiece(id) <=2;
   }
 
   const clickField = (id) => {
-    if (playerState === 'choosePiece' && ctx.playerIndex === 0)
-    {
+    if (playerState === 'choosePiece' && ctx.playerIndex === 0) {
       if (!isAllowed_choosePiece(id)) return;
       setPlayerState('movePiece');
       setChosenPiece(id);
-    }
-    else if (ctx.playerIndex === 1 || playerState === 'movePiece')
-    {
-      if (board.board[id]==='red' && ctx.playerIndex === 0){
+    } else if (ctx.playerIndex === 1 || playerState === 'movePiece') {
+      if (board.board[id]==='submarine' && ctx.playerIndex === 0){
         setChosenPiece(id);
-      }
-      else if (!isAllowed_movePiece(id)) return;
-      else{
+      } else if (!isAllowed_movePiece(id)) {
+        return;
+      } else{
         const newBoard = cloneDeep(board);
         newBoard.board[chosenPiece] = null;
-        newBoard.board[id] = playerColor(ctx.playerIndex);
+        newBoard.board[id] = playerRole(ctx.playerIndex);
         newBoard.turn = board.turn+1;
-              if (ctx.playerIndex === 1) newBoard.shark = id;
-        if (ctx.playerIndex === 0 && board.shark === id)
-        {
+        if (ctx.playerIndex === 1) newBoard.shark = id;
+        if (ctx.playerIndex === 0 && board.shark === id) {
           newBoard.shark = -1;
         }
         setPlayerState('choosePiece');
@@ -82,9 +73,8 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
       }
     }
-
-
   };
+
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
     <b><font size="4">Hátralévő lépések száma: {12-board.turn}</font></b>
@@ -110,14 +100,14 @@ const GameBoard = ({ board, setBoard, ctx }) => {
             </svg>
             </span>
           )}
-          {board.board[id]==='red' && (
+          {board.board[id]==='submarine' && (
             <span>
             <svg className="w-full aspect-square inline-block">
               <use xlinkHref="#submarine" />
             </svg>
             </span>
           )}
-          {board.board[id]==='blue' && (
+          {board.board[id]==='shark' && (
             <span>
             <svg className="w-full aspect-square inline-block">
               <use xlinkHref="#shark" />
@@ -125,7 +115,6 @@ const GameBoard = ({ board, setBoard, ctx }) => {
             </span>
 
           )}
-
       </button>
       ))}
     </div>
@@ -156,18 +145,11 @@ const Game = strategyGameFactory({
   secondRoleLabel: 'Cápa leszek!',
   GameBoard,
   G: {
-    getPlayerStepDescription: (data) =>
-    {
-      if (data.playerIndex === 0)
-      {
-        return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.';
-      }
-      else
-      {
-        return 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';
-      }
+    getPlayerStepDescription: ({ playerIndex }) => {
+      return playerIndex === 0
+        ? 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.'
+        : 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';
     },
-
     generateNewBoard: generateStartBoard,
     getGameStateAfterAiTurn
   }
