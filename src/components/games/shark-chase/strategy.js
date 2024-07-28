@@ -2,9 +2,6 @@
 
 import { cloneDeep, sample } from 'lodash';
 
-export const playerRole = playerIndex => playerIndex === 0 ? 'submarine' : 'shark';
-const aiRole = playerIndex => playerIndex === 0 ? 'shark' : 'submarine';
-
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const findSubmarineNextToShark = () => {
     if (board.shark+4 < 16 && board.board[board.shark+4] === 'submarine') return board.shark+4;
@@ -17,7 +14,7 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const moveSubmarine = (from,to) => {
     const newBoard = cloneDeep(board);
     if(board.shark === to) newBoard.shark = -1;
-    newBoard.board[to] = aiRole(playerIndex);
+    newBoard.board[to] = 'submarine';
     newBoard.board[from] = null;
     return getGameStateAfterMove(newBoard);
   }
@@ -26,7 +23,7 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
     const newMove = getOptimalAiPlacingPositionShark(board, playerIndex);
     const newBoard = cloneDeep(board);
     newBoard.board[board.shark] = null;
-    newBoard.board[newMove] = aiRole(playerIndex);
+    newBoard.board[newMove] = 'shark';
     newBoard.shark = newMove
     return getGameStateAfterMove(newBoard);
   } else {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterMove, getGameStateAfterAiTurn, playerRole } from './strategy';
+import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
 import { SharkSvg } from './shark-chase-shark-svg';
 import { SubmarineSvg } from './shark-chase-submarine-svg';
 
@@ -40,7 +40,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   const isAllowed_choosePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    return board.board[id] === playerRole(ctx.playerIndex);
+    return board.board[id] === ctx.playerIndex === 0 ? 'submarine' : 'shark';
   }
   const isAllowed_movePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
@@ -62,7 +62,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       } else{
         const newBoard = cloneDeep(board);
         newBoard.board[chosenPiece] = null;
-        newBoard.board[id] = playerRole(ctx.playerIndex);
+        newBoard.board[id] = ctx.playerIndex === 0 ? 'submarine' : 'shark';
         newBoard.turn = board.turn+1;
         if (ctx.playerIndex === 1) newBoard.shark = id;
         if (ctx.playerIndex === 0 && board.shark === id) {
