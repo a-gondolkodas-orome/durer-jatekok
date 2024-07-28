@@ -60,17 +60,17 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       } else if (!isAllowed_movePiece(id)) {
         return;
       } else{
-        const newBoard = cloneDeep(board);
-        newBoard.board[chosenPiece] = null;
-        newBoard.board[id] = ctx.playerIndex === 0 ? 'submarine' : 'shark';
-        newBoard.turn = board.turn+1;
-        if (ctx.playerIndex === 1) newBoard.shark = id;
+        const nextBoard = cloneDeep(board);
+        nextBoard.board[chosenPiece] = null;
+        nextBoard.board[id] = ctx.playerIndex === 0 ? 'submarine' : 'shark';
+        nextBoard.turn = board.turn+1;
+        if (ctx.playerIndex === 1) nextBoard.shark = id;
         if (ctx.playerIndex === 0 && board.shark === id) {
-          newBoard.shark = -1;
+          nextBoard.shark = -1;
         }
         setPlayerState('choosePiece');
         setChosenPiece(id);
-        ctx.endPlayerTurn(getGameStateAfterMove(newBoard));
+        ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
       }
     }
   };
@@ -150,7 +150,7 @@ const Game = strategyGameFactory({
         ? 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.'
         : 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';
     },
-    generateNewBoard: generateStartBoard,
+    generateStartBoard,
     getGameStateAfterAiTurn
   }
 });

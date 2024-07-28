@@ -10,8 +10,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [1] };
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[2][0]).toEqual(0);
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[2][0]).toEqual(0);
       expect(isGameEnd).toBe(false);
     });
 
@@ -22,8 +22,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][2]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][2]).toEqual(0);
     });
 
     it('only removes one bacteria', () => {
@@ -33,8 +33,8 @@ describe('test ai strategy', () => {
         [0, 0, 0]
       ]);
       const board = { bacteria, goals: [1] };
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[2][0]).toEqual(1);
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[2][0]).toEqual(1);
       expect(isGameEnd).toBe(false);
     });
 
@@ -56,8 +56,8 @@ describe('test ai strategy', () => {
         [1, 0, 0, 1, 0]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][3]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][3]).toEqual(0);
     });
 
     it('removes a bacteria if it could reach goals in several steps', () => {
@@ -69,8 +69,8 @@ describe('test ai strategy', () => {
         [0, 0, 0, 1, 0, 0, 0]
       ]);
       const board = { bacteria, goals: [2, 3, 4] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][3]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][3]).toEqual(0);
     });
 
     it('removes a bacteria if multiple in a cell', () => {
@@ -80,8 +80,8 @@ describe('test ai strategy', () => {
         [0, 2, 0, 1, 0]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][1]).toEqual(1);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][1]).toEqual(1);
     });
 
     it('removes a bacteria from a path with multiple bacteria', () => {
@@ -91,8 +91,8 @@ describe('test ai strategy', () => {
         [0, 0, 1, 0, 0]
       ]);
       const board = { bacteria, goals: [4] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[1][1] === 0 || newBoard.bacteria[0][2] === 0).toBe(true);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[1][1] === 0 || nextBoard.bacteria[0][2] === 0).toBe(true);
     });
 
     it('removes a bacteria from a path with multiple bacteria: right side', () => {
@@ -102,8 +102,8 @@ describe('test ai strategy', () => {
         [0, 0, 1, 0, 0]
       ]);
       const board = { bacteria, goals: [0] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[1][2] === 0 || newBoard.bacteria[0][2] === 0).toBe(true);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[1][2] === 0 || nextBoard.bacteria[0][2] === 0).toBe(true);
     });
 
     it('removes a dangerous bacteria if no multiple', () => {
@@ -113,8 +113,8 @@ describe('test ai strategy', () => {
         [0, 0, 1, 0, 0]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][2]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][2]).toEqual(0);
     });
 
     it('removes dangerous bacteria if multiples cannot spread', () => {
@@ -124,8 +124,8 @@ describe('test ai strategy', () => {
         [2, 0, 1, 0, 0]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[0][2]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[0][2]).toEqual(0);
     });
   });
 
@@ -137,8 +137,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [1] };
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[2][1]).toEqual(1);
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[2][1]).toEqual(1);
       expect(isGameEnd).toBe(true);
     });
 
@@ -149,8 +149,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [1] };
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[2][1]).toEqual(1);
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[2][1]).toEqual(1);
       expect(isGameEnd).toBe(true);
     });
 
@@ -161,8 +161,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [1] };
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[2][1]).toEqual(1);
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[2][1]).toEqual(1);
       expect(isGameEnd).toBe(true);
     });
 
@@ -173,8 +173,8 @@ describe('test ai strategy', () => {
         [0, 0, 1]
       ]);
       const board = { bacteria, goals: [2] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[2][2]).toEqual(1);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[2][2]).toEqual(1);
     });
 
     it('spreads a dangerous bacteria if it can', () => {
@@ -187,7 +187,7 @@ describe('test ai strategy', () => {
       ]);
       const board = { bacteria, goals: [2, 3, 4] };
 
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
 
       const expectedBacteria = reverse([
         [1, 0, 0, 0, 0, 0, 0],
@@ -196,7 +196,7 @@ describe('test ai strategy', () => {
           [0, 0, 1, 1, 1, 0],
         [0, 0, 0, 0, 0, 0, 0]
       ]);
-      expect(newBoard.bacteria).toEqual(expectedBacteria);
+      expect(nextBoard.bacteria).toEqual(expectedBacteria);
       expect(isGameEnd).toBe(false);
     });
 
@@ -208,7 +208,7 @@ describe('test ai strategy', () => {
       ]);
       const board = { bacteria, goals: [1] }
 
-      const { newBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
 
       const variantA = reverse([
         [0, 0, 0],
@@ -226,9 +226,9 @@ describe('test ai strategy', () => {
         [0, 0, 0]
       ]);
       expect(
-        isEqual(newBoard.bacteria, variantA) ||
-        isEqual(newBoard.bacteria, variantB) ||
-        isEqual(newBoard.bacteria, variantC)
+        isEqual(nextBoard.bacteria, variantA) ||
+        isEqual(nextBoard.bacteria, variantB) ||
+        isEqual(nextBoard.bacteria, variantC)
       ).toBe(true);
       expect(isGameEnd).toBe(false);
     });
@@ -240,8 +240,8 @@ describe('test ai strategy', () => {
         [0, 0, 0, 0, 1]
       ]);
       const board = { bacteria, goals: [3] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[2][1]).toEqual(2);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[2][1]).toEqual(2);
     });
 
     it('should attack with closest dangerous bacteria', () => {
@@ -253,8 +253,8 @@ describe('test ai strategy', () => {
         [0, 0, 1, 0, 0]
       ]);
       const board = { bacteria, goals: [1, 2, 3] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
-      expect(newBoard.bacteria[4][2]).toEqual(1);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 1 });
+      expect(nextBoard.bacteria[4][2]).toEqual(1);
     });
   });
 });

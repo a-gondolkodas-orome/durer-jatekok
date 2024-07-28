@@ -32,7 +32,7 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
 };
 
 const aiDefense = (board) => {
-  const newBoard = cloneDeep(board);
+  const nextBoard = cloneDeep(board);
   let defenseRow, defenseCol;
 
   const bacteriaCoords = getBacteriaCoords(board.bacteria);
@@ -67,13 +67,13 @@ const aiDefense = (board) => {
     );
   }
 
-  newBoard.bacteria[defenseRow][defenseCol] -= 1;
-  const isGameEnd = areAllBacteriaRemoved(newBoard.bacteria);
-  return { newBoard, isGameEnd };
+  nextBoard.bacteria[defenseRow][defenseCol] -= 1;
+  const isGameEnd = areAllBacteriaRemoved(nextBoard.bacteria);
+  return { nextBoard, isGameEnd };
 };
 
 const aiAttack = (board) => {
-  const newBoard = cloneDeep(board);
+  const nextBoard = cloneDeep(board);
   const { bacteria, goals } = board;
 
   const goalRowIdx = bacteria.length - 1;
@@ -132,12 +132,12 @@ const aiAttack = (board) => {
   const isGameEnd = goalsReached.length >= 1;
 
   if (attackChoice === "jump") {
-    newBoard.bacteria = makeJump(bacteria, attackRow, attackCol);
+    nextBoard.bacteria = makeJump(bacteria, attackRow, attackCol);
   } else {
-    newBoard.bacteria = makeShiftOrSpread(bacteria, attackRow, attackCol, reachedFields);
+    nextBoard.bacteria = makeShiftOrSpread(bacteria, attackRow, attackCol, reachedFields);
   }
 
-  return { newBoard, isGameEnd };
+  return { nextBoard, isGameEnd };
 };
 
 const getBacteriaCoords = (bacteria) => {

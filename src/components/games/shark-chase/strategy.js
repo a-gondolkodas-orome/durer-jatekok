@@ -12,20 +12,20 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   }
 
   const moveSubmarine = (from,to) => {
-    const newBoard = cloneDeep(board);
-    if(board.shark === to) newBoard.shark = -1;
-    newBoard.board[to] = 'submarine';
-    newBoard.board[from] = null;
-    return getGameStateAfterMove(newBoard);
+    const nextBoard = cloneDeep(board);
+    if(board.shark === to) nextBoard.shark = -1;
+    nextBoard.board[to] = 'submarine';
+    nextBoard.board[from] = null;
+    return getGameStateAfterMove(nextBoard);
   }
 
   if (playerIndex === 0) {
-    const newMove = getOptimalAiPlacingPositionShark(board, playerIndex);
-    const newBoard = cloneDeep(board);
-    newBoard.board[board.shark] = null;
-    newBoard.board[newMove] = 'shark';
-    newBoard.shark = newMove
-    return getGameStateAfterMove(newBoard);
+    const nextMove = getOptimalAiPlacingPositionShark(board, playerIndex);
+    const nextBoard = cloneDeep(board);
+    nextBoard.board[board.shark] = null;
+    nextBoard.board[nextMove] = 'shark';
+    nextBoard.shark = nextMove
+    return getGameStateAfterMove(nextBoard);
   } else {
     let place = findSubmarineNextToShark();
     if (place!==-1) {
@@ -72,11 +72,11 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   }
 };
 
-export const getGameStateAfterMove = (newBoard) => {
+export const getGameStateAfterMove = (nextBoard) => {
   return {
-    newBoard,
-    isGameEnd: (newBoard.shark === -1 || newBoard.turn > 11),
-    winnerIndex: newBoard.shark === -1 ? 0 : 1
+    nextBoard,
+    isGameEnd: (nextBoard.shark === -1 || nextBoard.turn > 11),
+    winnerIndex: nextBoard.shark === -1 ? 0 : 1
   };
 };
 
