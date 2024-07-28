@@ -4,26 +4,23 @@ import { cloneDeep, sample } from 'lodash';
 
 export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const findSubmarineNextToShark = () => {
-    if (board.shark+4 < 16 && board.board[board.shark+4] === 'submarine') return board.shark+4;
-    if (board.shark-4 >= 0 && board.board[board.shark-4] === 'submarine') return board.shark-4;
-    if (board.shark+1 < 16 && board.shark%4 !== 3 && board.board[board.shark+1] === 'submarine') return board.shark+1;
-    if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.board[board.shark-1] === 'submarine') return board.shark-1;
+    if (board.shark+4 < 16 && board.submarines[board.shark+4] >= 1) return board.shark+4;
+    if (board.shark-4 >= 0 && board.submarines[board.shark-4] >= 1) return board.shark-4;
+    if (board.shark+1 < 16 && board.shark%4 !== 3 && board.submarines[board.shark+1] >= 1) return board.shark+1;
+    if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.submarines[board.shark-1] >= 1) return board.shark-1;
     return -1;
   }
 
   const moveSubmarine = (from,to) => {
     const nextBoard = cloneDeep(board);
-    if(board.shark === to) nextBoard.shark = -1;
-    nextBoard.board[to] = 'submarine';
-    nextBoard.board[from] = null;
+    nextBoard.submarines[to] += 1;
+    nextBoard.submarines[from] -= 1;
     return getGameStateAfterMove(nextBoard);
   }
 
   if (playerIndex === 0) {
     const nextMove = getOptimalAiPlacingPositionShark(board, playerIndex);
     const nextBoard = cloneDeep(board);
-    nextBoard.board[board.shark] = null;
-    nextBoard.board[nextMove] = 'shark';
     nextBoard.shark = nextMove
     return getGameStateAfterMove(nextBoard);
   } else {
@@ -75,19 +72,19 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
 export const getGameStateAfterMove = (nextBoard) => {
   return {
     nextBoard,
-    isGameEnd: (nextBoard.shark === -1 || nextBoard.turn > 11),
-    winnerIndex: nextBoard.shark === -1 ? 0 : 1
+    isGameEnd: nextBoard.submarines[nextBoard.shark] >= 1 || nextBoard.turn > 11,
+    winnerIndex: nextBoard.submarines[nextBoard.shark] >= 1 ? 0 : 1
   };
 };
 
-const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
+const getOptimalAiPlacingPositionShark = (board) => {
   const possibleMoves = [];
   const isNextToSubmarine = (id) => {
-    if (id+4 < 16 && board.board[id+4] === 'submarine') return true;
-    if (id-4 >= 0 && board.board[id-4] === 'submarine') return true;
-    if (id+1 < 16 && id%4 !== 3 && board.board[id+1] === 'submarine') return true;
-    if (id-1 >= 0 && id%4 !== 0 && board.board[id-1] === 'submarine') return true;
-    if (board.board[id] === 'submarine') return true;
+    if (id+4 < 16 && board.submarines[id+4] >= 1) return true;
+    if (id-4 >= 0 && board.submarines[id-4] >= 1) return true;
+    if (id+1 < 16 && id%4 !== 3 && board.submarines[id+1] >= 1) return true;
+    if (id-1 >= 0 && id%4 !== 0 && board.submarines[id-1] >= 1) return true;
+    if (board.submarines[id] >= 1) return true;
     return false;
   }
   const distanceFromShark = (id) => {
@@ -179,7 +176,7 @@ const getOptimalAiPlacingPositionShark = (board, playerIndex) => {
   }
   if (possibleMoves.length === 0) {
     for (let i = 0; i <16; i++) {
-      if (distanceFromShark(i) <=2 && board.board[i] !== 'submarine') {
+      if (distanceFromShark(i) <=2 && board.submarines[i] === 0) {
         possibleMoves.push(i);
       }
     }

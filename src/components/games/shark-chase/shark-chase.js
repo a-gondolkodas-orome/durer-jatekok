@@ -7,12 +7,11 @@ import { SubmarineSvg } from './shark-chase-submarine-svg';
 
 
 export const generateStartBoard = () => {
-  let startboard = Array(16).fill(null);
-  startboard[2] = 'submarine';
-  startboard[3] = 'submarine';
-  startboard[7] = 'submarine';
-  startboard[12] = 'shark';
-  return {board: startboard, shark: 12, turn: 1};
+  return {
+    submarines: [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    shark: 12,
+    turn: 1
+  };
 }
 
 const distance = (fieldA, fieldB) => {
@@ -23,53 +22,52 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   const [playerState, setPlayerState] = useState('choosePiece');
   const [chosenPiece, setChosenPiece] = useState(12);
 
-  const distanceFromShark = (id) => distance(board.shark, id);
-
-  const distanceFromChosenPiece = (id) => distance(chosenPiece, id);
-
   let possibleMoves=[]
-  if (ctx.playerIndex===1) {
-    possibleMoves = range(16).filter(
-      i => distanceFromShark(i) <= 2 && board.board[i]!=='shark' && board.board[i]!=='submarine'
-    )
-  } else if (ctx.playerIndex===0 && playerState === 'movePiece') {
-    possibleMoves = range(16).filter(
-      i => distanceFromChosenPiece(i) <= 1 && board.board[i]!=='shark' && board.board[i]!=='submarine'
-    )
+  if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 1) {
+    possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
+  } else if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 0 && playerState === 'movePiece') {
+    possibleMoves = range(16).filter(i => distance(chosenPiece, i) <= 1)
   }
 
   const isAllowed_choosePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    return board.board[id] === ctx.playerIndex === 0 ? 'submarine' : 'shark';
+    if (ctx.playerIndex === 0) return board.submarines[id] !== 0;
+    if (ctx.playerIndex === 1) return board.shark === id;
   }
+
   const isAllowed_movePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    if (board.board[id] === 'submarine') return false;
-    if (ctx.playerIndex === 0) return distanceFromChosenPiece(id) <=1;
-    else return distanceFromChosenPiece(id) <=2;
+    if (board.submarines[id] !== 0) return false;
+    if (ctx.playerIndex === 0) return distance(chosenPiece, id) <= 1;
+    else return distance(board.shark, id) <= 1;
   }
 
   const clickField = (id) => {
-    if (playerState === 'choosePiece' && ctx.playerIndex === 0) {
-      if (!isAllowed_choosePiece(id)) return;
-      setPlayerState('movePiece');
-      setChosenPiece(id);
-    } else if (ctx.playerIndex === 1 || playerState === 'movePiece') {
-      if (board.board[id]==='submarine' && ctx.playerIndex === 0){
-        setChosenPiece(id);
-      } else if (!isAllowed_movePiece(id)) {
-        return;
-      } else{
+    if (ctx.playerIndex === 0) {
+      if (playerState === 'choosePiece') {
+        if (!isAllowed_choosePiece(id)) return;
+        setChosenPiece(id)
+        setPlayerState('movePiece');
+      } else if (playerState === 'movePiece') {
+        if (!isAllowed_movePiece(id)) return;
         const nextBoard = cloneDeep(board);
-        nextBoard.board[chosenPiece] = null;
-        nextBoard.board[id] = ctx.playerIndex === 0 ? 'submarine' : 'shark';
-        nextBoard.turn = board.turn+1;
-        if (ctx.playerIndex === 1) nextBoard.shark = id;
-        if (ctx.playerIndex === 0 && board.shark === id) {
-          nextBoard.shark = -1;
-        }
+        nextBoard.submarines[chosenPiece] -= 1;
+        nextBoard.submarines[id] += 1;
+        nextBoard.turn += 1;
         setPlayerState('choosePiece');
-        setChosenPiece(id);
+        ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      }
+    }
+    if (ctx.playerIndex === 1) {
+      if (!isAllowed_movePiece(id)) return;
+      const nextBoard = cloneDeep(board);
+      nextBoard.shark = id;
+      if (playerState !== 'secondSharkMove') {
+        setBoard(nextBoard);
+        setPlayerState('secondSharkMove');
+      } else {
+        setPlayerState('firstSharkMove');
+        nextBoard.turn += 1;
         ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
       }
     }
@@ -86,28 +84,28 @@ const GameBoard = ({ board, setBoard, ctx }) => {
           key={id}
           onClick={() => clickField(id)}
           className="aspect-square p-[0%] border-2"
-        > {(possibleMoves.includes(id) && ctx.playerIndex===0) && (
+        > {(possibleMoves.includes(id) && ctx.playerIndex === 0 && board.submarines[id] === 0) && (
             <span>
             <svg className="w-full aspect-square opacity-30 inline-block">
               <use xlinkHref="#submarine" />
             </svg>
             </span>
           )}
-         {(ctx.shouldPlayerMoveNext && possibleMoves.includes(id) && ctx.playerIndex===1 && board.shark!=-1) && (
+         {(possibleMoves.includes(id) && ctx.playerIndex === 1 && board.submarines[id] === 0 && board.shark !== id) && (
             <span>
             <svg className="w-full aspect-square opacity-30 inline-block">
               <use xlinkHref="#shark" />
             </svg>
             </span>
           )}
-          {board.board[id]==='submarine' && (
+          {board.submarines[id] >= 1 && (
             <span>
             <svg className="w-full aspect-square inline-block">
               <use xlinkHref="#submarine" />
             </svg>
             </span>
           )}
-          {board.board[id]==='shark' && (
+          {board.shark === id && board.submarines[id] === 0 && (
             <span>
             <svg className="w-full aspect-square inline-block">
               <use xlinkHref="#shark" />
@@ -148,7 +146,7 @@ const Game = strategyGameFactory({
     getPlayerStepDescription: ({ playerIndex }) => {
       return playerIndex === 0
         ? 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.'
-        : 'Válassz ki a cápától egy maximum 2 távolságra lévő mezőt.';
+        : 'Válassz ki a cápától egy maximum 1 távolságra lévő mezőt. Kattints a cápára, ha helyben szeretnél maradni.';
     },
     generateStartBoard,
     getGameStateAfterAiTurn
