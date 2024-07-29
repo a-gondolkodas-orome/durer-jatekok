@@ -26,7 +26,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
   if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 1) {
     possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
   } else if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 0 && playerState === 'movePiece') {
-    possibleMoves = range(16).filter(i => distance(chosenPiece, i) <= 1)
+    possibleMoves = range(16).filter(i => distance(chosenPiece, i) === 1)
   }
 
   const isAllowed_choosePiece = (id) => {
@@ -37,8 +37,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   const isAllowed_movePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    if (board.submarines[id] !== 0) return false;
-    if (ctx.playerIndex === 0) return distance(chosenPiece, id) <= 1;
+    if (ctx.playerIndex === 0) return distance(chosenPiece, id) === 1;
     else return distance(board.shark, id) <= 1;
   }
 
@@ -63,6 +62,11 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       const nextBoard = cloneDeep(board);
       nextBoard.shark = id;
       if (playerState !== 'secondSharkMove') {
+        if (nextBoard.submarines[id] >= 1) {
+          // instant lose
+          ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+          return;
+        }
         setBoard(nextBoard);
         setPlayerState('secondSharkMove');
       } else {
@@ -83,41 +87,81 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         <button
           key={id}
           onClick={() => clickField(id)}
-          className="aspect-square p-[0%] border-2"
-        > {(possibleMoves.includes(id) && ctx.playerIndex === 0 && board.submarines[id] === 0) && (
-            <span>
-            <svg className="w-full aspect-square opacity-30 inline-block">
-              <use xlinkHref="#submarine" />
-            </svg>
-            </span>
+          className="aspect-square p-[0%] border-2 relative"
+        >
+          {possibleMoves.includes(id) && ctx.playerIndex === 0 && (
+            <OptinalNextSubmarine board={board} id={id} />
           )}
-         {(possibleMoves.includes(id) && ctx.playerIndex === 1 && board.submarines[id] === 0 && board.shark !== id) && (
-            <span>
-            <svg className="w-full aspect-square opacity-30 inline-block">
-              <use xlinkHref="#shark" />
-            </svg>
-            </span>
+         {possibleMoves.includes(id) && ctx.playerIndex === 1 && (
+            <OptionalNextShark />
           )}
           {board.submarines[id] >= 1 && (
-            <span>
-            <svg className="w-full aspect-square inline-block">
-              <use xlinkHref="#submarine" />
-            </svg>
-            </span>
+            <SubmarinesInCell board={board} id={id} />
           )}
-          {board.shark === id && board.submarines[id] === 0 && (
-            <span>
-            <svg className="w-full aspect-square inline-block">
+          {board.shark === id && (
+            <svg className="aspect-square top-0 absolute z-10 opacity-80">
               <use xlinkHref="#shark" />
             </svg>
-            </span>
-
           )}
       </button>
       ))}
     </div>
   </section>
   );
+};
+
+const OptionalNextShark = () => {
+  return <svg className="aspect-square top-0 absolute z-40 opacity-50">
+    <use xlinkHref="#shark" />
+  </svg>;
+};
+
+const OptinalNextSubmarine = ({ board, id }) => {
+  return <>
+    {(board.submarines[id] === 1) && (
+      <svg className="aspect-square top-[10%] absolute z-40 opacity-50">
+        <use xlinkHref="#submarine" />
+      </svg>
+    )}
+    {(board.submarines[id] !== 1) && (
+      <svg className="aspect-square top-0 absolute z-40 opacity-50">
+        <use xlinkHref="#submarine" />
+      </svg>
+    )}
+  </>;
+};
+
+const SubmarinesInCell = ({ board, id }) => {
+  return <>
+    {board.submarines[id] === 1 && (
+      <svg className="aspect-square top-0 absolute z-20 opacity-80">
+        <use xlinkHref="#submarine" />
+      </svg>
+    )}
+    {board.submarines[id] === 2 && (
+      <>
+        <svg className="aspect-square top-[-10%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-[10%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+      </>
+    )}
+    {board.submarines[id] === 3 && (
+      <>
+        <svg className="aspect-square top-[-10%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-0 absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-[10%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+      </>
+    )}
+  </>;
 };
 
 const rule = <>
