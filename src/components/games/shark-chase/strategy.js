@@ -2,73 +2,6 @@
 
 import { cloneDeep, sample } from 'lodash';
 
-export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
-  const findSubmarineNextToShark = () => {
-    if (board.shark+4 < 16 && board.submarines[board.shark+4] >= 1) return board.shark+4;
-    if (board.shark-4 >= 0 && board.submarines[board.shark-4] >= 1) return board.shark-4;
-    if (board.shark+1 < 16 && board.shark%4 !== 3 && board.submarines[board.shark+1] >= 1) return board.shark+1;
-    if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.submarines[board.shark-1] >= 1) return board.shark-1;
-    return -1;
-  }
-
-  const moveSubmarine = (from,to) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard.submarines[to] += 1;
-    nextBoard.submarines[from] -= 1;
-    return getGameStateAfterMove(nextBoard);
-  }
-
-  if (playerIndex === 0) {
-    const nextMove = getOptimalAiPlacingPositionShark(board, playerIndex);
-    const nextBoard = cloneDeep(board);
-    nextBoard.shark = nextMove
-    return getGameStateAfterMove(nextBoard);
-  } else {
-    let place = findSubmarineNextToShark();
-    if (place!==-1) {
-      return moveSubmarine(place, board.shark);
-    }
-
-    switch(board.turn){
-      case 1:
-        return moveSubmarine(2,1);
-      case 2:
-        return moveSubmarine(1,5);
-      case 3:
-        return moveSubmarine(7,6);
-      case 4:
-        return moveSubmarine(6,10);
-      case 5:
-        return moveSubmarine(10,14);
-      case 6:
-        return moveSubmarine(3,2);
-      default:
-        if (board.shark === 7 || board.shark === 11) {
-          switch(board.turn) {
-            case 7:
-              return moveSubmarine(2,3);
-            case 8:
-              return moveSubmarine(3,7);
-            case 9:
-              return moveSubmarine(7,11);
-          }
-        } else {
-          switch(board.turn){
-            case 7:
-              return moveSubmarine(2,1);
-            case 8:
-              return moveSubmarine(1,0);
-            case 9:
-              return moveSubmarine(0,4);
-            case 10:
-              return moveSubmarine(4,8);
-        }
-        break;
-      }
-    }
-  }
-};
-
 export const getGameStateAfterMove = (nextBoard) => {
   return {
     nextBoard,
@@ -77,7 +10,73 @@ export const getGameStateAfterMove = (nextBoard) => {
   };
 };
 
-const getOptimalAiPlacingPositionShark = (board) => {
+export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
+  const nextBoard = cloneDeep(board);
+
+  if (playerIndex === 0) {
+    nextBoard.shark = getNextSharkPositionByAI(board);
+  } else {
+    const { from, to } = getOptimalSubmarineMoveByAi(board);
+    nextBoard.submarines[from] -= 1;
+    nextBoard.submarines[to] += 1;
+  }
+  return getGameStateAfterMove(nextBoard);
+};
+
+const getOptimalSubmarineMoveByAi = (board) => {
+  const submarineNextToShark = findSubmarineNextToShark(board);
+  if (submarineNextToShark !== undefined) {
+    return { from: submarineNextToShark, to: board.shark }
+  }
+
+  switch(board.turn){
+    case 1:
+      return { from: 2, to: 1 };
+    case 2:
+      return { from: 1, to: 5 };
+    case 3:
+      return { from: 7, to: 6 };
+    case 4:
+      return { from: 6, to: 10 };
+    case 5:
+      return { from: 10, to: 14 };
+    case 6:
+      return { from: 3, to: 2 };
+    default:
+      if (board.shark === 7 || board.shark === 11) {
+        switch(board.turn) {
+          case 7:
+            return { from: 2, to: 3 };
+          case 8:
+            return { from: 3, to: 7 };
+          case 9:
+            return { from: 7, to: 11 };
+        }
+      } else {
+        switch(board.turn){
+          case 7:
+            return { from: 2, to: 1 };
+          case 8:
+            return { from: 1, to: 0 };
+          case 9:
+            return { from: 0, to: 4 };
+          case 10:
+            return { from: 4, to: 8 };
+      }
+      break;
+    }
+  }
+};
+
+const findSubmarineNextToShark = (board) => {
+  if (board.shark+4 < 16 && board.submarines[board.shark+4] >= 1) return board.shark+4;
+  if (board.shark-4 >= 0 && board.submarines[board.shark-4] >= 1) return board.shark-4;
+  if (board.shark+1 < 16 && board.shark%4 !== 3 && board.submarines[board.shark+1] >= 1) return board.shark+1;
+  if (board.shark-1 >= 0 && board.shark%4 !== 0 && board.submarines[board.shark-1] >= 1) return board.shark-1;
+  return undefined;
+};
+
+const getNextSharkPositionByAI = (board) => {
   const possibleMoves = [];
   const isNextToSubmarine = (id) => {
     if (id+4 < 16 && board.submarines[id+4] >= 1) return true;
