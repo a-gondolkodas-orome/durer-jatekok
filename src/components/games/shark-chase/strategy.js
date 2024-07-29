@@ -77,17 +77,75 @@ const findSubmarineNextToShark = (board) => {
 };
 
 const getNextSharkPositionByAI = (board) => {
-  const possibleMoves = [];
-  const isNextToSubmarine = (id) => {
-    if (id+4 < 16 && board.submarines[id+4] >= 1) return true;
-    if (id-4 >= 0 && board.submarines[id-4] >= 1) return true;
-    if (id+1 < 16 && id%4 !== 3 && board.submarines[id+1] >= 1) return true;
-    if (id-1 >= 0 && id%4 !== 0 && board.submarines[id-1] >= 1) return true;
-    if (board.submarines[id] >= 1) return true;
-    return false;
-  }
+  const componentSizes = getComponentSizes(board.submarines)
+
   const distanceFromShark = (id) => {
     return Math.abs(board.shark%4-id%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(id/4));
+  }
+
+  // 2 lepessel elerheto mezo aminek legnagyobb az osszefuggosegi komponense
+  // TODO: a ket lepes kozben nem lephetunk tengeralattjarora
+  let maxi = 1;
+  for (let i = 0; i < 16; i++) {
+    if (distanceFromShark(i) <= 2) {
+      if(maxi < componentSizes[i]) {
+        maxi = componentSizes[i];
+      }
+    }
+  }
+
+  const possibleMoves = [];
+
+  // 4 kozepso mezo
+  for (let ind = 0; ind < 4; ind++) {
+    let i = [5,6,9,10][ind];
+    if (componentSizes[i] === maxi && distanceFromShark(i) <=2) {
+      possibleMoves.push(i);
+    }
+  }
+
+  // szelek de nem sarkok
+  if (possibleMoves.length === 0) {
+    for (let ind = 0; ind < 8; ind++) {
+      let i = [1,2,4,7,8,11,13,14][ind];
+      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
+        possibleMoves.push(i);
+      }
+    }
+  }
+
+  // sarkok
+  if (possibleMoves.length === 0) {
+    for (let ind = 0; ind < 4; ind++) {
+      let i = [0,3,12,15][ind];
+      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
+        possibleMoves.push(i);
+      }
+    }
+  }
+
+  // ha nincs mas lehetoseg, legalabb ne lepjunk azonnal tengeralattjarora
+  // TODO: ilyenkor tenyleg lehet, hogy atlep egy tengeralattjaron
+  if (possibleMoves.length === 0) {
+    for (let i = 0; i <16; i++) {
+      if (distanceFromShark(i) <=2 && board.submarines[i] === 0) {
+        possibleMoves.push(i);
+      }
+    }
+  }
+
+  return sample(possibleMoves);
+}
+
+// osszefuggosegi komponensek a tengeralattjarokkal nem kozvetlen szomszedos mezokbol
+const getComponentSizes = (submarines) => {
+  const isNextToSubmarine = (id) => {
+    if (id+4 < 16 && submarines[id+4] >= 1) return true;
+    if (id-4 >= 0 && submarines[id-4] >= 1) return true;
+    if (id+1 < 16 && id%4 !== 3 && submarines[id+1] >= 1) return true;
+    if (id-1 >= 0 && id%4 !== 0 && submarines[id-1] >= 1) return true;
+    if (submarines[id] >= 1) return true;
+    return false;
   }
 
   const visited = Array(16).fill(false);
@@ -141,45 +199,5 @@ const getNextSharkPositionByAI = (board) => {
       }
     }
   }
-
-  let maxi = 1;
-  for (let i = 0; i < 16; i++) {
-    if (distanceFromShark(i) <= 2) {
-      if(maxi < componentSizes[i]) {
-        maxi = componentSizes[i];
-      }
-    }
-  }
-
-  for (let ind = 0; ind < 4; ind++) {
-    let i = [5,6,9,10][ind];
-    if (componentSizes[i] === maxi && distanceFromShark(i) <=2) {
-      possibleMoves.push(i);
-    }
-  }
-  if (possibleMoves.length === 0) {
-    for (let ind = 0; ind < 8; ind++) {
-      let i = [1,2,4,7,8,11,13,14][ind];
-      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
-        possibleMoves.push(i);
-      }
-    }
-  }
-  if (possibleMoves.length === 0) {
-    for (let ind = 0; ind < 4; ind++) {
-      let i = [0,3,12,15][ind];
-      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
-        possibleMoves.push(i);
-      }
-    }
-  }
-  if (possibleMoves.length === 0) {
-    for (let i = 0; i <16; i++) {
-      if (distanceFromShark(i) <=2 && board.submarines[i] === 0) {
-        possibleMoves.push(i);
-      }
-    }
-  }
-
-  return sample(possibleMoves);
+  return componentSizes;
 }
