@@ -15,23 +15,31 @@ export const generateStartBoard = () => {
 }
 
 const distance = (fieldA, fieldB) => {
-  return Math.abs(fieldA%4-fieldB%4) + Math.abs(Math.floor(fieldA/4)-Math.floor(fieldB/4))
-}
+  return (
+    Math.abs((fieldA % 4) - (fieldB % 4)) +
+    Math.abs(Math.floor(fieldA / 4) - Math.floor(fieldB / 4))
+  );
+};
 
 const GameBoard = ({ board, setBoard, ctx }) => {
-  const [playerState, setPlayerState] = useState('choosePiece');
   const [chosenPiece, setChosenPiece] = useState(12);
 
+  if (ctx.phase === 'play' && ctx.turnStage === null) {
+    ctx.setTurnStage(ctx.playerIndex === 0 ? 'choosePiece' : 'firstSharkMove');
+  }
+
   let possibleMoves=[]
-  if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 1) {
-    possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
-  } else if (ctx.shouldPlayerMoveNext && ctx.playerIndex === 0 && playerState === 'movePiece') {
-    possibleMoves = range(16).filter(i => distance(chosenPiece, i) === 1)
+  if (ctx.shouldPlayerMoveNext) {
+    if (ctx.playerIndex === 1) {
+      possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
+    } else if (ctx.turnStage === 'movePiece') {
+      possibleMoves = range(16).filter(i => distance(chosenPiece, i) === 1)
+    }
   }
 
   const isAllowed_choosePiece = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
-    if (ctx.playerIndex === 0) return board.submarines[id] !== 0;
+    if (ctx.playerIndex === 0) return board.submarines[id] >= 1;
     if (ctx.playerIndex === 1) return board.shark === id;
   }
 
@@ -43,17 +51,17 @@ const GameBoard = ({ board, setBoard, ctx }) => {
 
   const clickField = (id) => {
     if (ctx.playerIndex === 0) {
-      if (playerState === 'choosePiece') {
+      if (ctx.turnStage === 'choosePiece') {
         if (!isAllowed_choosePiece(id)) return;
         setChosenPiece(id)
-        setPlayerState('movePiece');
-      } else if (playerState === 'movePiece') {
+        ctx.setTurnStage('movePiece');
+      } else if (ctx.turnStage === 'movePiece') {
         if (!isAllowed_movePiece(id)) return;
         const nextBoard = cloneDeep(board);
         nextBoard.submarines[chosenPiece] -= 1;
         nextBoard.submarines[id] += 1;
         nextBoard.turn += 1;
-        setPlayerState('choosePiece');
+        ctx.setTurnStage('choosePiece');
         ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
       }
     }
@@ -61,19 +69,22 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       if (!isAllowed_movePiece(id)) return;
       const nextBoard = cloneDeep(board);
       nextBoard.shark = id;
-      if (playerState !== 'secondSharkMove') {
+      if (ctx.turnStage !== 'secondSharkMove') {
         if (nextBoard.submarines[id] >= 1) {
           // instant lose
           ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
           return;
         }
-        setBoard(nextBoard);
-        setPlayerState('secondSharkMove');
-      } else {
-        setPlayerState('firstSharkMove');
-        nextBoard.turn += 1;
-        ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+        if (id !== board.shark) {
+          setBoard(nextBoard);
+          ctx.setTurnStage('secondSharkMove');
+          return;
+        }
       }
+
+      ctx.setTurnStage('firstSharkMove');
+      nextBoard.turn += 1;
+      ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
     }
   };
 
@@ -90,13 +101,13 @@ const GameBoard = ({ board, setBoard, ctx }) => {
           className="aspect-square p-[0%] border-2 relative"
         >
           {possibleMoves.includes(id) && ctx.playerIndex === 0 && (
-            <OptinalNextSubmarine board={board} id={id} />
+            <OptionalNextSubmarine existingSubmarineCount={board.submarines[id]} />
           )}
          {possibleMoves.includes(id) && ctx.playerIndex === 1 && (
             <OptionalNextShark />
           )}
           {board.submarines[id] >= 1 && (
-            <SubmarinesInCell board={board} id={id} />
+            <SubmarinesInCell count={board.submarines[id]} />
           )}
           {board.shark === id && (
             <svg className="aspect-square top-0 absolute z-10 opacity-80">
@@ -116,14 +127,14 @@ const OptionalNextShark = () => {
   </svg>;
 };
 
-const OptinalNextSubmarine = ({ board, id }) => {
+const OptionalNextSubmarine = ({ existingSubmarineCount }) => {
   return <>
-    {(board.submarines[id] === 1) && (
+    {(existingSubmarineCount === 1) && (
       <svg className="aspect-square top-[10%] absolute z-40 opacity-50">
         <use xlinkHref="#submarine" />
       </svg>
     )}
-    {(board.submarines[id] !== 1) && (
+    {(existingSubmarineCount !== 1) && (
       <svg className="aspect-square top-0 absolute z-40 opacity-50">
         <use xlinkHref="#submarine" />
       </svg>
@@ -131,14 +142,14 @@ const OptinalNextSubmarine = ({ board, id }) => {
   </>;
 };
 
-const SubmarinesInCell = ({ board, id }) => {
+const SubmarinesInCell = ({ count }) => {
   return <>
-    {board.submarines[id] === 1 && (
+    {count === 1 && (
       <svg className="aspect-square top-0 absolute z-20 opacity-80">
         <use xlinkHref="#submarine" />
       </svg>
     )}
-    {board.submarines[id] === 2 && (
+    {count === 2 && (
       <>
         <svg className="aspect-square top-[-10%] absolute z-20 opacity-80">
           <use xlinkHref="#submarine" />
@@ -148,7 +159,7 @@ const SubmarinesInCell = ({ board, id }) => {
         </svg>
       </>
     )}
-    {board.submarines[id] === 3 && (
+    {count === 3 && (
       <>
         <svg className="aspect-square top-[-10%] absolute z-20 opacity-80">
           <use xlinkHref="#submarine" />
@@ -180,6 +191,18 @@ const rule = <>
   <br></br>Sok sikert! :)
 </>;
 
+const getPlayerStepDescription = ({ playerIndex, turnStage }) => {
+  if (playerIndex === 0) {
+    return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos szektort.'
+  }
+  return <>Válassz ki egy cápával oldalszomszédos szektort. Kattints a cápára,
+    ha helyben szeretnél maradni.
+    <br />
+    Ebben a lépésben még legfeljebb <b>{turnStage === 'firstSharkMove' ? 'kétszer' : 'egyszer'} </b>
+    úszhatsz át egy szomszédos szektorba.
+  </>;
+};
+
 const Game = strategyGameFactory({
   rule,
   title: 'Cápa üldözés',
@@ -187,11 +210,7 @@ const Game = strategyGameFactory({
   secondRoleLabel: 'Cápa leszek!',
   GameBoard,
   G: {
-    getPlayerStepDescription: ({ playerIndex }) => {
-      return playerIndex === 0
-        ? 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos mezőt.'
-        : 'Válassz ki a cápától egy maximum 1 távolságra lévő mezőt. Kattints a cápára, ha helyben szeretnél maradni.';
-    },
+    getPlayerStepDescription,
     generateStartBoard,
     getGameStateAfterAiTurn
   }

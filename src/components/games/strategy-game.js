@@ -93,6 +93,7 @@ export const strategyGameFactory = ({ rule, title, firstRoleLabel, secondRoleLab
                 shouldPlayerMoveNext,
                 endPlayerTurn,
                 playerIndex,
+                phase,
                 turnStage,
                 setTurnStage
               }}
