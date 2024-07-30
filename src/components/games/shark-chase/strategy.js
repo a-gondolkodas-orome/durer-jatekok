@@ -14,7 +14,7 @@ export const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   const nextBoard = cloneDeep(board);
 
   if (playerIndex === 0) {
-    nextBoard.shark = getNextSharkPositionByAI(board);
+    nextBoard.shark = getNextSharkPositionByAI(board.submarines, board.shark);
   } else {
     const { from, to } = getOptimalSubmarineMoveByAi(board);
     nextBoard.submarines[from] -= 1;
@@ -76,11 +76,11 @@ const findSubmarineNextToShark = (board) => {
   return undefined;
 };
 
-const getNextSharkPositionByAI = (board) => {
-  const componentSizes = getComponentSizes(board.submarines)
+const getNextSharkPositionByAI = (submarines, shark) => {
+  const componentSizes = getComponentSizes(submarines)
 
   const distanceFromShark = (id) => {
-    return Math.abs(board.shark%4-id%4) + Math.abs(Math.floor(board.shark/4)-Math.floor(id/4));
+    return Math.abs(shark%4-id%4) + Math.abs(Math.floor(shark/4)-Math.floor(id/4));
   }
 
   // 2 lepessel elerheto mezo aminek legnagyobb az osszefuggosegi komponense
@@ -128,7 +128,7 @@ const getNextSharkPositionByAI = (board) => {
   // TODO: ilyenkor tenyleg lehet, hogy atlep egy tengeralattjaron
   if (possibleMoves.length === 0) {
     for (let i = 0; i <16; i++) {
-      if (distanceFromShark(i) <=2 && board.submarines[i] === 0) {
+      if (distanceFromShark(i) <=2 && submarines[i] === 0) {
         possibleMoves.push(i);
       }
     }
