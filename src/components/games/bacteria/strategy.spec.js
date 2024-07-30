@@ -35,8 +35,8 @@ describe('test ai strategy', () => {
         [0, 0, 0, 0]
       ]);
       const board = { bacteria, goals: [2, 3, 4] };
-      const { newBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
-      expect(newBoard.bacteria[2][4]).toEqual(0);
+      const { nextBoard } = getGameStateAfterAiTurn({ board, playerIndex: 0 });
+      expect(nextBoard.bacteria[2][4]).toEqual(0);
     });
 
     it('only removes one bacteria', () => {
