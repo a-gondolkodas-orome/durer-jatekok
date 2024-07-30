@@ -76,18 +76,20 @@ const findSubmarineNextToShark = (board) => {
   return undefined;
 };
 
-const getNextSharkPositionByAI = (submarines, shark) => {
+const distanceFromShark = (shark, id) => {
+  return (
+    Math.abs((shark % 4) - (id % 4)) +
+    Math.abs(Math.floor(shark / 4) - Math.floor(id / 4))
+  );
+}
+
+export const getNextSharkPositionByAI = (submarines, shark) => {
   const componentSizes = getComponentSizes(submarines)
 
-  const distanceFromShark = (id) => {
-    return Math.abs(shark%4-id%4) + Math.abs(Math.floor(shark/4)-Math.floor(id/4));
-  }
-
   // 2 lepessel elerheto mezo aminek legnagyobb az osszefuggosegi komponense
-  // TODO: a ket lepes kozben nem lephetunk tengeralattjarora
   let maxi = 1;
   for (let i = 0; i < 16; i++) {
-    if (distanceFromShark(i) <= 2) {
+    if (isReachableWithoutDeath(submarines, shark, i)) {
       if(maxi < componentSizes[i]) {
         maxi = componentSizes[i];
       }
@@ -99,7 +101,7 @@ const getNextSharkPositionByAI = (submarines, shark) => {
   // 4 kozepso mezo
   for (let ind = 0; ind < 4; ind++) {
     let i = [5,6,9,10][ind];
-    if (componentSizes[i] === maxi && distanceFromShark(i) <=2) {
+    if (componentSizes[i] === maxi && isReachableWithoutDeath(submarines, shark, i)) {
       possibleMoves.push(i);
     }
   }
@@ -108,7 +110,7 @@ const getNextSharkPositionByAI = (submarines, shark) => {
   if (possibleMoves.length === 0) {
     for (let ind = 0; ind < 8; ind++) {
       let i = [1,2,4,7,8,11,13,14][ind];
-      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
+      if (componentSizes[i] == maxi && isReachableWithoutDeath(submarines, shark, i)) {
         possibleMoves.push(i);
       }
     }
@@ -118,23 +120,38 @@ const getNextSharkPositionByAI = (submarines, shark) => {
   if (possibleMoves.length === 0) {
     for (let ind = 0; ind < 4; ind++) {
       let i = [0,3,12,15][ind];
-      if (componentSizes[i] == maxi && distanceFromShark(i) <=2) {
+      if (componentSizes[i] == maxi && isReachableWithoutDeath(submarines, shark, i)) {
         possibleMoves.push(i);
       }
     }
   }
 
   // ha nincs mas lehetoseg, legalabb ne lepjunk azonnal tengeralattjarora
-  // TODO: ilyenkor tenyleg lehet, hogy atlep egy tengeralattjaron
   if (possibleMoves.length === 0) {
     for (let i = 0; i <16; i++) {
-      if (distanceFromShark(i) <=2 && submarines[i] === 0) {
+      if (isReachableWithoutDeath(submarines, shark, i)) {
         possibleMoves.push(i);
       }
     }
   }
 
   return sample(possibleMoves);
+}
+
+const isReachableWithoutDeath = (submarines, shark, id) => {
+  if (distanceFromShark(shark, id) > 2) return false;
+  if (submarines[id] >= 1) return false;
+  if (distanceFromShark(shark, id) === 2) {
+    if (id === shark - 2 && submarines[shark - 1] >= 1) return false;
+    if (id === shark + 2 && submarines[shark + 1] >= 1) return false;
+    if (id === shark + 8 && submarines[shark + 4] >= 1) return false;
+    if (id === shark - 8 && submarines[shark - 4] >= 1) return false;
+    if (id === shark - 5 && (submarines[shark - 4] >= 1 || submarines[shark - 1] >= 1)) return false;
+    if (id === shark + 3 && (submarines[shark + 4] >= 1 || submarines[shark - 1] >= 1)) return false;
+    if (id === shark + 5 && (submarines[shark + 4] >= 1 || submarines[shark + 1] >= 1)) return false;
+    if (id === shark - 3 && (submarines[shark - 4] >= 1 || submarines[shark + 1] >= 1)) return false;
+  }
+  return true;
 }
 
 // osszefuggosegi komponensek a tengeralattjarokkal nem kozvetlen szomszedos mezokbol
