@@ -12,7 +12,8 @@ export const strategyGameFactory = ({
   GameBoard,
   G
 }) => {
-  return ({ board, setBoard }) => {
+  return () => {
+    const [board, setBoard] = useState(G.generateStartBoard())
     const [phase, setPhase] = useState('roleSelection');
     const [playerIndex, setPlayerIndex] = useState(null);
     const [next, setNext] = useState(null);

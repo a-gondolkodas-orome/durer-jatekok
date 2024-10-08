@@ -117,7 +117,7 @@ const rule = <>
   Az veszít, aki nem tud lépni.
 </>;
 
-const Game = strategyGameFactory({
+export const AddReduceDouble = strategyGameFactory({
   rule,
   title: 'Kettőt vesz, egyet kap',
   GameBoard,
@@ -127,9 +127,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn: ({ board }) => getGameStateAfterMove(board, getOptimalAiMove(board))
   }
 });
-
-export const AddReduceDouble = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

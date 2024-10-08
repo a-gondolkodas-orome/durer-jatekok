@@ -215,7 +215,7 @@ const getPlayerStepDescription = ({ playerIndex, turnStage }) => {
   </>;
 };
 
-const Game = strategyGameFactory({
+export const SharkChase = strategyGameFactory({
   rule,
   title: 'Cápa üldözés',
   roleLabels: ['Kutató leszek!', 'Cápa leszek!'],
@@ -227,9 +227,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const SharkChase = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

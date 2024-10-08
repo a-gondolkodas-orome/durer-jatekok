@@ -99,7 +99,7 @@ const rule = <>
 	szabad. Az nyer, aki átugorja az ellenfél bábuját.
 </>;
 
-const Game = strategyGameFactory({
+export const TwelveSquares = strategyGameFactory({
   rule,
   title: 'Tizenkét mező',
   GameBoard,
@@ -111,9 +111,3 @@ const Game = strategyGameFactory({
 	  getGameStateAfterAiTurn
   }
 });
-
-export const TwelveSquares = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

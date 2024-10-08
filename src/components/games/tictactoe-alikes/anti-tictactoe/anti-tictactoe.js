@@ -50,7 +50,7 @@ const rule = <>
   átlóban. Ha mind a kilenc mező foglalt és nincs ilyen koronghármas, akkor a kezdő nyer.
 </>;
 
-const Game = strategyGameFactory({
+export const AntiTicTacToe = strategyGameFactory({
   rule,
   title: '3x3-as antiamőba',
   GameBoard,
@@ -60,9 +60,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const AntiTicTacToe = () => {
-  const [board, setBoard] = useState(generateEmptyTicTacToeBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

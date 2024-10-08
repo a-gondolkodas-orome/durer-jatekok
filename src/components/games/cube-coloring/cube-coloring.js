@@ -131,7 +131,7 @@ const rule = <>
   ha van olyan csúcs ami nem lett kiszínezve.
 </>;
 
-const Game = strategyGameFactory({
+export const CubeColoring = strategyGameFactory({
   rule,
   title: 'Kockaszínezés',
   GameBoard,
@@ -141,9 +141,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const CubeColoring = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

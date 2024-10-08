@@ -105,7 +105,7 @@ const rule = <>
   Az veszít, aki nem tud lépni.
 </>;
 
-const Game = strategyGameFactory({
+export const PileSplitter = strategyGameFactory({
   rule,
   title: 'Kupac kettéosztó',
   GameBoard,
@@ -115,9 +115,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const PileSplitter = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

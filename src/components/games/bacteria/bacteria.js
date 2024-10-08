@@ -221,7 +221,7 @@ const rule = (
   </>
 );
 
-const Game = strategyGameFactory({
+export const Bacteria = strategyGameFactory({
   rule,
   title: "Baktérimok terjedése",
   roleLabels: ["Támadó leszek", "Védekező leszek"],
@@ -232,9 +232,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const Bacteria = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

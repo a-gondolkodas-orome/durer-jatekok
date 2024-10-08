@@ -66,7 +66,7 @@ const rule = <>
   nem tud lépni.
 </>;
 
-const Game = strategyGameFactory({
+export const ChessRook = strategyGameFactory({
   rule,
   title: 'Barangolás bástyával',
   GameBoard,
@@ -76,9 +76,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const ChessRook = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

@@ -62,7 +62,7 @@ const rule = <>
   léphet előre. Az veszít, aki először lép {target}-nél nagyobb számra.
 </>;
 
-const Game = strategyGameFactory({
+export const PlusOneTwoThree = strategyGameFactory({
   rule: rule,
   title: '+1, +2, +3',
   GameBoard,
@@ -72,9 +72,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const PlusOneTwoThree = () => {
-  const [board, setBoard] = useState(0);
-
-  return <Game board={board} setBoard={setBoard}/>;
-}

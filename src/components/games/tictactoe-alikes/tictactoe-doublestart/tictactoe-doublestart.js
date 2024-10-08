@@ -63,7 +63,7 @@ const rule = <>
   nyer.
 </>;
 
-const Game = strategyGameFactory({
+export const TicTacToeDoubleStart = strategyGameFactory({
   rule,
   title: 'Duplánkezdő 3x3 amőba',
   GameBoard,
@@ -73,9 +73,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const TicTacToeDoubleStart = () => {
-  const [board, setBoard] = useState(generateEmptyTicTacToeBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

@@ -84,7 +84,7 @@ számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege p
 nyer, ha pedig páratlan, akkor a második.
 </>;
 
-const Game8 = strategyGameFactory({
+export const NumberCovering8 = strategyGameFactory({
   rule: rule8,
   title: 'Számok lefedés 1-től 8-ig',
   GameBoard,
@@ -95,7 +95,7 @@ const Game8 = strategyGameFactory({
   }
 });
 
-const Game10 = strategyGameFactory({
+export const NumberCovering10 = strategyGameFactory({
   rule: rule10,
   title: 'Számok lefedés 1-től 10-ig',
   GameBoard,
@@ -105,15 +105,3 @@ const Game10 = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const NumberCovering8 = () => {
-  const [board, setBoard] = useState(range(1, 9));
-
-  return <Game8 board={board} setBoard={setBoard} />;
-};
-
-export const NumberCovering10 = () => {
-  const [board, setBoard] = useState(range(1, 11));
-
-  return <Game10 board={board} setBoard={setBoard} />;
-};

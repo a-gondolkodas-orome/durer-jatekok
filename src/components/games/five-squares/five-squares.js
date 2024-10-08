@@ -82,7 +82,7 @@ const rule = <>
   minden mezőn különböző számú korong áll.
 </>;
 
-const Game = strategyGameFactory({
+export const FiveSquares = strategyGameFactory({
   rule,
   title: '5 mezőbe különbözőt',
   GameBoard,
@@ -92,9 +92,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const FiveSquares = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

@@ -192,7 +192,7 @@ const rule = <>
   Egy lépést követően tehát újra 4 kupac marad. Az veszít, aki nem tud lépni.
 </>;
 
-const Game = strategyGameFactory({
+export const PileSplitter4 = strategyGameFactory({
   rule,
   title: 'Kupac kettéosztó 4 kupaccal',
   GameBoard,
@@ -202,9 +202,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const PileSplitter4 = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

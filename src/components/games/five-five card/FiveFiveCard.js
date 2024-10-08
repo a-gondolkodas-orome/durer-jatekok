@@ -67,7 +67,7 @@ pedig az, aki előtt a kisebbik (ha ugyanaz a szám marad meg a két játékos e
 aki kezdte a játékot).
 </>;
 
-const Game = strategyGameFactory({
+export const FiveFiveCard = strategyGameFactory({
   rule,
   title: 'Párbaj 5 lappal',
   GameBoard,
@@ -77,9 +77,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const FiveFiveCard = () => {
-  const [board, setBoard] = useState(Array(15).fill(null));
-
-  return <Game board={board} setBoard={setBoard} />;
-};

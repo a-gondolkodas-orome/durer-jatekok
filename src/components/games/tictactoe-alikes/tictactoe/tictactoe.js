@@ -73,7 +73,7 @@ const rule = <>
   aki először hoz létre három fehér korongot egy sorban, oszlopban vagy átlóban.
 </>;
 
-const Game = strategyGameFactory({
+export const TicTacToe = strategyGameFactory({
   rule,
   title: 'Átszínezős tic-tac-toe',
   GameBoard,
@@ -83,9 +83,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const TicTacToe = () => {
-  const [board, setBoard] = useState(generateEmptyTicTacToeBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

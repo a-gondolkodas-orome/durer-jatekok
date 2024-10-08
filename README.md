@@ -118,7 +118,8 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
 ```
 
 ```js
-const Game = strategyGameFactory({
+// React component for the whole game which should be added to router
+export const HunyadiAndTheJanissaries = strategyGameFactory({
   // a React component (can be text in <></>)
   rule,
   // a short string
@@ -133,14 +134,6 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-// React component for the whole game which should be added to router
-export const HunyadiAndTheJanissaries = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};
-```
 
 ### Game end, determining winner
 

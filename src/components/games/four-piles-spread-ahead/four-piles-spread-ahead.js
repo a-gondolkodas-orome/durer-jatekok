@@ -123,7 +123,7 @@ const rule = <>
   elvett korongokat. Az veszít, aki nem tud lépni.
 </>;
 
-const Game = strategyGameFactory({
+export const FourPilesSpreadAhead = strategyGameFactory({
   rule,
   title: '4 kupacban előrepakolás',
   GameBoard,
@@ -133,9 +133,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn: ({ board }) => getGameStateAfterMove(board, getOptimalAiMove(board))
   }
 });
-
-export const FourPilesSpreadAhead = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

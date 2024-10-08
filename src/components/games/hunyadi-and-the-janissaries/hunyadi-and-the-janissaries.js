@@ -120,7 +120,7 @@ const rule = <>
   A szultán nyer, ha lesz olyan janicsár, aki felér a várhoz.
 </>;
 
-const Game = strategyGameFactory({
+export const HunyadiAndTheJanissaries = strategyGameFactory({
   rule,
   title: 'Hunyadi és a janicsárok',
   roleLabels: ['Szultán leszek', 'Hunyadi leszek'],
@@ -131,9 +131,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const HunyadiAndTheJanissaries = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

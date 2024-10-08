@@ -90,7 +90,7 @@ const rule = <>
   szabályoknak megfelelően több kötelet kifeszíteni.
 </>;
 
-const Game = strategyGameFactory({
+export const TriangularGridRopes = strategyGameFactory({
   rule,
   title: '10 totemoszlop',
   GameBoard,
@@ -100,9 +100,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const TriangularGridRopes = () => {
-  const [board, setBoard] = useState([]);
-
-  return <Game board={board} setBoard={setBoard} />;
-};

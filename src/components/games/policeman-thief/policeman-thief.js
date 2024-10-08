@@ -154,7 +154,7 @@ const rule = (
   </>
 );
 
-const Game = strategyGameFactory({
+export const Policemanthief = strategyGameFactory({
   rule,
   title: "Rendőr-tolvaj",
   roleLabels: ["Rendőrök", "Tolvaj"],
@@ -171,8 +171,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const Policemanthief = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-  return <Game board={board} setBoard={setBoard} />;
-};

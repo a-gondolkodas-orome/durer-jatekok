@@ -79,7 +79,7 @@ const rule = <>
   lépésben nem adhat hozzá <code>13-x</code>-et. Az veszít, aki eléri (vagy átlépi) <code>m</code>-et.
 </>;
 
-const Game = strategyGameFactory({
+export const SuperstitiousCounting = strategyGameFactory({
   rule,
   title: 'Babonás lépkedés',
   GameBoard,
@@ -89,9 +89,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const SuperstitiousCounting = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

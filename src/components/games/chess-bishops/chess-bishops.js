@@ -94,7 +94,7 @@ const rule = <>
   veszít, aki nem tud lerakni futót.
 </>;
 
-const Game = strategyGameFactory({
+export const ChessBishops = strategyGameFactory({
   rule,
   title: 'Futók lerakása',
   GameBoard,
@@ -104,9 +104,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 });
-
-export const ChessBishops = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};

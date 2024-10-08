@@ -229,7 +229,7 @@ ebből a játékosok felváltva vonnak le egy tetszőleges
 prímhatványt. Az nyer, aki a nullát mondja!
 </>
 
-const Game = strategyGameFactory({
+export const PrimeExponentials = strategyGameFactory({
   rule,
   title: 'Prímhatványok kivonása',
   GameBoard,
@@ -239,9 +239,3 @@ const Game = strategyGameFactory({
     getGameStateAfterAiTurn
   }
 })
-
-export const PrimeExponentials = () => {
-  const [board, setBoard] = useState(generateStartBoard());
-
-  return <Game board={board} setBoard={setBoard} />;
-};
