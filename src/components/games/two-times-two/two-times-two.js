@@ -31,10 +31,10 @@ const getGameStateAfterAiTurn = ({ board }) => {
   return getGameState(nextBoard);
 };
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const placePiece = id => {
     const nextBoard = addPiece(board, id);
-    ctx.endPlayerTurn(getGameState(nextBoard));
+    events.endPlayerTurn(getGameState(nextBoard));
   };
 
   return (

@@ -29,7 +29,7 @@ const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   return getGameState(nextBoard);
 };
 
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, setBoard, ctx, events }) => {
   const [oneMoveDone, setOneMoveDone] = useState(false);
 
   const placePiece = id => {
@@ -39,7 +39,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       setBoard(nextBoard);
       setOneMoveDone(true);
     } else {
-      ctx.endPlayerTurn(getGameState(nextBoard));
+      events.endPlayerTurn(getGameState(nextBoard));
       setOneMoveDone(false);
     }
   };

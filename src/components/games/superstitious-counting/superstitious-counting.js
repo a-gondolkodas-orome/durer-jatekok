@@ -25,7 +25,7 @@ const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   return getGameStateAfterMove(board, step, 1 - playerIndex);
 };
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const fields = range(board.target + 14);
 
   const isMoveAllowed = (step) => {
@@ -38,7 +38,7 @@ const GameBoard = ({ board, ctx }) => {
 
   const makeStep = (step) => {
     if (!isMoveAllowed(step)) return;
-    ctx.endPlayerTurn(getGameStateAfterMove(board, step, ctx.playerIndex));
+    events.endPlayerTurn(getGameStateAfterMove(board, step, ctx.playerIndex));
   };
 
   return (

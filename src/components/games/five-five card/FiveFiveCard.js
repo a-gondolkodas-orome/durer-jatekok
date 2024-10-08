@@ -3,7 +3,7 @@ import { range, cloneDeep, isNull } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const isMoveAllowed = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
     return board[id] === null;
@@ -13,7 +13,7 @@ const GameBoard = ({ board, ctx }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = 'removed';
-    ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
   };
 
   const isDisabled = id => {

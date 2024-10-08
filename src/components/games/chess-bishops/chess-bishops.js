@@ -7,12 +7,12 @@ import {
   BISHOP, FORBIDDEN
 } from './strategy/strategy';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const [hoveredField, setHoveredField] = useState(null);
   const clickField = (field) => {
     if (!isMoveAllowed(field)) return;
 
-    ctx.endPlayerTurn(getGameStateAfterMove(board, field));
+    events.endPlayerTurn(getGameStateAfterMove(board, field));
   };
 
   const isPotentialNextStep = (field) => {

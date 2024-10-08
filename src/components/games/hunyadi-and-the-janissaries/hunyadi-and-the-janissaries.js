@@ -9,7 +9,7 @@ import {
 } from './strategy/strategy';
 import { cloneDeep } from 'lodash';
 
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, setBoard, ctx, events }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const isPlayerSultan = ctx.playerIndex === 0;
@@ -35,7 +35,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
       const { nextBoard, intermediateBoard, isGameEnd, winnerIndex } = getGameStateAfterKillingGroup(board, group);
       setBoard(intermediateBoard);
       setTimeout(() => {
-        ctx.endPlayerTurn({ nextBoard, isGameEnd, winnerIndex });
+        events.endPlayerTurn({ nextBoard, isGameEnd, winnerIndex });
       }, 750);
     }
   };
@@ -96,7 +96,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
         <button
           className="cta-button"
           disabled={!ctx.shouldPlayerMoveNext}
-          onClick={() => ctx.endPlayerTurn({ nextBoard: board, isGameEnd: false })}
+          onClick={() => events.endPlayerTurn({ nextBoard: board, isGameEnd: false })}
         >
           Befejezem a kettéosztást
         </button>

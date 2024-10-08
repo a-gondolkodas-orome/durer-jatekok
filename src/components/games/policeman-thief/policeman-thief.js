@@ -25,24 +25,24 @@ const cubeCoords = [
   { cx: "90%", cy: "90%" }
 ];
 
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, setBoard, ctx, events }) => {
   const handleCircleClick = (vertex) => {
     if (!isClickable(vertex)) return;
     if (ctx.playerIndex === 1) {
       const nextBoard = { ...board, thief: vertex, turnCount: board.turnCount + 1 };
-      ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
       return;
     }
     const nextBoard = { ...board }
     if (ctx.turnStage === "secondMove") {
       nextBoard.policemen[1] = vertex;
       nextBoard.turnCount++;
-      ctx.setTurnStage(null)
-      ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.setTurnStage(null)
+      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
       return;
     }
     nextBoard.policemen[0] = vertex;
-    ctx.setTurnStage("secondMove")
+    events.setTurnStage("secondMove")
     setBoard(nextBoard);
   };
 

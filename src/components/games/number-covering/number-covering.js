@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, sum, sample } from 'lodash';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
 
   const clickNumber = (number) => {
     if (ctx.shouldPlayerMoveNext) {
       let nextBoard = [...board];
       nextBoard[number-1] = -1;
-      ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
     }
   };
 

@@ -5,7 +5,7 @@ import { range, random } from 'lodash';
 const target = 40;
 const maxStep = 3;
 
-const GameBoard = ({board, ctx}) => {
+const GameBoard = ({ board, ctx, events }) => {
 
   const isMoveAllowed = number => {
     if (!ctx.shouldPlayerMoveNext) return false;
@@ -15,7 +15,7 @@ const GameBoard = ({board, ctx}) => {
 
   const clickNumber = (number) => {
     if (!isMoveAllowed(number)) return;
-    ctx.endPlayerTurn(getGameStateAfterMove(number, ctx.playerIndex));
+    events.endPlayerTurn(getGameStateAfterMove(number, ctx.playerIndex));
   };
 
   return(

@@ -16,7 +16,7 @@ const cubeCoords = [
   { cx: '25%', cy: '74%' }
 ];
 
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, setBoard, ctx, events }) => {
   const [color, setColor] = useState('');
   const [show, setShow] = useState(false);
   const [x, setX] = useState(0);
@@ -49,7 +49,7 @@ const GameBoard = ({ board, setBoard, ctx }) => {
     nextBoard[vertex] = color;
     setBoard(nextBoard);
     setShow(false);
-    ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
   };
 
   return (

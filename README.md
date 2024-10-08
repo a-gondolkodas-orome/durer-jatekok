@@ -86,9 +86,9 @@ If you need a new, common parameter, you can create it and pass it down from `st
 
 *It is recommended to copy and modify an existing, similar game.*
 
-GameBoard: a React component with `board`, `setBoard`, `ctx` props which calls `ctx.endPlayerTurn`,
+GameBoard: a React component with `board`, `setBoard`, `ctx` and `events` props which calls `events.endPlayerTurn`,
 typically following a click from the user. Typically the user clicks, new state is calculated within
-the GameBoard component and then as a final step `ctx.endPlayerTurn` is called with a
+the GameBoard component and then as a final step `events.endPlayerTurn` is called with a
 `{ nextBoard, isGameEnd }` object (see more details in section "Game end, determining winner")
 
 Concept: `board` holds the state necessary to know the game state, that the next player
@@ -100,16 +100,17 @@ You should use `setBoard` if you need to change the board before ending player t
 ```js
 // `ctx` is an object and will contain the following (extendable):
 // - `shouldPlayerMoveNext: boolean
-// - endPlayerTurn: a function, see below
 // - playerIndex: null/0/1 (the role that the player chooses at the beginning)
 // - turnStage: in game with multi-stage turns you may use this param to track to stage
 //     if you need it in common parts such as step description as well
+// `events` is and objects that will contain the following (extendable):
+// - endPlayerTurn: a function, see below
 // - setTurnStage
-const GameBoard = ({ board, setBoard, ctx }) => {
+const GameBoard = ({ board, setBoard, ctx, events }) => {
   return (
     <section className="p-2 shrink-0 grow basis-2/3">   
         <button
-          onClick={() => ctx.endPlayerTurn({ nextBoard: {}, isGameEnd: false })}
+          onClick={() => events.endPlayerTurn({ nextBoard: {}, isGameEnd: false })}
         ></button>
     </section>
   );
@@ -148,7 +149,7 @@ When ending the turn, specify the game state with an object `{ nextBoard, isGame
 
 If the winner can be determined from who moved last before the game ended, it is enough to pass `winnerIndex: null`.
 
-`ctx.endPlayerTurn` should be called with this and also `getGameStateAfterAiTurn` should return
+`events.endPlayerTurn` should be called with this and also `getGameStateAfterAiTurn` should return
 such an object.
 
 ## Things to look out for

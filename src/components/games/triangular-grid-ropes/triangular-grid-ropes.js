@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterAiTurn, isAllowed, getAllowedSuperset, isGameEnd, vertices } from './strategy';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const [firstNode, setFirstNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
 
@@ -16,7 +16,7 @@ const GameBoard = ({ board, ctx }) => {
       if (!isAllowed(board, { from: firstNode, to: node })) return;
       const nextBoard = [...board];
       nextBoard.push(getAllowedSuperset(board, { from: firstNode, to: node }));
-      ctx.endPlayerTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
+      events.endPlayerTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
       setFirstNode(null);
     }
   };

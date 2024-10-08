@@ -17,7 +17,7 @@ const getGameStateAfterMove = (board, { pileId, pieceId }) => {
   return { nextBoard, intermediateBoard, isGameEnd, winnerIndex: null };
 };
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const nonExistent = ({ pileId, pieceId }) => {
@@ -41,7 +41,7 @@ const GameBoard = ({ board, ctx }) => {
   const clickPiece = ({ pileId, pieceId }) => {
     if (isDisabled({ pileId, pieceId })) return;
 
-    ctx.endPlayerTurn(getGameStateAfterMove(board, { pileId, pieceId }));
+    events.endPlayerTurn(getGameStateAfterMove(board, { pileId, pieceId }));
 
     setHoveredPiece(null);
   };

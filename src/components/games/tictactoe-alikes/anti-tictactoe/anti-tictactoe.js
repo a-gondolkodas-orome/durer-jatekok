@@ -4,7 +4,7 @@ import { strategyGameFactory } from '../../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn, playerColor } from './strategy/strategy';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const isMoveAllowed = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;
     return board[id] === null;
@@ -14,7 +14,7 @@ const GameBoard = ({ board, ctx }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = playerColor(ctx.playerIndex);
-    ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
   };
   const pieceColor = (id) => {
     const colorCode = board[id];

@@ -6,11 +6,11 @@ import {
 } from './strategy/strategy';
 import { ChessRookSvg } from './chess-rook-svg';
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const clickField = (field) => {
     if (!isMoveAllowed(field)) return;
 
-    ctx.endPlayerTurn(getGameStateAfterMove(board, field));
+    events.endPlayerTurn(getGameStateAfterMove(board, field));
   };
   const isMoveAllowed = (targetField) => {
     if (!ctx.shouldPlayerMoveNext) return false;

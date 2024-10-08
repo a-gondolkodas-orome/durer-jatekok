@@ -101,10 +101,12 @@ export const strategyGameFactory = ({
               setBoard={setBoard}
               ctx={{
                 shouldPlayerMoveNext,
-                endPlayerTurn,
                 playerIndex,
                 phase,
-                turnStage,
+                turnStage
+              }}
+              events={{
+                endPlayerTurn,
                 setTurnStage
               }}
             />

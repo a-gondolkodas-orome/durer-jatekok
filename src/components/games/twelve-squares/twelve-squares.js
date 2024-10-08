@@ -27,7 +27,7 @@ const getOptimalAiStep = ({ left, right }) => {
   return (dst+1) % 3;
 };
 
-const GameBoard = ({ board, ctx }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const isMoveAllowed = (step) => {
 	  if(!ctx.shouldPlayerMoveNext) return false;
     if (step === board.right - board.left) return false;
@@ -39,7 +39,7 @@ const GameBoard = ({ board, ctx }) => {
     const nextBoard = ctx.playerIndex === 0
       ? { left: board.left + step, right: board.right }
       : { left: board.left, right: board.right - step };
-	  ctx.endPlayerTurn(getGameStateAfterMove(nextBoard));
+	  events.endPlayerTurn(getGameStateAfterMove(nextBoard));
   };
 
   const potentialStep = i => {
