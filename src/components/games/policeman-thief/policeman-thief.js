@@ -25,7 +25,7 @@ const cubeCoords = [
   { cx: "90%", cy: "90%" }
 ];
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const handleCircleClick = (vertex) => {
     if (!isClickable(vertex)) return;
     if (ctx.playerIndex === 1) {
@@ -43,7 +43,7 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
     }
     nextBoard.policemen[0] = vertex;
     events.setTurnStage("secondMove")
-    setBoard(nextBoard);
+    moves.setBoard(nextBoard);
   };
 
   const isClickable = (vertex) => {

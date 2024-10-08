@@ -22,7 +22,7 @@ const distance = (fieldA, fieldB) => {
   );
 };
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const [chosenPiece, setChosenPiece] = useState(null);
 
   let possibleMoves=[]
@@ -80,7 +80,7 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
           return;
         }
         if (id !== board.shark) {
-          setBoard(nextBoard);
+          moves.setBoard(nextBoard);
           events.setTurnStage('secondSharkMove');
           return;
         }

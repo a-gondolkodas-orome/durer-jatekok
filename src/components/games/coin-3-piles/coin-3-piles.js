@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { range } from 'lodash';
 import { getGameStateAfterMove  } from './strategy/strategy';
 
-export const GameBoard = ({ board, setBoard, ctx, events }) => {
+export const GameBoard = ({ board, ctx, events, moves }) => {
   const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState(null);
   const [hoveredPile, setHoveredPile] = useState(null);
 
@@ -23,7 +23,7 @@ export const GameBoard = ({ board, setBoard, ctx, events }) => {
   const undoCoinRemoval = () => {
     const nextBoard = [...board];
     nextBoard[valueOfRemovedCoin] += 1;
-    setBoard(nextBoard);
+    moves.setBoard(nextBoard);
     events.setTurnStage(null);
     setValueOfRemovedCoin(null);
   };
@@ -35,7 +35,7 @@ export const GameBoard = ({ board, setBoard, ctx, events }) => {
     events.setTurnStage('placeBack');
     const nextBoard = [...board];
     nextBoard[coinValue] -= 1;
-    setBoard(nextBoard);
+    moves.setBoard(nextBoard);
     if (coinValue === 0) endTurn(nextBoard);
   };
 

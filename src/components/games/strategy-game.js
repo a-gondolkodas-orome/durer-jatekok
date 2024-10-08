@@ -99,7 +99,6 @@ export const strategyGameFactory = ({
             <GameBoard
               key={gameUuid}
               board={board}
-              setBoard={setBoard}
               ctx={{
                 shouldPlayerMoveNext,
                 playerIndex,
@@ -109,6 +108,12 @@ export const strategyGameFactory = ({
               events={{
                 endPlayerTurn,
                 setTurnStage
+              }}
+              moves={{
+                // general move, should not be needed if specialized functions
+                // are provided for each move in G
+                setBoard,
+                ...G.moves
               }}
             />
             <GameSidebar

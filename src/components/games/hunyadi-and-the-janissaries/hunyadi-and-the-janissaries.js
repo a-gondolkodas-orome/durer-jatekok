@@ -9,7 +9,7 @@ import {
 } from './strategy/strategy';
 import { cloneDeep } from 'lodash';
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const isPlayerSultan = ctx.playerIndex === 0;
@@ -29,11 +29,11 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
     if (isPlayerSultan) {
       const nextBoard = cloneDeep(board);
       nextBoard[rowIndex][pieceIndex] = board[rowIndex][pieceIndex] === 'blue' ? 'red' : 'blue';
-      setBoard(nextBoard);
+      moves.setBoard(nextBoard);
     } else {
       const group = board[rowIndex][pieceIndex];
       const { nextBoard, intermediateBoard, isGameEnd, winnerIndex } = getGameStateAfterKillingGroup(board, group);
-      setBoard(intermediateBoard);
+      moves.setBoard(intermediateBoard);
       setTimeout(() => {
         events.endPlayerTurn({ nextBoard, isGameEnd, winnerIndex });
       }, 750);

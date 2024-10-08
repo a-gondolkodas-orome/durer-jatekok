@@ -86,7 +86,7 @@ If you need a new, common parameter, you can create it and pass it down from `st
 
 *It is recommended to copy and modify an existing, similar game.*
 
-GameBoard: a React component with `board`, `setBoard`, `ctx` and `events` props which calls `events.endPlayerTurn`,
+GameBoard: a React component with `board`, `ctx` `events` and `moves` props which calls `events.endPlayerTurn`,
 typically following a click from the user. Typically the user clicks, new state is calculated within
 the GameBoard component and then as a final step `events.endPlayerTurn` is called with a
 `{ nextBoard, isGameEnd }` object (see more details in section "Game end, determining winner")
@@ -95,7 +95,7 @@ Concept: `board` holds the state necessary to know the game state, that the next
 needs to know. Additional state variables may be created within the `GameBoard` component
 that is relevant only during a turn, not between turns, such as reacting to hover events.
 
-You should use `setBoard` if you need to change the board before ending player turn.
+You should use `moves.setBoard` if you need to change the board before ending player turn.
 
 ```js
 // `ctx` is an object and will contain the following (extendable):
@@ -106,7 +106,7 @@ You should use `setBoard` if you need to change the board before ending player t
 // `events` is and objects that will contain the following (extendable):
 // - endPlayerTurn: a function, see below
 // - setTurnStage
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   return (
     <section className="p-2 shrink-0 grow basis-2/3">   
         <button
@@ -131,7 +131,9 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
     // a function returning a new, possibly random starting board object
     generateStartBoard,
     // a function with `{ board, playerIndex }` parameter returning `{ nextBoard, isGameEnd, winnerIndex }`
-    getGameStateAfterAiTurn
+    getGameStateAfterAiTurn,
+    // and object with functions. TBD
+    moves
   }
 });
 

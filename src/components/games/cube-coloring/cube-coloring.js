@@ -16,7 +16,7 @@ const cubeCoords = [
   { cx: '25%', cy: '74%' }
 ];
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const [color, setColor] = useState('');
   const [show, setShow] = useState(false);
   const [x, setX] = useState(0);
@@ -47,7 +47,7 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
     if (!isMoveAllowed(vertex)) return;
     const nextBoard = [...board];
     nextBoard[vertex] = color;
-    setBoard(nextBoard);
+    moves.setBoard(nextBoard);
     setShow(false);
     events.endPlayerTurn(getGameStateAfterMove(nextBoard));
   };

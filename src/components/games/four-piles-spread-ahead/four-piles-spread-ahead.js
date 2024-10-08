@@ -19,7 +19,7 @@ const getGameStateAfterMove = (board, { pileId, pieceId }) => {
   return { nextBoard, intermediateBoard, isGameEnd, winnerIndex: null };
 };
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const nonExistent = ({ pileId, pieceId }) => {

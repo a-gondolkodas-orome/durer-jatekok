@@ -30,7 +30,7 @@ const getBoardAfterMove = (board, { removedPileId, splitPileId, pieceId }) => {
   return { intermediateBoard, nextBoard };
 };
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const [removedPileId, setRemovedPileId] = useState(null);
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
@@ -59,7 +59,7 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
       pieceId
     });
 
-    setBoard(intermediateBoard);
+    moves.setBoard(intermediateBoard);
 
     setTimeout(() => {
       events.endPlayerTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });

@@ -12,7 +12,7 @@ const getGameStateAfterAiTurn = ({ board }) => {
   return { intermediateBoard, nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
 };
 
-const GameBoard = ({ board, setBoard, ctx, events }) => {
+const GameBoard = ({ board, ctx, events, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const isDisabled = ({ pileId, pieceId }) => {
@@ -23,7 +23,7 @@ const GameBoard = ({ board, setBoard, ctx, events }) => {
   const clickPiece = ({ pileId, pieceId }) => {
     if (isDisabled({ pileId, pieceId })) return;
 
-    setBoard(pileId === 0 ? [board[0], 0] : [0, board[1]]);
+    moves.setBoard(pileId === 0 ? [board[0], 0] : [0, board[1]]);
 
     setTimeout(() => {
       const nextBoard = [pieceId + 1, board[pileId] - pieceId - 1];
