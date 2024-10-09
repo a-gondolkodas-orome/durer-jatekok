@@ -130,7 +130,7 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
     getPlayerStepDescription,
     // a function returning a new, possibly random starting board object
     generateStartBoard,
-    // a function with `{ board, playerIndex }` parameter returning `{ nextBoard, isGameEnd, winnerIndex }`
+    // a function with `{ board, ctx, events, moves }` parameter returning `{ nextBoard, isGameEnd, winnerIndex }`
     getGameStateAfterAiTurn,
     // and object with functions. TBD
     moves

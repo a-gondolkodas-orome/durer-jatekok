@@ -11,9 +11,9 @@ const getGameStateAfterMove = (nextBoard) => {
 	return { nextBoard, isGameEnd: nextBoard.right < nextBoard.left, winnerIndex: null };
 };
 
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
+const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const step = getOptimalAiStep(board);
-  const nextBoard = playerIndex === 0
+  const nextBoard = ctx.playerIndex === 0
     ? { left: board.left, right: board.right - step }
     : { left: board.left + step, right: board.right };
   return getGameStateAfterMove(nextBoard);

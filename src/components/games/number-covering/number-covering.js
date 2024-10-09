@@ -52,7 +52,7 @@ const getGameStateAfterMove = (nextBoard) => {
   return { nextBoard, isGameEnd, winnerIndex };
 };
 
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
+const getGameStateAfterAiTurn = ({ board, ctx }) => {
   let nextBoard = [...board];
   const notCovered = nextBoard.filter(i => i !== -1);
   const evens = notCovered.filter(i => i%2 === 0);
@@ -60,7 +60,7 @@ const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
   if (evens.length===odds.length || evens.length === 0 || odds.length === 0) {
     nextBoard[sample(notCovered) - 1] = -1;
   } else {
-    if (playerIndex===0){
+    if (ctx.playerIndex === 0){
       const candidates = evens.length > odds.length ? evens : odds;
       nextBoard[sample(candidates) - 1] = -1;
     } else {

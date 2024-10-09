@@ -24,8 +24,8 @@ const getGameState = nextBoard => ({
   winnerIndex: getWinnerIndex(nextBoard)
 });
 
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
-  const nextBoard = getBoardAfterAiTurn({ board, playerIndex });
+const getGameStateAfterAiTurn = ({ board, ctx }) => {
+  const nextBoard = getBoardAfterAiTurn({ board, playerIndex: ctx.playerIndex });
   return getGameState(nextBoard);
 };
 

@@ -20,9 +20,9 @@ const getGameStateAfterMove = (board, step, moverIndex) => {
   };
 };
 
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
+const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const step = getOptimalAiStep(board);
-  return getGameStateAfterMove(board, step, 1 - playerIndex);
+  return getGameStateAfterMove(board, step, 1 - ctx.playerIndex);
 };
 
 const GameBoard = ({ board, ctx, events }) => {

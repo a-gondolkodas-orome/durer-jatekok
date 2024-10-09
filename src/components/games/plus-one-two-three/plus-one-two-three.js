@@ -49,11 +49,11 @@ const getGameStateAfterMove = (nextBoard, moverIndex) => {
   return { nextBoard, isGameEnd: false };
 };
 
-const getGameStateAfterAiTurn = ({ board, playerIndex }) => {
+const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const nextBoard = board % (1 + maxStep) !== 0
     ? board + (1 + maxStep) - board % (1 + maxStep)
     : board + random(1, maxStep);
-  return (getGameStateAfterMove(nextBoard, 1-playerIndex));
+  return (getGameStateAfterMove(nextBoard, 1 - ctx.playerIndex));
 };
 
 const rule = <>
