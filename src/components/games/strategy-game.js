@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
@@ -25,6 +25,8 @@ export const strategyGameFactory = ({
     const [gameUuid, setGameUuid] = useState(uuidv4());
     const [turnStage, setTurnStage] = useState(null);
 
+    const gameOverRef = useRef(winnerIndex !== null)
+
     const startNewGame = () => {
       setBoard(generateStartBoard());
       setPhase('roleSelection');
@@ -32,6 +34,7 @@ export const strategyGameFactory = ({
       setNext(null);
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
+      gameOverRef.current = false;
       setGameUuid(uuidv4());
       setTurnStage(null);
     };
@@ -42,6 +45,7 @@ export const strategyGameFactory = ({
     const endGame = (winnerIndex) => {
       setPhase('gameEnd');
       setWinnerIndex(winnerIndex);
+      gameOverRef.current = true;
       setIsGameEndDialogOpen(true);
     };
 
@@ -52,7 +56,6 @@ export const strategyGameFactory = ({
       if (isGameEnd) {
         // default: last player to move is the winner
         endGame(winnerIndex === null ? playerIndex : winnerIndex);
-        return;
       }
 
       doAiTurn({ currentBoard: nextBoard });
@@ -83,6 +86,10 @@ export const strategyGameFactory = ({
     };
 
     const doAiTurn = ({ currentBoard }) => {
+      if (gameOverRef.current) {
+        return;
+      }
+
       const localPlayerIndex = playerIndex === null ? 1 : playerIndex;
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
