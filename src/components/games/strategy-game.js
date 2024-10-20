@@ -26,12 +26,15 @@ export const strategyGameFactory = ({
     const [turnStage, setTurnStage] = useState(null);
 
     const gameOverRef = useRef(winnerIndex !== null)
+    // player -> ai -> player is triggered from one render that is why next is not enough
+    const currentPlayerIdxRef = useRef(next);
 
     const startNewGame = () => {
       setBoard(generateStartBoard());
       setPhase('roleSelection');
       setPlayerIndex(null);
       setNext(null);
+      currentPlayerIdxRef.current = null;
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
       gameOverRef.current = false;
@@ -44,19 +47,25 @@ export const strategyGameFactory = ({
 
     const endGame = (winnerIndex) => {
       setPhase('gameEnd');
-      setWinnerIndex(winnerIndex);
+      // default: last player to move is the winner
+      setWinnerIndex(winnerIndex === null ? currentPlayerIdxRef.current : winnerIndex);
       gameOverRef.current = true;
       setIsGameEndDialogOpen(true);
     };
 
+    const advanceCurrentPlayer = () => {
+      setNext(next => 1 - next);
+      currentPlayerIdxRef.current = 1 - currentPlayerIdxRef.current;
+    };
+
     const endPlayerTurn = ({ nextBoard, isGameEnd, winnerIndex }) => {
       setBoard(nextBoard);
-      setNext(next => 1 - next);
 
       if (isGameEnd) {
-        // default: last player to move is the winner
-        endGame(winnerIndex === null ? playerIndex : winnerIndex);
+        endGame(winnerIndex);
       }
+
+      advanceCurrentPlayer();
 
       doAiTurn({ currentBoard: nextBoard });
     };
@@ -64,6 +73,7 @@ export const strategyGameFactory = ({
     const chooseRole = (playerIdx) => {
       setPhase('play');
       setNext(0);
+      currentPlayerIdxRef.current = 0;
       setPlayerIndex(playerIdx);
       if (initialTurnStages !== undefined) {
         setTurnStage(initialTurnStages[playerIdx]);
@@ -90,7 +100,6 @@ export const strategyGameFactory = ({
         return;
       }
 
-      const localPlayerIndex = playerIndex === null ? 1 : playerIndex;
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
         const { intermediateBoard, nextBoard, isGameEnd, winnerIndex } = getGameStateAfterAiTurn({
@@ -110,11 +119,10 @@ export const strategyGameFactory = ({
         }
         setTimeout(() => {
           setBoard(nextBoard);
-          setNext(next => 1 - next);
           if (isGameEnd) {
-            // default: last player to move is the winner
-            endGame(winnerIndex === null ? (1 - localPlayerIndex) : winnerIndex);
+            endGame(winnerIndex);
           }
+          advanceCurrentPlayer();
         }, stageTimeout);
       }, time);
     };
