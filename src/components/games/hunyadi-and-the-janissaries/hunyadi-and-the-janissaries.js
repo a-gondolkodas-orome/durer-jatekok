@@ -35,7 +35,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       const { nextBoard, intermediateBoard, isGameEnd, winnerIndex } = getGameStateAfterKillingGroup(board, group);
       moves.setBoard(intermediateBoard);
       setTimeout(() => {
-        events.endPlayerTurn({ nextBoard, isGameEnd, winnerIndex });
+        events.endTurn({ nextBoard, isGameEnd, winnerIndex });
       }, 750);
     }
   };
@@ -96,7 +96,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
         <button
           className="cta-button"
           disabled={!ctx.shouldPlayerMoveNext}
-          onClick={() => events.endPlayerTurn({ nextBoard: board, isGameEnd: false })}
+          onClick={() => events.endTurn({ nextBoard: board, isGameEnd: false })}
         >
           Befejezem a kettéosztást
         </button>

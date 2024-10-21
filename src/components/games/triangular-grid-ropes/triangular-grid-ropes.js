@@ -16,7 +16,7 @@ const BoardClient = ({ board, ctx, events }) => {
       if (!isAllowed(board, { from: firstNode, to: node })) return;
       const nextBoard = [...board];
       nextBoard.push(getAllowedSuperset(board, { from: firstNode, to: node }));
-      events.endPlayerTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
+      events.endTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
       setFirstNode(null);
     }
   };

@@ -93,10 +93,10 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
     if (!isPlayerAttacker) {
       nextBoard.bacteria[row][col] -= 1;
       if (areAllBacteriaRemoved(nextBoard.bacteria)) {
-        events.endPlayerTurn({ nextBoard, isGameEnd: true, winnerIndex: 1 });
+        events.endTurn({ nextBoard, isGameEnd: true, winnerIndex: 1 });
         return;
       }
-      events.endPlayerTurn({ nextBoard, isGameEnd: false });
+      events.endTurn({ nextBoard, isGameEnd: false });
       return;
     }
 
@@ -117,9 +117,9 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
     }
 
     if (goalsReached.length >= 1) {
-      events.endPlayerTurn({ nextBoard, isGameEnd: true, winnerIndex: 0 });
+      events.endTurn({ nextBoard, isGameEnd: true, winnerIndex: 0 });
     } else {
-      events.endPlayerTurn({ nextBoard, isGameEnd: false });
+      events.endTurn({ nextBoard, isGameEnd: false });
     }
 
     setAttackRow(null);

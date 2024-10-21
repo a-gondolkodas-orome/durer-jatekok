@@ -11,7 +11,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = gameIsInPlacingPhase ? pColor : 'white';
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
   };
   const isMoveAllowed = (id) => {
     if (!ctx.shouldPlayerMoveNext) return false;

@@ -38,7 +38,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
   const makeStep = (step) => {
     if (!isMoveAllowed(step)) return;
-    events.endPlayerTurn(getGameStateAfterMove(board, step, ctx.playerIndex));
+    events.endTurn(getGameStateAfterMove(board, step, ctx.playerIndex));
   };
 
   return (

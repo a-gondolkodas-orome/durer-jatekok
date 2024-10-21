@@ -49,7 +49,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     nextBoard[vertex] = color;
     moves.setBoard(nextBoard);
     setShow(false);
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
   };
 
   return (

@@ -34,7 +34,7 @@ const getGameStateAfterAiTurn = ({ board }) => {
 const BoardClient = ({ board, ctx, events }) => {
   const placePiece = id => {
     const nextBoard = addPiece(board, id);
-    events.endPlayerTurn(getGameState(nextBoard));
+    events.endTurn(getGameState(nextBoard));
   };
 
   return (

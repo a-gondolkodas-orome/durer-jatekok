@@ -16,7 +16,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = 'removed';
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
   };
   const isDisabled = (id) => {
     if (!isMoveAllowed(id)) return true;

@@ -14,7 +14,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = playerColor(ctx.playerIndex);
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
   };
   const pieceColor = (id) => {
     const colorCode = board[id];

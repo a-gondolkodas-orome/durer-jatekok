@@ -30,7 +30,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     if (!isClickable(vertex)) return;
     if (ctx.playerIndex === 1) {
       const nextBoard = { ...board, thief: vertex, turnCount: board.turnCount + 1 };
-      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endTurn(getGameStateAfterMove(nextBoard));
       return;
     }
     const nextBoard = { ...board }
@@ -38,7 +38,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       nextBoard.policemen[1] = vertex;
       nextBoard.turnCount++;
       events.setTurnStage(null)
-      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endTurn(getGameStateAfterMove(nextBoard));
       return;
     }
     nextBoard.policemen[0] = vertex;

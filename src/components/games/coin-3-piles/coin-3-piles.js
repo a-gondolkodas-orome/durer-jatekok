@@ -53,7 +53,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
     events.setTurnStage(null);
   };
   const endTurn = (nextBoard) => {
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
     resetTurnState();
   };
   const getCoinBgColor = (coinValue) => {

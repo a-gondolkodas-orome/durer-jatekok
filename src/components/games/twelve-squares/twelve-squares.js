@@ -39,7 +39,7 @@ const BoardClient = ({ board, ctx, events }) => {
     const nextBoard = ctx.playerIndex === 0
       ? { left: board.left + step, right: board.right }
       : { left: board.left, right: board.right - step };
-	  events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+	  events.endTurn(getGameStateAfterMove(nextBoard));
   };
 
   const potentialStep = i => {

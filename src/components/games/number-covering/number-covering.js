@@ -8,7 +8,7 @@ const BoardClient = ({ board, ctx, events }) => {
     if (ctx.shouldPlayerMoveNext) {
       let nextBoard = [...board];
       nextBoard[number-1] = -1;
-      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endTurn(getGameStateAfterMove(nextBoard));
     }
   };
 

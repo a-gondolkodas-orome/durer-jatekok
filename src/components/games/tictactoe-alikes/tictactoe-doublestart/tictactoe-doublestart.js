@@ -18,7 +18,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     nextBoard[id] = playerColor(ctx.playerIndex);
     moves.setBoard(nextBoard);
     if (isDuringFirstMove(nextBoard)) return;
-    events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+    events.endTurn(getGameStateAfterMove(nextBoard));
   };
   const pieceColor = (id) => {
     const colorCode = board[id];

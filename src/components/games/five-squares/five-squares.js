@@ -39,7 +39,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       moves.setBoard(nextBoard);
       setOneMoveDone(true);
     } else {
-      events.endPlayerTurn(getGameState(nextBoard));
+      events.endTurn(getGameState(nextBoard));
       setOneMoveDone(false);
     }
   };

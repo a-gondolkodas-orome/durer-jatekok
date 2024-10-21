@@ -64,7 +64,7 @@ export const strategyGameFactory = ({
       currentPlayerIdxRef.current = 1 - currentPlayerIdxRef.current;
     };
 
-    const endPlayerTurn = ({ nextBoard, isGameEnd, winnerIndex }) => {
+    const endTurn = ({ nextBoard, isGameEnd, winnerIndex }) => {
       setBoard(nextBoard);
 
       if (isGameEnd) {
@@ -92,7 +92,7 @@ export const strategyGameFactory = ({
     };
 
     const events = {
-      endPlayerTurn,
+      endTurn,
       setTurnStage
     };
 

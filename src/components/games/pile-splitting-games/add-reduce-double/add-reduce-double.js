@@ -41,7 +41,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const clickPiece = ({ pileId, pieceId }) => {
     if (isDisabled({ pileId, pieceId })) return;
 
-    events.endPlayerTurn(getGameStateAfterMove(board, { pileId, pieceId }));
+    events.endTurn(getGameStateAfterMove(board, { pileId, pieceId }));
 
     setHoveredPiece(null);
   };

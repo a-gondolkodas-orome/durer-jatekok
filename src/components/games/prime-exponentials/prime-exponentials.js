@@ -155,7 +155,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const chooseExponential = (e) => {
     setPlayerPrime(null);
     events.setTurnStage(null);
-    events.endPlayerTurn(getGameStateAfterMove(board - playerPrime ** e));
+    events.endTurn(getGameStateAfterMove(board - playerPrime ** e));
   }
 
   const PlayerOptions = ctx.turnStage !== "chooseExponent"

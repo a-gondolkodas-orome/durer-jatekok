@@ -10,7 +10,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const clickField = (field) => {
     if (!isMoveAllowed(field)) return;
 
-    events.endPlayerTurn(getGameStateAfterMove(board, field));
+    events.endTurn(getGameStateAfterMove(board, field));
   };
   const isMoveAllowed = (targetField) => {
     if (!ctx.shouldPlayerMoveNext) return false;

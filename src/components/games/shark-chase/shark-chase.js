@@ -66,7 +66,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
         nextBoard.turn += 1;
         setChosenPiece(null);
         events.setTurnStage('choosePiece');
-        events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+        events.endTurn(getGameStateAfterMove(nextBoard));
       }
     }
     if (ctx.playerIndex === 1) {
@@ -76,7 +76,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       if (ctx.turnStage !== 'secondSharkMove') {
         if (nextBoard.submarines[id] >= 1) {
           // instant lose
-          events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+          events.endTurn(getGameStateAfterMove(nextBoard));
           return;
         }
         if (id !== board.shark) {
@@ -89,7 +89,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       nextBoard.turn += 1;
       setChosenPiece(null);
       events.setTurnStage('firstSharkMove');
-      events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+      events.endTurn(getGameStateAfterMove(nextBoard));
     }
   };
 

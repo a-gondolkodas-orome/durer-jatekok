@@ -15,7 +15,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
   const clickNumber = (number) => {
     if (!isMoveAllowed(number)) return;
-    events.endPlayerTurn(getGameStateAfterMove(number, ctx.playerIndex));
+    events.endTurn(getGameStateAfterMove(number, ctx.playerIndex));
   };
 
   return(

@@ -43,7 +43,7 @@ const gameBoardFactory = (maxDiscs) => {
         nextBoard[pile] = i;
         if (pile === 1) nextBoard[0] += d;
         setHovered(null);
-        events.endPlayerTurn(getGameStateAfterMove(nextBoard));
+        events.endTurn(getGameStateAfterMove(nextBoard));
       }
     };
 
