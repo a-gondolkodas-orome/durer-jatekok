@@ -26,8 +26,6 @@ export const strategyGameFactory = ({
     const [turnStage, setTurnStage] = useState(null);
 
     const gameOverRef = useRef(winnerIndex !== null)
-    // player -> ai -> player is triggered from one render that is why currentPlayer is not enough
-    const currentPlayerIdxRef = useRef(currentPlayer);
 
     useEffect(() => {
       if (phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
@@ -40,7 +38,6 @@ export const strategyGameFactory = ({
       setPhase('roleSelection');
       setChosenRoleIndex(null);
       setCurrentPlayer(null);
-      currentPlayerIdxRef.current = null;
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
       gameOverRef.current = false;
@@ -54,30 +51,22 @@ export const strategyGameFactory = ({
     const endGame = (winnerIndex) => {
       setPhase('gameEnd');
       // default: last player to move is the winner
-      setWinnerIndex(winnerIndex === null ? currentPlayerIdxRef.current : winnerIndex);
+      setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
       gameOverRef.current = true;
       setIsGameEndDialogOpen(true);
     };
 
-    const advanceCurrentPlayer = () => {
-      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
-      currentPlayerIdxRef.current = 1 - currentPlayerIdxRef.current;
-    };
-
     const endTurn = ({ nextBoard, isGameEnd, winnerIndex }) => {
       setBoard(nextBoard);
-
       if (isGameEnd) {
         endGame(winnerIndex);
       }
-
-      advanceCurrentPlayer();
+      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
     };
 
     const chooseRole = (playerIdx) => {
       setPhase('play');
       setCurrentPlayer(0);
-      currentPlayerIdxRef.current = 0;
       setChosenRoleIndex(playerIdx);
       if (initialTurnStages !== undefined) {
         setTurnStage(initialTurnStages[playerIdx]);
@@ -123,7 +112,7 @@ export const strategyGameFactory = ({
           if (isGameEnd) {
             endGame(winnerIndex);
           }
-          advanceCurrentPlayer();
+          setCurrentPlayer(currentPlayer => 1 - currentPlayer);
         }, stageTimeout);
       }, time);
     };
