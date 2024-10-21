@@ -5,7 +5,7 @@ import { range, sum, sample } from 'lodash';
 const BoardClient = ({ board, ctx, events }) => {
 
   const clickNumber = (number) => {
-    if (ctx.shouldPlayerMoveNext) {
+    if (ctx.shouldRoleSelectorMoveNext) {
       let nextBoard = [...board];
       nextBoard[number-1] = -1;
       events.endTurn(getGameStateAfterMove(nextBoard));
@@ -25,7 +25,7 @@ const BoardClient = ({ board, ctx, events }) => {
               key = {i}
             >
               <button
-                disabled={!ctx.shouldPlayerMoveNext}
+                disabled={!ctx.shouldRoleSelectorMoveNext}
                 className='w-full enabled:hover:bg-gray-400 enabled:focus:bg-gray-400'
                 onClick={() => clickNumber(i+1)}
               >
@@ -60,7 +60,7 @@ const getGameStateAfterAiTurn = ({ board, ctx }) => {
   if (evens.length===odds.length || evens.length === 0 || odds.length === 0) {
     nextBoard[sample(notCovered) - 1] = -1;
   } else {
-    if (ctx.playerIndex === 0){
+    if (ctx.chosenRoleIndex === 0){
       const candidates = evens.length > odds.length ? evens : odds;
       nextBoard[sample(candidates) - 1] = -1;
     } else {

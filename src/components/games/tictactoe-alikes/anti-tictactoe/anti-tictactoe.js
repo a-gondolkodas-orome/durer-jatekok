@@ -6,14 +6,14 @@ import { generateEmptyTicTacToeBoard } from '../helpers';
 
 const BoardClient = ({ board, ctx, events }) => {
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
   };
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
 
     const nextBoard = cloneDeep(board);
-    nextBoard[id] = playerColor(ctx.playerIndex);
+    nextBoard[id] = playerColor(ctx.chosenRoleIndex);
     events.endTurn(getGameStateAfterMove(nextBoard));
   };
   const pieceColor = (id) => {

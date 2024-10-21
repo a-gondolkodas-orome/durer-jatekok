@@ -8,14 +8,14 @@ const maxStep = 3;
 const BoardClient = ({ board, ctx, events }) => {
 
   const isMoveAllowed = number => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     if (number <= board) return false;
     return (number - board) <= maxStep;
   }
 
   const clickNumber = (number) => {
     if (!isMoveAllowed(number)) return;
-    events.endTurn(getGameStateAfterMove(number, ctx.playerIndex));
+    events.endTurn(getGameStateAfterMove(number, ctx.chosenRoleIndex));
   };
 
   return(
@@ -53,7 +53,7 @@ const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const nextBoard = board % (1 + maxStep) !== 0
     ? board + (1 + maxStep) - board % (1 + maxStep)
     : board + random(1, maxStep);
-  return (getGameStateAfterMove(nextBoard, 1 - ctx.playerIndex));
+  return (getGameStateAfterMove(nextBoard, 1 - ctx.chosenRoleIndex));
 };
 
 const rule = <>

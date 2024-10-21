@@ -22,14 +22,14 @@ const getGameStateAfterMove = (board, step, moverIndex) => {
 
 const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const step = getOptimalAiStep(board);
-  return getGameStateAfterMove(board, step, 1 - ctx.playerIndex);
+  return getGameStateAfterMove(board, step, 1 - ctx.chosenRoleIndex);
 };
 
 const BoardClient = ({ board, ctx, events }) => {
   const fields = range(board.target + 14);
 
   const isMoveAllowed = (step) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     if(step === board.restricted || step <= 0 || step >= 13) {
       return false;
     }
@@ -38,7 +38,7 @@ const BoardClient = ({ board, ctx, events }) => {
 
   const makeStep = (step) => {
     if (!isMoveAllowed(step)) return;
-    events.endTurn(getGameStateAfterMove(board, step, ctx.playerIndex));
+    events.endTurn(getGameStateAfterMove(board, step, ctx.chosenRoleIndex));
   };
 
   return (
@@ -63,7 +63,7 @@ const BoardClient = ({ board, ctx, events }) => {
       )}
     </div>
     <span className = "text-xl"><code>m</code> értéke: { board.target }</span>
-    {ctx.shouldPlayerMoveNext && (
+    {ctx.shouldRoleSelectorMoveNext && (
       <p className="text-xl">
         Előző lépés: { board.restricted ? (13 - board.restricted) : '-' }. Tiltott: { board.restricted || '-' }.
       </p>

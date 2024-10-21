@@ -43,7 +43,7 @@ const BoardClient = ({ board, ctx, events }) => {
       {range(board.length).map(id =>
         <button
           key={id}
-          disabled={!ctx.shouldPlayerMoveNext}
+          disabled={!ctx.shouldRoleSelectorMoveNext}
           onClick={() => placePiece(id)}
           className="aspect-square border-2 p-[4%]"
         >

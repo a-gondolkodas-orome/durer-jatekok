@@ -18,28 +18,28 @@ export const strategyGameFactory = ({
   return () => {
     const [board, setBoard] = useState(generateStartBoard())
     const [phase, setPhase] = useState('roleSelection');
-    const [playerIndex, setPlayerIndex] = useState(null);
-    const [next, setNext] = useState(null);
+    const [chosenRoleIndex, setChosenRoleIndex] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
     const [winnerIndex, setWinnerIndex] = useState(null);
     const [gameUuid, setGameUuid] = useState(uuidv4());
     const [turnStage, setTurnStage] = useState(null);
 
     const gameOverRef = useRef(winnerIndex !== null)
-    // player -> ai -> player is triggered from one render that is why next is not enough
-    const currentPlayerIdxRef = useRef(next);
+    // player -> ai -> player is triggered from one render that is why currentPlayer is not enough
+    const currentPlayerIdxRef = useRef(currentPlayer);
 
     useEffect(() => {
-      if (phase === 'play' && next === (1 - playerIndex)) {
+      if (phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
         doAiTurn({ currentBoard: board });
       }
-    }, [next])
+    }, [currentPlayer])
 
     const startNewGame = () => {
       setBoard(generateStartBoard());
       setPhase('roleSelection');
-      setPlayerIndex(null);
-      setNext(null);
+      setChosenRoleIndex(null);
+      setCurrentPlayer(null);
       currentPlayerIdxRef.current = null;
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
@@ -48,8 +48,8 @@ export const strategyGameFactory = ({
       setTurnStage(null);
     };
 
-    const shouldPlayerMoveNext = (phase === 'play' && next === playerIndex);
-    const isPlayerWinner = winnerIndex === playerIndex;
+    const shouldRoleSelectorMoveNext = (phase === 'play' && currentPlayer === chosenRoleIndex);
+    const isRoleSelectorWinner = winnerIndex === chosenRoleIndex;
 
     const endGame = (winnerIndex) => {
       setPhase('gameEnd');
@@ -60,7 +60,7 @@ export const strategyGameFactory = ({
     };
 
     const advanceCurrentPlayer = () => {
-      setNext(next => 1 - next);
+      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
       currentPlayerIdxRef.current = 1 - currentPlayerIdxRef.current;
     };
 
@@ -76,17 +76,17 @@ export const strategyGameFactory = ({
 
     const chooseRole = (playerIdx) => {
       setPhase('play');
-      setNext(0);
+      setCurrentPlayer(0);
       currentPlayerIdxRef.current = 0;
-      setPlayerIndex(playerIdx);
+      setChosenRoleIndex(playerIdx);
       if (initialTurnStages !== undefined) {
         setTurnStage(initialTurnStages[playerIdx]);
       }
     };
 
     const ctx = {
-      shouldPlayerMoveNext,
-      playerIndex,
+      shouldRoleSelectorMoveNext,
+      chosenRoleIndex,
       phase,
       turnStage
     };
@@ -145,7 +145,7 @@ export const strategyGameFactory = ({
             <GameSidebar
               roleLabels={roleLabels}
               stepDescription={getPlayerStepDescription({ board, ctx })}
-              ctx={{ phase, shouldPlayerMoveNext, isPlayerWinner }}
+              ctx={{ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }}
               moves={{ chooseRole, startNewGame }}
             />
           </div>
@@ -156,7 +156,7 @@ export const strategyGameFactory = ({
         isOpen={isGameEndDialogOpen}
         setIsOpen={setIsGameEndDialogOpen}
         startNewGame={startNewGame}
-        isPlayerWinner={isPlayerWinner}
+        isRoleSelectorWinner={isRoleSelectorWinner}
       />
     </main>
     );

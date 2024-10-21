@@ -8,7 +8,7 @@ import { ScissorSvg } from './scissor-svg';
 
 const BoardClient = ({ board, ctx, events }) => {
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
   };
   const clickField = (id) => {
@@ -21,8 +21,8 @@ const BoardClient = ({ board, ctx, events }) => {
   const isDisabled = (id) => {
     if (!isMoveAllowed(id)) return true;
     if ([1, 4, 7].includes(id)) return true;
-    if (ctx.playerIndex === 1) return [2, 5, 8].includes(id);
-    if (ctx.playerIndex === 0) return [0, 3, 6].includes(id);
+    if (ctx.chosenRoleIndex === 1) return [2, 5, 8].includes(id);
+    if (ctx.chosenRoleIndex === 0) return [0, 3, 6].includes(id);
   };
 
   return (

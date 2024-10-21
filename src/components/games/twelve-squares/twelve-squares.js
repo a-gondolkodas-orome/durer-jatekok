@@ -13,7 +13,7 @@ const getGameStateAfterMove = (nextBoard) => {
 
 const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const step = getOptimalAiStep(board);
-  const nextBoard = ctx.playerIndex === 0
+  const nextBoard = ctx.chosenRoleIndex === 0
     ? { left: board.left, right: board.right - step }
     : { left: board.left + step, right: board.right };
   return getGameStateAfterMove(nextBoard);
@@ -29,31 +29,31 @@ const getOptimalAiStep = ({ left, right }) => {
 
 const BoardClient = ({ board, ctx, events }) => {
   const isMoveAllowed = (step) => {
-	  if(!ctx.shouldPlayerMoveNext) return false;
+	  if(!ctx.shouldRoleSelectorMoveNext) return false;
     if (step === board.right - board.left) return false;
     return step === 1 || step === 2;
   };
 
   const makeStep = (step) => {
     if (!isMoveAllowed(step)) return;
-    const nextBoard = ctx.playerIndex === 0
+    const nextBoard = ctx.chosenRoleIndex === 0
       ? { left: board.left + step, right: board.right }
       : { left: board.left, right: board.right - step };
 	  events.endTurn(getGameStateAfterMove(nextBoard));
   };
 
   const potentialStep = i => {
-    return ctx.playerIndex === 0 ? i - board.left : board.right - i;
+    return ctx.chosenRoleIndex === 0 ? i - board.left : board.right - i;
   }
 
   const cellBackground = (i) => {
     if (isMoveAllowed(potentialStep(i))) {
       return 'bg-green-200 hover:bg-green-400 focus:bg-green-400';
     }
-    if (( i === board.left && ctx.playerIndex === 0) || (i === board.right && ctx.playerIndex === 1)) {
+    if (( i === board.left && ctx.chosenRoleIndex === 0) || (i === board.right && ctx.chosenRoleIndex === 1)) {
       return 'bg-green-400';
     }
-    if (( i === board.left && ctx.playerIndex === 1) || (i === board.right && ctx.playerIndex === 0)) {
+    if (( i === board.left && ctx.chosenRoleIndex === 1) || (i === board.right && ctx.chosenRoleIndex === 0)) {
       return 'bg-purple-400';
     }
     return 'bg-slate-200';
@@ -103,7 +103,7 @@ export const TwelveSquares = strategyGameFactory({
   rule,
   title: 'Tizenkét mező',
   BoardClient,
-  getPlayerStepDescription: ({ ctx: { playerIndex } }) => playerIndex === 0
+  getPlayerStepDescription: ({ ctx: { chosenRoleIndex } }) => chosenRoleIndex === 0
     ? 'Kattints a mezőre ahova lépni szeretnél a bal oldali bábuval.'
     : 'Kattints a mezőre ahova lépni szeretnél a jobb oldali bábuval.',
   generateStartBoard,

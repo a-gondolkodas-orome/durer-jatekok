@@ -7,7 +7,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const [hoveredNode, setHoveredNode] = useState(null);
 
   const connectNode = node => {
-    if (!ctx.shouldPlayerMoveNext) return;
+    if (!ctx.shouldRoleSelectorMoveNext) return;
     if (firstNode === null) {
       setFirstNode(node);
     } else if (node === firstNode) {
@@ -40,7 +40,7 @@ const BoardClient = ({ board, ctx, events }) => {
         key={`${from}-${to}`}
         x1={vertices[from].cx} y1={vertices[from].cy}
         x2={vertices[to].cx} y2={vertices[to].cy}
-        stroke={idx % 2 === ctx.playerIndex ? 'blue' : 'green'}
+        stroke={idx % 2 === ctx.chosenRoleIndex ? 'blue' : 'green'}
         strokeWidth="4"
       />
     ))}
@@ -68,7 +68,7 @@ const BoardClient = ({ board, ctx, events }) => {
         onKeyUp={(event) => {
           if (event.key === 'Enter') connectNode(vertex.id);
         }}
-        tabIndex={ctx.shouldPlayerMoveNext ? 0 : 'none'}
+        tabIndex={ctx.shouldRoleSelectorMoveNext ? 0 : 'none'}
         onFocus={() => setHoveredNode(vertex.id)}
         onBlur={() => setHoveredNode(null)}
         onMouseOver={() => setHoveredNode(vertex.id)}

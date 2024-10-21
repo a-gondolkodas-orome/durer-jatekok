@@ -99,8 +99,8 @@ You should use `moves.setBoard` if you need to change the board before ending pl
 
 ```js
 // `ctx` is an object and will contain the following (extendable):
-// - `shouldPlayerMoveNext: boolean
-// - playerIndex: null/0/1 (the role that the player chooses at the beginning)
+// - `shouldRoleSelectorMoveNext: boolean
+// - chosenRoleIndex: null/0/1 (the role that the player chooses at the beginning)
 // - turnStage: in game with multi-stage turns you may use this param to track to stage
 //     if you need it in common parts such as step description as well
 // `events` is and objects that will contain the following (extendable):
@@ -125,7 +125,7 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
   // a short string
   title: 'Hunyadi és a janicsárok',
   BoardClient,
-  // a function returning a string, receives { board, ctx: { playerIndex, turnStage, ... } }
+  // a function returning a string, receives { board, ctx: { chosenRoleIndex, turnStage, ... } }
   getPlayerStepDescription,
   // a function returning a new, possibly random starting board object
   generateStartBoard,
@@ -154,7 +154,7 @@ such an object.
 - is it clear what the player should do next?
 - can the player undo their last interaction in turns with multiple stages?
 - is it easy to guess the winning strategy from wathing the AI play?
-- do not allow the player interacting with the game while the other player's step is in progress, use `ctx.shouldPlayerMoveNext`
+- do not allow the player interacting with the game while the other player's step is in progress, use `ctx.shouldRoleSelectorMoveNext`
 - never modify react state (e.g. the board) in place
 - check for console errors/warnings as well, i.e. missing keys on react components
 

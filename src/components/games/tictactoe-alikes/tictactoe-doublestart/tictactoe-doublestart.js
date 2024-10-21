@@ -8,14 +8,14 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   const isDuringFirstMove = board => board.filter(c => c).length <= 1;
 
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
   };
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
 
     const nextBoard = cloneDeep(board);
-    nextBoard[id] = playerColor(ctx.playerIndex);
+    nextBoard[id] = playerColor(ctx.chosenRoleIndex);
     moves.setBoard(nextBoard);
     if (isDuringFirstMove(nextBoard)) return;
     events.endTurn(getGameStateAfterMove(nextBoard));

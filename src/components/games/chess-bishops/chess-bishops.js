@@ -21,7 +21,7 @@ const BoardClient = ({ board, ctx, events }) => {
     return isEqual(hoveredField, field);
   };
   const isMoveAllowed = (targetField) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return some(getAllowedMoves(board), field => isEqual(field, targetField));
   };
   const isForbidden = ({ row, col }) => {
@@ -31,7 +31,7 @@ const BoardClient = ({ board, ctx, events }) => {
     return board[row][col] === BISHOP;
   };
   const wouldBeForbidden = ({ row, col }) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     if (!hoveredField) return false;
     if (!isMoveAllowed(hoveredField)) return false;
     if (!isMoveAllowed({ row, col })) return false;

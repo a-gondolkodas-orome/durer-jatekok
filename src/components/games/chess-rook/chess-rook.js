@@ -13,7 +13,7 @@ const BoardClient = ({ board, ctx, events }) => {
     events.endTurn(getGameStateAfterMove(board, field));
   };
   const isMoveAllowed = (targetField) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return some(getAllowedMoves(board), field => isEqual(field, targetField));
   };
 

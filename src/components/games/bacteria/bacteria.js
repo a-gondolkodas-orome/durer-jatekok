@@ -64,7 +64,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
   const [attackCol, setAttackCol] = useState(null);
 
   const nextBoard = { bacteria: cloneDeep(bacteria), goals };
-  const isPlayerAttacker = ctx.playerIndex === 0;
+  const isPlayerAttacker = ctx.chosenRoleIndex === 0;
 
   const isAllowedAttack = ({ row, col }) => {
     if (bacteria[row][col] === undefined) return false;
@@ -74,7 +74,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
   const isGoal = ({ row, col }) => row === (bacteria.length - 1) && goals.includes(col);
 
   const clickField = ({ row, col }) => {
-    if (!ctx.shouldPlayerMoveNext) return;
+    if (!ctx.shouldRoleSelectorMoveNext) return;
     if (attackRow === null && !bacteria[row][col] >= 1) return;
     if (isPlayerAttacker && attackRow === row && attackCol === col) {
       setAttackRow(null);
@@ -146,7 +146,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
   };
 
   const isDisabled = ({ row, col }) => (
-    !ctx.shouldPlayerMoveNext
+    !ctx.shouldRoleSelectorMoveNext
     || isForbidden({ row, col })
     || (row % 2 === 1 && col === (boardWidth - 1))
   );
@@ -191,7 +191,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
 };
 
 const getPlayerStepDescription = ({ ctx }) => {
-  if (ctx.playerIndex === 0) {
+  if (ctx.chosenRoleIndex === 0) {
     return "".concat(
       "Kattints egy mezőre, amin van baktérium és hajtsd végre ",
       "a három lehetséges támadás egyikét egy további szabályos kattintással."

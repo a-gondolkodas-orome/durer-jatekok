@@ -25,7 +25,7 @@ const BoardClient = ({ board, ctx, events }) => {
   };
 
   const isDisabled = ({ pileId, pieceId }) => {
-    if (!ctx.shouldPlayerMoveNext) return true;
+    if (!ctx.shouldRoleSelectorMoveNext) return true;
     return pieceId % 2 === 0 || (pieceId > board[pileId] - 1);
   };
 
@@ -63,7 +63,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const currentChoiceDescription = (pileId) => {
     const pieceCountInPile = board[pileId];
 
-    if (!ctx.shouldPlayerMoveNext) return pieceCountInPile;
+    if (!ctx.shouldRoleSelectorMoveNext) return pieceCountInPile;
     if (!hoveredPiece) return pieceCountInPile;
 
     if (hoveredPiece.pileId !== pileId) return `${pieceCountInPile} → ${pieceCountInPile + (hoveredPiece.pieceId+1)/2 }`;

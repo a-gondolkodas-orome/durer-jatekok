@@ -5,7 +5,7 @@ import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
 
 const BoardClient = ({ board, ctx, events }) => {
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldPlayerMoveNext) return false;
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
   };
   const clickField = (id) => {
@@ -19,8 +19,8 @@ const BoardClient = ({ board, ctx, events }) => {
   const isDisabled = id => {
     if (!isMoveAllowed(id)) return true;
     if (id % 3 === 1) return true;
-    if(ctx.playerIndex == 0 && id % 3 == 0) return true;
-    if (ctx.playerIndex == 1 && id % 3 == 2) return true;
+    if(ctx.chosenRoleIndex == 0 && id % 3 == 0) return true;
+    if (ctx.chosenRoleIndex == 1 && id % 3 == 2) return true;
     return false;
   }
 

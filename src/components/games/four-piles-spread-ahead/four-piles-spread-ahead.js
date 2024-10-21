@@ -27,7 +27,7 @@ const BoardClient = ({ board, ctx, events }) => {
   };
 
   const isDisabled = ({ pileId, pieceId }) => {
-    if (!ctx.shouldPlayerMoveNext) return true;
+    if (!ctx.shouldRoleSelectorMoveNext) return true;
     return pieceId>pileId-1 || (pieceId>board[pileId]-1);
   };
 
@@ -67,7 +67,7 @@ const BoardClient = ({ board, ctx, events }) => {
   const currentChoiceDescription = (pileId) => {
     const pieceCountInPile = board[pileId];
 
-    if (!ctx.shouldPlayerMoveNext || !hoveredPiece) {
+    if (!ctx.shouldRoleSelectorMoveNext || !hoveredPiece) {
       return `${pileId+1}. kupac: ${pieceCountInPile} `;
     }
 
