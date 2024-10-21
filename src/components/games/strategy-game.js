@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
@@ -28,6 +28,12 @@ export const strategyGameFactory = ({
     const gameOverRef = useRef(winnerIndex !== null)
     // player -> ai -> player is triggered from one render that is why next is not enough
     const currentPlayerIdxRef = useRef(next);
+
+    useEffect(() => {
+      if (phase === 'play' && next === (1 - playerIndex)) {
+        doAiTurn({ currentBoard: board });
+      }
+    }, [next])
 
     const startNewGame = () => {
       setBoard(generateStartBoard());
@@ -66,8 +72,6 @@ export const strategyGameFactory = ({
       }
 
       advanceCurrentPlayer();
-
-      doAiTurn({ currentBoard: nextBoard });
     };
 
     const chooseRole = (playerIdx) => {
@@ -77,9 +81,6 @@ export const strategyGameFactory = ({
       setPlayerIndex(playerIdx);
       if (initialTurnStages !== undefined) {
         setTurnStage(initialTurnStages[playerIdx]);
-      }
-      if (playerIdx === 1) {
-        doAiTurn({ currentBoard: board });
       }
     };
 
