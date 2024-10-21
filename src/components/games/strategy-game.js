@@ -82,6 +82,7 @@ export const strategyGameFactory = ({
 
     const events = {
       endTurn,
+      endGame,
       setTurnStage
     };
 
