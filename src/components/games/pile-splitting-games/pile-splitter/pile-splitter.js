@@ -27,7 +27,11 @@ const BoardClient = ({ board, ctx, events, moves }) => {
 
     setTimeout(() => {
       const nextBoard = [pieceId + 1, board[pileId] - pieceId - 1];
-      events.endTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
+      moves.setBoard(nextBoard);
+      events.endTurn();
+      if (isGameEnd(nextBoard)) {
+        events.endGame();
+      }
 
       setHoveredPiece(null);
     }, 750);

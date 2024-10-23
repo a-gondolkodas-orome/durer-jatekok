@@ -137,7 +137,7 @@ const PrimesTable = ({ board, choosePrime, hovered, setHovered }) => {
   </table>;
 }
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const [playerPrime, setPlayerPrime] = useState(null);
   const [hovered, setHovered] = useState(null);
 
@@ -155,7 +155,12 @@ const BoardClient = ({ board, ctx, events }) => {
   const chooseExponential = (e) => {
     setPlayerPrime(null);
     events.setTurnStage(null);
-    events.endTurn(getGameStateAfterMove(board - playerPrime ** e));
+    const nextBoard = board - playerPrime ** e;
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (nextBoard === 0) {
+      events.endGame();
+    }
   }
 
   const PlayerOptions = ctx.turnStage !== "chooseExponent"

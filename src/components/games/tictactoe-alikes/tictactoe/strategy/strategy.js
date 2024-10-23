@@ -102,7 +102,7 @@ const getNextColor = (board, amIPlayer) => {
   return 'white';
 };
 
-const isGameEnd = (board) => {
+export const isGameEnd = (board) => {
   const occupiedPlaces = range(0, 9).filter((i) => board[i]);
   const boardIndicesByPieceColor = groupBy(occupiedPlaces, (i) => board[i]);
   return some(boardIndicesByPieceColor, hasWinningSubset);

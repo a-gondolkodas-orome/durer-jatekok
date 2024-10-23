@@ -49,7 +49,11 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     nextBoard[vertex] = color;
     moves.setBoard(nextBoard);
     setShow(false);
-    events.endTurn(getGameStateAfterMove(nextBoard));
+    const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+    events.endTurn();
+    if (isGameEnd) {
+      events.endGame({ winnerIndex });
+    }
   };
 
   return (

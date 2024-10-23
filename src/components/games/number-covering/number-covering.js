@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, sum, sample } from 'lodash';
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
 
   const clickNumber = (number) => {
     if (ctx.shouldRoleSelectorMoveNext) {
       let nextBoard = [...board];
       nextBoard[number-1] = -1;
-      events.endTurn(getGameStateAfterMove(nextBoard));
+      const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+      moves.setBoard(nextBoard);
+      events.endTurn();
+      if (isGameEnd) {
+        events.endGame({ winnerIndex });
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { range, cloneDeep, isNull } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
@@ -6,7 +6,7 @@ import { RockSvg } from './rock-svg';
 import { PaperSvg } from './paper-svg';
 import { ScissorSvg } from './scissor-svg';
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const isMoveAllowed = (id) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
@@ -16,7 +16,12 @@ const BoardClient = ({ board, ctx, events }) => {
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = 'removed';
-    events.endTurn(getGameStateAfterMove(nextBoard));
+    moves.setBoard(nextBoard);
+    const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+    events.endTurn();
+    if (isGameEnd) {
+      events.endGame({ winnerIndex });
+    }
   };
   const isDisabled = (id) => {
     if (!isMoveAllowed(id)) return true;

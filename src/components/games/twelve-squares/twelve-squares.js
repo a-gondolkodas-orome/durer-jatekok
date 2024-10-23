@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, random } from 'lodash';
 import { ChessBishopSvg } from '../chess-bishops/chess-bishop-svg';
@@ -27,7 +27,7 @@ const getOptimalAiStep = ({ left, right }) => {
   return (dst+1) % 3;
 };
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const isMoveAllowed = (step) => {
 	  if(!ctx.shouldRoleSelectorMoveNext) return false;
     if (step === board.right - board.left) return false;
@@ -39,7 +39,11 @@ const BoardClient = ({ board, ctx, events }) => {
     const nextBoard = ctx.chosenRoleIndex === 0
       ? { left: board.left + step, right: board.right }
       : { left: board.left, right: board.right - step };
-	  events.endTurn(getGameStateAfterMove(nextBoard));
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (nextBoard.right < nextBoard.left) {
+      events.endGame();
+    }
   };
 
   const potentialStep = i => {

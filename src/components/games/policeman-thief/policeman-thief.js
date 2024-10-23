@@ -30,15 +30,25 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     if (!isClickable(vertex)) return;
     if (ctx.chosenRoleIndex === 1) {
       const nextBoard = { ...board, thief: vertex, turnCount: board.turnCount + 1 };
-      events.endTurn(getGameStateAfterMove(nextBoard));
+      moves.setBoard(nextBoard);
+      const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+      events.endTurn();
+      if (isGameEnd) {
+        events.endGame({ winnerIndex });
+      }
       return;
     }
     const nextBoard = { ...board }
     if (ctx.turnStage === "secondMove") {
       nextBoard.policemen[1] = vertex;
       nextBoard.turnCount++;
-      events.setTurnStage(null)
-      events.endTurn(getGameStateAfterMove(nextBoard));
+      events.setTurnStage(null);
+      moves.setBoard(nextBoard);
+      const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+      events.endTurn();
+      if (isGameEnd) {
+        events.endGame({ winnerIndex });
+      }
       return;
     }
     nextBoard.policemen[0] = vertex;

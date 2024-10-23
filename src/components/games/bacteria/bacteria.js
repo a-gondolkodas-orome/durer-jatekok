@@ -59,7 +59,7 @@ const generateStartBoard = () => {
   }
 };
 
-const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
+const BoardClient = ({ board: { bacteria, goals }, ctx, events, moves }) => {
   const [attackRow, setAttackRow] = useState(null);
   const [attackCol, setAttackCol] = useState(null);
 
@@ -92,11 +92,11 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
 
     if (!isPlayerAttacker) {
       nextBoard.bacteria[row][col] -= 1;
+      moves.setBoard(nextBoard);
+      events.endTurn();
       if (areAllBacteriaRemoved(nextBoard.bacteria)) {
-        events.endTurn({ nextBoard, isGameEnd: true, winnerIndex: 1 });
-        return;
+        events.endGame({ winnerIndex: 1 });
       }
-      events.endTurn({ nextBoard, isGameEnd: false });
       return;
     }
 
@@ -116,10 +116,10 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, events }) => {
       nextBoard.bacteria = makeShiftOrSpread(bacteria, attackRow, attackCol, reachedFields);
     }
 
+    moves.setBoard(nextBoard);
+    events.endTurn();
     if (goalsReached.length >= 1) {
-      events.endTurn({ nextBoard, isGameEnd: true, winnerIndex: 0 });
-    } else {
-      events.endTurn({ nextBoard, isGameEnd: false });
+      events.endGame({ winnerIndex: 0 });
     }
 
     setAttackRow(null);

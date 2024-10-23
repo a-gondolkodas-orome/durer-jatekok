@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { range, sample, difference } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getOptimalAiStep } from './strategy';
@@ -25,7 +25,7 @@ const getGameStateAfterAiTurn = ({ board, ctx }) => {
   return getGameStateAfterMove(board, step, 1 - ctx.chosenRoleIndex);
 };
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const fields = range(board.target + 14);
 
   const isMoveAllowed = (step) => {
@@ -38,7 +38,12 @@ const BoardClient = ({ board, ctx, events }) => {
 
   const makeStep = (step) => {
     if (!isMoveAllowed(step)) return;
-    events.endTurn(getGameStateAfterMove(board, step, ctx.chosenRoleIndex));
+    const { nextBoard, isGameEnd, winnerIndex } = getGameStateAfterMove(board, step, ctx.chosenRoleIndex);
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (isGameEnd) {
+      events.endGame({ winnerIndex });
+    }
   };
 
   return (

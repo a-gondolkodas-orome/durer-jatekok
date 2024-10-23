@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, random } from 'lodash';
 
 const target = 40;
 const maxStep = 3;
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
 
   const isMoveAllowed = number => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
@@ -15,7 +15,11 @@ const BoardClient = ({ board, ctx, events }) => {
 
   const clickNumber = (number) => {
     if (!isMoveAllowed(number)) return;
-    events.endTurn(getGameStateAfterMove(number, ctx.chosenRoleIndex));
+    moves.setBoard(number);
+    events.endTurn();
+    if (number > target) {
+      events.endGame({ winnerIndex: 1 - ctx.chosenRoleIndex })
+    }
   };
 
   return(

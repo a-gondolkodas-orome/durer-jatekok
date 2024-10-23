@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
-import { inPlacingPhase, pColor, aiColor, getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy/strategy';
+import { inPlacingPhase, pColor, aiColor, isGameEnd, getGameStateAfterAiTurn } from './strategy/strategy';
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
 
     const nextBoard = cloneDeep(board);
     nextBoard[id] = gameIsInPlacingPhase ? pColor : 'white';
-    events.endTurn(getGameStateAfterMove(nextBoard));
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (isGameEnd(nextBoard)) {
+      events.endGame();
+    }
   };
   const isMoveAllowed = (id) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;

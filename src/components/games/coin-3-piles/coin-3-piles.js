@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { range } from 'lodash';
-import { getGameStateAfterMove  } from './strategy/strategy';
+import { isGameEnd  } from './strategy/strategy';
 
 export const BoardClient = ({ board, ctx, events, moves }) => {
   const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState(null);
@@ -53,7 +53,11 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
     events.setTurnStage(null);
   };
   const endTurn = (nextBoard) => {
-    events.endTurn(getGameStateAfterMove(nextBoard));
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (isGameEnd(nextBoard)) {
+      events.endGame();
+    }
     resetTurnState();
   };
   const getCoinBgColor = (coinValue) => {

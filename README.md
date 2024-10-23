@@ -88,8 +88,7 @@ If you need a new, common parameter, you can create it and pass it down from `st
 
 BoardClient: a React component with `board`, `ctx` `events` and `moves` props which calls `events.endTurn`,
 typically following a click from the user. Typically the user clicks, new state is calculated within
-the BoardClient component and then as a final step `events.endTurn` is called with a
-`{ nextBoard, isGameEnd }` object (see more details in section "Game end, determining winner")
+the BoardClient component and then as a final step `events.endTurn` is called possibly followed by `events.endGame()`
 
 Concept: `board` holds the state necessary to know the game state, specific to each game, that the next player
 needs to know. Common state, managed by the framework is stored in ctx such as playerIdx. Additional state variables may be created within the `BoardClient` component
@@ -105,12 +104,20 @@ You should use `moves.setBoard` if you need to change the board before ending pl
 //     if you need it in common parts such as step description as well
 // `events` is and objects that will contain the following (extendable):
 // - endTurn: a function, see below
+// - endGame
 // - setTurnStage
 const BoardClient = ({ board, ctx, events, moves }) => {
+  const click = () => {
+    // const nextBoard = ...
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    // optionally
+    // events.endGame();
+  }
   return (
     <section className="p-2 shrink-0 grow basis-2/3">   
         <button
-          onClick={() => events.endTurn({ nextBoard: {}, isGameEnd: false })}
+          onClick={click}
         ></button>
     </section>
   );
@@ -137,13 +144,8 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
 
 ### Game end, determining winner
 
-When ending the turn, specify the game state with an object `{ nextBoard, isGameEnd: false }` or
-`{ nextBoard, isGameEnd: true, winnerIndex: null/0/1 }`
-
-If the winner can be determined from who moved last before the game ended, it is enough to pass `winnerIndex: null`.
-
-`events.endTurn` should be called with this and also `getGameStateAfterAiTurn` should return
-such an object.
+`events.endGame({ winnerIndex })` or if the winner can be determined from who moved last before the game ended,
+no need to specify winnerIndex.
 
 ## Things to look out for
 

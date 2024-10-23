@@ -35,10 +35,19 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       const { nextBoard, intermediateBoard, isGameEnd, winnerIndex } = getGameStateAfterKillingGroup(board, group);
       moves.setBoard(intermediateBoard);
       setTimeout(() => {
-        events.endTurn({ nextBoard, isGameEnd, winnerIndex });
+        moves.setBoard(nextBoard);
+        events.endTurn();
+        if (isGameEnd) {
+          events.endGame({ winnerIndex });
+        }
       }, 750);
     }
   };
+
+  const finishSeparation = () => {
+    moves.setBoard(board);
+    events.endTurn();
+  }
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
@@ -96,7 +105,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
         <button
           className="cta-button"
           disabled={!ctx.shouldRoleSelectorMoveNext}
-          onClick={() => events.endTurn({ nextBoard: board, isGameEnd: false })}
+          onClick={finishSeparation}
         >
           Befejezem a kettéosztást
         </button>

@@ -48,7 +48,7 @@ export const strategyGameFactory = ({
     const shouldRoleSelectorMoveNext = (phase === 'play' && currentPlayer === chosenRoleIndex);
     const isRoleSelectorWinner = winnerIndex === chosenRoleIndex;
 
-    const endGame = (winnerIndex) => {
+    const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
       setPhase('gameEnd');
       // default: last player to move is the winner
       setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
@@ -56,11 +56,7 @@ export const strategyGameFactory = ({
       setIsGameEndDialogOpen(true);
     };
 
-    const endTurn = ({ nextBoard, isGameEnd, winnerIndex }) => {
-      setBoard(nextBoard);
-      if (isGameEnd) {
-        endGame(winnerIndex);
-      }
+    const endTurn = () => {
       setCurrentPlayer(currentPlayer => 1 - currentPlayer);
     };
 
@@ -111,7 +107,7 @@ export const strategyGameFactory = ({
         setTimeout(() => {
           setBoard(nextBoard);
           if (isGameEnd) {
-            endGame(winnerIndex);
+            endGame({ winnerIndex });
           }
           setCurrentPlayer(currentPlayer => 1 - currentPlayer);
         }, stageTimeout);

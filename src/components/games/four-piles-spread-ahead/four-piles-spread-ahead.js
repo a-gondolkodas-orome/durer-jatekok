@@ -19,7 +19,7 @@ const getGameStateAfterMove = (board, { pileId, pieceId }) => {
   return { nextBoard, intermediateBoard, isGameEnd, winnerIndex: null };
 };
 
-const BoardClient = ({ board, ctx, events }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const nonExistent = ({ pileId, pieceId }) => {
@@ -43,9 +43,19 @@ const BoardClient = ({ board, ctx, events }) => {
   const clickPiece = ({ pileId, pieceId }) => {
     if (isDisabled({ pileId, pieceId })) return;
 
-    events.endTurn(getGameStateAfterMove(board, { pileId, pieceId }));
+    const { intermediateBoard, nextBoard, isGameEnd } = getGameStateAfterMove(board, { pileId, pieceId });
 
-    setHoveredPiece(null);
+    moves.setBoard(intermediateBoard);
+
+    setTimeout(() => {
+      moves.setBoard(nextBoard);
+      events.endTurn();
+      if (isGameEnd) {
+        events.endGame();
+      }
+
+      setHoveredPiece(null);
+    }, 750);
   };
 
   const toBeRemoved = ({ pileId, pieceId }) => {

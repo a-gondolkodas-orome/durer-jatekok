@@ -95,7 +95,11 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     moves.setBoard(intermediateBoard);
 
     setTimeout(() => {
-      events.endTurn({ nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null });
+      moves.setBoard(nextBoard);
+      events.endTurn();
+      if (isGameEnd(nextBoard)) {
+        events.endGame();
+      }
 
       setRemovedPileId(null);
       setHoveredPiece(null);

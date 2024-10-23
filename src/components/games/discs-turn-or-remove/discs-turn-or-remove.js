@@ -33,7 +33,7 @@ const DisabledDisc = ({ bgColor }) => {
 
 
 const gameBoardFactory = (maxDiscs) => {
-  return ({ board, ctx, events }) => {
+  return ({ board, ctx, events, moves }) => {
     const [hovered, setHovered] = useState(null);
 
     const select = (pile, i) => {
@@ -43,7 +43,11 @@ const gameBoardFactory = (maxDiscs) => {
         nextBoard[pile] = i;
         if (pile === 1) nextBoard[0] += d;
         setHovered(null);
-        events.endTurn(getGameStateAfterMove(nextBoard));
+        moves.setBoard(nextBoard);
+        events.endTurn();
+        if (isEqual(nextBoard, [0, 0])) {
+          events.endGame();
+        }
       }
     };
 
