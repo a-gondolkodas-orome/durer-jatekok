@@ -5,22 +5,6 @@ import { range, random } from 'lodash';
 const target = 40;
 const maxStep = 3;
 
-const isIncreaseValid = ({ board, number }) => {
-  if (number <= board) return false;
-  return (number - board) <= maxStep;
-}
-
-const increaseTo = ({ board, setBoard, ctx, events }, number) => {
-  if (!isIncreaseValid({ board, number })) {
-    console.error('invalid_move');
-  }
-  setBoard(number);
-  events.endTurn();
-  if (number > target) {
-    events.endGame({ winnerIndex: 1 - ctx.currentPlayer })
-  }
-}
-
 const BoardClient = ({ board, ctx, moves }) => {
 
   const isMoveAllowed = number => {
@@ -57,6 +41,24 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
+const isIncreaseValid = ({ board, number }) => {
+  if (number <= board) return false;
+  return (number - board) <= maxStep;
+}
+
+const moves = {
+  increaseTo: ({ board, setBoard, ctx, events }, number) => {
+    if (!isIncreaseValid({ board, number })) {
+      console.error('invalid_move');
+    }
+    setBoard(number);
+    events.endTurn();
+    if (number > target) {
+      events.endGame({ winnerIndex: 1 - ctx.currentPlayer })
+    }
+  }
+};
+
 const aiBotStrategy = ({ board, moves }) => {
   const nextBoard = board % (1 + maxStep) !== 0
     ? board + (1 + maxStep) - board % (1 + maxStep)
@@ -77,5 +79,5 @@ export const PlusOneTwoThree = strategyGameFactory({
   getPlayerStepDescription: () => 'Válaszd ki, hogy melyik számra lépsz.',
   generateStartBoard: () => 0,
   aiBotStrategy,
-  moves: { increaseTo }
+  moves
 });
