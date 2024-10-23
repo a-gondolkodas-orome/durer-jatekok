@@ -3,6 +3,7 @@ import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
 import { v4 as uuidv4 } from 'uuid';
+import { partial, mapValues } from 'lodash';
 
 export const strategyGameFactory = ({
   rule,
@@ -13,6 +14,7 @@ export const strategyGameFactory = ({
   generateStartBoard,
   moves,
   getGameStateAfterAiTurn,
+  aiBotStrategy,
   getPlayerStepDescription
 }) => {
   return () => {
@@ -72,6 +74,7 @@ export const strategyGameFactory = ({
     const ctx = {
       shouldRoleSelectorMoveNext,
       chosenRoleIndex,
+      currentPlayer,
       phase,
       turnStage
     };
@@ -82,6 +85,13 @@ export const strategyGameFactory = ({
       setTurnStage
     };
 
+    const availableMoves = {
+      ...mapValues(moves, f => partial(f, { board, setBoard, ctx, events })),
+      // FIXME: general move, should not be needed if specialized functions
+      // are provided for each move
+      setBoard
+    };
+
     const doAiTurn = ({ currentBoard }) => {
       if (gameOverRef.current) {
         return;
@@ -89,30 +99,36 @@ export const strategyGameFactory = ({
 
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
-        const { intermediateBoard, nextBoard, isGameEnd, winnerIndex } = getGameStateAfterAiTurn({
-          board: currentBoard,
-          ctx,
-          events,
-          moves: {
-            // FIXME: general move, should not be needed if specialized functions
-            // are provided for each move
-            setBoard,
-            ...moves
-          }
-        });
-        const stageTimeout = intermediateBoard !== undefined ? 750 : 0;
-        if (intermediateBoard !== undefined) {
-          setBoard(intermediateBoard);
+        if (aiBotStrategy !== undefined) {
+          aiBotStrategy({
+            board: currentBoard,
+            moves: availableMoves
+          });
+        } else {
+          oldAiMove({ currentBoard });
         }
-        setTimeout(() => {
-          setBoard(nextBoard);
-          if (isGameEnd) {
-            endGame({ winnerIndex });
-          }
-          setCurrentPlayer(currentPlayer => 1 - currentPlayer);
-        }, stageTimeout);
       }, time);
     };
+
+    const oldAiMove = ({ currentBoard }) => {
+      const { intermediateBoard, nextBoard, isGameEnd, winnerIndex } = getGameStateAfterAiTurn({
+        board: currentBoard,
+        ctx,
+        events,
+        moves: availableMoves
+      });
+      const stageTimeout = intermediateBoard !== undefined ? 750 : 0;
+      if (intermediateBoard !== undefined) {
+        setBoard(intermediateBoard);
+      }
+      setTimeout(() => {
+        setBoard(nextBoard);
+        if (isGameEnd) {
+          endGame({ winnerIndex });
+        }
+        setCurrentPlayer(currentPlayer => 1 - currentPlayer);
+      }, stageTimeout);
+    }
 
     return (
     <main className="p-2">
@@ -126,7 +142,7 @@ export const strategyGameFactory = ({
               board={board}
               ctx={ctx}
               events={events}
-              moves={{ setBoard, ...moves }}
+              moves={availableMoves}
             />
             <GameSidebar
               roleLabels={roleLabels}
