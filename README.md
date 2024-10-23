@@ -74,6 +74,8 @@ Recommended VS Code extensions:
 
 # How to develop
 
+_WIP, substantial refactor in progress!_
+
 This project uses the React frontend "framework", the [official tutorial](https://react.dev/learn) is a good starting point.
 
 The common parts of all games (showing rules, alternating turns, buttons for choosing a role, restart game) are extracted
