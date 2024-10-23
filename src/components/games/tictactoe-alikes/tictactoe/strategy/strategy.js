@@ -7,15 +7,11 @@ export const getGameStateAfterAiTurn = ({ board }) => {
   const nextBoard = cloneDeep(board);
   const aiPosition = getOptimalAiPosition(nextBoard);
   nextBoard[aiPosition] = getNextColor(nextBoard, false);
-  return getGameStateAfterMove(nextBoard);
+  return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
 };
 
 export const pColor = 'blue';
 export const aiColor = 'red';
-
-export const getGameStateAfterMove = (nextBoard) => {
-  return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
-};
 
 export const inPlacingPhase = (board) => board.find(isNull) !== undefined;
 

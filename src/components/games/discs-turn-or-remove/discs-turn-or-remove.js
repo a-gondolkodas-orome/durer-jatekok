@@ -164,10 +164,6 @@ const getGameStateAfterAiTurn = ({ board }) => {
       nextBoard[0] -= rem;
     }
   }
-  return getGameStateAfterMove(nextBoard);
-};
-
-const getGameStateAfterMove = (nextBoard) => {
   return {
     nextBoard: nextBoard,
     isGameEnd: isEqual(nextBoard, [0, 0]),

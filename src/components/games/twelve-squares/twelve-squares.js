@@ -7,16 +7,12 @@ const generateStartBoard = () => {
   return { left: 1, right: 12 };
 };
 
-const getGameStateAfterMove = (nextBoard) => {
-	return { nextBoard, isGameEnd: nextBoard.right < nextBoard.left, winnerIndex: null };
-};
-
 const getGameStateAfterAiTurn = ({ board, ctx }) => {
   const step = getOptimalAiStep(board);
   const nextBoard = ctx.chosenRoleIndex === 0
     ? { left: board.left, right: board.right - step }
     : { left: board.left + step, right: board.right };
-  return getGameStateAfterMove(nextBoard);
+  return { nextBoard, isGameEnd: nextBoard.right < nextBoard.left, winnerIndex: null };
 };
 
 const getOptimalAiStep = ({ left, right }) => {
