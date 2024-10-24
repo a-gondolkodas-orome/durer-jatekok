@@ -102,6 +102,7 @@ export const strategyGameFactory = ({
         if (aiBotStrategy !== undefined) {
           aiBotStrategy({
             board: currentBoard,
+            ctx,
             moves: availableMoves
           });
         } else {

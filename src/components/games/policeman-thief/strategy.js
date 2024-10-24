@@ -1,6 +1,6 @@
 "use strict";
 
-import { cloneDeep, random } from "lodash";
+import { random } from "lodash";
 
 export const neighbours = {
   0: [1, 2, 4],
@@ -13,44 +13,23 @@ export const neighbours = {
   7: [3, 5, 6]
 };
 
-export const getGameStateAfterAiTurn = ({ board, ctx }) => {
-  const nextBoard = ctx.chosenRoleIndex === 0
-    ? makeOptimalStepAsSecond(board)
-    : makeOptimalStepAsFirst(board);
-  return getGameStateAfterMove(nextBoard);
-};
-
-export const getGameStateAfterMove = (nextBoard) => {
-  return {
-    nextBoard,
-    isGameEnd: isGameEnd(nextBoard),
-    winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1
-  };
-};
-
-const isGameEnd = (board) => {
-  if (board.turnCount === 3) {
-    return true;
-  } else if (board.thief === board.policemen[0] || board.thief === board.policemen[1]) {
-    return true;
+export const aiBotStrategy = ({ board, ctx, moves }) => {
+  if (ctx.chosenRoleIndex === 0) {
+    makeOptimalStepAsSecond({ board, moves });
+  } else {
+    makeOptimalStepAsFirst({ board, moves });
   }
-  return false;
 };
 
-const hasFirstPlayerWon = (board) => {
-  return board.turnCount < 4 && board.policemen.includes(board.thief);
-};
-
-const makeOptimalStepAsFirst = (board) => {
-  const nextBoard = cloneDeep(board);
-
+const makeOptimalStepAsFirst = ({ board, moves }) => {
   //policeman0 Step
   let index0 = board.policemen[0];
   let canWeCatch0 = false;
   for (let i = 0; i < 3; i++) {
     if (neighbours[board.policemen[0]][i] === board.thief) {
       index0 = neighbours[board.policemen[0]][i];
-      nextBoard.policemen[0] = index0;
+
+      moves.moveFirstPoliceman(index0);
       canWeCatch0 = true;
     } else {
       for (let j = 0; j < 3; j++) {
@@ -64,7 +43,7 @@ const makeOptimalStepAsFirst = (board) => {
     index0 = neighbours[board.policemen[0]][random(0, 2)];
   }
   if (!canWeCatch0) {
-    nextBoard.policemen[0] = index0;
+    moves.moveFirstPoliceman(index0);
   }
 
   //policeman1 Step
@@ -76,7 +55,7 @@ const makeOptimalStepAsFirst = (board) => {
       index0 !== neighbours[board.policemen[1]][i]
     ) {
       index1 = neighbours[board.policemen[1]][i];
-      nextBoard.policemen[1] = index1;
+      moves.moveSecondPoliceman(index1);
       canWeCatch1 = true;
     } else {
       for (let j = 0; j < 3; j++) {
@@ -95,13 +74,11 @@ const makeOptimalStepAsFirst = (board) => {
     }
   }
   if (!canWeCatch1) {
-    nextBoard.policemen[1] = index1;
+    moves.moveSecondPoliceman(index1);
   }
-  return nextBoard;
 };
 
-const makeOptimalStepAsSecond = (board) => {
-  const nextBoard = cloneDeep(board);
+const makeOptimalStepAsSecond = ({ board, moves }) => {
   let index = board.thief;
   for (let i = 0; i < 3; i++) {
     if (
@@ -119,6 +96,5 @@ const makeOptimalStepAsSecond = (board) => {
   if (index === board.thief) {
     index = neighbours[board.thief][random(0, 2)];
   }
-  nextBoard.thief = index;
-  return nextBoard;
+  moves.moveThief(index);
 };
