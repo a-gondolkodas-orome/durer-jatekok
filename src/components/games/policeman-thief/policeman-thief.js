@@ -1,7 +1,8 @@
 import React, { Fragment } from "react";
 import { range, random, sample, difference } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { neighbours, aiBotStrategy } from "./strategy";
+import { neighbours } from "./helpers";
+import { aiBotStrategy } from "./bot-strategy";
 
 const cubeCoords = [
   { cx: "30%", cy: "30%" },

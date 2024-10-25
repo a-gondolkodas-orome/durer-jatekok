@@ -1,17 +1,7 @@
 "use strict";
 
 import { random } from "lodash";
-
-export const neighbours = {
-  0: [1, 2, 4],
-  1: [0, 3, 5],
-  2: [0, 3, 6],
-  3: [1, 2, 7],
-  4: [0, 5, 6],
-  5: [1, 4, 7],
-  6: [2, 4, 7],
-  7: [3, 5, 6]
-};
+import { neighbours } from "./helpers";
 
 export const aiBotStrategy = ({ board, ctx, moves }) => {
   if (ctx.chosenRoleIndex === 0) {
