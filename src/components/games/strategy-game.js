@@ -59,7 +59,13 @@ export const strategyGameFactory = ({
     };
 
     const endTurn = () => {
-      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
+      if (currentPlayer === ctx.chosenRoleIndex) {
+        setCurrentPlayer(currentPlayer => 1 - currentPlayer)
+      } else {
+        setTimeout(() => {
+          setCurrentPlayer(currentPlayer => 1 - currentPlayer);
+        }, 250)
+      }
     };
 
     const chooseRole = (playerIdx) => {

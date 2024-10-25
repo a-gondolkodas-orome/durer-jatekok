@@ -163,6 +163,7 @@ no need to specify winnerIndex.
 - do not allow the player interacting with the game while the other player's step is in progress, use `ctx.shouldRoleSelectorMoveNext`
 - never modify react state (e.g. the board) in place
 - check for console errors/warnings as well, i.e. missing keys on react components
+- pretend AI is thinking in turns with multiple moves (for one move it is handled by framework)
 
 ## Technologies used
 
