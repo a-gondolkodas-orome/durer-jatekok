@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
@@ -27,8 +27,6 @@ export const strategyGameFactory = ({
     const [gameUuid, setGameUuid] = useState(uuidv4());
     const [turnStage, setTurnStage] = useState(null);
 
-    const gameOverRef = useRef(winnerIndex !== null)
-
     useEffect(() => {
       if (phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
         doAiTurn({ currentBoard: board });
@@ -42,7 +40,6 @@ export const strategyGameFactory = ({
       setCurrentPlayer(null);
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
-      gameOverRef.current = false;
       setGameUuid(uuidv4());
       setTurnStage(null);
     };
@@ -54,7 +51,6 @@ export const strategyGameFactory = ({
       setPhase('gameEnd');
       // default: last player to move is the winner
       setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
-      gameOverRef.current = true;
       setIsGameEndDialogOpen(true);
     };
 
@@ -93,10 +89,6 @@ export const strategyGameFactory = ({
     };
 
     const doAiTurn = ({ currentBoard }) => {
-      if (gameOverRef.current) {
-        return;
-      }
-
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
         if (aiBotStrategy !== undefined) {
