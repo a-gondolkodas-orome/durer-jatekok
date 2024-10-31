@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { range, random, sample, difference } from "lodash";
+import { range, random, sample, difference, cloneDeep } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
 import { neighbours } from "./helpers";
 import { aiBotStrategy } from "./bot-strategy";
@@ -136,7 +136,7 @@ const generateStartBoard = () => {
 
 const moves = {
   moveThief: ({ board, setBoard, events }, vertex) => {
-    const nextBoard = { ...board, thief: vertex, turnCount: board.turnCount + 1 };
+    const nextBoard = { ...cloneDeep(board), thief: vertex, turnCount: board.turnCount + 1 };
     setBoard(nextBoard);
     events.endTurn();
     if (isGameEnd(nextBoard)) {
@@ -144,13 +144,13 @@ const moves = {
     }
   },
   moveFirstPoliceman: ({ board, setBoard, events }, vertex) => {
-    const nextBoard = { ...board };
+    const nextBoard = cloneDeep(board);
     nextBoard.policemen[0] = vertex;
     events.setTurnStage("secondMove");
     setBoard(nextBoard);
   },
   moveSecondPoliceman: ({ board, setBoard, events }, vertex) => {
-    const nextBoard = { ...board };
+    const nextBoard = cloneDeep(board);
     nextBoard.policemen[1] = vertex;
     events.setTurnStage(null);
     setBoard(nextBoard);
