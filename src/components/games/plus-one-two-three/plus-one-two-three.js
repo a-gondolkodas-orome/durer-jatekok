@@ -56,14 +56,15 @@ const moves = {
     if (number > target) {
       events.endGame({ winnerIndex: 1 - ctx.currentPlayer })
     }
+    return { nextBoard: number }
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, setBoard, ctx, events, moves }) => {
   const nextBoard = board % (1 + maxStep) !== 0
     ? board + (1 + maxStep) - board % (1 + maxStep)
     : board + random(1, maxStep);
-  moves.increaseTo(nextBoard);
+  moves.increaseTo({ board, setBoard, ctx, events }, nextBoard);
 };
 
 const rule = <>

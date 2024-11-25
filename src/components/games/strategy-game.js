@@ -94,8 +94,10 @@ export const strategyGameFactory = ({
         if (aiBotStrategy !== undefined) {
           aiBotStrategy({
             board,
+            setBoard,
             ctx,
-            moves: availableMoves
+            events,
+            moves
           });
         } else {
           oldAiMove();
@@ -108,7 +110,7 @@ export const strategyGameFactory = ({
         board,
         ctx,
         events,
-        moves: availableMoves
+        moves: { setBoard }
       });
       const stageTimeout = intermediateBoard !== undefined ? 750 : 0;
       if (intermediateBoard !== undefined) {

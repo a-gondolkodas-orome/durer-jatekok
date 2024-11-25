@@ -142,12 +142,14 @@ const moves = {
     if (isGameEnd(nextBoard)) {
       events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
     }
+    return { nextBoard };
   },
   moveFirstPoliceman: ({ board, setBoard, events }, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.policemen[0] = vertex;
     events.setTurnStage("secondMove");
     setBoard(nextBoard);
+    return { nextBoard };
   },
   moveSecondPoliceman: ({ board, setBoard, events }, vertex) => {
     const nextBoard = cloneDeep(board);
@@ -158,6 +160,7 @@ const moves = {
     if (isGameEnd(nextBoard)) {
       events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
     }
+    return { nextBoard };
   }
 };
 
