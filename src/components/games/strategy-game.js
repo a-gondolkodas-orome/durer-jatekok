@@ -29,7 +29,7 @@ export const strategyGameFactory = ({
 
     useEffect(() => {
       if (phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
-        doAiTurn({ currentBoard: board });
+        doAiTurn();
       }
     }, [currentPlayer])
 
@@ -88,24 +88,24 @@ export const strategyGameFactory = ({
       setBoard
     };
 
-    const doAiTurn = ({ currentBoard }) => {
+    const doAiTurn = () => {
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
         if (aiBotStrategy !== undefined) {
           aiBotStrategy({
-            board: currentBoard,
+            board,
             ctx,
             moves: availableMoves
           });
         } else {
-          oldAiMove({ currentBoard });
+          oldAiMove();
         }
       }, time);
     };
 
-    const oldAiMove = ({ currentBoard }) => {
+    const oldAiMove = () => {
       const { intermediateBoard, nextBoard, isGameEnd, winnerIndex } = getGameStateAfterAiTurn({
-        board: currentBoard,
+        board,
         ctx,
         events,
         moves: availableMoves
