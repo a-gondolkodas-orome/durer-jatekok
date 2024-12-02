@@ -98,6 +98,9 @@ that is relevant only during a turn, not between turns, such as reacting to hove
 
 You should use `moves.setBoard` if you need to change the board before ending player turn.
 
+Each move must return an object with nextBoard, the framework will call setBoard(nextBoard).
+In the Ai strategy in case of multiple moves one must provide board, etc params to moves yourself.
+
 ```js
 // `ctx` is an object and will contain the following (extendable):
 // - `shouldRoleSelectorMoveNext: boolean

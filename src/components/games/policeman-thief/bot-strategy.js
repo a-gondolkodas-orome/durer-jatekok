@@ -3,15 +3,15 @@
 import { random } from "lodash";
 import { neighbours } from "./helpers";
 
-export const aiBotStrategy = ({ board, setBoard, events, moves }) => {
+export const aiBotStrategy = ({ board, ctx, events, moves }) => {
   if (ctx.chosenRoleIndex === 0) {
-    moveThiefOptimally({ board, setBoard, events, moves });
+    moveThiefOptimally({ board, events, moves });
   } else {
-    movePolicemenOptimally({ board, setBoard, events, moves });
+    movePolicemenOptimally({ board, events, moves });
   }
 };
 
-const movePolicemenOptimally = ({ board, setBoard, events, moves }) => {
+const movePolicemenOptimally = ({ board, events, moves }) => {
   //policeman0 Step
   let index0 = board.policemen[0];
   let canWeCatch0 = false;
@@ -20,7 +20,7 @@ const movePolicemenOptimally = ({ board, setBoard, events, moves }) => {
     if (neighbours[board.policemen[0]][i] === board.thief) {
       index0 = neighbours[board.policemen[0]][i];
 
-      nextBoard = moves.moveFirstPoliceman({ board, setBoard, events }, index0).nextBoard;
+      nextBoard = moves.moveFirstPoliceman({ board, events }, index0).nextBoard;
       canWeCatch0 = true;
     } else {
       for (let j = 0; j < 3; j++) {
@@ -34,7 +34,7 @@ const movePolicemenOptimally = ({ board, setBoard, events, moves }) => {
     index0 = neighbours[board.policemen[0]][random(0, 2)];
   }
   if (!canWeCatch0) {
-    nextBoard = moves.moveFirstPoliceman({ board, setBoard, events }, index0).nextBoard;
+    nextBoard = moves.moveFirstPoliceman({ board, events }, index0).nextBoard;
   }
 
   // timeout so that AI bot seems to be thinking between moves as well
@@ -48,7 +48,7 @@ const movePolicemenOptimally = ({ board, setBoard, events, moves }) => {
         index0 !== neighbours[board.policemen[1]][i]
       ) {
         index1 = neighbours[board.policemen[1]][i];
-        moves.moveSecondPoliceman({ board: nextBoard, setBoard, events }, index1);
+        moves.moveSecondPoliceman({ board: nextBoard, events }, index1);
         canWeCatch1 = true;
       } else {
         for (let j = 0; j < 3; j++) {
@@ -67,13 +67,13 @@ const movePolicemenOptimally = ({ board, setBoard, events, moves }) => {
       }
     }
     if (!canWeCatch1) {
-      moves.moveSecondPoliceman({ board: nextBoard, setBoard, events }, index1);
+      moves.moveSecondPoliceman({ board: nextBoard, events }, index1);
     }
   }, 750);
 
 };
 
-const moveThiefOptimally = ({ board, setBoard, ctx, events, moves }) => {
+const moveThiefOptimally = ({ board, events, moves }) => {
   let index = board.thief;
   for (let i = 0; i < 3; i++) {
     if (
@@ -91,5 +91,5 @@ const moveThiefOptimally = ({ board, setBoard, ctx, events, moves }) => {
   if (index === board.thief) {
     index = neighbours[board.thief][random(0, 2)];
   }
-  moves.moveThief({ board, setBoard, events }, index);
+  moves.moveThief({ board, events }, index);
 };

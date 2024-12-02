@@ -3,7 +3,7 @@ import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
 import { v4 as uuidv4 } from 'uuid';
-import { partial, mapValues } from 'lodash';
+import { partial, mapValues, wrap } from 'lodash';
 
 export const strategyGameFactory = ({
   rule,
@@ -32,6 +32,12 @@ export const strategyGameFactory = ({
         doAiTurn();
       }
     }, [currentPlayer])
+
+    const moveWrapper = (moveFunc, ...args) => {
+      const moveResult = moveFunc(...args);
+      setBoard(moveResult.nextBoard);
+      return moveResult;
+    };
 
     const startNewGame = () => {
       setBoard(generateStartBoard());
@@ -82,7 +88,7 @@ export const strategyGameFactory = ({
     };
 
     const availableMoves = {
-      ...mapValues(moves, f => partial(f, { board, setBoard, ctx, events })),
+      ...mapValues(moves, f => wrap(partial(f, { board, ctx, events }), moveWrapper)),
       // FIXME: general move, should not be needed if specialized functions
       // are provided for each move
       setBoard
@@ -94,10 +100,9 @@ export const strategyGameFactory = ({
         if (aiBotStrategy !== undefined) {
           aiBotStrategy({
             board,
-            setBoard,
             ctx,
             events,
-            moves
+            moves: mapValues(moves, f => wrap(f, moveWrapper))
           });
         } else {
           oldAiMove();

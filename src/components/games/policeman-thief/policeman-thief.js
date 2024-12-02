@@ -135,27 +135,24 @@ const generateStartBoard = () => {
 };
 
 const moves = {
-  moveThief: ({ board, setBoard, events }, vertex) => {
+  moveThief: ({ board, events }, vertex) => {
     const nextBoard = { ...cloneDeep(board), thief: vertex, turnCount: board.turnCount + 1 };
-    setBoard(nextBoard);
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
     }
     return { nextBoard };
   },
-  moveFirstPoliceman: ({ board, setBoard, events }, vertex) => {
+  moveFirstPoliceman: ({ board, events }, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.policemen[0] = vertex;
     events.setTurnStage("secondMove");
-    setBoard(nextBoard);
     return { nextBoard };
   },
-  moveSecondPoliceman: ({ board, setBoard, events }, vertex) => {
+  moveSecondPoliceman: ({ board, events }, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.policemen[1] = vertex;
     events.setTurnStage(null);
-    setBoard(nextBoard);
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
