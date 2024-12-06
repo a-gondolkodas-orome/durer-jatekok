@@ -8,13 +8,13 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
   if (board.filter(c => c).length === 0) {
     // choose two neighboring corners randomly
     const firstStep = sample([[0, 2], [2, 8], [6, 8], [0, 6]]);
-    moves.placePiece(firstStep[0]);
+    const { nextBoard } = moves.placePiece(board, firstStep[0]);
     setTimeout(() => {
-      moves.placePiece(firstStep[1]);
+      moves.placePiece(nextBoard, firstStep[1]);
     }, 750)
   } else {
     const position = getOptimalAiPlacingPosition(board, ctx.chosenRoleIndex);
-    moves.placePiece(position);
+    moves.placePiece(board, position);
   }
 };
 

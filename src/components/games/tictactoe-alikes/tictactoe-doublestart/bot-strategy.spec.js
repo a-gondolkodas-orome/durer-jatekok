@@ -5,7 +5,7 @@ describe('Double starter TicTacToe strategy', () => {
   describe('AI is the first to move', () => {
     it('should place to two corners in same row as a starting move', () => {
       const board = Array(9).fill(null);
-      const moves = { placePiece: id => board[id] = 'new_piece' }
+      const moves = { placePiece: (board, id) => board[id] = 'new_piece' }
 
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
 
@@ -24,7 +24,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null
       ];
 
-      const moves = { placePiece: id => board[id] = 'red' }
+      const moves = { placePiece: (board, id) => board[id] = 'red' }
 
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
       expect(board[4]).toEqual('red');
@@ -37,7 +37,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, 'blue'
       ];
 
-      const moves = { placePiece: id => board[id] = 'red' }
+      const moves = { placePiece: (board, id) => board[id] = 'red' }
 
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
       expect(board[6]).toEqual('red');
@@ -50,7 +50,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'blue', 'blue'
       ];
 
-      const moves = { placePiece: id => board[id] = 'red' }
+      const moves = { placePiece: (board, id) => board[id] = 'red' }
 
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
       expect(board[6]).toEqual('red');
@@ -65,7 +65,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'blue', 'blue'
       ];
 
-      const moves = { placePiece: id => board[id] = 'blue' }
+      const moves = { placePiece: (board, id) => board[id] = 'blue' }
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 }, moves });
       expect(board[6]).toEqual('blue');
     });
@@ -77,7 +77,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null
       ];
 
-      const moves = { placePiece: id => board[id] = 'blue' }
+      const moves = { placePiece: (board, id) => board[id] = 'blue' }
       aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 }, moves });
       expect(board[8]).toEqual('blue');
     });

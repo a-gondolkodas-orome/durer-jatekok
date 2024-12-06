@@ -45,16 +45,15 @@ const BoardClient = ({ board, ctx, moves }) => {
 const isDuringFirstMove = board => board.filter(c => c).length <= 1;
 
 const moves = {
-  placePiece: ({ board, setBoard, ctx, events }, id) => {
-    console.log(board);
+  placePiece: (board, { ctx, events }, id) => {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = ctx.currentPlayer === 0 ? 'red' : 'blue';
-    setBoard(nextBoard);
     if (isDuringFirstMove(nextBoard)) return;
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
     }
+    return { nextBoard };
   }
 };
 
