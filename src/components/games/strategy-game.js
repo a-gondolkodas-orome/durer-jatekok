@@ -3,7 +3,7 @@ import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
 import { v4 as uuidv4 } from 'uuid';
-import { partial, mapValues, wrap } from 'lodash';
+import { partial, mapValues, wrap, _ } from 'lodash';
 
 export const strategyGameFactory = ({
   rule,
@@ -88,7 +88,7 @@ export const strategyGameFactory = ({
     };
 
     const availableMoves = {
-      ...mapValues(moves, f => wrap(partial(f, { board, ctx, events }), moveWrapper)),
+      ...mapValues(moves, f => wrap(partial(f, board, { ctx, events }), moveWrapper)),
       // FIXME: general move, should not be needed if specialized functions
       // are provided for each move
       setBoard
@@ -101,8 +101,8 @@ export const strategyGameFactory = ({
           aiBotStrategy({
             board,
             ctx,
-            events,
-            moves: mapValues(moves, f => wrap(f, moveWrapper))
+            // only second argument of move's is fixed here (_ special syntax)
+            moves: mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper))
           });
         } else {
           oldAiMove();

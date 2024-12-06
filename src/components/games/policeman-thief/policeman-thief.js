@@ -135,7 +135,7 @@ const generateStartBoard = () => {
 };
 
 const moves = {
-  moveThief: ({ board, events }, vertex) => {
+  moveThief: (board, { events }, vertex) => {
     const nextBoard = { ...cloneDeep(board), thief: vertex, turnCount: board.turnCount + 1 };
     events.endTurn();
     if (isGameEnd(nextBoard)) {
@@ -143,13 +143,13 @@ const moves = {
     }
     return { nextBoard };
   },
-  moveFirstPoliceman: ({ board, events }, vertex) => {
+  moveFirstPoliceman: (board, { events }, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.policemen[0] = vertex;
     events.setTurnStage("secondMove");
     return { nextBoard };
   },
-  moveSecondPoliceman: ({ board, events }, vertex) => {
+  moveSecondPoliceman: (board, { events }, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.policemen[1] = vertex;
     events.setTurnStage(null);
