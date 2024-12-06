@@ -87,13 +87,6 @@ export const strategyGameFactory = ({
       setTurnStage
     };
 
-    const availableMoves = {
-      ...mapValues(moves, f => wrap(partial(f, board, { ctx, events }), moveWrapper)),
-      // FIXME: general move, should not be needed if specialized functions
-      // are provided for each move
-      setBoard
-    };
-
     const doAiTurn = () => {
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
@@ -102,6 +95,8 @@ export const strategyGameFactory = ({
             board,
             ctx,
             // only second argument of move's is fixed here (_ special syntax)
+            // board (first argument) needs to be handled by ai strategy as
+            // it may change between moves but for AI strategy there is no re-render between moves
             moves: mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper))
           });
         } else {
@@ -128,7 +123,14 @@ export const strategyGameFactory = ({
         }
         setCurrentPlayer(currentPlayer => 1 - currentPlayer);
       }, stageTimeout);
-    }
+    };
+
+    const clientSideMoves = {
+      ...mapValues(moves, f => wrap(partial(f, board, { ctx, events }), moveWrapper)),
+      // FIXME: general move, should not be needed if specialized functions
+      // are provided for each move
+      setBoard
+    };
 
     return (
     <main className="p-2">
@@ -142,7 +144,7 @@ export const strategyGameFactory = ({
               board={board}
               ctx={ctx}
               events={events}
-              moves={availableMoves}
+              moves={clientSideMoves}
             />
             <GameSidebar
               roleLabels={roleLabels}
