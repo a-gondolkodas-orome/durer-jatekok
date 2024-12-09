@@ -48,11 +48,14 @@ const moves = {
   placePiece: (board, { ctx, events }, id) => {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = ctx.currentPlayer === 0 ? 'red' : 'blue';
-    if (isDuringFirstMove(nextBoard)) return;
-    events.endTurn();
-    if (isGameEnd(nextBoard)) {
-      events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
+
+    if (!isDuringFirstMove(nextBoard)) {
+      events.endTurn();
+      if (isGameEnd(nextBoard)) {
+        events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
+      }
     }
+
     return { nextBoard };
   }
 };
