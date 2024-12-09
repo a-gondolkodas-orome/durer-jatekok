@@ -1,16 +1,6 @@
-import { getGameStateAfterAiTurn, inPlacingPhase } from './strategy';
+import { getGameStateAfterAiTurn } from './bot-strategy';
 
 describe('TicTacToe strategy', () => {
-  describe('inPlacingPhase', () => {
-    it('should return true if board has empty place', () => {
-      expect(inPlacingPhase([null, 'blue', 'red', 'red', 'red', 'blue', 'blue', 'blue', 'red'])).toBe(true);
-    });
-
-    it('should return false if board does not have empty place', () => {
-      expect(inPlacingPhase(['blue', 'red', 'red', 'white', 'red', 'white', 'blue', 'blue', 'white'])).toBe(false);
-    });
-  });
-
   describe('getGameStateAfterAiTurn', () => {
     describe('new piece placing phase', () => {
       it('should win the game in 1 move if possible', () => {

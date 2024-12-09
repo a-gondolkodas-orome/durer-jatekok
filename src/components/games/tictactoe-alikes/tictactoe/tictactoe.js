@@ -2,7 +2,8 @@ import React from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
-import { inPlacingPhase, pColor, aiColor, isGameEnd, getGameStateAfterAiTurn } from './strategy/strategy';
+import { getGameStateAfterAiTurn } from './bot-strategy';
+import { inPlacingPhase, pColor, aiColor, isGameEnd } from './helpers';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);

@@ -1,7 +1,7 @@
 'use strict';
 
-import { isNull, some, groupBy, range, cloneDeep, sample } from 'lodash';
-import { hasWinningSubset } from '../../helpers';
+import { isNull, range, cloneDeep, sample } from 'lodash';
+import { pColor, aiColor, inPlacingPhase, isGameEnd } from './helpers';
 
 export const getGameStateAfterAiTurn = ({ board }) => {
   const nextBoard = cloneDeep(board);
@@ -9,11 +9,6 @@ export const getGameStateAfterAiTurn = ({ board }) => {
   nextBoard[aiPosition] = getNextColor(nextBoard, false);
   return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
 };
-
-export const pColor = 'blue';
-export const aiColor = 'red';
-
-export const inPlacingPhase = (board) => board.find(isNull) !== undefined;
 
 const getOptimalAiPosition = (board) => {
   if (inPlacingPhase(board)) return getOptimalAiPlacingPosition(board);
@@ -96,10 +91,4 @@ const getNextColor = (board, amIPlayer) => {
     return amIPlayer ? pColor : aiColor;
   }
   return 'white';
-};
-
-export const isGameEnd = (board) => {
-  const occupiedPlaces = range(0, 9).filter((i) => board[i]);
-  const boardIndicesByPieceColor = groupBy(occupiedPlaces, (i) => board[i]);
-  return some(boardIndicesByPieceColor, hasWinningSubset);
 };
