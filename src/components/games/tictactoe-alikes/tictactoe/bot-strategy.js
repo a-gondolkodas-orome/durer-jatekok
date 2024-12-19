@@ -3,16 +3,14 @@
 import { isNull, range, cloneDeep, sample } from 'lodash';
 import { pColor, aiColor, inPlacingPhase, isGameEnd } from './helpers';
 
-export const getGameStateAfterAiTurn = ({ board }) => {
-  const nextBoard = cloneDeep(board);
-  const aiPosition = getOptimalAiPosition(nextBoard);
-  nextBoard[aiPosition] = getNextColor(nextBoard, false);
-  return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
-};
-
-const getOptimalAiPosition = (board) => {
-  if (inPlacingPhase(board)) return getOptimalAiPlacingPosition(board);
-  return getOptimalAiFlippingPosition(board);
+export const aiBotStrategy = ({ board, moves }) => {
+  if (inPlacingPhase(board)) {
+    const id = getOptimalAiPlacingPosition(board);
+    moves.placePiece(board, id);
+  } else {
+    const id = getOptimalAiFlippingPosition(board);
+    moves.whitenPiece(board, id);
+  }
 };
 
 const getOptimalAiPlacingPosition = (board) => {
