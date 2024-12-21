@@ -13,12 +13,12 @@ export const getBoardAfterAiTurn = (board) => {
 const getAiStep = (board) => {
   const randomPileIndex = random(0, 1);
 
-  const PileIndexToSplit = (board[randomPileIndex] % 2 === 0 || board[1 - randomPileIndex] === 1)
+  const pileIndexToSplit = (board[randomPileIndex] % 2 === 0 || board[1 - randomPileIndex] === 1)
     ? randomPileIndex
     : 1 - randomPileIndex;
 
-  const pieceId = getOptimalDivision(board[PileIndexToSplit]);
-  return { pileId: PileIndexToSplit, pieceId };
+  const pieceId = getOptimalDivision(board[pileIndexToSplit]);
+  return { pileId: pileIndexToSplit, pieceId };
 };
 
 const getOptimalDivision = (pieceCountInPile) => {
