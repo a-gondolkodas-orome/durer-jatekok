@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { range, isEqual, random } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
-import { getBoardAfterAiTurn } from './strategy';
+import { getBoardAfterAiTurn } from './bot-strategy';
 
 const generateStartBoard = () => {
   const x = random(2, 8) * 2 + 1;
