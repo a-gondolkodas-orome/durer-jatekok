@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { range, isEqual, random } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
-import { getBoardAfterAiTurn, isWinningState } from './strategy';
+import { getBoardAfterAiTurn, isWinningState } from './bot-strategy';
 
 const generateStartBoard = () => {
   if (random(0, 1)) return generateWinningStartBoard();
