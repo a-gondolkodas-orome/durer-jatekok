@@ -14,10 +14,10 @@ const BoardClient = ({ board, ctx, moves }) => {
   const clickPiece = ({ pileId, pieceId }) => {
     if (isDisabled({ pileId, pieceId })) return;
 
-    moves.removePile(1 - pileId);
+    const { nextBoard } = moves.removePile(board, 1 - pileId);
 
     setTimeout(() => {
-      moves.splitPile({ pileId, pieceId });
+      moves.splitPile(nextBoard, { pileId, pieceId });
       setHoveredPiece(null);
     }, 750);
   };
