@@ -10,7 +10,7 @@ export const aiBotStrategy = ({ board, moves }) => {
   }, 750)
 };
 
-const getAiStep = (board) => {
+export const getAiStep = (board) => {
   const start = random(0, 2);
   let removedPileId, splitPileId;
 
