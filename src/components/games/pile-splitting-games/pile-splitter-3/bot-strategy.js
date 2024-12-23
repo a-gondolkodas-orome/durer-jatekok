@@ -66,5 +66,5 @@ const getOptimalDivision = function (board, pileId) {
 
   if (sum === 2) return 0;
 
-  return pieceId = 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
+  return 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
 };
