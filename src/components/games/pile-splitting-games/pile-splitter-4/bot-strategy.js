@@ -2,25 +2,37 @@
 
 import { random, range, sample } from 'lodash';
 
-export const getBoardAfterAiTurn = (board) => {
+export const aiBotStrategy = ({ board, moves }) => {
+  const { removedPileId, pileId, pieceId } = getAiStep(board);
+  const { nextBoard } = moves.removePile(board, removedPileId);
+  setTimeout(() => {
+    moves.splitPile(nextBoard, { pileId, pieceId });
+  }, 750)
+};
+
+export const getAiStep = (board) => {
   const start = random(0, 3);
+  let removedPileId, splitPileId;
 
   const odds = board.filter(p => p % 2 === 1).length;
 
   if (odds === 4) {
     const notSinglePileIndices = range(0, 4).filter(i => board[i] !== 1);
     const first = sample(notSinglePileIndices);
-    return getOptimalDivision(board, first, (first + 1) % 4);
+    removedPileId = (first + 1) % 4;
+    splitPileId = first;
   }
 
   if (odds === 3) {
     const evenPileIndex = range(0, 4).find(i => board[i] % 2 === 0);
-    return getOptimalDivision(board, evenPileIndex, (evenPileIndex + 1) % 4);
+    removedPileId = (evenPileIndex + 1) % 4;
+    splitPileId = evenPileIndex;
   }
 
   if (odds === 2) {
     const evenPileIndices = range(0, 4).filter(i => board[i] % 2 === 0);
-    return getOptimalDivision(board, evenPileIndices[0], evenPileIndices[1]);
+    removedPileId = evenPileIndices[1];
+    splitPileId = evenPileIndices[0];
   }
 
   if (odds === 1) {
@@ -29,44 +41,42 @@ export const getBoardAfterAiTurn = (board) => {
       board[oddPile] === 1 && board[(oddPile + 1) % 4] === 2 &&
       board[(oddPile + 2) % 4] === 2 && board[(oddPile + 3) % 4] === 2
     ) {
-      return getOptimalDivision(board, (oddPile + 1) % 4, (oddPile + 2) % 4);
+      removedPileId = (oddPile + 2) % 4;
+      splitPileId = (oddPile + 1) % 4;
     } else {
+      // TODO: test this case especially thoroughly
       let modifiedBoard = [...board];
       modifiedBoard[oddPile] += 1;
-      const { nextBoard, intermediateBoard } = getBoardAfterAiTurn(modifiedBoard);
-      nextBoard[oddPile] -= 1;
-      intermediateBoard[oddPile] -= 1;
-      return { nextBoard, intermediateBoard };
+      const { removedPileId, splitPileId, pieceId } = getAiStep(modifiedBoard);
+      return {
+        removedPileId,
+        splitPileId,
+        pieceId: pieceId - 1
+      }
     }
   }
 
   if (odds === 0) {
     if (board[0] === 2 && board[1] === 2 && board[2] === 2 && board[3] === 2) {
-      return getOptimalDivision(board, start, (start + 1) % 4);
+      removedPileId = (start + 1) % 4;
+      splitPileId = start;
     } else {
-      const { nextBoard, intermediateBoard } = getBoardAfterAiTurn(board.map((x) => x / 2));
-      return { nextBoard: nextBoard.map((x) => x * 2), intermediateBoard: intermediateBoard.map(x => x * 2) };
+      const { removedPileId, pileId, pieceId } = getAiStep(board.map((x) => x / 2));
+      return { removedPileId, pileId, pieceId: (pieceId + 1) * 2 - 1 };
     }
+  }
+
+  return {
+    removedPileId,
+    pileId: splitPileId,
+    pieceId: getOptimalDivision(board, splitPileId)
   }
 };
 
-const getOptimalDivision = function (board, first, second) {
-  const sum = board[first];
+const getOptimalDivision = function (board, pileId) {
+  const sum = board[pileId];
 
-  const intermediateBoard = [...board];
-  intermediateBoard[second] = 0;
+  if (sum === 2) return 0;
 
-  const nextBoard = [...board];
-
-  if (sum === 2) {
-    nextBoard[first] = 1;
-    nextBoard[second] = 1;
-    return { nextBoard, intermediateBoard };
-  }
-
-  const firstPile = 1 + 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
-  nextBoard[first] = firstPile;
-  nextBoard[second] = sum - firstPile;
-
-  return { intermediateBoard, nextBoard };
+  return 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
 };

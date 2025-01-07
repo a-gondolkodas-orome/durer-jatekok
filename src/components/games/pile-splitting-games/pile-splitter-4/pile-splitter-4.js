@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
 import { range, isEqual } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
-import { getBoardAfterAiTurn } from './bot-strategy';
+import { aiBotStrategy } from './bot-strategy';
 import { generateStartBoard } from './helpers';
 
-const isGameEnd = (board) => isEqual(board, [1, 1, 1, 1]);
-
-const getGameStateAfterAiTurn = ({ board }) => {
-  const { nextBoard, intermediateBoard } = getBoardAfterAiTurn(board);
-  return { nextBoard, intermediateBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
-};
-
-const getBoardAfterMove = (board, { removedPileId, splitPileId, pieceId }) => {
-  const nextBoard = [...board];
-  const intermediateBoard = [...board];
-  intermediateBoard[removedPileId] = 0;
-  if (removedPileId < splitPileId) {
-    nextBoard[removedPileId] = pieceId + 1;
-    nextBoard[splitPileId] = nextBoard[splitPileId] - pieceId - 1;
-  } else {
-    nextBoard[removedPileId] = nextBoard[splitPileId] - pieceId - 1;
-    nextBoard[splitPileId] = pieceId + 1;
-  }
-  return { intermediateBoard, nextBoard };
-};
-
-const BoardClient = ({ board, ctx, events, moves }) => {
+const BoardClient = ({ board, ctx, moves }) => {
   const [removedPileId, setRemovedPileId] = useState(null);
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
@@ -48,20 +27,10 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     }
     if (pieceId === board[pileId] - 1) return;
 
-    const { intermediateBoard, nextBoard } = getBoardAfterMove(board, {
-      removedPileId: removedPileId,
-      splitPileId: pileId,
-      pieceId
-    });
-
-    moves.setBoard(intermediateBoard);
+    const { nextBoard } = moves.removePile(board, removedPileId)
 
     setTimeout(() => {
-      moves.setBoard(nextBoard);
-      events.endTurn();
-      if (isGameEnd(nextBoard)) {
-        events.endGame();
-      }
+      moves.splitPile(nextBoard, { pileId, pieceId })
 
       setRemovedPileId(null);
       setHoveredPiece(null);
@@ -148,6 +117,31 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   );
 };
 
+const moves = {
+  removePile: (board, _, pileId) => {
+    const nextBoard = cloneDeep(board);
+    nextBoard[pileId] = 0;
+    return { nextBoard };
+  },
+  splitPile: (board, { events }, { pileId, pieceId }) => {
+    const nextBoard = cloneDeep(board);
+    const removedPileId = [0, 1, 2, 3].find(i => nextBoard[i] === 0)
+    if (removedPileId === undefined) console.error('invalid_move');
+    if (removedPileId < pileId) {
+      nextBoard[removedPileId] = pieceId + 1;
+      nextBoard[pileId] = nextBoard[pileId] - pieceId - 1;
+    } else {
+      nextBoard[removedPileId] = nextBoard[pileId] - pieceId - 1;
+      nextBoard[pileId] = pieceId + 1;
+    }
+    events.endTurn();
+    if (isEqual(nextBoard, [1, 1, 1, 1])) {
+      events.endGame();
+    }
+    return { nextBoard };
+  }
+};
+
 const getPlayerStepDescription = () =>
   'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.';
 
@@ -164,5 +158,6 @@ export const PileSplitter4 = strategyGameFactory({
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,
-  getGameStateAfterAiTurn
+  aiBotStrategy,
+  moves
 });
