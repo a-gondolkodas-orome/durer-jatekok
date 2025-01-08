@@ -35,7 +35,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     const { nextBoard } = moves.removePile(board, removedPileId)
 
     setTimeout(() => {
-      moves.splitPile(nextBoard, { pileId, pieceId })
+      moves.splitPile(nextBoard, { pileId, pieceCount: pieceId + 1 })
 
       setRemovedPileId(null);
       setHoveredPiece(null);
@@ -115,16 +115,16 @@ const moves = {
     nextBoard[pileId] = 0;
     return { nextBoard };
   },
-  splitPile: (board, { events }, { pileId, pieceId }) => {
+  splitPile: (board, { events }, { pileId, pieceCount }) => {
     const nextBoard = cloneDeep(board);
     const removedPileId = [0, 1, 2].find(i => nextBoard[i] === 0)
     if (removedPileId === undefined) console.error('invalid_move');
     if (removedPileId < pileId) {
-      nextBoard[removedPileId] = pieceId + 1;
-      nextBoard[pileId] = nextBoard[pileId] - pieceId - 1;
+      nextBoard[removedPileId] = pieceCount;
+      nextBoard[pileId] = nextBoard[pileId] - pieceCount;
     } else {
-      nextBoard[removedPileId] = nextBoard[pileId] - pieceId - 1;
-      nextBoard[pileId] = pieceId + 1;
+      nextBoard[removedPileId] = nextBoard[pileId] - pieceCount;
+      nextBoard[pileId] = pieceCount;
     }
     events.endTurn();
     if (isEqual(nextBoard, [1, 1, 1])) {

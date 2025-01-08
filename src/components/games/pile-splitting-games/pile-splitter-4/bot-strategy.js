@@ -3,10 +3,10 @@
 import { random, range, sample } from 'lodash';
 
 export const aiBotStrategy = ({ board, moves }) => {
-  const { removedPileId, pileId, pieceId } = getAiStep(board);
+  const { removedPileId, pileId, pieceCount } = getAiStep(board);
   const { nextBoard } = moves.removePile(board, removedPileId);
   setTimeout(() => {
-    moves.splitPile(nextBoard, { pileId, pieceId });
+    moves.splitPile(nextBoard, { pileId, pieceCount });
   }, 750)
 };
 
@@ -50,7 +50,7 @@ export const getAiStep = (board) => {
       return {
         removedPileId: aiStep.removedPileId,
         pileId: aiStep.pileId,
-        pieceId: aiStep.pieceId - 1
+        pieceCount: aiStep.pieceCount - 1
       }
     }
   }
@@ -60,22 +60,22 @@ export const getAiStep = (board) => {
       removedPileId = (start + 1) % 4;
       splitPileId = start;
     } else {
-      const { removedPileId, pileId, pieceId } = getAiStep(board.map((x) => x / 2));
-      return { removedPileId, pileId, pieceId: (pieceId + 1) * 2 - 1 };
+      const aiStep = getAiStep(board.map((x) => x / 2));
+      return { ...aiStep, pieceCount: aiStep.pieceCount * 2 };
     }
   }
 
   return {
     removedPileId,
     pileId: splitPileId,
-    pieceId: getOptimalDivision(board, splitPileId)
+    pieceCount: getOptimalDivision(board, splitPileId)
   }
 };
 
 const getOptimalDivision = function (board, pileId) {
   const sum = board[pileId];
 
-  if (sum === 2) return 0;
+  if (sum === 2) return 1;
 
-  return 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
+  return 1 + 2 * Math.ceil(Math.random() * Math.floor((sum - 2) / 2));
 };
