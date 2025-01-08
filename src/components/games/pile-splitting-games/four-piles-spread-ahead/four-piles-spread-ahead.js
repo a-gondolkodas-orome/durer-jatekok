@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { range, random } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
-import { getOptimalAiMove } from './strategy';
+import { getOptimalAiMove } from './bot-strategy';
 
 const generateStartBoard = () => ([random(0, 9), random(0, 9), random(0, 9), random(4, 9)]);
 
