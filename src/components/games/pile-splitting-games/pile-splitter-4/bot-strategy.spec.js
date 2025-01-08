@@ -18,14 +18,35 @@ describe('getAiStep', () => {
     expect(aiStep.pieceId === 0 || aiStep.pieceId === 2)
   });
 
-  it('even, even, even, even case: follow strategy for halfed piles', () => {
-    const aiStep = getAiStep([10, 14, 4, 6]);
+  it('even, even, even, even case: follow strategy for halfed piles recursively', () => {
+    const aiStep = getAiStep([20, 28, 8, 12]);
     expect(aiStep.pileId).toEqual(2);
-    expect(aiStep.pieceId).toEqual(1);
+    expect(aiStep.pieceId).toEqual(3);
   });
 
-  it('even, even, even, odd case', () => {
-    // TODO: add thorough tests
-    expect(1).toEqual(1);
-  })
+  describe('even, even, even, odd case', () => {
+    it('2, 2, 2, 1', () => {
+      const aiStep = getAiStep([2, 2, 2, 1]);
+      expect([0, 1, 2]).toContainEqual(aiStep.pileId);
+      expect(aiStep.pieceId).toEqual(0);
+    });
+
+    it('2, 2, 2, 3', () => {
+      const aiStep = getAiStep([2, 2, 2, 3]);
+      expect(aiStep.pileId).toEqual(3);
+      expect(aiStep.pieceId).toEqual(0);
+    });
+
+    it('4, 4, 4, 15', () => {
+      const aiStep = getAiStep([4, 15, 4, 4]);
+      expect(aiStep.pileId).toEqual(1);
+      expect(aiStep.pieceId).toEqual(10);
+    });
+
+    it('4, 4, 4, 11', () => {
+      const aiStep = getAiStep([4, 11, 4, 4]);
+      expect(aiStep.pileId).toEqual(1);
+      expect(aiStep.pieceId).toEqual(2);
+    });
+  });
 });

@@ -44,14 +44,13 @@ export const getAiStep = (board) => {
       removedPileId = (oddPile + 2) % 4;
       splitPileId = (oddPile + 1) % 4;
     } else {
-      // TODO: test this case especially thoroughly
-      let modifiedBoard = [...board];
+      const modifiedBoard = [...board];
       modifiedBoard[oddPile] += 1;
-      const { removedPileId, splitPileId, pieceId } = getAiStep(modifiedBoard);
+      const aiStep = getAiStep(modifiedBoard);
       return {
-        removedPileId,
-        splitPileId,
-        pieceId: pieceId - 1
+        removedPileId: aiStep.removedPileId,
+        pileId: aiStep.pileId,
+        pieceId: aiStep.pieceId - 1
       }
     }
   }
