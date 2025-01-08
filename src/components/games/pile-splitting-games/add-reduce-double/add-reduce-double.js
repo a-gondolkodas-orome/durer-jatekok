@@ -3,8 +3,6 @@ import { range, isEqual, random } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { getOptimalAiMove } from './bot-strategy';
 
-const generateStartBoard = () => ([random(3, 10), random(3, 10)]);
-
 const getGameStateAfterMove = (board, { pileId, pieceId }) => {
   const intermediateBoard = pileId === 0
     ? [board[0] - pieceId - 1, board[1]]
@@ -132,6 +130,6 @@ export const AddReduceDouble = strategyGameFactory({
   title: 'Kettőt vesz, egyet kap',
   BoardClient,
   getPlayerStepDescription: () => 'Kattints egy korongra, hogy jelezd, hány korongot szeretnél elvenni a kupacból.',
-  generateStartBoard,
+  generateStartBoard: () => ([random(3, 10), random(3, 10)]),
   getGameStateAfterAiTurn: ({ board }) => getGameStateAfterMove(board, getOptimalAiMove(board))
 });
