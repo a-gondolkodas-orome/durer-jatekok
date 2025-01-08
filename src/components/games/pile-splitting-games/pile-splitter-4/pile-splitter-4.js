@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { range, isEqual } from 'lodash';
+import { range, isEqual, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
 import { generateStartBoard } from './helpers';
