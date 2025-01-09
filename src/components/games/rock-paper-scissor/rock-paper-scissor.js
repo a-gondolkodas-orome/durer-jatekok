@@ -1,5 +1,5 @@
 import React from 'react';
-import { range, cloneDeep, isNull } from 'lodash';
+import { compact, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
 import { RockSvg } from './symbols/rock-svg';
@@ -7,21 +7,15 @@ import { PaperSvg } from './symbols/paper-svg';
 import { ScissorSvg } from './symbols/scissor-svg';
 
 const BoardClient = ({ board, ctx, moves }) => {
-  const isMoveAllowed = (id) => {
+  const isMoveAllowed = (symbolIdx) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
-    return board[id] === null;
+    return board[1 - ctx.chosenRoleIndex][symbolIdx] !== null;
   };
-  const clickField = (id) => {
-    if (!isMoveAllowed(id)) return;
 
-    const idx = Math.floor(id / 3);
-    moves.removeSymbol(board, idx)
-  };
-  const isDisabled = (id) => {
-    if (!isMoveAllowed(id)) return true;
-    if ([1, 4, 7].includes(id)) return true;
-    if (ctx.chosenRoleIndex === 1) return [2, 5, 8].includes(id);
-    if (ctx.chosenRoleIndex === 0) return [0, 3, 6].includes(id);
+  const clickField = (symbolIdx) => {
+    if (!isMoveAllowed(symbolIdx)) return;
+
+    moves.removeSymbol(board, symbolIdx)
   };
 
   return (
@@ -32,30 +26,26 @@ const BoardClient = ({ board, ctx, moves }) => {
       <span className="text-gray-500 text-xl text-center">Második</span>
     </div>
     <div className="grid grid-cols-3">
-      {range(9).map(id => (
-        [1,4,7].includes(id) || !isNull(board[id])
-        ? <span className="aspect-[4/5] m-2" key={id}></span>
-        : <button
-          key={id}
-          disabled={isDisabled(id)}
-          onClick={() => clickField(id)}
-          className={`
-            p-2 m-2 aspect-[4/5] border-4 rounded-xl shadow-md
-            disabled:cursor-not-allowed
-            enabled:border-emerald-400 enabled:border-dashed
-            enabled:hover:border-solid enabled:focus:border-solid
-          `}
-        >
-          { isNull(board[id]) && (id === 0 || id === 2) && (
-            <RockSvg />
-          )}
-          { isNull(board[id]) && (id === 3 || id === 5) && (
-            <PaperSvg />
-          )}
-          { isNull(board[id]) && (id === 6 || id === 8) && (
-            <ScissorSvg />
-          )}
-      </button>
+      {[0, 1, 2].map(symbolIdx => (
+        [0, null, 1].map(playerIdx => (
+          playerIdx === null || board[playerIdx][symbolIdx] === null
+          ? <span className="aspect-[4/5] m-2" key={`${playerIdx}-${symbolIdx}`}></span>
+          : <button
+              key={`${playerIdx}-${symbolIdx}`}
+              disabled={playerIdx === ctx.chosenRoleIndex || !isMoveAllowed(symbolIdx)}
+              onClick={() => clickField(symbolIdx)}
+              className={`
+                p-2 m-2 aspect-[4/5] border-4 rounded-xl shadow-md
+                disabled:cursor-not-allowed
+                enabled:border-emerald-400 enabled:border-dashed
+                enabled:hover:border-solid enabled:focus:border-solid
+              `}
+            >
+              { symbolIdx === 0 && (<RockSvg />) }
+              { symbolIdx === 1 && (<PaperSvg />) }
+              { symbolIdx === 2 && (<ScissorSvg />) }
+            </button>
+        ))
       ))}
     </div>
   </section>
@@ -63,34 +53,27 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const isGameEnd = (board) => {
-  if (board.filter(c => c).length === 4) return true;
-  return false;
+  return compact(board[0]).length === 1 && compact(board[1]).length === 1;
 };
 
-const hasFirstPlayerWon = (board) => {
+const getWinnerIndex = (board) => {
   if (!isGameEnd(board)) return undefined;
-  const pairs = [[6, 2], [0, 5], [3, 8]];
+  const pairs = [[0, 2], [1, 0], [2, 1]];
   for (const p of pairs) {
-
-    // first is occupied, second is not from given pair
-    if (isNull(board[p[0]]) && isNull(board[p[1]])) {
-      return false;
+    if (board[0][p[0]] !== null && board[1][p[1]]) {
+      return 0;
     }
   }
-  return true;
+  return 1;
 };
 
 const moves = {
   removeSymbol: (board, { ctx, events }, idx) => {
     const nextBoard = cloneDeep(board);
-    if (ctx.currentPlayer === 0) {
-      nextBoard[idx * 3 + 2] = 'removed'
-    } else {
-      nextBoard[idx * 3] = 'removed'
-    }
+    nextBoard[1 - ctx.currentPlayer][idx] = null;
     events.endTurn();
     if (isGameEnd(nextBoard)) {
-      events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
+      events.endGame({ winnerIndex: getWinnerIndex(nextBoard) });
     }
     return { nextBoard };
   }
@@ -109,7 +92,7 @@ export const RockPaperScissor = strategyGameFactory({
   title: 'Kő-papír-olló',
   BoardClient,
   getPlayerStepDescription: () => 'Távolíts el egy kártyát az ellenfél elől.',
-  generateStartBoard: () => Array(9).fill(null),
+  generateStartBoard: () => [['rock', 'paper', 'scissor'], ['rock', 'paper', 'scissor']],
   moves,
   aiBotStrategy
 });

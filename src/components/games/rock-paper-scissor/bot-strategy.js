@@ -1,36 +1,30 @@
 'use strict';
 
-import { isNull, range, random } from 'lodash';
+import { random } from 'lodash';
 
 export const aiBotStrategy = ({ board, ctx, moves }) => {
-  const idx = getOptimalAiPlacingPosition(board, ctx.chosenRoleIndex);
+  const idx = getOptimalAiMove(board, ctx.chosenRoleIndex);
   moves.removeSymbol(board, idx);
 };
 
-const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
-  const allowedPlaces = range(0, 9).filter(i => i !== 1 && i !== 4 && i !== 7 && isNull(board[i]));
-
-  let freePlaces = [];
-  for (let i = 0; i <= 8; i++){
-    if (i === 1 || i === 4 || i === 7) continue;
-    if (isNull(board[i])) {
-      freePlaces.push(i);
-    }
-  }
-
+export const getOptimalAiMove = (board, chosenRoleIndex) => {
   // start with a random place as a first step
-  if (allowedPlaces.length === 6) {
-    return random(0, 2);
+  if (chosenRoleIndex === 1) {
+    const allowedPlaces = [0, 1, 2].filter(i => board[1][i] !== null);
+    if (allowedPlaces.length === 3) {
+      return random(0, 2);
+    }
   }
 
   // as a first player still try to win if second player may not play optimally
   if (chosenRoleIndex === 1) {
     // pairs to still have chance
+    // we have two cards left to choose from so at least one option is available
     const pairs = [[0, 2], [1, 0], [2, 1], [0, 0], [1, 1], [2, 2]];
     for (const p of pairs) {
 
       // first is occupied, second is not from given pair
-      if (!isNull(board[p[0] * 3]) && isNull(board[p[1] * 3 + 2])) {
+      if (board[0][p[0]] === null && board[1][p[1]] !== null) {
         return p[1];
       }
     }
@@ -43,7 +37,7 @@ const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
     const pairs = [[0, 1], [1, 2], [2, 0]];
     for (const p of pairs) {
       // first is not occupied, second is occupied from given pair
-      if (isNull(board[p[0] * 3]) && !isNull(board[p[1] * 3 + 2])) {
+      if (board[0][p[0]] !== null && board[1][p[1]] === null) {
         return p[0];
       }
     }
