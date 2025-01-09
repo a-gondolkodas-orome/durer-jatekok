@@ -2,9 +2,9 @@ import React from 'react';
 import { range, cloneDeep, isNull } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
-import { RockSvg } from './rock-svg';
-import { PaperSvg } from './paper-svg';
-import { ScissorSvg } from './scissor-svg';
+import { RockSvg } from './symbols/rock-svg';
+import { PaperSvg } from './symbols/paper-svg';
+import { ScissorSvg } from './symbols/scissor-svg';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const isMoveAllowed = (id) => {
