@@ -1,12 +1,12 @@
 import React from 'react';
 import { range, cloneDeep, isNull } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
+import { aiBotStrategy } from './bot-strategy';
 import { RockSvg } from './symbols/rock-svg';
 import { PaperSvg } from './symbols/paper-svg';
 import { ScissorSvg } from './symbols/scissor-svg';
 
-const BoardClient = ({ board, ctx, events, moves }) => {
+const BoardClient = ({ board, ctx, moves }) => {
   const isMoveAllowed = (id) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
     return board[id] === null;
@@ -14,14 +14,8 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
 
-    const nextBoard = cloneDeep(board);
-    nextBoard[id] = 'removed';
-    moves.setBoard(nextBoard);
-    const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-    events.endTurn();
-    if (isGameEnd) {
-      events.endGame({ winnerIndex });
-    }
+    const idx = Math.floor(id / 3);
+    moves.removeSymbol(board, idx)
   };
   const isDisabled = (id) => {
     if (!isMoveAllowed(id)) return true;
@@ -68,6 +62,40 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   );
 };
 
+const isGameEnd = (board) => {
+  if (board.filter(c => c).length === 4) return true;
+  return false;
+};
+
+const hasFirstPlayerWon = (board) => {
+  if (!isGameEnd(board)) return undefined;
+  const pairs = [[6, 2], [0, 5], [3, 8]];
+  for (const p of pairs) {
+
+    // first is occupied, second is not from given pair
+    if (isNull(board[p[0]]) && isNull(board[p[1]])) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const moves = {
+  removeSymbol: (board, { ctx, events }, idx) => {
+    const nextBoard = cloneDeep(board);
+    if (ctx.currentPlayer === 0) {
+      nextBoard[idx * 3 + 2] = 'removed'
+    } else {
+      nextBoard[idx * 3] = 'removed'
+    }
+    events.endTurn();
+    if (isGameEnd(nextBoard)) {
+      events.endGame({ winnerIndex: hasFirstPlayerWon(nextBoard) ? 0 : 1 });
+    }
+    return { nextBoard };
+  }
+}
+
 const rule = <>
   A játék kezdetekor mindkét játékos elé leteszünk három kártyát: az egyik követ, a
 másik papírt, a harmadik ollót ábrázol. Ezután a játékosok felváltva elvesznek egy-egy kártyát az
@@ -82,5 +110,6 @@ export const RockPaperScissor = strategyGameFactory({
   BoardClient,
   getPlayerStepDescription: () => 'Távolíts el egy kártyát az ellenfél elől.',
   generateStartBoard: () => Array(9).fill(null),
-  getGameStateAfterAiTurn
+  moves,
+  aiBotStrategy
 });
