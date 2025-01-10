@@ -1,33 +1,18 @@
 import React from 'react';
-import { range, cloneDeep, isNull } from 'lodash';
+import { range, cloneDeep, compact } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
+import { aiBotStrategy } from './bot-strategy';
 
-const BoardClient = ({ board, ctx, events, moves }) => {
+const BoardClient = ({ board, ctx, moves }) => {
   const isMoveAllowed = (id) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
-    return board[id] === null;
+    return board[1 - ctx.chosenRoleIndex][id] !== null;
   };
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
 
-    const nextBoard = cloneDeep(board);
-    nextBoard[id] = 'removed';
-    moves.setBoard(nextBoard);
-    const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-    events.endTurn();
-    if (isGameEnd) {
-      events.endGame({ winnerIndex });
-    }
+    moves.removeCard(board, id + 1);
   };
-
-  const isDisabled = id => {
-    if (!isMoveAllowed(id)) return true;
-    if (id % 3 === 1) return true;
-    if(ctx.chosenRoleIndex == 0 && id % 3 == 0) return true;
-    if (ctx.chosenRoleIndex == 1 && id % 3 == 2) return true;
-    return false;
-  }
 
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
@@ -37,31 +22,58 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       <span className="text-gray-500 text-xl text-center">Második</span>
     </div>
     <div className="grid grid-cols-3">
-      {range(15).map(id => (
-        [1, 4, 7, 10, 13].includes(id) || !isNull(board[id])
-        ? <span className="aspect-[3/2] m-2" key={id}></span>
-        : <button
-          key={id}
-          disabled={isDisabled(id)}
-          onClick={() => clickField(id)}
-          className={`
-            p-2 m-2 aspect-[3/2] text-3xl border-4 rounded-xl shadow-md
-            disabled:cursor-not-allowed
-            enabled:border-emerald-400 enabled:border-dashed
-            enabled:hover:border-solid enabled:focus:border-solid
-          `}
-        >
-          { isNull(board[id]) && (id === 0 || id === 2) && '1'}
-          { isNull(board[id]) && (id === 3 || id === 5) && '2'}
-          { isNull(board[id]) && (id === 6 || id === 8) && '3'}
-          { isNull(board[id]) && (id === 9 || id === 11) && '4'}
-          { isNull(board[id]) && (id === 12 || id === 14) && '5'}
-      </button>
+      {range(5).map(id => (
+        [0, null, 1].map(playerIdx => (
+          playerIdx === null || board[playerIdx][id] === null
+          ? <span className="aspect-[3/2] m-2" key={`${playerIdx}-${id}`}></span>
+          : <button
+              key={`${playerIdx}-${id}`}
+              disabled={playerIdx === ctx.chosenRoleIndex || !isMoveAllowed(id)}
+              onClick={() => clickField(id)}
+              className={`
+                p-2 m-2 aspect-[3/2] text-3xl border-4 rounded-xl shadow-md
+                disabled:cursor-not-allowed
+                enabled:border-emerald-400 enabled:border-dashed
+                enabled:hover:border-solid enabled:focus:border-solid
+              `}
+            >
+              {board[playerIdx][id]}
+          </button>
+        ))
       ))}
     </div>
   </section>
   );
 };
+
+const isGameEnd = (board) => {
+  return compact(board[0]).length === 1 && compact(board[1]).length === 1;
+};
+
+const getWinnerIndex = board => {
+  if (!isGameEnd(board)) return undefined;
+  const firstPlayerNumber = compact(board[0])[0];
+  const secondPlayerNumber = compact(board[1])[0]
+
+  if (firstPlayerNumber === secondPlayerNumber) return 0;
+  if ((firstPlayerNumber + secondPlayerNumber) % 2 === 0){
+    return firstPlayerNumber < secondPlayerNumber ? 0 : 1;
+  } else {
+    return firstPlayerNumber > secondPlayerNumber ? 0 : 1;
+  }
+}
+
+const moves = {
+  removeCard: (board, { ctx, events }, id) => {
+    const nextBoard = cloneDeep(board);
+    nextBoard[1 - ctx.currentPlayer][id - 1] = null;
+    events.endTurn();
+    if (isGameEnd(nextBoard)) {
+      events.endGame({ winnerIndex: getWinnerIndex(nextBoard) });
+    }
+    return { nextBoard };
+  }
+}
 
 const rule = <>
   Mindkét játékos előtt 5-5 kártyalap van az 1-5 egész számokkal megszámozva.
@@ -77,6 +89,7 @@ export const FiveFiveCard = strategyGameFactory({
   title: 'Párbaj 5 lappal',
   BoardClient,
   getPlayerStepDescription: () => 'Vegyél el egy kártyát az ellenfél elől.',
-  generateStartBoard: () => Array(15).fill(null),
-  getGameStateAfterAiTurn
+  generateStartBoard: () => [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
+  moves,
+  aiBotStrategy
 });
