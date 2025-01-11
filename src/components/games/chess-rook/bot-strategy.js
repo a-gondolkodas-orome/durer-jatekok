@@ -1,24 +1,13 @@
 'use strict';
 
-import { last, random, cloneDeep } from 'lodash';
-import { markVisitedFields, getAllowedMoves } from './helpers';
+import { last, random } from 'lodash';
 
-export const getGameStateAfterAiTurn = ({ board }) => {
+export const aiBotStrategy = ({ board, moves }) => {
   const aiMove = getOptimalAiMove(board);
-  return getGameStateAfterMove(board, aiMove);
+  moves.moveRook(board, aiMove);
 };
 
-export const getGameStateAfterMove = (board, { row, col }) => {
-  const nextBoard = cloneDeep(board);
-  markVisitedFields(nextBoard, nextBoard.rookPosition, { row, col });
-
-  nextBoard.chessBoard[row][col] = 'rook';
-  nextBoard.rookPosition = { row, col };
-
-  return { nextBoard, isGameEnd: getAllowedMoves(nextBoard).length === 0, winnerIndex: null };
-};
-
-const getOptimalAiMove = (board) => {
+export const getOptimalAiMove = (board) => {
   const { row, col } = board.rookPosition;
 
   const allowedHorizontalMoves = [];

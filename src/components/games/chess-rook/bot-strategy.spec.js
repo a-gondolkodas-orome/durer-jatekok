@@ -1,12 +1,12 @@
-import { getGameStateAfterAiTurn, getGameStateAfterMove } from './bot-strategy';
-import { generateStartBoard } from './helpers';
-import { isEqual } from 'lodash';
+import { getOptimalAiMove } from './bot-strategy';
+import { generateStartBoard, markVisitedFields } from './helpers';
+import { isEqual, cloneDeep } from 'lodash';
 
 describe('chess rook', () => {
   describe('getGameStateAfterAiTurn()', () => {
     it('should move to end of row or column as a first step', () => {
       const board = generateStartBoard();
-      const rookPosition = getGameStateAfterAiTurn({ board }).nextBoard.rookPosition;
+      const rookPosition = getOptimalAiMove(board);
       expect(
         isEqual(rookPosition, { row: 0, col: 7 }) ||
         isEqual(rookPosition, { row: 7, col: 0 })
@@ -15,8 +15,13 @@ describe('chess rook', () => {
 
     it('should create a narrow rectangle if possible', () => {
       const board = generateStartBoard();
-      const { nextBoard } = getGameStateAfterMove(board, { row: 0, col: 5 });
-      const rookPosition = getGameStateAfterAiTurn({ board: nextBoard }).nextBoard.rookPosition;
+
+      const nextBoard = cloneDeep(board);
+      markVisitedFields(nextBoard, nextBoard.rookPosition, { row: 0, col: 5 });
+      nextBoard.chessBoard[0][5] = 'rook';
+      nextBoard.rookPosition = { row: 0, col: 5 };
+
+      const rookPosition = getOptimalAiMove(nextBoard);
       expect(rookPosition).toEqual({ row: 7, col: 5 });
     });
   });
