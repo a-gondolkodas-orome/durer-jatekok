@@ -1,9 +1,12 @@
 import {
   getGameStateAfterMove,
-  getGameStateAfterAiTurn,
-  BISHOP, FORBIDDEN,
-  generateStartBoard
-} from './strategy';
+  getGameStateAfterAiTurn
+} from './bot-strategy';
+import {
+  generateStartBoard,
+  BISHOP,
+  FORBIDDEN
+} from './helpers'
 
 describe('test bishop strategy', () => {
   describe('getGameStateAfterMove', () => {

@@ -3,9 +3,14 @@ import { range, isEqual, some } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { ChessBishopSvg } from './chess-bishop-svg';
 import {
-  getGameStateAfterAiTurn, getGameStateAfterMove, getAllowedMoves, generateStartBoard,
-  BISHOP, FORBIDDEN
-} from './strategy/strategy';
+  getGameStateAfterAiTurn, getGameStateAfterMove
+} from './bot-strategy';
+import {
+  generateStartBoard,
+  getAllowedMoves,
+  BISHOP,
+  FORBIDDEN
+} from './helpers';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const [hoveredField, setHoveredField] = useState(null);

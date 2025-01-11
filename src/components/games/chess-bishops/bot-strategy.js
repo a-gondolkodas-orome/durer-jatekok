@@ -1,19 +1,16 @@
 'use strict';
 
-import { flatMap, range, sample, cloneDeep, random, shuffle } from 'lodash';
-
-export const generateStartBoard = () => {
-  return range(0, 8).map(() => range(0, 8).map(() => null));
-};
+import { sample, cloneDeep, random, shuffle } from 'lodash';
+import {
+  markForbiddenFields,
+  getAllowedMoves,
+  boardIndices,
+  BISHOP
+} from './helpers';
 
 const HORIZONTAL = "h";
 const VERTICAL = "v";
 let axis = null;
-
-const boardIndices = flatMap(range(0, 8), row => range(0, 8).map(col => ({ row, col })));
-
-export const BISHOP = 1;
-export const FORBIDDEN = 2;
 
 export const getGameStateAfterAiTurn = ({ board }) => {
   const aiMove = getOptimalAiMove(board);
@@ -77,27 +74,6 @@ const getOptimalAiMove = (board) => {
     }
   }
   return sample(allowedMoves);
-};
-
-export const getAllowedMoves = (board) => {
-  return boardIndices.filter(({ row, col }) => board[row][col] === null);
-};
-
-const markForbiddenFields = (board, { row, col }) => {
-  range(0, 8).forEach(i => {
-    if (row - i >= 0 && col - i >= 0) {
-      board[(row - i)][col - i] = FORBIDDEN;
-    }
-    if (row + i <= 7 && col + i <= 7) {
-      board[(row + i)][col + i] = FORBIDDEN;
-    }
-    if (row + i <= 7 && col - i >= 0) {
-      board[(row + i)][col - i] = FORBIDDEN;
-    }
-    if (row - i >= 0 && col + i <= 7) {
-      board[(row - i)][col + i] = FORBIDDEN;
-    }
-  });
 };
 
 // given board *after* your step, are you set up to win the game for sure?
