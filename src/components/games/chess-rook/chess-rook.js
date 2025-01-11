@@ -3,7 +3,7 @@ import { range, some, isEqual } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import {
   getAllowedMoves, getGameStateAfterAiTurn, getGameStateAfterMove, generateStartBoard
-} from './strategy/strategy';
+} from './strategy';
 import { ChessRookSvg } from './chess-rook-svg';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
