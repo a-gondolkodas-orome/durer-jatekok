@@ -1,31 +1,18 @@
 'use strict';
 
 import { sample, cloneDeep, random, shuffle } from 'lodash';
-import {
-  markForbiddenFields,
-  getAllowedMoves,
-  boardIndices,
-  BISHOP
-} from './helpers';
+import { markForbiddenFields, getAllowedMoves, boardIndices, BISHOP } from './helpers';
 
 const HORIZONTAL = "h";
 const VERTICAL = "v";
 let axis = null;
 
-export const getGameStateAfterAiTurn = ({ board }) => {
+export const aiBotStrategy = ({ board, moves }) => {
   const aiMove = getOptimalAiMove(board);
-  return getGameStateAfterMove(board, aiMove);
+  moves.placeBishop(board, aiMove);
 };
 
-export const getGameStateAfterMove = (board, { row, col }) => {
-  const nextBoard = cloneDeep(board);
-  markForbiddenFields(nextBoard, { row, col });
-  nextBoard[row][col] = BISHOP;
-
-  return { nextBoard, isGameEnd: getAllowedMoves(nextBoard).length === 0, winnerIndex: null };
-};
-
-const getOptimalAiMove = (board) => {
+export const getOptimalAiMove = (board) => {
   const allowedHMirrorMoves = boardIndices.filter(
     ({ row, col }) => board[row][col] === null && board[row][7 - col] === BISHOP
   );
