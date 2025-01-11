@@ -1,7 +1,7 @@
 import React from 'react';
 import { range, some, isEqual } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterAiTurn, getGameStateAfterMove } from './strategy';
+import { getGameStateAfterAiTurn, getGameStateAfterMove } from './bot-strategy';
 import { getAllowedMoves, generateStartBoard } from './helpers';
 import { ChessRookSvg } from './chess-rook-svg';
 
