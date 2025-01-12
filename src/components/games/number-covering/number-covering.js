@@ -1,19 +1,18 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, sum, sample } from 'lodash';
+import { range, sum, sample, cloneDeep } from 'lodash';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
 
   const clickNumber = (number) => {
-    if (ctx.shouldRoleSelectorMoveNext) {
-      let nextBoard = [...board];
-      nextBoard[number-1] = -1;
-      const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-      moves.setBoard(nextBoard);
-      events.endTurn();
-      if (isGameEnd) {
-        events.endGame({ winnerIndex });
-      }
+    if (!ctx.shouldRoleSelectorMoveNext) return;
+    const nextBoard = cloneDeep(board);
+    nextBoard[number-1] = -1;
+    const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
+    moves.setBoard(nextBoard);
+    events.endTurn();
+    if (isGameEnd) {
+      events.endGame({ winnerIndex });
     }
   };
 
