@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { aiBotStrategy } from './strategy';
+import { aiBotStrategy } from './bot-strategy';
 import { isAllowed, getAllowedSuperset, isGameEnd, vertices } from './helpers';
 import { cloneDeep } from 'lodash';
 
