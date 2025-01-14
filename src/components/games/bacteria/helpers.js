@@ -2,6 +2,80 @@
 
 import { cloneDeep, last } from "lodash";
 
+export const moves = {
+  defend: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+
+    nextBoard.bacteria[row][col] -= 1;
+    events.endTurn();
+
+    if (areAllBacteriaRemoved(nextBoard.bacteria)) {
+      events.endGame();
+    }
+
+    return { nextBoard };
+  },
+  shiftRight: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+
+    const reachedFields = [[row, col + 1]];
+    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
+    events.endTurn();
+
+    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
+    if (goalsReached.length >= 1) {
+      events.endGame();
+    }
+
+    return { nextBoard };
+  },
+  shiftLeft: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+
+    const reachedFields = [[row, col - 1]];
+    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
+    events.endTurn();
+
+    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
+    if (goalsReached.length >= 1) {
+      events.endGame();
+    }
+
+    return { nextBoard };
+  },
+  jump: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+
+    nextBoard.bacteria = makeJump(nextBoard.bacteria, row, col);
+    events.endTurn();
+
+    const reachedFields = [[row + 2, col]];
+    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
+    if (goalsReached.length >= 1) {
+      events.endGame();
+    }
+
+    return { nextBoard };
+  },
+  spread: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+
+    const reachedFields = reachedFieldsWithAttack(
+      "spread",
+      { bacteria: nextBoard.bacteria, attackRow: row, attackCol: col }
+    );
+    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
+    events.endTurn();
+
+    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
+    if (goalsReached.length >= 1) {
+      events.endGame();
+    }
+
+    return { nextBoard };
+  }
+};
+
 export const reachedFieldsWithAttack = (move, { bacteria, attackRow, attackCol }) => {
   if (move === "shiftRight") return [[attackRow, attackCol + 1]];
   if (move === "shiftLeft") return [[attackRow, attackCol - 1]];
