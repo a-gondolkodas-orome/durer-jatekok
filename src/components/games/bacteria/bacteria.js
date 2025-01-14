@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { range, cloneDeep, random } from "lodash";
 import { strategyGameFactory } from "../strategy-game";
-import { getGameStateAfterAiTurn } from "./strategy";
+import { getGameStateAfterAiTurn } from "./bot-strategy";
 import {
   isJump,
   reachedFieldsAfterClick,

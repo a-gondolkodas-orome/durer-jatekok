@@ -1,4 +1,4 @@
-import { getGameStateAfterAiTurn } from "./strategy";
+import { getGameStateAfterAiTurn } from "./bot-strategy";
 import { reverse, isEqual } from "lodash";
 
 describe('test ai strategy', () => {
