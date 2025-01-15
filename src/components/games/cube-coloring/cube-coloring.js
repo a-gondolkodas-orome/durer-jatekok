@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { range, cloneDeep, every, some, isNull } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { isAllowedStep, aiBotStrategy, allColors } from './bot-strategy';
+import { aiBotStrategy } from './bot-strategy';
+import { isAllowedStep, allColors } from './helpers';
 
 const generateStartBoard = () => Array(8).fill(null);
 
