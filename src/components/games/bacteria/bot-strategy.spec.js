@@ -35,30 +35,6 @@ describe('test ai strategy', () => {
       expect(aiDefense(board)).toEqual({ defenseRow: 2, defenseCol: 4 })
     });
 
-    // TODO:
-    // it('only removes one bacteria', () => {
-    //   const bacteria = reverse([
-    //     [2, 0, 0],
-    //       [0, 0],
-    //     [0, 0, 0]
-    //   ]);
-    //   const board = { bacteria, goals: [1] };
-    //   const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, ctx: { chosenRoleIndex: 0 } });
-    //   expect(nextBoard.bacteria[2][0]).toEqual(1);
-    //   expect(isGameEnd).toBe(false);
-    // });
-
-    // it('ends game if no more bacteria', () => {
-    //   const bacteria = reverse([
-    //     [1, 0, 0],
-    //       [0, 0],
-    //     [0, 0, 0]
-    //   ]);
-    //   const board = { bacteria, goals: [1] };
-    //   const { isGameEnd } = getGameStateAfterAiTurn({ board, ctx: { chosenRoleIndex: 0 } });
-    //   expect(isGameEnd).toBe(true);
-    // });
-
     it('removes a more dangerous bacteria even if no immediate threat', () => {
       const bacteria = reverse([
         [0, 0, 0, 0, 0],
@@ -188,62 +164,63 @@ describe('test ai strategy', () => {
       expect(aiAttack(board)).toEqual({ attackChoice: "spread", attackRow: 0, attackCol: 3 })
     });
 
-    // TODO:
-    // it('makes a valid move from a losing position', () => {
-    //   const bacteria = reverse([
-    //     [0, 0, 0],
-    //       [0, 0],
-    //     [0, 0, 1]
-    //   ]);
-    //   const board = { bacteria, goals: [1] }
+    it('makes a valid move from a losing position', () => {
+      const bacteria = reverse([
+        [0, 0, 0],
+          [0, 0],
+        [0, 0, 1]
+      ]);
+      const board = { bacteria, goals: [1] }
+      const attack = aiAttack(board);
 
-    //   const { nextBoard, isGameEnd } = getGameStateAfterAiTurn({ board, ctx: { chosenRoleIndex: 1 } });
+      const variantA = {
+        attackChoice: "jump",
+        attackRow: 0,
+        attackCol: 2
+      }
+      const variantB = {
+        attackChoice: "spread",
+        attackRow: 0,
+        attackCol: 2
+      };
+      const variantC = {
+        attackChoice: "shiftLeft",
+        attackRow: 0,
+        attackCol: 2
+      };
+      expect(
+        isEqual(attack, variantA) ||
+        isEqual(attack, variantB) ||
+        isEqual(attack, variantC)
+      ).toBe(true);
+    });
 
-    //   const variantA = reverse([
-    //     [0, 0, 0],
-    //       [0, 0],
-    //     [0, 1, 0]
-    //   ]);
-    //   const variantB = reverse([
-    //     [0, 0, 0],
-    //       [0, 1],
-    //     [0, 0, 0]
-    //   ]);
-    //   const variantC = reverse([
-    //     [0, 0, 1],
-    //       [0, 0],
-    //     [0, 0, 0]
-    //   ]);
-    //   expect(
-    //     isEqual(nextBoard.bacteria, variantA) ||
-    //     isEqual(nextBoard.bacteria, variantB) ||
-    //     isEqual(nextBoard.bacteria, variantC)
-    //   ).toBe(true);
-    //   expect(isGameEnd).toBe(false);
-    // });
+    it('attack with multiple bacteria if no dangerous one', () => {
+      const bacteria = reverse([
+        [0, 0, 0, 0, 0],
+          [2, 0, 0, 0],
+        [0, 0, 0, 0, 1]
+      ]);
+      const board = { bacteria, goals: [3] };
+      const attack = aiAttack(board);
+      expect(attack).toEqual({
+        attackChoice: "spread",
+        attackRow: 1,
+        attackCol: 0
+      })
+    });
 
-    // it('attack with multiple bacteria if no dangerous one', () => {
-    //   const bacteria = reverse([
-    //     [0, 0, 0, 0, 0],
-    //       [2, 0, 0, 0],
-    //     [0, 0, 0, 0, 1]
-    //   ]);
-    //   const board = { bacteria, goals: [3] };
-    //   const { nextBoard } = getGameStateAfterAiTurn({ board, ctx: { chosenRoleIndex: 1 } });
-    //   expect(nextBoard.bacteria[2][1]).toEqual(2);
-    // });
-
-    // it('should attack with closest dangerous bacteria', () => {
-    //   const bacteria = reverse([
-    //     [0, 0, 0, 0, 0],
-    //       [0, 1, 0, 0],
-    //     [0, 1, 0, 1, 0],
-    //       [0, 1, 1, 0],
-    //     [0, 0, 1, 0, 0]
-    //   ]);
-    //   const board = { bacteria, goals: [1, 2, 3] };
-    //   const { nextBoard } = getGameStateAfterAiTurn({ board, ctx: { chosenRoleIndex: 1 } });
-    //   expect(nextBoard.bacteria[4][2]).toEqual(1);
-    // });
+    it('should attack with closest dangerous bacteria', () => {
+      const bacteria = reverse([
+        [0, 0, 0, 0, 0],
+          [0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+          [0, 1, 1, 0],
+        [0, 0, 1, 0, 0]
+      ]);
+      const board = { bacteria, goals: [1, 2, 3] };
+      const { attackRow, attackCol } = aiAttack(board);
+      expect([attackRow, attackCol]).toEqual([3, 1])
+    });
   });
 });
