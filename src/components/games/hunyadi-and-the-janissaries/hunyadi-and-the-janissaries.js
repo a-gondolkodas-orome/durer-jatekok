@@ -6,7 +6,7 @@ import {
   generateStartBoard,
   getGameStateAfterKillingGroup,
   getGameStateAfterAiTurn
-} from './strategy/strategy';
+} from './strategy';
 import { cloneDeep } from 'lodash';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
