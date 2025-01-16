@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { CastleSvg } from './castle-svg';
-import { SoldierSvg } from './soldier-svg';
+import { CastleSvg } from './assets/castle-svg';
+import { SoldierSvg } from './assets/soldier-svg';
 import {
   generateStartBoard,
   getGameStateAfterKillingGroup,
