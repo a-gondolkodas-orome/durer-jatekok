@@ -3,10 +3,9 @@ import { strategyGameFactory } from '../strategy-game';
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import {
-  generateStartBoard,
-  getGameStateAfterKillingGroup,
   getGameStateAfterAiTurn
 } from './strategy';
+import { getGameStateAfterKillingGroup, generateStartBoard } from './helpers';
 import { cloneDeep } from 'lodash';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
