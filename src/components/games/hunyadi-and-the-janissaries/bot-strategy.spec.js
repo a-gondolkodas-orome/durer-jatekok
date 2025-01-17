@@ -1,6 +1,6 @@
 'use strict';
 
-import { getGameStateAfterAiTurn } from './strategy';
+import { getGameStateAfterAiTurn } from './bot-strategy';
 import { isEqual } from 'lodash';
 
 describe('HunyadiAndTheJanissaries strategy', () => {

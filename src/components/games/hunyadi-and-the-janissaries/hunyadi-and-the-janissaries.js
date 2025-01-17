@@ -4,7 +4,7 @@ import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import {
   getGameStateAfterAiTurn
-} from './strategy';
+} from './bot-strategy';
 import { getGameStateAfterKillingGroup, generateStartBoard } from './helpers';
 import { cloneDeep } from 'lodash';
 
