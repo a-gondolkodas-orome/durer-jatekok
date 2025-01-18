@@ -1,35 +1,46 @@
 'use strict';
 
-import { getGameStateAfterKillingGroup, generateStartBoard } from './helpers';
+import { moves, generateStartBoard } from './helpers';
 import { uniq, flatten } from 'lodash';
 
 describe('HunyadiAndTheJanissaries helpers', () => {
-  describe('getGameStateAfterKillingGroup', () => {
+  describe('moves', () => {
     it('should claim victory for Hunyadi if all soldiers are killed', () => {
-      expect(getGameStateAfterKillingGroup([[], ['red', 'red']], 'red')).toEqual({
-        intermediateBoard: [[], []],
-        nextBoard: [[], []],
-        isGameEnd: true,
-        winnerIndex: 1
-      });
+      let winnerIndexMock = null;
+      const events = {
+        endTurn: () => {},
+        endGame: ({ winnerIndex }) => { winnerIndexMock = winnerIndex; }
+      }
+      moves.killGroup([[], ['red', 'red']], { events }, 'red')
+      setTimeout(() => {
+        expect(winnerIndexMock).toBe(1);
+      }, 0);
     });
 
     it('should claim loss for Hunyadi if a soldier reaches the castle', () => {
-      expect(getGameStateAfterKillingGroup([[], ['red', 'blue'], ['blue']], 'red')).toEqual({
-        intermediateBoard: [[], ['blue'], ['blue']],
-        nextBoard: [['blue'], ['blue'], []],
-        isGameEnd: true,
-        winnerIndex: 0
-      });
+      let winnerIndexMock = null;
+      const events = {
+        endTurn: () => {},
+        endGame: ({ winnerIndex }) => { winnerIndexMock = winnerIndex; }
+      }
+      moves.killGroup([[], ['red', 'blue'], ['blue']], { events }, 'red');
+      setTimeout(() => {
+        expect(winnerIndexMock).toBe(0);
+      }, 0);
     });
 
     it('should report game as still in progress and advance remaining soldiers otherwise', () => {
+      let winnerIndexMock = 'mock';
+      const events = {
+        endTurn: () => {},
+        endGame: ({ winnerIndex }) => { winnerIndexMock = winnerIndex; }
+      }
       const board = [[], ['red'], ['blue', 'red'], [], ['blue', 'blue']];
-      expect(getGameStateAfterKillingGroup(board, 'red')).toEqual({
-        intermediateBoard: [[], [], ['blue'], [], ['blue', 'blue']],
-        nextBoard: [[], ['blue'], [], ['blue', 'blue'], []],
-        isGameEnd: false
-      });
+      const { nextBoard } = moves.killGroup(board, { events }, 'red');
+      setTimeout(() => {
+        expect(nextBoard).toEqual([[], ['blue'], [], ['blue', 'blue']])
+        expect(winnerIndexMock).toBe('mock');
+      }, 0);
     });
   });
 

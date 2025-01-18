@@ -1,35 +1,41 @@
 'use strict';
 
-import { random, cloneDeep } from 'lodash';
-import { getGameStateAfterKillingGroup } from './helpers';
+import { random } from 'lodash';
 
-export const getGameStateAfterAiTurn = ({ board, ctx }) => {
+export const aiBotStrategy = ({ board, ctx, moves }) => {
   if (ctx.chosenRoleIndex === 0) {
     const optimalGroupToKill = getOptimalGroupToKill(board);
-    return getGameStateAfterKillingGroup(board, optimalGroupToKill);
+    const { nextBoard, isGameEnd } = moves.killGroup(board, optimalGroupToKill);
+    if (!isGameEnd) {
+      setTimeout(() => {
+        moves.stepUp(nextBoard);
+      }, 750);
+    }
   } else {
-    return { nextBoard: colorBoardOptimally(board), isGameEnd: false };
+    const soldiers = getOptimalSoldierGroups(board);
+    const { nextBoard } = moves.setGroupOfSoldiers(board, soldiers);
+    moves.finalizeSeparation(nextBoard);
   }
 };
 
-const colorBoardOptimally = (board) => {
+export const getOptimalSoldierGroups = (board) => {
   const groupScores = { blue: 0, red: 0 };
   const firstColor = random(0, 1) === 1 ? 'red' : 'blue';
   const secondColor = firstColor === 'blue' ? 'red' : 'blue';
-  const nextBoard = cloneDeep(board);
+  const soldierGroups = [];
 
-  for (let i = 1; i < nextBoard.length; i++) {
-    for (let j = 0; j < nextBoard[i].length; j++) {
+  for (let i = 1; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
       const nextGroup = groupScores[firstColor] < groupScores[secondColor] ? firstColor : secondColor;
-      nextBoard[i][j] = nextGroup;
+      soldierGroups.push({ rowIndex: i, pieceIndex: j, group: nextGroup });
       groupScores[nextGroup] += (1 / 2) ** (i - 1);
     }
   }
 
-  return nextBoard;
+  return soldierGroups;
 };
 
-const getOptimalGroupToKill = (board) => {
+export const getOptimalGroupToKill = (board) => {
   if (board[1].length > 0) {
     return board[1][0];
   }

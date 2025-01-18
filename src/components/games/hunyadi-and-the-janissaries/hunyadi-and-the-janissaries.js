@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
-import {
-  getGameStateAfterAiTurn
-} from './bot-strategy';
-import { getGameStateAfterKillingGroup, generateStartBoard } from './helpers';
-import { cloneDeep } from 'lodash';
+import { aiBotStrategy } from './bot-strategy';
+import { generateStartBoard, moves } from './helpers';
 
-const BoardClient = ({ board, ctx, events, moves }) => {
+const BoardClient = ({ board, ctx, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const isPlayerSultan = ctx.chosenRoleIndex === 0;
@@ -26,27 +23,18 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     if (!ctx.shouldRoleSelectorMoveNext) return;
 
     if (isPlayerSultan) {
-      const nextBoard = cloneDeep(board);
-      nextBoard[rowIndex][pieceIndex] = board[rowIndex][pieceIndex] === 'blue' ? 'red' : 'blue';
-      moves.setBoard(nextBoard);
+      const group = board[rowIndex][pieceIndex] === 'red' ? 'blue' : 'red';
+      moves.setGroupOfSoldiers(board, [{ rowIndex, pieceIndex, group }]);
     } else {
       const group = board[rowIndex][pieceIndex];
-      const { nextBoard, intermediateBoard, isGameEnd, winnerIndex } = getGameStateAfterKillingGroup(board, group);
-      moves.setBoard(intermediateBoard);
-      setTimeout(() => {
-        moves.setBoard(nextBoard);
-        events.endTurn();
-        if (isGameEnd) {
-          events.endGame({ winnerIndex });
-        }
-      }, 750);
+      const { nextBoard, isGameEnd } = moves.killGroup(board, group);
+      if (!isGameEnd) {
+        setTimeout(() => {
+          moves.stepUp(nextBoard);
+        }, 750)
+      }
     }
   };
-
-  const finishSeparation = () => {
-    moves.setBoard(board);
-    events.endTurn();
-  }
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
@@ -104,7 +92,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
         <button
           className="cta-button"
           disabled={!ctx.shouldRoleSelectorMoveNext}
-          onClick={finishSeparation}
+          onClick={() => moves.finalizeSeparation(board)}
         >
           Befejezem a kettéosztást
         </button>
@@ -135,5 +123,6 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,
-  getGameStateAfterAiTurn
+  moves,
+  aiBotStrategy
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-import { random, flatten, cloneDeep, sum } from 'lodash';
+import { random, flatten, cloneDeep, sum, _, remove, tail } from 'lodash';
 
 export const generateStartBoard = () => {
   // this code is not 50% Hunyadi - 50% Szultan winnin position generator,
@@ -43,32 +43,34 @@ export const generateStartBoard = () => {
   return [[], ...board];
 };
 
-export const getGameStateAfterKillingGroup = (board, group) => {
-  let isGameEnd = false;
-  let hasFirstPlayerWon = undefined;
-  const intermediateBoard = cloneDeep(board);
-  const nextBoard = cloneDeep(board);
+export const moves = {
+  killGroup: (board, { events }, group) => {
+    const nextBoard = board.map(row => remove(row, soldier => soldier !== group))
 
-  for (let i = 1; i < nextBoard.length; i++) {
-    const remainingSoldiersInRow = nextBoard[i].filter((soldier) => soldier !== group);
-    if (remainingSoldiersInRow.length > 0) {
-      if (i === 1) {
-        isGameEnd = true;
-        hasFirstPlayerWon = true;
-      }
-      nextBoard[i - 1].push(...remainingSoldiersInRow);
+    const isGameEnd = flatten(nextBoard).length === 0;
+    if (isGameEnd) {
+      events.endTurn();
+      events.endGame({ winnerIndex: 1 });
     }
-    intermediateBoard[i] = remainingSoldiersInRow;
-    nextBoard[i] = [];
+    return { nextBoard, isGameEnd };
+  },
+  finalizeSeparation: (board, { events }) => {
+    events.endTurn();
+    return { nextBoard: board };
+  },
+  setGroupOfSoldiers: (board, _, soldiers) => {
+    const nextBoard = cloneDeep(board);
+    for (const soldier of soldiers) {
+      nextBoard[soldier.rowIndex][soldier.pieceIndex] = soldier.group;
+    }
+    return { nextBoard };
+  },
+  stepUp: (board, { events }) => {
+    const nextBoard = [...tail(board), []];
+    events.endTurn();
+    if (nextBoard[0].length > 0) {
+      events.endGame({ winnerIndex: 0 });
+    }
+    return { nextBoard };
   }
-
-  if (flatten(nextBoard).length === 0 && !isGameEnd) {
-    isGameEnd = true;
-    hasFirstPlayerWon = false;
-  }
-  if (isGameEnd) {
-    return { nextBoard, intermediateBoard, isGameEnd, winnerIndex: hasFirstPlayerWon ? 0 : 1 };
-  } else {
-    return { nextBoard, intermediateBoard, isGameEnd };
-  }
-};
+}
