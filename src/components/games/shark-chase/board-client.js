@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
-import { getGameStateAfterMove } from './strategy';
+import { getGameStateAfterMove } from './helpers';
 import { SharkSvg } from './assets/shark-chase-shark-svg';
 import { SubmarineSvg } from './assets/shark-chase-submarine-svg';
 

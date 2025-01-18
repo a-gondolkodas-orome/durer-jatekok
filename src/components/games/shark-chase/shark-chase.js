@@ -1,6 +1,6 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterAiTurn } from './strategy';
+import { getGameStateAfterAiTurn } from './bot-strategy';
 import { BoardClient } from './board-client';
 
 const generateStartBoard = () => {
