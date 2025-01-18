@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 import { getGameStateAfterMove, getGameStateAfterAiTurn } from './strategy';
-import { SharkSvg } from './shark-chase-shark-svg';
-import { SubmarineSvg } from './shark-chase-submarine-svg';
-
+import { SharkSvg } from './assets/shark-chase-shark-svg';
+import { SubmarineSvg } from './assets/shark-chase-submarine-svg';
 
 export const generateStartBoard = () => {
   return {
@@ -12,7 +11,7 @@ export const generateStartBoard = () => {
     shark: 12,
     turn: 1
   };
-}
+};
 
 const distance = (fieldA, fieldB) => {
   if (fieldA === null || fieldB === null) return null;
