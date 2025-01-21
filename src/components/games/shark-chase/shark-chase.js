@@ -7,7 +7,8 @@ const generateStartBoard = () => {
   return {
     submarines: [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     shark: 12,
-    turn: 1
+    turn: 1,
+    sharkMovesInTurn: 0
   };
 };
 
@@ -25,14 +26,14 @@ const rule = <>
   nyer, ha még a 11. nap végén is szabad.
 </>;
 
-const getPlayerStepDescription = ({ ctx: { chosenRoleIndex, turnStage } }) => {
+const getPlayerStepDescription = ({ board, ctx: { chosenRoleIndex } }) => {
   if (chosenRoleIndex === 0) {
     return 'Válassz ki egy tengeralattjárót, majd válassz egy szomszédos szektort.'
   }
   return <>Válassz ki egy cápával oldalszomszédos szektort. Kattints a cápára,
     ha helyben szeretnél maradni.
     <br />
-    Ebben a lépésben még legfeljebb <b>{turnStage === 'firstSharkMove' ? 'kétszer' : 'egyszer'} </b>
+    Ebben a lépésben még legfeljebb <b>{board.sharkMovesInTurn === 0 ? 'kétszer' : 'egyszer'} </b>
     úszhatsz át egy szomszédos szektorba.
   </>;
 };
@@ -41,7 +42,6 @@ export const SharkChase = strategyGameFactory({
   rule,
   title: 'Cápa üldözés',
   roleLabels: ['Kutató leszek!', 'Cápa leszek!'],
-  initialTurnStages: ['choosePiece', 'firstSharkMove'],
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,
