@@ -1,19 +1,19 @@
 'use strict';
 
-import { cloneDeep, sample } from 'lodash';
-import { getGameStateAfterMove } from './helpers';
+import { sample } from 'lodash';
 
-export const getGameStateAfterAiTurn = ({ board, ctx }) => {
-  const nextBoard = cloneDeep(board);
-
+export const aiBotStrategy = ({ board, ctx, moves }) => {
   if (ctx.chosenRoleIndex === 0) {
-    nextBoard.shark = getNextSharkPositionByAI(board.submarines, board.shark);
+    const finalPos = getNextSharkPositionByAI(board.submarines, board.shark);
+    const firstPos = getIntermediateSharkPosition(board.submarines, board.shark, finalPos);
+    const { nextBoard } = moves.moveShark(board, firstPos);
+    setTimeout(() => {
+      moves.moveShark(nextBoard, finalPos);
+    }, firstPos === finalPos ? 0 : 750);
   } else {
     const { from, to } = getOptimalSubmarineMoveByAi(board);
-    nextBoard.submarines[from] -= 1;
-    nextBoard.submarines[to] += 1;
+    moves.moveSubmarine(board, { from, to });
   }
-  return getGameStateAfterMove(nextBoard);
 };
 
 const getOptimalSubmarineMoveByAi = (board) => {
@@ -139,12 +139,35 @@ const isReachableWithoutDeath = (submarines, shark, id) => {
     if (id === shark + 2 && submarines[shark + 1] >= 1) return false;
     if (id === shark + 8 && submarines[shark + 4] >= 1) return false;
     if (id === shark - 8 && submarines[shark - 4] >= 1) return false;
+    // TODO: shouldn't this be && ?? if both has submarine, it is not reachable
+    // if either does not have submarine, it is reachable to one direction
+    // but this may not have consequence on game :thinking_face:
     if (id === shark - 5 && (submarines[shark - 4] >= 1 || submarines[shark - 1] >= 1)) return false;
     if (id === shark + 3 && (submarines[shark + 4] >= 1 || submarines[shark - 1] >= 1)) return false;
     if (id === shark + 5 && (submarines[shark + 4] >= 1 || submarines[shark + 1] >= 1)) return false;
     if (id === shark - 3 && (submarines[shark - 4] >= 1 || submarines[shark + 1] >= 1)) return false;
   }
   return true;
+}
+
+const getIntermediateSharkPosition = (submarines, shark, id) => {
+  if (id === shark - 2) return shark - 1;
+  if (id === shark + 2) return shark + 1;
+  if (id === shark + 8) return shark + 4;
+  if (id === shark - 8) return shark - 4;
+  if (id === shark - 5 && submarines[shark - 4] >= 1) return shark - 1;
+  if (id === shark + 3 && submarines[shark + 4] >= 1) return shark - 1;
+  if (id === shark + 5 && submarines[shark + 4] >= 1) return shark + 1;
+  if (id === shark - 3 && submarines[shark - 4] >= 1) return shark + 1;
+  if (id === shark - 5 && submarines[shark - 1] >= 1) return shark - 4;
+  if (id === shark + 3 && submarines[shark - 1] >= 1) return shark + 4;
+  if (id === shark + 5 && submarines[shark + 1] >= 1) return shark + 4;
+  if (id === shark - 3 && submarines[shark + 1] >= 1) return shark - 4;
+  if (id === shark - 5) return shark - 4;
+  if (id === shark + 3) return shark + 4;
+  if (id === shark + 5) return shark + 4;
+  if (id === shark - 3) return shark - 4;
+  return id;
 }
 
 // osszefuggosegi komponensek a tengeralattjarokkal nem kozvetlen szomszedos mezokbol

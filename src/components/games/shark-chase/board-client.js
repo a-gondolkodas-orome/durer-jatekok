@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { range, cloneDeep } from 'lodash';
-import { getGameStateAfterMove } from './helpers';
+import { range } from 'lodash';
 import { SharkSvg } from './assets/shark-chase-shark-svg';
 import { SubmarineSvg } from './assets/shark-chase-submarine-svg';
 
-export const BoardClient = ({ board, ctx, events, moves }) => {
+export const BoardClient = ({ board, ctx, moves }) => {
   const [chosenPiece, setChosenPiece] = useState(null);
 
   let possibleMoves=[]
@@ -34,57 +33,20 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
       if (chosenPiece === null) {
         if (!isAllowed_choosePiece(id)) return;
         setChosenPiece(id)
-      } else if (chosenPiece !== null) {
+      } else {
         if (!isAllowed_movePiece(id)) {
           if (id === chosenPiece) {
             setChosenPiece(null);
           }
           return;
         };
-        const nextBoard = cloneDeep(board);
-        nextBoard.submarines[chosenPiece] -= 1;
-        nextBoard.submarines[id] += 1;
-        nextBoard.turn += 1;
+        moves.moveSubmarine(board, { from: chosenPiece, to: id });
         setChosenPiece(null);
-        moves.setBoard(nextBoard);
-        const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-        events.endTurn();
-        if (isGameEnd) {
-          events.endGame({ winnerIndex });
-        }
       }
     }
     if (ctx.chosenRoleIndex === 1) {
       if (!isAllowed_movePiece(id)) return;
-      const nextBoard = cloneDeep(board);
-      nextBoard.shark = id;
-      if (nextBoard.sharkMovesInTurn === 0) {
-        if (nextBoard.submarines[id] >= 1) {
-          // instant lose
-          moves.setBoard(nextBoard);
-          const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-          events.endTurn();
-          if (isGameEnd) {
-            events.endGame({ winnerIndex });
-          }
-          return;
-        }
-        if (id !== board.shark) {
-          nextBoard.sharkMovesInTurn = 1;
-          moves.setBoard(nextBoard);
-          return;
-        }
-      }
-
-      nextBoard.turn += 1;
-      setChosenPiece(null);
-      nextBoard.sharkMovesInTurn = 0;
-      moves.setBoard(nextBoard);
-      const { isGameEnd, winnerIndex } = getGameStateAfterMove(nextBoard);
-      events.endTurn();
-      if (isGameEnd) {
-        events.endGame({ winnerIndex });
-      }
+      moves.moveShark(board, id);
     }
   };
 
