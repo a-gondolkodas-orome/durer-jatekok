@@ -7,9 +7,11 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
     const finalPos = getNextSharkPositionByAI(board.submarines, board.shark);
     const firstPos = getIntermediateSharkPosition(board.submarines, board.shark, finalPos);
     const { nextBoard } = moves.moveShark(board, firstPos);
-    setTimeout(() => {
-      moves.moveShark(nextBoard, finalPos);
-    }, firstPos === finalPos ? 0 : 750);
+    if (finalPos !== board.shark) {
+      setTimeout(() => {
+        moves.moveShark(nextBoard, finalPos);
+      }, firstPos === finalPos ? 0 : 750);
+    }
   } else {
     const { from, to } = getOptimalSubmarineMoveByAi(board);
     moves.moveSubmarine(board, { from, to });
