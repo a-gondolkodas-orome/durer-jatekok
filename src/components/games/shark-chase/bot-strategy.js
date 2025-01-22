@@ -141,13 +141,10 @@ const isReachableWithoutDeath = (submarines, shark, id) => {
     if (id === shark + 2 && submarines[shark + 1] >= 1) return false;
     if (id === shark + 8 && submarines[shark + 4] >= 1) return false;
     if (id === shark - 8 && submarines[shark - 4] >= 1) return false;
-    // TODO: shouldn't this be && ?? if both has submarine, it is not reachable
-    // if either does not have submarine, it is reachable to one direction
-    // but this may not have consequence on game :thinking_face:
-    if (id === shark - 5 && (submarines[shark - 4] >= 1 || submarines[shark - 1] >= 1)) return false;
-    if (id === shark + 3 && (submarines[shark + 4] >= 1 || submarines[shark - 1] >= 1)) return false;
-    if (id === shark + 5 && (submarines[shark + 4] >= 1 || submarines[shark + 1] >= 1)) return false;
-    if (id === shark - 3 && (submarines[shark - 4] >= 1 || submarines[shark + 1] >= 1)) return false;
+    if (id === shark - 5 && (submarines[shark - 4] >= 1 && submarines[shark - 1] >= 1)) return false;
+    if (id === shark + 3 && (submarines[shark + 4] >= 1 && submarines[shark - 1] >= 1)) return false;
+    if (id === shark + 5 && (submarines[shark + 4] >= 1 && submarines[shark + 1] >= 1)) return false;
+    if (id === shark - 3 && (submarines[shark - 4] >= 1 && submarines[shark + 1] >= 1)) return false;
   }
   return true;
 }
