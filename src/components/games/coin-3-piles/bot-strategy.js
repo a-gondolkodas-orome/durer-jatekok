@@ -1,19 +1,19 @@
 import { findIndex } from 'lodash';
-import { isGameEnd } from './helpers';
 
-export const getGameStateAfterAiTurn = ({ board }) => {
-  const nextBoard = [...board];
-  const oddPiles = [0, 1, 2].filter(i => nextBoard[i] % 2 === 1);
+export const aiBotStrategy = ({ board, moves }) => {
+  const oddPiles = [1, 2, 3].filter(i => board[i - 1] % 2 === 1);
 
   if (oddPiles.length === 3 || oddPiles.length === 0) {
-    nextBoard[findIndex(nextBoard, i => i > 0)] -= 1;
+    const valueToRemove = findIndex(board, i => i > 0) + 1;
+    moves.removeCoin(board, valueToRemove);
   }
   if (oddPiles.length === 2) {
-    nextBoard[oddPiles[1]] -= 1;
-    nextBoard[oddPiles[0]] += 1;
+    const { nextBoard } = moves.removeCoin(board, oddPiles[1]);
+    setTimeout(() => {
+      moves.addCoin(nextBoard, oddPiles[0]);
+    }, 750)
   }
   if (oddPiles.length === 1) {
-    nextBoard[oddPiles[0]] -= 1;
+    moves.removeCoin(board, oddPiles[0]);
   }
-  return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
 };

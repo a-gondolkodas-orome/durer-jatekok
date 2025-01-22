@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { range } from 'lodash';
-import { isGameEnd  } from './helpers';
 
-export const BoardClient = ({ board, ctx, events, moves }) => {
+export const BoardClient = ({ board, ctx, moves }) => {
   const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState(null);
   const [hoveredPile, setHoveredPile] = useState(null);
 
@@ -11,7 +10,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
   const isRemovalAllowed = coinValue => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
     if (wasCoinAlreadyRemovedInTurn) return false;
-    return board[coinValue] !== 0;
+    return board[coinValue - 1] !== 0;
   };
 
   const isAddAllowed = coinValue => {
@@ -21,59 +20,36 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
   };
 
   const undoCoinRemoval = () => {
-    const nextBoard = [...board];
-    nextBoard[valueOfRemovedCoin] += 1;
-    moves.setBoard(nextBoard);
-    events.setTurnStage(null);
+    moves.undoRemoveCoin(board, valueOfRemovedCoin);
     setValueOfRemovedCoin(null);
   };
 
   const removeFromPile = coinValue => {
     if (!isRemovalAllowed(coinValue)) return;
-
     setValueOfRemovedCoin(coinValue);
-    events.setTurnStage('placeBack');
-    const nextBoard = [...board];
-    nextBoard[coinValue] -= 1;
-    moves.setBoard(nextBoard);
-    if (coinValue === 0) endTurn(nextBoard);
+    moves.removeCoin(board, coinValue);
   };
 
-  const addToPile = (coinValue) => {
+  const addToPile = coinValue => {
     if (!isAddAllowed(coinValue)) return;
-
-    const nextBoard = [...board];
-    nextBoard[coinValue] += 1;
-    endTurn(nextBoard);
-  };
-
-  const resetTurnState = () => {
-    setHoveredPile(null);
     setValueOfRemovedCoin(null);
-    events.setTurnStage(null);
+    moves.addCoin(board, coinValue);
   };
-  const endTurn = (nextBoard) => {
-    moves.setBoard(nextBoard);
-    events.endTurn();
-    if (isGameEnd(nextBoard)) {
-      events.endGame();
-    }
-    resetTurnState();
-  };
+
   const getCoinBgColor = (coinValue) => {
-    if (coinValue === 0) return 'bg-yellow-700';
-    if (coinValue === 1) return 'bg-slate-500';
+    if (coinValue === 1) return 'bg-yellow-700';
+    if (coinValue === 2) return 'bg-slate-500';
     return 'bg-yellow-400';
   };
   const getCoinShadowColor = (coinValue) => {
-    if (coinValue === 0) return 'shadow-yellow-700';
-    if (coinValue === 1) return 'shadow-slate-500';
+    if (coinValue === 1) return 'shadow-yellow-700';
+    if (coinValue === 2) return 'shadow-slate-500';
     return 'shadow-yellow-400';
   };
   const shouldShowCoinToBeRemoved = (coinValue) => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
     if (wasCoinAlreadyRemovedInTurn) return false;
-    return coinValue === hoveredPile && board[coinValue] !== 0;
+    return coinValue === hoveredPile && board[coinValue - 1] !== 0;
   };
   const shouldShowCoinToBeAdded = (coinValue) => {
     if (!wasCoinAlreadyRemovedInTurn) return false;
@@ -83,16 +59,16 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
     <div className="text-center" style={{ transform: 'scaleY(-1)' }}>
-    {[0, 1, 2].map(coinValue => (
+    {[1, 2, 3].map(coinValue => (
       <span key={coinValue}>
-        {range(board[coinValue]).map(i => (
+        {range(board[coinValue - 1]).map(i => (
           <button
             key={`${i}-${shouldShowCoinToBeAdded(coinValue)}`}
             disabled={!isRemovalAllowed(coinValue)}
             className={`
               w-[15%] aspect-square inline-block rounded-full mr-0.5 mt-1
               ${getCoinBgColor(coinValue)} shadow-md ${getCoinShadowColor(coinValue)}
-              ${shouldShowCoinToBeRemoved(coinValue) && i === (board[coinValue] - 1) ? 'opacity-50' : ''}
+              ${shouldShowCoinToBeRemoved(coinValue) && i === (board[coinValue - 1] - 1) ? 'opacity-50' : ''}
             `}
             style={{ transform: 'scaleY(-1)' }}
             onClick={() => removeFromPile(coinValue)}
@@ -100,7 +76,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
             onMouseOut={() => setHoveredPile(null)}
             onFocus={() => {if (!wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
             onBlur={() => setHoveredPile(null)}
-          >{coinValue+1}</button>
+          >{coinValue}</button>
         ))}
         {shouldShowCoinToBeAdded(coinValue) && (
           <button
@@ -111,7 +87,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
               ${getCoinBgColor(coinValue)} shadow-md ${getCoinShadowColor(coinValue)}
             `}
             style={{ transform: 'scaleY(-1)' }}
-          >{coinValue+1}</button>
+          >{coinValue}</button>
         )}
       </span>))}
     </div>
@@ -121,14 +97,14 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
         <tr>
           <td key="nothing" className="px-2">
             <button
-              disabled={!isAddAllowed(0)}
+              disabled={!isAddAllowed(1)}
               className="cta-button text-sm px-1"
-              onClick={() => endTurn(board)}
+              onClick={() => moves.addCoin(board, null)}
             >
               Semmit se rakok be
             </button>
           </td>
-          {[0, 1].map(coinValue =>
+          {[1, 2].map(coinValue =>
             <td key={coinValue} className="text-center">
               <button
                 disabled={!isAddAllowed(coinValue)}
@@ -142,7 +118,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
                 onMouseOut={() => setHoveredPile(null)}
                 onFocus={() => {if (wasCoinAlreadyRemovedInTurn) setHoveredPile(coinValue)}}
                 onBlur={() => setHoveredPile(null)}
-              >{coinValue+1}</button>
+              >{coinValue}</button>
             </td>
           )}
         </tr>
