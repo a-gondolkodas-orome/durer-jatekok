@@ -1,8 +1,9 @@
 import React from 'react';
 import { random, sum } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterAiTurn, isWinningState  } from './strategy';
-import { BoardClient, getPlayerStepDescription } from './coin-3-piles';
+import { getGameStateAfterAiTurn  } from './bot-strategy';
+import { BoardClient } from './board-client';
+import { getPlayerStepDescription, isWinningState } from './helpers';
 
 const generateStartBoard = () => {
   if (random(0, 1)) {

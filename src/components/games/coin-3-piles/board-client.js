@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { range } from 'lodash';
-import { isGameEnd  } from './strategy';
+import { isGameEnd  } from './helpers';
 
 export const BoardClient = ({ board, ctx, events, moves }) => {
   const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState(null);
@@ -158,11 +158,4 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
     </button>
   </section>
   );
-};
-
-export const getPlayerStepDescription = ({ ctx: { turnStage } }) => {
-  if (turnStage === 'placeBack') {
-    return 'Kattints egy érmére a kupac alatt, hogy visszatégy egy olyan pénzérmét.';
-  }
-  return 'Kattints egy érmére, hogy elvegyél egy olyan pénzérmét.';
 };

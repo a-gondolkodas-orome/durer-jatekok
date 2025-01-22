@@ -1,4 +1,4 @@
-import { getGameStateAfterAiTurn } from './strategy';
+import { getGameStateAfterAiTurn } from './bot-strategy';
 
 describe('coin123 strategy', () => {
   describe('getGameStateAfterAiTurn', () => {

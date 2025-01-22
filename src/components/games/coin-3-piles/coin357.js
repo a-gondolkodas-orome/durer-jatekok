@@ -1,7 +1,8 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { getGameStateAfterAiTurn  } from './strategy';
-import { BoardClient, getPlayerStepDescription } from './coin-3-piles';
+import { getGameStateAfterAiTurn  } from './bot-strategy';
+import { BoardClient } from './board-client';
+import { getPlayerStepDescription } from './helpers';
 
 const rule = <>
   Egy kupacban 3 darab 1, 5 darab 2 és 7 darab 3 pengős érme van. Egy lépésben az

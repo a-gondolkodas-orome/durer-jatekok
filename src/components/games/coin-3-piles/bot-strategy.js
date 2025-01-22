@@ -1,4 +1,5 @@
 import { findIndex } from 'lodash';
+import { isGameEnd } from './helpers';
 
 export const getGameStateAfterAiTurn = ({ board }) => {
   const nextBoard = [...board];
@@ -16,11 +17,3 @@ export const getGameStateAfterAiTurn = ({ board }) => {
   }
   return { nextBoard, isGameEnd: isGameEnd(nextBoard), winnerIndex: null };
 };
-
-export const isWinningState = ({ board }) => {
-  const oddPiles = [0, 1, 2].filter(i => board[i] % 2 === 1);
-
-  return (oddPiles.length === 3 || oddPiles.length === 0);
-}
-
-export const isGameEnd = (nextBoard) => nextBoard[0] === 0 && nextBoard[1] === 0 && nextBoard[2] === 0;
