@@ -26,15 +26,26 @@ export const BoardClient = ({ board, ctx, moves }) => {
 
   const removeFromPile = coinValue => {
     if (!isRemovalAllowed(coinValue)) return;
-    setValueOfRemovedCoin(coinValue);
+    if (coinValue !== 1) {
+      setValueOfRemovedCoin(coinValue);
+    } else {
+      setHoveredPile(null);
+    }
     moves.removeCoin(board, coinValue);
   };
 
   const addToPile = coinValue => {
     if (!isAddAllowed(coinValue)) return;
     setValueOfRemovedCoin(null);
+    setHoveredPile(null);
     moves.addCoin(board, coinValue);
   };
+
+  const passAddition = () => {
+    setValueOfRemovedCoin(null);
+    setHoveredPile(null);
+    moves.addCoin(board, null);
+  }
 
   const getCoinBgColor = (coinValue) => {
     if (coinValue === 1) return 'bg-yellow-700';
@@ -99,7 +110,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
             <button
               disabled={!isAddAllowed(1)}
               className="cta-button text-sm px-1"
-              onClick={() => moves.addCoin(board, null)}
+              onClick={passAddition}
             >
               Semmit se rakok be
             </button>

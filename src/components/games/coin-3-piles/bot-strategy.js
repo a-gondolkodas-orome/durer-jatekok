@@ -5,7 +5,12 @@ export const aiBotStrategy = ({ board, moves }) => {
 
   if (oddPiles.length === 3 || oddPiles.length === 0) {
     const valueToRemove = findIndex(board, i => i > 0) + 1;
-    moves.removeCoin(board, valueToRemove);
+    const { nextBoard } = moves.removeCoin(board, valueToRemove);
+    if (valueToRemove !== 1) {
+      setTimeout(() => {
+        moves.addCoin(nextBoard, null);
+      }, 0)
+    }
   }
   if (oddPiles.length === 2) {
     const { nextBoard } = moves.removeCoin(board, oddPiles[1]);
@@ -14,6 +19,11 @@ export const aiBotStrategy = ({ board, moves }) => {
     }, 750)
   }
   if (oddPiles.length === 1) {
-    moves.removeCoin(board, oddPiles[0]);
+    const { nextBoard } = moves.removeCoin(board, oddPiles[0]);
+    if (oddPiles[0] !== 1) {
+      setTimeout(() => {
+        moves.addCoin(nextBoard, null);
+      }, 0)
+    }
   }
 };
