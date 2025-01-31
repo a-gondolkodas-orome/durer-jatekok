@@ -22,6 +22,13 @@ const BoardClient = ({ board, ctx, moves }) => {
     moves.rob(board, index);
   }
 
+  const getBankColor = index => {
+    if (index === board.lastMove) return "fill-red-800 stroke-red-600";
+    if (board.circle[index] === false) return "fill-red-800";
+    if (!isAllowedBank(index)) return "fill-gray-400";
+    return "fill-emerald-600";
+  }
+
   return(
     <section className="p-2 shrink-0 grow basis-2/3">
       <svg width="100%" height="100%" viewBox='0 0 110 110'>
@@ -29,9 +36,9 @@ const BoardClient = ({ board, ctx, moves }) => {
         range(board.circle.length).map(index => (
           <line
           key={`${index-1}-${index}`}
+          className="stroke-gray-600"
           x1={55+50*Math.cos(getAngle(index))} y1={55+50*Math.sin(getAngle(index))}
           x2={55+50*Math.cos(getAngle(index-1))} y2={55+50*Math.sin(getAngle(index-1))}
-          stroke = {(board.circle.at(index-1) && board.circle.at(index)) ? "green" : "red"}
           strokeWidth={1.5}
           />
         ))}
@@ -40,8 +47,7 @@ const BoardClient = ({ board, ctx, moves }) => {
         key={index}
         cx={55+50*Math.cos(getAngle(index))} cy={55+50*Math.sin(getAngle(index))}
         r="4%"
-        fill={index === board.lastMove ? "white" : (isAllowedBank(index) ? "green" : "red")}
-        stroke={index === board.lastMove ? "red" : "none"}
+        className={`${getBankColor(index)}`}
         strokeWidth={index === board.lastMove ? "1%" : "0"}
         onClick={() => clickBank(index)}
         onKeyUp={(event) => {
