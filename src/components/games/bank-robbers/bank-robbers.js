@@ -1,11 +1,12 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, cloneDeep, sample, random } from 'lodash';
+import { range, cloneDeep, random } from 'lodash';
+import { aiBotStrategy } from './bot-strategy';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const getAngle = (index) => {
     const step = Math.PI*2/board.circle.length;
-    return index*step;
+    return index*step + (board.firstMove === null ? 0 : board.firstMove*step);
   };
 
   const isAllowedMove = index => {
@@ -64,8 +65,13 @@ const BoardClient = ({ board, ctx, moves }) => {
 const moves = {
   rob: (board, { events }, index) => {
     const nextBoard = cloneDeep(board);
-    nextBoard.lastMove = index;
-    nextBoard.circle[index] = false;
+    // so that ai strategy can be simpler: first move is always the same
+    const transformedMove = board.firstMove === null ? 0 : index;
+    if (board.firstMove === null) {
+      nextBoard.firstMove = index;
+    }
+    nextBoard.lastMove = transformedMove;
+    nextBoard.circle[transformedMove] = false;
     events.endTurn();
     if (getAllowedBanks(nextBoard).length === 0) {
       events.endGame();
@@ -78,11 +84,6 @@ const getAllowedBanks = board => {
   return range(board.circle.length).filter(i => {
     return board.circle[i] && (board.circle.at(i-1) || board.circle[(i+1)%board.circle.length]);
   })
-}
-
-const aiBotStrategy = ({ board, moves }) => {
-  const allowedBank = sample(getAllowedBanks(board));
-  moves.rob(board, allowedBank);
 }
 
 const rule = <>
@@ -99,8 +100,9 @@ export const BankRobbersE = strategyGameFactory({
   BoardClient,
   getPlayerStepDescription: () => 'Válassz egy kirabolható bankot.',
   generateStartBoard: () => ({
-    circle: Array(random(5, 10)).fill(true),
-    lastMove: null
+    circle: Array(random(7, 10)).fill(true),
+    lastMove: null,
+    firstMove: null
   }),
   moves,
   aiBotStrategy
