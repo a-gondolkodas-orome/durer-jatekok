@@ -1,6 +1,6 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, cloneDeep, random } from 'lodash';
+import { range, cloneDeep, random, sample } from 'lodash';
 import { aiBotStrategy } from './bot-strategy';
 
 const BoardClient = ({ board, ctx, moves }) => {
@@ -87,23 +87,29 @@ const getAllowedBanks = board => {
 }
 
 const rule = <>
-  Bergengócia fővárosában legalább 3 és legfeljebb 10 bank található, melyek körben,
+  Bergengócia fővárosában legalább 7 és legfeljebb 10 bank található, melyek körben,
   a Nagykörút mentén helyezkednek el. Két rivális bűnbanda ezen bankok kirablását tervezi,
   mégpedig úgy, hogy felváltva választanak ki egy-egy bankot. Nem választanak ki olyat,
   amit már korábban az egyikük kifosztott, és olyat sem, aminek már mindkét szomszédját kirabolták,
   mert ott már lesben áll a rendőrség. Az a banda veszt, aki már nem talál bankot, amit kirabolhat.
+  <br></br><em>C kategóriában 7, D kategóriában 9 bankkal szerepelt a feladat a versenyen.</em>
 </>;
 
-export const BankRobbersE = strategyGameFactory({
-  rule,
-  title: 'Bankrablók: 3-10 bank',
-  BoardClient,
-  getPlayerStepDescription: () => 'Válassz egy kirabolható bankot.',
-  generateStartBoard: () => ({
-    circle: Array(random(7, 10)).fill(true),
+const generateStartBoard = () => {
+  const n = random(0, 2) === 0 ? sample([6, 8, 10]) : sample([7, 9]);
+  return {
+    circle: Array(n).fill(true),
     lastMove: null,
     firstMove: null
-  }),
+  }
+}
+
+export const BankRobbers = strategyGameFactory({
+  rule,
+  title: 'Bankrablók: 7-10 bank',
+  BoardClient,
+  getPlayerStepDescription: () => 'Válassz egy kirabolható bankot.',
+  generateStartBoard,
   moves,
   aiBotStrategy
 });

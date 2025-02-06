@@ -4,7 +4,7 @@ import { Overview } from '../overview/overview';
 import { ErrorPage } from '../error-page';
 import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
 import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
-import { BankRobbersE } from '../games/bank-robbers/bank-robbers';
+import { BankRobbers } from '../games/bank-robbers/bank-robbers';
 import { ChessBishops } from '../games/chess-bishops/chess-bishops';
 import { ChessRook } from '../games/chess-rook/chess-rook';
 import { Coin123 } from '../games/coin-3-piles/coin123';
@@ -37,7 +37,7 @@ export const App = () => {
     { path: '/', element: <Overview />, errorElement: <ErrorPage /> },
     { path: '/game/AddReduceDouble', element: <AddReduceDouble /> },
     { path: '/game/AntiTicTacToe', element: <AntiTicTacToe /> },
-    { path: '/game/BankRobbersE', element: <BankRobbersE /> },
+    { path: '/game/BankRobbers', element: <BankRobbers /> },
     { path: '/game/ChessBishops', element: <ChessBishops /> },
     { path: '/game/ChessRook', element: <ChessRook /> },
     { path: '/game/Coin123', element: <Coin123 /> },

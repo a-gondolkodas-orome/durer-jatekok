@@ -179,10 +179,10 @@ export const gameList = {
     category: ['A'],
     name: '+1, +2, +3'
   },
-  BankRobbersE: {
+  BankRobbers: {
     year: 18,
     round: 'online',
-    category: ['E'],
-    name: 'Bankrablók (3-10 bank)'
+    category: ['C', 'D', 'E'],
+    name: 'Bankrablók (7-10 bank)'
   }
 };
