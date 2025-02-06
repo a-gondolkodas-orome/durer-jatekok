@@ -4,7 +4,6 @@ export const aiBotStrategy = ({ board, moves }) => {
   if (board.lastMove === null) {
     bankIndex = Math.floor(Math.random() * board.circle.length);
   } else {
-    console.log(convertToBinary(board.circle))
     let pMoves = optimalStrategy[board.circle.length - 7][convertToBinary(board.circle)];
     let i = Math.floor(Math.random() * pMoves.length);
     bankIndex = pMoves[i] + 1;
