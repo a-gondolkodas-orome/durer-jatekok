@@ -41,7 +41,11 @@ const moves = {
 };
 
 const aiBotStrategy = ({ board, moves }) => {
-  if (board === 4) {
+  if (board !== 4 && board % 4 === 0) {
+    moves.take1(board);
+  } else if (board === 6) {
+    moves.take1(board);
+  } else if (board % 2 === 0) {
     moves.halve(board);
   } else {
     moves.take1(board);
