@@ -54,11 +54,19 @@ játékos elvehet egy zsetont a kupacból, vagy ha páros számú zseton van az 
 zsetonok felét. Az nyer, akinek a lépése után nem marad zseton az asztalon.
 </>;
 
+const getPlayerStepDescription = ({ board }) => {
+  if (board % 2 === 1) {
+    return 'Vegyél el egy zsetont.'
+  } else {
+    return 'Egy zsetont vegyél el vagy felezz.'
+  }
+}
+
 export const Take1OrHalve = strategyGameFactory({
   rule,
   title: 'Egyet vegyél vagy felezz',
   BoardClient,
-  getPlayerStepDescription: () => 'Egy zsetont vegyél el vagy felezz.',
+  getPlayerStepDescription,
   generateStartBoard: () => random(20, 27),
   aiBotStrategy,
   moves
