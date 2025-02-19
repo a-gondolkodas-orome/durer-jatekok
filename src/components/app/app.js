@@ -32,6 +32,7 @@ import { PrimeExponentials } from '../games/prime-exponentials/prime-exponential
 import { Policemanthief } from '../games/policeman-thief/policeman-thief';
 import { SharkChase } from '../games/shark-chase/shark-chase';
 import { PlusOneTwoThree } from '../games/plus-one-two-three/plus-one-two-three';
+import { PlusOneTwoThree2H } from '../games/plus-one-two-three/plus-one-two-three-2h';
 
 export const App = () => {
   const router = createHashRouter([
@@ -67,7 +68,8 @@ export const App = () => {
     { path: '/game/PrimeExponentials', element: <PrimeExponentials />},
     { path: '/game/Policemanthief', element: <Policemanthief />},
     { path: '/game/SharkChase', element: <SharkChase />},
-    { path: '/game/PlusOneTwoThree', element: <PlusOneTwoThree />}
+    { path: '/game/PlusOneTwoThree', element: <PlusOneTwoThree />},
+    { path: '/game/hh/PlusOneTwoThree', element: <PlusOneTwoThree2H />}
   ]);
   return <StrictMode>
     <RouterProvider router={router}></RouterProvider>
