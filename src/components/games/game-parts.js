@@ -153,3 +153,75 @@ const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner })
 const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
   ? 'Nyertél. Gratulálunk! :)'
   : 'Sajnos, most nem nyertél, de ne add fel.';
+
+export const GameSidebarHH = ({
+  stepDescription,
+  ctx,
+  moves
+}) => {
+  return (
+    <div className="p-2 flex flex-col grow shrink-0 basis-64">
+      <p className="text-center font-bold text-lg basis-[3.5rem]">
+        {getCtaTextHH(ctx)}
+      </p>
+      {ctx.phase === 'play' && (
+        <p className="italic text-justify basis-[6rem]">
+          {stepDescription}
+        </p>
+      )}
+      {ctx.phase === 'roleSelection' && (
+        <span className="basis-[6rem]">
+          <button
+            className="cta-button"
+            onClick={() => moves.startHHGame(['Malacka (1)', 'Tigris (2)'])}
+          >
+            {'Kezdhetjük!'}
+          </button>
+        </span>
+      )}
+      <button
+        className="cta-button mt-[2vh]"
+        onClick={() => moves.startNewGame()}>
+        Új játék
+      </button>
+    </div>
+  );
+};
+
+export const GameEndDialogHH = ({ isOpen, setIsOpen, startNewGame, winnerName }) => {
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      className="relative z-50"
+    >
+      <div className="fixed inset-0 bg-black/50" aria-hidden="true"></div>
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <DialogPanel className="rounded bg-white max-w-sm w-full p-2">
+          <header className="flex items-baseline mb-2">
+            <DialogTitle className="grow block text-2xl text-center">
+              A játék véget ért
+            </DialogTitle>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="bg-slate-200 rounded text-2xl px-1"
+            >×</button>
+          </header>
+          <Description className="text-lg block text-justify">
+            A játékot nyerte: {winnerName}
+          </Description>
+
+          <button onClick={() => startNewGame()} className="cta-button mt-2">
+            Új játék
+          </button>
+        </DialogPanel>
+      </div>
+    </Dialog>
+  );
+};
+
+const getCtaTextHH = ({ phase, currentPlayerName, winnerName }) => {
+  if (phase === 'roleSelection') return 'Döntsétek el, hogy ki kezd.';
+  if (phase === 'play') return `Következik: ${currentPlayerName}`;
+  if (phase === 'gameEnd') return `A játékot nyerte: ${winnerName}`;
+};

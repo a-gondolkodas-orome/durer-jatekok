@@ -1,6 +1,6 @@
 import React from 'react';
-import { strategyGameFactory } from '../strategy-game';
-import { range, random } from 'lodash';
+import { strategyHHGameFactory } from '../strategy-game';
+import { range } from 'lodash';
 
 const target = 40;
 const maxStep = 3;
@@ -8,7 +8,7 @@ const maxStep = 3;
 const BoardClient = ({ board, ctx, moves }) => {
 
   const isMoveAllowed = number => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (ctx.phase !== 'play') return false;
     return isIncreaseValid({ board, number });
   }
 
@@ -59,25 +59,17 @@ const moves = {
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
-  const nextBoard = board % (1 + maxStep) !== 0
-    ? board + (1 + maxStep) - board % (1 + maxStep)
-    : board + random(1, maxStep);
-  moves.increaseTo(board, nextBoard);
-};
-
 const rule = <>
   A játék a nullával indul. A játékosok felváltva
   lépnek a pozitív egész számokon: a soron következő játékos mindig 1-gyel, 2-vel vagy 3-mal
   léphet előre. Az veszít, aki először lép {target}-nél nagyobb számra.
 </>;
 
-export const PlusOneTwoThree2H = strategyGameFactory({
+export const PlusOneTwoThree2H = strategyHHGameFactory({
   rule,
   title: '+1, +2, +3',
   BoardClient,
   getPlayerStepDescription: () => 'Válaszd ki, hogy melyik számra lépsz.',
   generateStartBoard: () => 0,
-  aiBotStrategy,
   moves
 });

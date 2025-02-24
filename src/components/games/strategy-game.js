@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
+  GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog,
+  GameEndDialogHH, GameSidebarHH
 } from './game-parts';
 import { v4 as uuidv4 } from 'uuid';
 import { partial, mapValues, wrap, _ } from 'lodash';
@@ -125,6 +126,117 @@ export const strategyGameFactory = ({
         setIsOpen={setIsGameEndDialogOpen}
         startNewGame={startNewGame}
         isRoleSelectorWinner={isRoleSelectorWinner}
+      />
+    </main>
+    );
+  };
+};
+
+export const strategyHHGameFactory = ({
+  rule,
+  title,
+  roleLabels,
+  BoardClient,
+  generateStartBoard,
+  moves,
+  getPlayerStepDescription
+}) => {
+  return () => {
+    const [board, setBoard] = useState(generateStartBoard())
+    const [phase, setPhase] = useState('roleSelection');
+    const [playerNames, setPlayerNames] = useState(['Első játékos', 'Második játékos']);
+    const [currentPlayer, setCurrentPlayer] = useState(null);
+    const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
+    const [winnerIndex, setWinnerIndex] = useState(null);
+    const [gameUuid, setGameUuid] = useState(uuidv4());
+    const [turnStage, setTurnStage] = useState(null);
+
+    const winnerName = winnerIndex ? playerNames[1] : playerNames[0];
+    const currentPlayerName = currentPlayer ? playerNames[1] : playerNames[0];
+
+    const moveWrapper = (moveFunc, ...args) => {
+      const moveResult = moveFunc(...args);
+      setBoard(moveResult.nextBoard);
+      return moveResult;
+    };
+
+    const startNewGame = () => {
+      setBoard(generateStartBoard());
+      setPhase('roleSelection');
+      setCurrentPlayer(null);
+      setIsGameEndDialogOpen(false);
+      setWinnerIndex(null);
+      setGameUuid(uuidv4());
+      setTurnStage(null);
+    };
+
+    const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
+      setPhase('gameEnd');
+      // default: last player to move is the winner
+      setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
+      setIsGameEndDialogOpen(true);
+    };
+
+    const endTurn = () => {
+      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
+    };
+
+    const startHHGame = (names) => {
+      setPhase('play');
+      setCurrentPlayer(0);
+      setPlayerNames(names);
+    };
+
+    const ctx = {
+      winnerIndex,
+      currentPlayer,
+      phase,
+      turnStage,
+      winnerName,
+      currentPlayerName
+    };
+
+    const events = {
+      endTurn,
+      endGame,
+      setTurnStage
+    };
+
+    // only second argument of move's is fixed here (_ special syntax)
+    // board (first argument) needs to be handled by ai strategy as
+    // it may change between moves but for AI strategy there is no re-render between moves
+    // in some cases there are multiple moves following single user event in that
+    // case there is also no re-render on client side between moves
+    const wrappedMoves = mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper));
+
+    return (
+    <main className="p-2">
+      <GameHeader title={title} />
+      <div className="flex justify-center">
+        <div className="max-w-[100ch] w-full">
+          <GameRule ruleDescription={rule} />
+          <div className="flex flex-wrap">
+            <BoardClient
+              key={gameUuid}
+              board={board}
+              ctx={ctx}
+              events={events}
+              moves={wrappedMoves}
+            />
+            <GameSidebarHH
+              stepDescription={getPlayerStepDescription({ board, ctx })}
+              ctx={{ phase, currentPlayerName, winnerName }}
+              moves={{ startNewGame, startHHGame }}
+            />
+          </div>
+        </div>
+      </div>
+      <GameFooter />
+      <GameEndDialogHH
+        isOpen={isGameEndDialogOpen}
+        setIsOpen={setIsGameEndDialogOpen}
+        startNewGame={startNewGame}
+        winnerName={winnerName}
       />
     </main>
     );
