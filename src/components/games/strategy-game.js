@@ -135,7 +135,6 @@ export const strategyGameFactory = ({
 export const strategyHHGameFactory = ({
   rule,
   title,
-  roleLabels,
   BoardClient,
   generateStartBoard,
   moves,
@@ -151,8 +150,8 @@ export const strategyHHGameFactory = ({
     const [gameUuid, setGameUuid] = useState(uuidv4());
     const [turnStage, setTurnStage] = useState(null);
 
-    const winnerName = winnerIndex ? playerNames[1] : playerNames[0];
-    const currentPlayerName = currentPlayer ? playerNames[1] : playerNames[0];
+    const winnerName = winnerIndex ? playerNames[1] || 'Második játékos': playerNames[0] || 'Első játékos';
+    const currentPlayerName = currentPlayer ? playerNames[1] || 'Második játékos' : playerNames[0] || 'Első játékos';
 
     const moveWrapper = (moveFunc, ...args) => {
       const moveResult = moveFunc(...args);
@@ -184,7 +183,6 @@ export const strategyHHGameFactory = ({
     const startHHGame = (names) => {
       setPhase('play');
       setCurrentPlayer(0);
-      setPlayerNames(names);
     };
 
     const ctx = {
@@ -227,6 +225,8 @@ export const strategyHHGameFactory = ({
               stepDescription={getPlayerStepDescription({ board, ctx })}
               ctx={{ phase, currentPlayerName, winnerName }}
               moves={{ startNewGame, startHHGame }}
+              playerNames={playerNames}
+              setPlayerNames={setPlayerNames}
             />
           </div>
         </div>

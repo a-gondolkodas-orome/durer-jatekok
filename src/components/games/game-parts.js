@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   Disclosure, DisclosureButton, DisclosurePanel,
   Dialog, DialogPanel, DialogTitle,
-  Description
+  Description,
+  Label, Field, Input
 } from '@headlessui/react';
 
 export const GameSidebar = ({
@@ -157,7 +158,9 @@ const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
 export const GameSidebarHH = ({
   stepDescription,
   ctx,
-  moves
+  moves,
+  playerNames,
+  setPlayerNames
 }) => {
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
@@ -171,9 +174,33 @@ export const GameSidebarHH = ({
       )}
       {ctx.phase === 'roleSelection' && (
         <span className="basis-[6rem]">
+          <Field>
+            <Label className="font-bold">Első: </Label>
+            <Input
+              name="name_of_first_player"
+              size="15"
+              className="border border-slate-600 rounded-md text-slate-600"
+              value={playerNames[0]}
+              onChange={e => {
+                setPlayerNames([e.target.value.trim(), playerNames[1]]);
+              }}
+            />
+          </Field>
+          <Field>
+            <Label className="font-bold">Második: </Label>
+            <Input
+              name="name_of_second_player"
+              size="15"
+              className="border border-slate-600 rounded-md text-slate-600"
+              value={playerNames[1]}
+              onChange={e => {
+                setPlayerNames([playerNames[0], e.target.value.trim()]);
+              }}
+            />
+          </Field>
           <button
             className="cta-button"
-            onClick={() => moves.startHHGame(['Malacka (1)', 'Tigris (2)'])}
+            onClick={() => moves.startHHGame()}
           >
             {'Kezdhetjük!'}
           </button>
