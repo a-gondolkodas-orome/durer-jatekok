@@ -81,7 +81,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 
     <svg
       onMouseMove={(event) => drawPickedColor(event)}
-      className="aspect-square stroke-black stroke-[3]"
+      className="aspect-square stroke-black stroke-3"
     >
       {/* <!-- front and back face --> */}
       <rect x="8%" y="25%" width="66%" height="66%" className="fill-transparent" />

@@ -44,7 +44,7 @@ export const Overview = () => {
 
 const OverviewFilterOptions = ({ options }) => {
   return <ListboxOptions
-    className="text-center py-2 w-[var(--button-width)] shadow-xl bg-slate-100"
+    className="text-center py-2 w-(--button-width) shadow-xl bg-slate-100"
     anchor="bottom"
   >
     {options.map(option =>
