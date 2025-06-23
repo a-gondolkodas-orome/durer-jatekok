@@ -108,7 +108,9 @@ const PrimesTable = ({ board, choosePrime }) => {
     choosablePrimesList = [2];
   }
 
-  const widthClassName = `w-[${(Math.min(choosablePrimesList.length, 10))*10}%]`;
+  const widthClassName = choosablePrimesList.length >= 10
+    ? 'w-full'
+    : `w-[${(Math.min(choosablePrimesList.length, 10))*10}%]`;
 
   return <table
     className={`m-2 border-collapse table-fixed max-w-full ${widthClassName}`}
