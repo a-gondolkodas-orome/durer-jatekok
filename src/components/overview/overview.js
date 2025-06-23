@@ -54,7 +54,7 @@ const OverviewFilterOptions = ({ options }) => {
         className="inline-block"
       >{({ focus, selected }) =>
         <span className={`
-          border-2 rounded px-1 m-1 inline-block
+          border-2 rounded-sm px-1 m-1 inline-block
           ${selected ? 'bg-blue-200' : 'bg-white'}
           ${focus ? 'outline' : ''}
         `}>
@@ -76,7 +76,7 @@ const CategoryFilter = ({ selectedCategories, setSelectedCategories }) => {
     <label htmlFor="category-selector" className="block">Kategória szűrő:</label>
     <ListboxButton
       id="category-selector"
-      className="border-2 border-slate-600 rounded w-full bg-slate-100"
+      className="border-2 border-slate-600 rounded-sm w-full bg-slate-100"
     >
       {selectedCategories.sort().join(', ') || 'Válassz kategóriákat'}
     </ListboxButton>
@@ -96,7 +96,7 @@ const YearFilter = ({ selectedYears, setSelectedYears }) => {
     <label htmlFor="year-selector" className="block">Év szűrő:</label>
     <ListboxButton
       id="year-selector"
-      className="border-2 border-slate-600 rounded w-full bg-slate-100"
+      className="border-2 border-slate-600 rounded-sm w-full bg-slate-100"
     >
       {selectedYears.sort((a, b) => Number(a) - Number(b)).join(', ') || 'Válassz éveket'}
     </ListboxButton>
