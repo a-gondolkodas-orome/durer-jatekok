@@ -1,6 +1,7 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { cloneDeep, some, flatMap, range, isEqual, sample } from 'lodash';
+import { DuckSvg } from './rubber-duck-svg';
 
 const [ROWS, COLS] = [4, 6];
 const [DUCK, FORBIDDEN] = [1, 2]
@@ -52,6 +53,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   return(
     <section className="p-2 shrink-0 grow basis-2/3">
+      <DuckSvg />
       <table className="m-2 w-full border-collapse table-fixed">
       <tbody>
         {range(ROWS).map(row => (
@@ -65,9 +67,18 @@ const BoardClient = ({ board, ctx, moves }) => {
                   ${isForbidden({ row, col }) ? 'bg-slate-400 cursor-not-allowed' : ''}
                 `}
               >
-                <div className="aspect-square p-[5%] w-full">
-                  {isDuck({ row, col }) && 'KACSA'}
-                </div>
+                <button
+                  className="aspect-square w-full h-full p-[5%]"
+                  disabled={!isMoveAllowed({ row, col })}
+                >
+                  {isDuck({ row, col }) && (
+                    <span>
+                      <svg className="inline-block aspect-square">
+                        <use xlinkHref="#game-duck" />
+                      </svg>
+                    </span>
+                  )}
+                </button>
               </td>
             ))}
           </tr>
