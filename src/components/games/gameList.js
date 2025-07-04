@@ -190,5 +190,11 @@ export const gameList = {
     round: 'online',
     category: ['C', 'D', 'E'],
     name: 'Egyet vegyél vagy felezz'
+  },
+  ChessDucks: {
+    year: { k: 'XV. (21/22)', v: '21/22' },
+    round: 'online',
+    category: ['C'],
+    name: 'Békés kacsák'
   }
 };
