@@ -2,9 +2,10 @@ import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { cloneDeep, some, flatMap, range, isEqual, sample, shuffle } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
+import { aiOptimalSecondSteps } from './bot-strategy';
 
 const chessDucksGameFactory = ({ ROWS, COLS }) => {
-  const [DUCK, FORBIDDEN] = [1, 2]
+  const [DUCK, FORBIDDEN] = [1, 2];
 
   const generateStartBoard = () => {
     return range(0, ROWS).map(() => range(0, COLS).map(() => null));
@@ -110,11 +111,17 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
   const getOptimalAiMove = (board) => {
     const allowedMoves = getAllowedMoves(board);
 
-    const duckCount = boardIndices.filter(({ row, col }) => board[row][col] === DUCK).length;
+    const ducks = boardIndices.filter(({ row, col }) => board[row][col] === DUCK);
+    const duckCount = ducks.length;
 
     // live search is too slow and there is no optimal first step anyways
     if (duckCount === 0) {
       return sample(allowedMoves);
+    }
+
+    // live search is too slow
+    if (duckCount === 1 && COLS === 7) {
+      return aiOptimalSecondSteps[`${ducks[0].row};${ducks[0].col}`];
     }
 
     // sample + find has the same effect as filter + sample: find a random
@@ -166,7 +173,7 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
     aiBotStrategy,
     moves
   });
-}
+};
 
 export const ChessDucksC = chessDucksGameFactory({ ROWS: 4, COLS: 6 });
 export const ChessDucksE = chessDucksGameFactory({ ROWS: 4, COLS: 7 });
