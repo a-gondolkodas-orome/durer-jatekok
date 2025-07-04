@@ -191,10 +191,16 @@ export const gameList = {
     category: ['C', 'D', 'E'],
     name: 'Egyet vegyél vagy felezz'
   },
-  ChessDucks: {
+  ChessDucksC: {
     year: { k: 'XV. (21/22)', v: '21/22' },
     round: 'online',
     category: ['C'],
-    name: 'Békés kacsák'
+    name: 'Békés kacsák (4x6)'
   }
+  // , ChessDucksE: {
+  //   year: { k: 'XV. (21/22)', v: '21/22' },
+  //   round: 'online',
+  //   category: ['E'],
+  //   name: 'Békés kacsák (4x7)'
+  // }
 };
