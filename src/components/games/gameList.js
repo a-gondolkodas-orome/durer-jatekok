@@ -195,12 +195,12 @@ export const gameList = {
     year: { k: 'XV. (21/22)', v: '21/22' },
     round: 'online',
     category: ['C'],
-    name: 'Békés kacsák (4x6)'
+    name: 'Békés kacsák (4 × 6)'
   }
   // , ChessDucksE: {
   //   year: { k: 'XV. (21/22)', v: '21/22' },
   //   round: 'online',
   //   category: ['E'],
-  //   name: 'Békés kacsák (4x7)'
+  //   name: 'Békés kacsák (4 × 7)'
   // }
 };

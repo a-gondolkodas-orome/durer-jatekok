@@ -159,7 +159,7 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
 
   return strategyGameFactory({
     rule,
-    title: `Békés kacsák a ${ROWS} × ${COLS}-es sakktáblán`,
+    title: `Békés kacsák a ${ROWS} × ${COLS}-${COLS === 6 ? 'o' : 'e'}s sakktáblán`,
     BoardClient,
     getPlayerStepDescription: () => 'Kattints egy mezőre, amit nem üt egyik kacsa sem.',
     generateStartBoard,
