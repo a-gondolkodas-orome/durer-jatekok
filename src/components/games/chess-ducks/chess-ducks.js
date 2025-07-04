@@ -1,6 +1,6 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { cloneDeep, some, flatMap, range, isEqual, sample } from 'lodash';
+import { cloneDeep, some, flatMap, range, isEqual, sample, shuffle } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
 
 const [ROWS, COLS] = [4, 6];
@@ -103,9 +103,51 @@ const moves = {
 };
 
 const aiBotStrategy = ({ board, moves }) => {
-  const allowedMoves = getAllowedMoves(board);
-  const aiMove = sample(allowedMoves);
+  const aiMove = getOptimalAiMove(board);
   moves.placeDuck(board, aiMove);
+};
+
+const getOptimalAiMove = (board) => {
+  const allowedMoves = getAllowedMoves(board);
+
+  const duckCount = boardIndices.filter(({ row, col }) => board[row][col] === DUCK).length;
+
+  // live search is too slow and there is no optimal first step anyways
+  if (duckCount === 0) {
+    return sample(allowedMoves);
+  }
+
+  // sample + find has the same effect as filter + sample: find a random
+  // from the optimal moves
+  const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
+    const boardCopy = cloneDeep(board);
+    markForbiddenFields(boardCopy, { row, col });
+    boardCopy[row][col] = DUCK;
+    return isWinningState(boardCopy, false);
+  });
+
+
+  if (optimalPlace !== undefined) {
+    return optimalPlace;
+  }
+  return sample(allowedMoves);
+};
+
+// given board *after* your step, are you set up to win the game for sure?
+const isWinningState = (board, amIPlayer) => {
+  if (getAllowedMoves(board).length === 0) {
+    return true;
+  }
+
+  const allowedPlacesForOther = getAllowedMoves(board);
+
+  const optimalPlaceForOther = allowedPlacesForOther.find(({ row, col }) => {
+    const boardCopy = cloneDeep(board);
+    markForbiddenFields(boardCopy, { row, col });
+    boardCopy[row][col] = DUCK;
+    return isWinningState(boardCopy, !amIPlayer);
+  });
+  return optimalPlaceForOther === undefined;
 };
 
 const rule = <>
