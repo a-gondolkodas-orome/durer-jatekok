@@ -2,10 +2,11 @@ import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { cloneDeep, some, flatMap, range, isEqual, sample, shuffle } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
-import { aiOptimalSecondSteps } from './bot-strategy';
+import { aiOptimalSecondSteps, getOptimalThirdStep } from './bot-strategy';
+
+const [DUCK, FORBIDDEN] = [1, 2];
 
 const chessDucksGameFactory = ({ ROWS, COLS }) => {
-  const [DUCK, FORBIDDEN] = [1, 2];
 
   const generateStartBoard = () => {
     return range(0, ROWS).map(() => range(0, COLS).map(() => null));
@@ -124,19 +125,29 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
       return aiOptimalSecondSteps[`${ducks[0].row};${ducks[0].col}`];
     }
 
-    // sample + find has the same effect as filter + sample: find a random
-    // from the optimal moves
-    const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
-      const boardCopy = cloneDeep(board);
-      markForbiddenFields(boardCopy, { row, col });
-      boardCopy[row][col] = DUCK;
-      return isWinningState(boardCopy, false);
-    });
-
-
-    if (optimalPlace !== undefined) {
-      return optimalPlace;
+    // use pre-calculated optimal 3rd moves as live calculation would be too slow
+    if (duckCount == 2 && COLS === 7) {
+      const optimalPlace = getOptimalThirdStep(board);
+      if (optimalPlace !== undefined) {
+        return optimalPlace;
+      }
     }
+
+    if (duckCount >= 3 || COLS === 6) {
+      // sample + find has the same effect as filter + sample: find a random
+      // from the optimal moves
+      const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
+        const boardCopy = cloneDeep(board);
+        markForbiddenFields(boardCopy, { row, col });
+        boardCopy[row][col] = DUCK;
+        return isWinningState(boardCopy, false);
+      });
+
+      if (optimalPlace !== undefined) {
+        return optimalPlace;
+      }
+    }
+
     return sample(allowedMoves);
   };
 
