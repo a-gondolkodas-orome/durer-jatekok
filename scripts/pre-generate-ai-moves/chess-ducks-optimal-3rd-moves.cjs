@@ -6,13 +6,15 @@
   calculate optimal moves real-time.
 */
 
-const { range, sample, cloneDeep, shuffle, isEqual } = require('lodash');
+const { range, sample, shuffle, isEqual } = require('lodash');
 const fs = require('fs');
 const {
   markForbiddenFields,
   getAllowedMoves,
-  DUCK
+  DUCK,
+  moves
 } = require('../../src/components/games/chess-ducks/helpers');
+const { dummyEvents } = require('../../src/components/games/strategy-game');
 
 const [ROWS, COLS] = [4, 7];
 
@@ -92,10 +94,8 @@ const getOptimalAiMove = (board) => {
   const allowedMoves = getAllowedMoves(board);
 
   const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
-    const boardCopy = cloneDeep(board);
-    markForbiddenFields(boardCopy, { row, col });
-    boardCopy[row][col] = DUCK;
-    return isWinningState(boardCopy, false);
+    const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
+    return isWinningState(nextBoard, false);
   });
 
 
@@ -115,10 +115,8 @@ const isWinningState = (board, amIPlayer) => {
   const allowedPlacesForOther = getAllowedMoves(board);
 
   const optimalPlaceForOther = allowedPlacesForOther.find(({ row, col }) => {
-    const boardCopy = cloneDeep(board);
-    markForbiddenFields(boardCopy, { row, col });
-    boardCopy[row][col] = DUCK;
-    return isWinningState(boardCopy, !amIPlayer);
+    const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
+    return isWinningState(nextBoard, !amIPlayer);
   });
   return optimalPlaceForOther === undefined;
 };

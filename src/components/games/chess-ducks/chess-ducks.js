@@ -1,9 +1,15 @@
 import React from 'react';
-import { strategyGameFactory } from '../strategy-game';
-import { cloneDeep, some, range, isEqual, sample, shuffle } from 'lodash';
+import { strategyGameFactory, dummyEvents } from '../strategy-game';
+import { some, range, isEqual, sample, shuffle } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
 import { aiOptimalSecondSteps, getOptimalThirdStep } from './bot-strategy';
-import { getBoardIndices, getAllowedMoves, DUCK, FORBIDDEN, markForbiddenFields } from './helpers';
+import {
+  getBoardIndices,
+  getAllowedMoves,
+  DUCK,
+  FORBIDDEN,
+  moves
+} from './helpers';
 
 const chessDucksGameFactory = ({ ROWS, COLS }) => {
 
@@ -71,19 +77,6 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
     );
   };
 
-  const moves = {
-    placeDuck: (board, { events }, { row, col }) => {
-      const nextBoard = cloneDeep(board);
-      nextBoard[row][col] = DUCK;
-      markForbiddenFields(nextBoard, { row, col });
-      events.endTurn();
-      if (getAllowedMoves(nextBoard).length === 0) {
-        events.endGame();
-      }
-      return { nextBoard }
-    }
-  };
-
   const aiBotStrategy = ({ board, moves }) => {
     const aiMove = getOptimalAiMove(board);
     moves.placeDuck(board, aiMove);
@@ -117,10 +110,8 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
       // sample + find has the same effect as filter + sample: find a random
       // from the optimal moves
       const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
-        const boardCopy = cloneDeep(board);
-        markForbiddenFields(boardCopy, { row, col });
-        boardCopy[row][col] = DUCK;
-        return isWinningState(boardCopy, false);
+        const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
+        return isWinningState(nextBoard, false);
       });
 
       if (optimalPlace !== undefined) {
@@ -140,10 +131,8 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
     const allowedPlacesForOther = getAllowedMoves(board);
 
     const optimalPlaceForOther = allowedPlacesForOther.find(({ row, col }) => {
-      const boardCopy = cloneDeep(board);
-      markForbiddenFields(boardCopy, { row, col });
-      boardCopy[row][col] = DUCK;
-      return isWinningState(boardCopy, !amIPlayer);
+      const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
+      return isWinningState(nextBoard, !amIPlayer);
     });
     return optimalPlaceForOther === undefined;
   };

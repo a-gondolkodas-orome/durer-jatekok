@@ -1,4 +1,4 @@
-import { flatMap, range } from "lodash";
+import { flatMap, range, cloneDeep } from "lodash";
 
 export const [DUCK, FORBIDDEN] = [1, 2];
 
@@ -24,5 +24,18 @@ export const markForbiddenFields = (board, { row, col }) => {
   }
   if (col + 1 <= (cols - 1)) {
     board[(row)][col + 1] = FORBIDDEN;
+  }
+};
+
+export const moves = {
+  placeDuck: (board, { events }, { row, col }) => {
+    const nextBoard = cloneDeep(board);
+    nextBoard[row][col] = DUCK;
+    markForbiddenFields(nextBoard, { row, col });
+    events.endTurn();
+    if (getAllowedMoves(nextBoard).length === 0) {
+      events.endGame();
+    }
+    return { nextBoard };
   }
 };
