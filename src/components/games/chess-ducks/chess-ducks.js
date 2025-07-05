@@ -1,10 +1,9 @@
 import React from 'react';
-import { strategyGameFactory, dummyEvents } from '../strategy-game';
-import { some, range, isEqual, sample, shuffle } from 'lodash';
+import { strategyGameFactory } from '../strategy-game';
+import { some, range, isEqual } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
-import { aiOptimalSecondSteps, getOptimalThirdStep } from './bot-strategy';
+import { aiBotStrategy } from './bot-strategy';
 import {
-  getBoardIndices,
   getAllowedMoves,
   DUCK,
   FORBIDDEN,
@@ -16,9 +15,6 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
   const generateStartBoard = () => {
     return range(0, ROWS).map(() => range(0, COLS).map(() => null));
   };
-
-  const boardIndices = getBoardIndices(ROWS, COLS);
-
 
   const BoardClient = ({ board, ctx, moves }) => {
     const clickField = (field) => {
@@ -75,66 +71,6 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
       </table>
       </section>
     );
-  };
-
-  const aiBotStrategy = ({ board, moves }) => {
-    const aiMove = getOptimalAiMove(board);
-    moves.placeDuck(board, aiMove);
-  };
-
-  const getOptimalAiMove = (board) => {
-    const allowedMoves = getAllowedMoves(board);
-
-    const ducks = boardIndices.filter(({ row, col }) => board[row][col] === DUCK);
-    const duckCount = ducks.length;
-
-    // live search is too slow and there is no optimal first step anyways
-    if (duckCount === 0) {
-      return sample(allowedMoves);
-    }
-
-    // live search is too slow
-    if (duckCount === 1 && COLS === 7) {
-      return aiOptimalSecondSteps[`${ducks[0].row};${ducks[0].col}`];
-    }
-
-    // use pre-calculated optimal 3rd moves as live calculation would be too slow
-    if (duckCount == 2 && COLS === 7) {
-      const optimalPlace = getOptimalThirdStep(board);
-      if (optimalPlace !== undefined) {
-        return optimalPlace;
-      }
-    }
-
-    if (duckCount >= 3 || COLS === 6) {
-      // sample + find has the same effect as filter + sample: find a random
-      // from the optimal moves
-      const optimalPlace = shuffle(allowedMoves).find(({ row, col }) => {
-        const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
-        return isWinningState(nextBoard, false);
-      });
-
-      if (optimalPlace !== undefined) {
-        return optimalPlace;
-      }
-    }
-
-    return sample(allowedMoves);
-  };
-
-  // given board *after* your step, are you set up to win the game for sure?
-  const isWinningState = (board, amIPlayer) => {
-    if (getAllowedMoves(board).length === 0) {
-      return true;
-    }
-
-    const allowedPlacesForOther = getAllowedMoves(board);
-
-    const optimalPlaceForOther = allowedPlacesForOther.find(({ row, col }) => {
-      const { nextBoard } = moves.placeDuck(board, { events: dummyEvents }, { row, col });
-      return isWinningState(nextBoard, !amIPlayer);
-    });
-    return optimalPlaceForOther === undefined;
   };
 
   const rule = <>
