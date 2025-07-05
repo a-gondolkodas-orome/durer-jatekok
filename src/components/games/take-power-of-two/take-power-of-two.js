@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, random } from 'lodash';
+import { range, random, reverse, sample } from 'lodash';
 
 const generateStartBoard = () => {
   if (random(0, 1)) {
@@ -94,7 +94,17 @@ const BoardClient = ({ board, ctx, moves }) => {
 }
 
 const aiBotStrategy = ({ board, moves }) => {
-  moves.subtractPowerOfTwo(board, 0);
+  if (board === 1) {
+    moves.subtractPowerOfTwo(board, 0);
+    return;
+  }
+  const availableExponents = getAvailableExponents(board);
+  if (board % 3 === 0) {
+    moves.subtractPowerOfTwo(board, sample(availableExponents));
+  } else {
+    const optimalMove = reverse(availableExponents).find(e => (board - 2 ** e) % 3 === 0);
+    moves.subtractPowerOfTwo(board, optimalMove);
+  }
 }
 
 const getAvailableExponents = (num) => {
