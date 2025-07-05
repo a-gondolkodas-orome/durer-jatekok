@@ -1,10 +1,9 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { cloneDeep, some, flatMap, range, isEqual, sample, shuffle } from 'lodash';
+import { cloneDeep, some, range, isEqual, sample, shuffle } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
 import { aiOptimalSecondSteps, getOptimalThirdStep } from './bot-strategy';
-
-const [DUCK, FORBIDDEN] = [1, 2];
+import { getBoardIndices, getAllowedMoves, DUCK, FORBIDDEN, markForbiddenFields } from './helpers';
 
 const chessDucksGameFactory = ({ ROWS, COLS }) => {
 
@@ -12,26 +11,7 @@ const chessDucksGameFactory = ({ ROWS, COLS }) => {
     return range(0, ROWS).map(() => range(0, COLS).map(() => null));
   };
 
-  const boardIndices = flatMap(range(0, ROWS), row => range(0, COLS).map(col => ({ row, col })));
-
-  const getAllowedMoves = (board) => {
-    return boardIndices.filter(({ row, col }) => board[row][col] === null);
-  };
-
-  const markForbiddenFields = (board, { row, col }) => {
-    if (row - 1 >= 0) {
-      board[(row - 1)][col] = FORBIDDEN;
-    }
-    if (row + 1 <= (ROWS - 1)) {
-      board[(row + 1)][col] = FORBIDDEN;
-    }
-    if (col - 1 >= 0) {
-      board[(row)][col - 1] = FORBIDDEN;
-    }
-    if (col + 1 <= (COLS - 1)) {
-      board[(row)][col + 1] = FORBIDDEN;
-    }
-  };
+  const boardIndices = getBoardIndices(ROWS, COLS);
 
 
   const BoardClient = ({ board, ctx, moves }) => {

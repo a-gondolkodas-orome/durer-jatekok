@@ -6,13 +6,18 @@
   calculate optimal moves real-time.
 */
 
-const { flatMap, range, sample, cloneDeep, shuffle } = require('lodash');
+const { range, sample, cloneDeep, shuffle } = require('lodash');
 const fs = require('fs');
+const {
+  getBoardIndices,
+  getAllowedMoves,
+  markForbiddenFields,
+  DUCK
+} = require('../../src/components/games/chess-ducks/helpers');
 
 const [ROWS, COLS] = [4, 7];
-const [DUCK, FORBIDDEN] = [1, 2]
 
-const boardIndices = flatMap(range(0, ROWS), row => range(0, COLS).map(col => ({ row, col })));
+const boardIndices = getBoardIndices(ROWS, COLS);
 
 const getOptimalAiMove = (board) => {
   const allowedMoves = getAllowedMoves(board);
@@ -30,25 +35,6 @@ const getOptimalAiMove = (board) => {
   }
   
   return { optimal: false, move: sample(allowedMoves) };
-};
-
-const getAllowedMoves = (board) => {
-  return boardIndices.filter(({ row, col }) => board[row][col] === null);
-};
-
-const markForbiddenFields = (board, { row, col }) => {
-  if (row - 1 >= 0) {
-    board[(row - 1)][col] = FORBIDDEN;
-  }
-  if (row + 1 <= (ROWS - 1)) {
-    board[(row + 1)][col] = FORBIDDEN;
-  }
-  if (col - 1 >= 0) {
-    board[(row)][col - 1] = FORBIDDEN;
-  }
-  if (col + 1 <= (COLS - 1)) {
-    board[(row)][col + 1] = FORBIDDEN;
-  }
 };
 
 // given board *after* your step, are you set up to win the game for sure?

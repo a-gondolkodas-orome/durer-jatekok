@@ -1,4 +1,4 @@
-import { flatMap, range } from "lodash";
+import { getBoardIndices } from "./helpers";
 
 /* This strategy file is relevant for the 4x7 case */
 const [ROWS, COLS] = [4, 7];
@@ -7,7 +7,7 @@ const [DUCK] = [1, 2];
 const flipH = ([r, c]) => [ROWS - 1 - r, c];
 const flipV = ([r, c]) => [r, COLS - 1 - c];
 
-const boardIndices = flatMap(range(0, ROWS), row => range(0, COLS).map(col => ({ row, col })));
+const boardIndices = getBoardIndices(ROWS, COLS);
 
 export const getOptimalThirdStep = (board) => {
   const ducks = boardIndices.filter(({ row, col }) => board[row][col] === DUCK);
