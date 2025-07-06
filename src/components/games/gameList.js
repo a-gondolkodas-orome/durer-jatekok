@@ -220,5 +220,11 @@ export const gameList = {
     round: 'döntő',
     category: ['C'],
     name: 'Háromszög színezés'
+  },
+  DominoesOnChessboard : {
+    year: { k: 'III. (09/10)', v: '09/10' },
+    round: 'döntő',
+    category: ['C'],
+    name: 'Sakktáblára Dominók'
   }
 };
