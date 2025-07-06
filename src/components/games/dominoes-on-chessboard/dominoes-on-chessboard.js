@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { range, cloneDeep, isEqual, flatMap, sample } from 'lodash';
+import { range, cloneDeep, isEqual, flatMap, sample, last } from 'lodash';
 import { strategyGameFactory } from '../strategy-game';
 
-const BOARDSIZE = 8;
+const BOARDSIZE = 6;
 const getId = ({ row, col }) => row * BOARDSIZE + col;
 
 const BoardClient = ({ board, ctx, moves }) => {
@@ -72,20 +72,20 @@ const BoardClient = ({ board, ctx, moves }) => {
   }
 
   const getOuterBoarders = field => {
-    if (!isCovered(field)) return 'border-2';
+    if (!isCovered(field)) return 'border-4';
     const domino = board.find(d => d.includes(getId(field)));
     const neighbor = domino[0] === getId(field) ? domino[1] : domino[0];
     const nCol = neighbor % BOARDSIZE;
     const nRow = ((neighbor - nCol) / BOARDSIZE);
     if (field.row === nRow) {
-      if (field.col === nCol - 1) return 'border-t-2 border-l-2 border-b-2 border-r-4 border-r-yellow-400';
-      return 'border-t-2 border-r-2 border-b-2 border-l-4 border-l-yellow-400'
+      if (field.col === nCol - 1) return 'border-t-4 border-l-4 border-b-4 border-r-4 border-r-yellow-400';
+      return 'border-t-4 border-r-4 border-b-4 border-l-4 border-l-yellow-400'
     }
     if (field.col === nCol) {
-      if (field.row === nRow - 1) return 'border-r-2 border-l-2 border-t-2 border-b-4 border-b-yellow-400';
-      return 'border-r-2 border-l-2 border-b-2 border-t-4 border-t-yellow-400';
+      if (field.row === nRow - 1) return 'border-r-4 border-l-4 border-t-4 border-b-4 border-b-yellow-400';
+      return 'border-r-4 border-l-4 border-b-4 border-t-4 border-t-yellow-400';
     }
-    return 'border-2';
+    return 'border-4';
   }
 
   return (
@@ -174,13 +174,26 @@ const moves = {
   }
 }
 
-const aiBotStrategy = ({ board, moves }) => {
-  const randomDomino = sample(getPossibleMoves(board));
-  moves.placeDomino(board, randomDomino);
+const aiBotStrategy = ({ board, moves, ctx }) => {
+  if (ctx.chosenRoleIndex === 1) {
+    const randomDomino = sample(getPossibleMoves(board));
+    moves.placeDomino(board, randomDomino);
+  } else {
+    const lastDomino = last(board);
+    const mirrorImage = [BOARDSIZE * BOARDSIZE - 1 - lastDomino[0], BOARDSIZE * BOARDSIZE - 1 - lastDomino[1]];
+    moves.placeDomino(board, mirrorImage);
+  }
+}
+
+const toldalek = {
+  '4': 'e',
+  '6': 'o',
+  '8': 'a'
 }
 
 const rule = <>
-  Két játékos felváltva tesz egy egy dominót egy 8 × 8-as sakktáblára úgy, hogy két
+  Két játékos felváltva tesz egy egy dominót egy {BOARDSIZE} × {BOARDSIZE}-{toldalek[BOARDSIZE]}s
+  sakktáblára úgy, hogy két
   élszomszédos üres mezőt fedjen le. Az veszít aki nem tud tenni.
 </>;
 
