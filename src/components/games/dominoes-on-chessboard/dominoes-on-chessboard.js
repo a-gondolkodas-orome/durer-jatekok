@@ -61,31 +61,31 @@ const BoardClient = ({ board, ctx, moves }) => {
     const nCol = neighbor % BOARDSIZE;
     const nRow = ((neighbor - nCol) / BOARDSIZE);
     if (field.row === nRow) {
-      if (field.col === nCol - 1) return 'rounded-sm border-t-4 border-l-4 border-b-4';
-      return 'rounded-sm border-t-4 border-r-4 border-b-4'
+      if (field.col === nCol - 1) return 'rounded-l-md border-t-4 border-l-4 border-b-4';
+      return 'rounded-r-md border-t-4 border-r-4 border-b-4'
     }
     if (field.col === nCol) {
-      if (field.row === nRow - 1) return 'rounded-sm border-r-4 border-l-4 border-t-4';
-      return 'rounded-sm border-r-4 border-l-4 border-b-4';
+      if (field.row === nRow - 1) return 'rounded-t-md border-r-4 border-l-4 border-t-4';
+      return 'rounded-b-md border-r-4 border-l-4 border-b-4';
     }
     return '';
   }
 
   const getOuterBoarders = field => {
-    if (!isCovered(field)) return 'border-4';
+    if (!isCovered(field)) return 'border-2';
     const domino = board.find(d => d.includes(getId(field)));
     const neighbor = domino[0] === getId(field) ? domino[1] : domino[0];
     const nCol = neighbor % BOARDSIZE;
     const nRow = ((neighbor - nCol) / BOARDSIZE);
     if (field.row === nRow) {
-      if (field.col === nCol - 1) return 'border-t-4 border-l-4 border-b-4 border-r-4 border-r-yellow-400';
-      return 'border-t-4 border-r-4 border-b-4 border-l-4 border-l-yellow-400'
+      if (field.col === nCol - 1) return 'border-t-2 border-l-2 border-b-2 border-r-4 border-r-yellow-400';
+      return 'border-t-2 border-r-2 border-b-2 border-l-4 border-l-yellow-400'
     }
     if (field.col === nCol) {
-      if (field.row === nRow - 1) return 'border-r-4 border-l-4 border-t-4 border-b-4 border-b-yellow-400';
-      return 'border-r-4 border-l-4 border-b-4 border-t-4 border-t-yellow-400';
+      if (field.row === nRow - 1) return 'border-r-2 border-l-2 border-t-2 border-b-4 border-b-yellow-400';
+      return 'border-r-2 border-l-2 border-b-2 border-t-4 border-t-yellow-400';
     }
-    return 'border-4';
+    return 'border-2';
   }
 
   return (
