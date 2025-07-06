@@ -1,6 +1,6 @@
 import React from 'react';
-import { strategyGameFactory } from '../strategy-game';
-import { range, cloneDeep, sample } from 'lodash';
+import { strategyGameFactory, dummyEvents } from '../strategy-game';
+import { range, cloneDeep, sample, shuffle } from 'lodash';
 
 const FORBIDDEN = 2;
 // triangles
@@ -106,16 +106,45 @@ const moves = {
       nextBoard[n] = FORBIDDEN;
     });
     events.endTurn();
-    if (nextBoard.filter(b => b === null).length === 0) {
+    if (getAllowedMoves(nextBoard).length === 0) {
       events.endGame();
     }
     return { nextBoard };
   }
 };
 
+const getAllowedMoves = board => range(16).filter(i => board[i] === null);
+
 const aiBotStrategy = ({ board, moves }) => {
-  const allowedMoves = range(16).filter(i => board[i] === null);
-  moves.colorTriangle(board, sample(allowedMoves));
+  const optimalMove = getOptimalAiMove(board);
+  moves.colorTriangle(board, optimalMove);
+};
+
+const getOptimalAiMove = board => {
+  const allowedMoves = getAllowedMoves(board);
+  const optimalPlace = shuffle(allowedMoves).find(i => {
+    const { nextBoard } = moves.colorTriangle(board, { events: dummyEvents }, i);
+    return isWinningState(nextBoard, false);
+  });
+
+  if (optimalPlace !== undefined) {
+    return optimalPlace;
+  }
+  return sample(allowedMoves);
+};
+
+// given board *after* your step, are you set up to win the game for sure?
+const isWinningState = (board, amIPlayer) => {
+  const allowedPlacesForOther = getAllowedMoves(board);
+  if (allowedPlacesForOther.length === 0) {
+    return true;
+  }
+
+  const optimalPlaceForOther = allowedPlacesForOther.find(i => {
+    const { nextBoard } = moves.colorTriangle(board, { events: dummyEvents }, i);
+    return isWinningState(nextBoard, !amIPlayer);
+  });
+  return optimalPlaceForOther === undefined;
 };
 
 const rule = <>
