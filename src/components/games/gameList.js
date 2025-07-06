@@ -147,13 +147,13 @@ export const gameList = {
     year: { k: 'X. (16/17)', v: '16/17' },
     round: 'döntő',
     category: ['A'],
-    name: 'Átfordítás, elvétel (6 korong)'
+    name: 'Átfordítás, elvétel (6)'
   },
   TenDiscs: {
     year: { k: 'X. (16/17)', v: '16/17' },
     round: 'döntő',
     category: ['B'],
-    name: 'Átfordítás, elvétel (10 korong)'
+    name: 'Átfordítás, elvétel (10)'
   },
   PrimeExponentials: {
     year: { k: 'I. (07/08)', v: '07/08' },
@@ -167,11 +167,17 @@ export const gameList = {
     category: ['A'],
     name: 'Rendőr, tolvaj'
   },
-  SharkChase: {
+  SharkChase4: {
     year: { k: 'XVII. (23/24)', v: '23/24' },
     round: 'döntő',
     category: ['C'],
-    name: 'Cápa üldözés'
+    name: 'Cápa üldözés (4 x 4)'
+  },
+  SharkChase5: {
+    year: { k: 'XVII. (23/24)', v: '23/24' },
+    round: 'döntő',
+    category: ['D'],
+    name: 'Cápa üldözés (5 x 5)'
   },
   PlusOneTwoThree: {
     year: { k: 'V. (11/12)', v: '11/12' },
@@ -214,5 +220,11 @@ export const gameList = {
     round: 'döntő',
     category: ['A'],
     name: 'Tolvajnál átlag'
+  }
+  , TriangleColoring: {
+    year: { k: 'VII. (13/14)', v: '13/14' },
+    round: 'döntő',
+    category: ['C'],
+    name: 'Háromszög színezés'
   }
 };
