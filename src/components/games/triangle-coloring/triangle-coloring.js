@@ -2,7 +2,7 @@ import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, cloneDeep, sample } from 'lodash';
 
-
+const FORBIDDEN = 2;
 // triangles
 //          0
 //       1  2  3
@@ -63,8 +63,17 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   const colorTriangle = i => {
     if (!ctx.shouldRoleSelectorMoveNext) return;
+    if (board[i] !== null) return;
     moves.colorTriangle(board, i);
   }
+
+  const isForbidden = i => board[i] === FORBIDDEN;
+
+  const getColor = i => {
+    if (board[i] === 'colored') return 'fill-blue-600';
+    if (isForbidden(i)) return 'fill-slate-400';
+    return 'fill-transparent';
+  };
 
   return(
     <section className="p-2 shrink-0 grow basis-2/3">
@@ -73,7 +82,9 @@ const BoardClient = ({ board, ctx, moves }) => {
           <polygon
             key={i}
             points={getTrianglePoints(i)}
-            fill={board[i] === 'colored' ? 'blue' : board[i] === 'FORBIDDEN' ? 'gray' : 'white'}
+            className={`
+              ${getColor(i)} ${isForbidden(i) ? 'cursor-not-allowed' : ''}
+            `}
             stroke="black" strokeWidth="0.5"
             onClick={() => colorTriangle(i)}
             onKeyUp={(event) => {
@@ -92,7 +103,7 @@ const moves = {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = 'colored';
     triangles[id].neighbors.forEach(n => {
-      nextBoard[n] = 'FORBIDDEN';
+      nextBoard[n] = FORBIDDEN;
     });
     events.endTurn();
     if (nextBoard.filter(b => b === null).length === 0) {
