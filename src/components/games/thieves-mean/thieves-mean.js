@@ -6,10 +6,10 @@ import { aiBotStrategy } from './bot-strategy';
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
-    return isAllowedBank(index);
+    return isAllowedCard(index);
   }
 
-  const isAllowedBank = index => {
+  const isAllowedCard = index => {
     return !board.thiefCards.includes(index) && !board.sheriffCards.includes(index)
   }
 
@@ -19,9 +19,9 @@ const BoardClient = ({ board, ctx, moves }) => {
   }
 
   const getCardColor = index => {
-    if (board.thiefCards.includes(index + 1)) return "#fc031c";
-    if (board.sheriffCards.includes(index + 1)) return "#0307fc";
-    return "#1cfc03";
+    if (board.thiefCards.includes(index + 1)) return "#dc2626";
+    if (board.sheriffCards.includes(index + 1)) return "#2563eb";
+    return "#00d492";
   }
 
   return(
@@ -42,7 +42,7 @@ const BoardClient = ({ board, ctx, moves }) => {
                     width="18%"
                     height="25%"
                     fill={`${getCardColor(i)}`}
-                    stroke="#1e40af"
+                    stroke="#1d293d"
                     strokeWidth="0.5%"
                     rx="3"
                     onClick={() => clickCard(i + 1)}
