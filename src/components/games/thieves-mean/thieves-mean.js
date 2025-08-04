@@ -151,6 +151,7 @@ export const ThievesMean = strategyGameFactory({
   title: 'Tolvajnál átlag',
   BoardClient,
   getPlayerStepDescription: () => 'Válassz egy kártyát',
+  roleLabels: ["Nyomozó leszek", "Tolvaj leszek"],
   generateStartBoard,
   moves,
   aiBotStrategy
