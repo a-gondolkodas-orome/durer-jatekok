@@ -26,14 +26,14 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   return(
     <section className="p-2 shrink-0 basis-2/3">
-      <div className="flex flex-wrap">
+      <div>
         {range(1, 8).map(num =>
         <button
           key={num}
           disabled={!isAllowedMove(num)}
           onClick={() => clickCard(num)}
           className={`
-            shrink-0 grow mx-1 min-h-28
+            m-1 min-h-28 w-18
             border-2 shadow-md border-slate-800 rounded-xl text-4xl
             text-center font-bold
             ${ctx.chosenRoleIndex === 1
