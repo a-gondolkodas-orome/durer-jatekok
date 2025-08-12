@@ -61,6 +61,7 @@ const moves = {
       nextBoard.thiefCards.push(idx);
     }
     nextBoard.numTurns += 1;
+    // TODO: end game early if thief has winning triple
     if (nextBoard.numTurns === 8) {
       nextBoard.sheriffCards.push(findLast(nextBoard)[0]);
       const winner = getWinner(nextBoard.thiefCards);
