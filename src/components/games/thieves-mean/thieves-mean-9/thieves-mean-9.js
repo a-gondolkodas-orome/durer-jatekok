@@ -62,11 +62,14 @@ const moves = {
       nextBoard.thiefCards.push(idx);
     }
     nextBoard.numTurns += 1;
-    // TODO: end game early if thief has winning triple
+
     if (nextBoard.numTurns === 8) {
       nextBoard.sheriffCards.push(findLast(nextBoard)[0]);
       const winner = getWinner(nextBoard.thiefCards);
       events.endGame({ winnerIndex: winner });
+    } else if (getWinner(nextBoard.thiefCards) === Thief) {
+      // Thief can win early
+      events.endGame({ winnerIndex: Thief });
     }
     events.endTurn();
     return { nextBoard };
@@ -100,9 +103,11 @@ const generateStartBoard = () => {
 
 const getWinner = (thiefCards) => {
   const thiefCardsSort = thiefCards.slice().sort((a, b) => a - b);
-  for (let a = 0; a <= 3; a++) {
-    for (let b = a + 1; b <= 3; b++) {
-      for (let c = b + 1; c <= 4; c++) {
+  const cardCount = thiefCards.length;
+  if (cardCount < 3) return undefined;
+  for (let a = 0; a < (cardCount - 2); a++) {
+    for (let b = a + 1; b < (cardCount - 1); b++) {
+      for (let c = b + 1; c < (cardCount); c++) {
         const valA = thiefCardsSort[a];
         const valB = thiefCardsSort[b];
         const valC = thiefCardsSort[c];
@@ -112,6 +117,7 @@ const getWinner = (thiefCards) => {
       }
     }
   }
+  if (cardCount < 4) return undefined
   return Sheriff;
 }
 
