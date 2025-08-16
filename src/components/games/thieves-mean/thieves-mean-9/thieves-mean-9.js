@@ -2,6 +2,7 @@ import React from 'react';
 import { strategyGameFactory } from '../../strategy-game';
 import { range, cloneDeep, difference } from 'lodash';
 import { aiBotStrategy } from './bot-strategy';
+import { Sheriff, Thief } from './helpers';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
@@ -36,7 +37,7 @@ const BoardClient = ({ board, ctx, moves }) => {
             m-1 min-h-28 w-18
             border-2 shadow-md border-slate-800 rounded-xl text-4xl
             text-center font-bold
-            ${ctx.chosenRoleIndex === 1
+            ${ctx.chosenRoleIndex === Thief
               ? "enabled:hover:bg-red-400 enabled:focus:bg-red-400"
               : "enabled:hover:bg-blue-400 enabled:focus:bg-blue-400"
             }
@@ -54,7 +55,7 @@ const moves = {
   takeCard: (board, { ctx, events }, idx) => {
     const nextBoard = cloneDeep(board);
 
-    if (ctx.currentPlayer === 0) {
+    if (ctx.currentPlayer === Sheriff) {
       nextBoard.sheriffCards.push(idx);
     }
     else {
@@ -106,12 +107,12 @@ const getWinner = (thiefCards) => {
         const valB = thiefCardsSort[b];
         const valC = thiefCardsSort[c];
         if (valA + valC === 2 * valB) {
-          return 1;
+          return Thief;
         }
       }
     }
   }
-  return 0;
+  return Sheriff;
 }
 
 export const ThievesMean9 = strategyGameFactory({

@@ -1,8 +1,5 @@
 import { sample } from 'lodash';
-
-const Sheriff = 0;
-const Thief = 1;
-const Nobody = 2;
+import { Sheriff, Thief } from '../helpers';
 
 export const aiBotStrategy = ({ board, moves, ctx }) => {
     const move = getMove(board, ctx.chosenRoleIndex);
@@ -10,7 +7,7 @@ export const aiBotStrategy = ({ board, moves, ctx }) => {
 }
 
 const getMove = (board) => {
-  let cards = Array(7).fill(Nobody);
+  let cards = Array(7).fill(null);
   board.sheriffCards.forEach(card => {
     cards[card - 1] = Sheriff;
   });
@@ -19,7 +16,7 @@ const getMove = (board) => {
   });
   const meanCounts = getMeanCounts(cards)
     .map((count, idx) => [count, idx])
-    .filter((count, idx) => cards[idx] === Nobody);
+    .filter((count, idx) => cards[idx] === null);
   // find max count that is not taken by sheriff or thief
   const maxCount = Math.max(...meanCounts.map(([count, idx]) => count));
   // return the card that participates in the most good sets of three cards
