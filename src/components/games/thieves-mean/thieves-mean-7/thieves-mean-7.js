@@ -2,7 +2,7 @@ import React from 'react';
 import { strategyGameFactory } from '../../strategy-game';
 import { range, cloneDeep, difference } from 'lodash';
 import { aiBotStrategy } from './bot-strategy';
-import { Sheriff, Thief } from '../helpers';
+import { hasWinningTriple, Sheriff, Thief } from '../helpers';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
@@ -68,7 +68,7 @@ const moves = {
       findLastTwo(nextBoard).forEach(idx => {
         nextBoard.thiefCards.push(idx);
       });
-      const winner = getWinner(nextBoard.thiefCards);
+      const winner = hasWinningTriple(nextBoard.thiefCards) ? Thief : Sheriff;
       events.endGame({ winnerIndex: winner });
     }
     events.endTurn();

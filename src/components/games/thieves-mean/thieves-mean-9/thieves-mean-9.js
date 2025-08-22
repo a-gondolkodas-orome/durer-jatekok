@@ -2,7 +2,7 @@ import React from 'react';
 import { strategyGameFactory } from '../../strategy-game';
 import { range, cloneDeep, difference } from 'lodash';
 import { aiBotStrategy } from './bot-strategy';
-import { Sheriff, Thief } from './helpers';
+import { hasWinningTriple, Sheriff, Thief } from '../helpers';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
@@ -65,9 +65,9 @@ const moves = {
 
     if (nextBoard.numTurns === 8) {
       nextBoard.sheriffCards.push(findLast(nextBoard)[0]);
-      const winner = getWinner(nextBoard.thiefCards);
+      const winner = hasWinningTriple(nextBoard.thiefCards) ? Thief : Sheriff;
       events.endGame({ winnerIndex: winner });
-    } else if (getWinner(nextBoard.thiefCards) === Thief) {
+    } else if (hasWinningTriple(nextBoard.thiefCards)) {
       // Thief can win early
       events.endGame({ winnerIndex: Thief });
     }
@@ -99,26 +99,6 @@ const generateStartBoard = () => {
     sheriffCards: [],
     numTurns: 0
   };
-}
-
-const getWinner = (thiefCards) => {
-  const thiefCardsSort = thiefCards.slice().sort((a, b) => a - b);
-  const cardCount = thiefCards.length;
-  if (cardCount < 3) return undefined;
-  for (let a = 0; a < (cardCount - 2); a++) {
-    for (let b = a + 1; b < (cardCount - 1); b++) {
-      for (let c = b + 1; c < (cardCount); c++) {
-        const valA = thiefCardsSort[a];
-        const valB = thiefCardsSort[b];
-        const valC = thiefCardsSort[c];
-        if (valA + valC === 2 * valB) {
-          return Thief;
-        }
-      }
-    }
-  }
-  if (cardCount < 4) return undefined
-  return Sheriff;
 }
 
 export const ThievesMean9 = strategyGameFactory({
