@@ -1,17 +1,21 @@
 import React from 'react';
 import { strategyGameFactory } from '../../strategy-game';
-import { range, cloneDeep, difference } from 'lodash';
+import { range, cloneDeep } from 'lodash';
 import { aiBotStrategy } from './bot-strategy';
-import { hasWinningTriple, Sheriff, Thief } from '../helpers';
+import {
+  hasWinningTriple,
+  Sheriff,
+  Thief,
+  getUntakenCards,
+  generateStartBoard
+} from "../helpers";
+
+const CARD_COUNT = 7;
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
     if (!ctx.shouldRoleSelectorMoveNext) return false;
-    return isAllowedCard(index);
-  }
-
-  const isAllowedCard = index => {
-    return !board.thiefCards.includes(index) && !board.sheriffCards.includes(index)
+    return getUntakenCards(board, CARD_COUNT).includes(index);
   }
 
   const clickCard = (index) => {
@@ -20,15 +24,15 @@ const BoardClient = ({ board, ctx, moves }) => {
   }
 
   const getCardColor = num => {
-    if (board.thiefCards.includes(num)) return 'bg-red-600';
-    if (board.sheriffCards.includes(num)) return 'bg-blue-600';
+    if (board.cards[Thief].includes(num)) return 'bg-red-600';
+    if (board.cards[Sheriff].includes(num)) return 'bg-blue-600';
     return 'bg-white';
   }
 
   return(
     <section className="p-2 shrink-0 basis-2/3">
       <div>
-        {range(1, 8).map(num =>
+        {range(1, CARD_COUNT + 1).map(num =>
         <button
           key={num}
           disabled={!isAllowedMove(num)}
@@ -56,19 +60,12 @@ const moves = {
     const nextBoard = cloneDeep(board);
 
     indices.forEach(idx => {
-      if (ctx.currentPlayer === Sheriff) {
-        nextBoard.sheriffCards.push(idx);
-      }
-      else {
-        nextBoard.thiefCards.push(idx);
-      }
+      nextBoard.cards[ctx.currentPlayer].push(idx)
     });
     nextBoard.numTurns += 1;
     if (nextBoard.numTurns >= 5) {
-      findLastTwo(nextBoard).forEach(idx => {
-        nextBoard.thiefCards.push(idx);
-      });
-      const winner = hasWinningTriple(nextBoard.thiefCards) ? Thief : Sheriff;
+      nextBoard.cards[Thief].push(...getUntakenCards(nextBoard, CARD_COUNT));
+      const winner = hasWinningTriple(nextBoard.cards[Thief]) ? Thief : Sheriff;
       events.endGame({ winnerIndex: winner });
     }
     events.endTurn();
@@ -76,16 +73,9 @@ const moves = {
   }
 }
 
-const findLastTwo = (board) => {
-  return difference(
-    range(1, 8),
-    [...board.thiefCards, ...board.sheriffCards]
-  );
-}
-
 const rule = <>
     <b>Nyomozó és Tolvaj</b> az alábbi játékot játssza. Hét kártya van az asztalon lévő készletben,
-    az 1, 2, ..., 7 számokkal jelölve. A játék 7 lépésből áll, minden lépésben az egyik
+    az 1, 2, ..., {CARD_COUNT} számokkal jelölve. A játék {CARD_COUNT} lépésből áll, minden lépésben az egyik
     játékos kezébe vesz egyet az asztalon lévő kártyák
     közül. Az alábbi sorrend szerint lépnek a játékosok:
     <br></br>
@@ -98,34 +88,9 @@ const rule = <>
     <br></br>
 </>;
 
-const generateStartBoard = () => {
-  return {
-    thiefCards: [],
-    sheriffCards: [],
-    numTurns: 0
-  };
-}
-
-const getWinner = (thiefCards) => {
-  const thiefCardsSort = thiefCards.slice().sort((a, b) => a - b);
-  for (let a = 0; a <= 2; a++) {
-    for (let b = a + 1; b <= 2; b++) {
-      for (let c = b + 1; c <= 3; c++) {
-        const valA = thiefCardsSort[a];
-        const valB = thiefCardsSort[b];
-        const valC = thiefCardsSort[c];
-        if (valA + valC === 2 * valB) {
-          return Thief;
-        }
-      }
-    }
-  }
-  return Sheriff;
-}
-
 export const ThievesMean7 = strategyGameFactory({
   rule,
-  title: 'Tolvajnál átlag (1-7)',
+  title: `Tolvajnál átlag (1-${CARD_COUNT})`,
   BoardClient,
   getPlayerStepDescription: () => 'Válassz egy kártyát.',
   roleLabels: ['Nyomozó leszek', 'Tolvaj leszek'],

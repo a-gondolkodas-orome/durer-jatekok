@@ -1,3 +1,5 @@
+import { range, difference } from 'lodash';
+
 export const [Sheriff, Thief] = [0, 1];
 
 export const hasWinningTriple = (thiefCards) => {
@@ -17,4 +19,18 @@ export const hasWinningTriple = (thiefCards) => {
     }
   }
   return false;
+}
+
+export const getUntakenCards = (board, total) => {
+  return difference(
+    range(1, total + 1),
+    [...board.cards[Thief], ...board.cards[Sheriff]]
+  );
+}
+
+export const generateStartBoard = () => {
+  return {
+    cards: [[], []],
+    numTurns: 0
+  };
 }

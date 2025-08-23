@@ -1,56 +1,40 @@
-import { sample, _ } from 'lodash';
-import { Sheriff, Thief } from '../helpers';
+import { sample, cloneDeep } from 'lodash';
+import { Thief, hasWinningTriple, getUntakenCards } from '../helpers';
 
-// TODO:
 export const aiBotStrategy = ({ board, moves, ctx }) => {
     const move = getMove(board, ctx.chosenRoleIndex);
     moves.takeCard(board, move);
 }
 
-const getMove = (board) => {
-  let cards = Array(9).fill(null);
-  board.sheriffCards.forEach(card => {
-    cards[card - 1] = Sheriff;
-  });
-  board.thiefCards.forEach(card => {
-    cards[card - 1] = Thief;
-  });
-  const meanCounts = getMeanCounts(cards)
-    .map((count, idx) => [count, idx])
-    .filter((_, idx) => cards[idx] === null);
-  // find max count that is not taken by sheriff or thief
-  const maxCount = Math.max(...meanCounts.map(([count]) => count));
-  // return the card that participates in the most good sets of three cards
-  // take only ones with max value
-  let maxIndices = meanCounts.filter(([count]) => count === maxCount)
-    .map(([_, idx]) => idx);
-  return sample(maxIndices) + 1;
+const getMove = (board, chosenRoleIndex) => {
+  const allowedMoves = getUntakenCards(board, 9);
+  if (chosenRoleIndex === 1 && getUntakenCards.length === 9) return 5;
+  const optimalMoves = allowedMoves.filter(i => {
+    const boardCopy = cloneDeep(board);
+    boardCopy.cards[1 - chosenRoleIndex].push(i);
+    boardCopy.numTurns += 1;
+    return isWinningState(boardCopy, chosenRoleIndex === 1);
+  })
+  if (optimalMoves.length > 0) return sample(optimalMoves);
+  return sample(allowedMoves);
 }
 
-const findPossibleMeans = (cards) => {
-  // get all good sets of three cards
-  let means = [];
-  for (let i = 0; i < 7; i++) {
-    for (let j = i + 1; j < 8; j++) {
-      for (let k = j + 1; k < 9; k++) {
-        if (cards[i] === Sheriff || cards[j] === Sheriff || cards[k] === Sheriff) {
-          continue;
-        }
-        if (i + k === 2 * j) {
-          means.push([i, j, k]);
-        }
-      }
-    }
+// given board *after* your step, are you set up to win the game for sure?
+const isWinningState = (board, amIFirst) => {
+  if (isGameEnd(board)) {
+    return amIFirst !== hasWinningTriple(board.cards[Thief]);
   }
-  return means;
-}
+  const allowedPlaces = getUntakenCards(board, 9);
 
-const getMeanCounts = (cards) => {
-  let counts = Array(9).fill(0);
-  findPossibleMeans(cards).forEach(mean => {
-    counts[mean[0]]++;
-    counts[mean[1]]++;
-    counts[mean[2]]++;
+  const optimalPlaceForOther = allowedPlaces.find(i => {
+    const boardCopy = cloneDeep(board);
+    boardCopy.cards[amIFirst ? 1 : 0].push(i);
+    boardCopy.numTurns += 1;
+    return isWinningState(boardCopy, !amIFirst);
   });
-  return counts;
+  return optimalPlaceForOther === undefined;
+};
+
+const isGameEnd = board => {
+  return board.numTurns === 8 || hasWinningTriple(board.cards[Thief]);
 }

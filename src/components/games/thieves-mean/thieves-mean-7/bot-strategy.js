@@ -1,4 +1,4 @@
-import { sample } from 'lodash';
+import { sample, _ } from 'lodash';
 import { Sheriff, Thief } from '../helpers';
 
 export const aiBotStrategy = ({ board, moves, ctx }) => {
@@ -8,21 +8,21 @@ export const aiBotStrategy = ({ board, moves, ctx }) => {
 
 const getMove = (board) => {
   let cards = Array(7).fill(null);
-  board.sheriffCards.forEach(card => {
+  board.cards[Sheriff].forEach(card => {
     cards[card - 1] = Sheriff;
   });
-  board.thiefCards.forEach(card => {
+  board.cards[Thief].forEach(card => {
     cards[card - 1] = Thief;
   });
   const meanCounts = getMeanCounts(cards)
     .map((count, idx) => [count, idx])
-    .filter((count, idx) => cards[idx] === null);
+    .filter((_, idx) => cards[idx] === null);
   // find max count that is not taken by sheriff or thief
-  const maxCount = Math.max(...meanCounts.map(([count, idx]) => count));
+  const maxCount = Math.max(...meanCounts.map(([count]) => count));
   // return the card that participates in the most good sets of three cards
   // take only ones with max value
-  let maxIndices = meanCounts.filter(([count, idx]) => count === maxCount)
-    .map(([count, idx]) => idx);
+  let maxIndices = meanCounts.filter(([count]) => count === maxCount)
+    .map(([_, idx]) => idx);
   return sample(maxIndices) + 1;
 }
 
