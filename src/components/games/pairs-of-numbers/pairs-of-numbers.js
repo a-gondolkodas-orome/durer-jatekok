@@ -15,7 +15,9 @@ const BoardClient = ({ board, ctx, moves }) => {
             disabled={!ctx.shouldRoleSelectorMoveNext}
             onClick={() => moves.add1(board)}
           >
-            Növelek (→<code className="text-md">({board[0]},{board[1] + 1})</code>)
+            Növelek {ctx.shouldRoleSelectorMoveNext && <>
+              (→<code className="text-md">({board[0]},{board[1] + 1})</code>)
+            </>}
           </button>
         </span>
         <span className='grow px-2'>
@@ -24,7 +26,9 @@ const BoardClient = ({ board, ctx, moves }) => {
             disabled={!ctx.shouldRoleSelectorMoveNext}
             onClick={() => moves.subtract(board)}
           >
-            Kivonok (→<code className="text-md">({board[0] - board[1]},{board[1]})</code>)
+            Kivonok {ctx.shouldRoleSelectorMoveNext && <>
+              (→<code className="text-md">({board[0] - board[1]},{board[1]})</code>)
+            </>}
           </button>
         </span>
       </div>
