@@ -78,10 +78,9 @@ const aiBotStrategy = ({ board, moves }) => {
 };
 
 const rule = <>
-  Kezdetben egy pozitív egészekből álló <code>(n, k)</code> rendezett számpár van
-  felírva egy lapra. Két játékos felváltva lép, ha a nem áthúzott <code>(a, b)</code> számpár
-  szerepel a lapon, a soron lévő játékosnak egy lépésben át kell húznia <code>(a, b)</code>-t és
-helyette felírnia vagy az <code>(a, b + 1)</code>, vagy az <code>(a − b, b)</code> számpárt.
+  Adott egy pozitív egészekből álló <code>(n, k)</code> rendezett számpár.
+  Két játékos felváltva lép, az <code>(a, b)</code> számpár
+  helyére egy lépésben kerülhet vagy az <code>(a, b + 1)</code>, vagy az <code>(a − b, b)</code> számpár.
 Az nyer, aki először ír fel olyan számpárt, amelyben nem mindkét szám pozitív.
 </>;
 
