@@ -1,55 +1,75 @@
 import React, { Fragment } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, cloneDeep } from 'lodash';
+import { range, cloneDeep, sample } from 'lodash';
+
+const isAllowed = (board, n) => {
+  if (board.previousMove === null) {
+    return true;
+  }
+  if (board.numbersOnTable[n - 1] === false) return false;
+  if (board.previousMove > n && board.previousMove % n === 0) {
+    return true;
+  } else if (board.previousMove < n && n % board.previousMove === 0) {
+    return true;
+  }
+  return false;
+}
 
 const BoardClient = ({ board, ctx, moves }) => {
-  const isMoveAllowed = n => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
-    if (board.previousMove === null) {
-      return true;
-    }
-    if (board.previousMove > n && board.previousMove % n === 0) {
-      return true;
-    } else if (board.previousMove < n && n % board.previousMove === 0) {
-      return true;
-    }
-    return false;
-  }
+  const isMoveAllowed = n => isAllowed(board, n);
+
   const removeNumber = n => {
+    if (!ctx.shouldRoleSelectorMoveNext) return;
     if (!isMoveAllowed(n)) return;
     moves.removeNumber(board, n);
   }
+
+  // TODO: rewrite without svg
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
+      <p className = "text-2xl">
+        A mostani játékban n={board.numbersOnTable.length}
+      </p>
+      <p className = "text-2xl">
+        Az előző lépés: {board.previousMove === null ? "-" : board.previousMove}
+      </p>
       <svg width="100%" height="100%" viewBox='0 0 200 200'>
         {
           range(board.numbersOnTable.length).map(n => (
             <Fragment key={n}>
               <rect
                 key={`${n}rect`}
-                x={(n%5)*40+5} y={Math.floor(n/5)*40+5+20+20} width={30} height={30} fill="white"
-                stroke= {board.numbersOnTable[n] ?
-                                (board.previousMove%(n+1)===0 || (n+1)%board.previousMove===0)? "green" : "lightgreen" : "red"}
-                opacity={ board.numbersOnTable[n] ? 1 : 0.1}
+                x={(n%5)*40+5} y={Math.floor(n/5)*40+5} width={30} height={30} fill="white"
+                stroke= {board.numbersOnTable[n] ? (isMoveAllowed(n + 1) ? "green" : "red") : "gray"}
+                opacity={ board.numbersOnTable[n] ? 1 : 0.5}
                 strokeWidth="1%"
                 onClick={() => removeNumber(n+1)}
+                onKeyUp={(event) => {
+                  if (event.key === 'Enter') removeNumber(n+1);
+                }}
+                tabIndex={isMoveAllowed(n + 1) ? 0 : 'none'}
+                className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
               />
               <text
                 key={`${n}text`}
                 x={(n%5)*40+20}
-                y={Math.floor(n/5)*40+20+20+20}
+                y={Math.floor(n/5)*40+20}
                 fontSize="100%"
                 textAnchor="middle"
                 dominantBaseline="middle"
-                opacity={ board.numbersOnTable[n] ? 1 : 0.1}
+                opacity={ board.numbersOnTable[n] ? 1 : 0.5}
                 fill="black"
-                onClick={() => removeNumber(n+1)}>
+                onClick={() => removeNumber(n+1)}
+                onKeyUp={(event) => {
+                  if (event.key === 'Enter') removeNumber(n+1);
+                }}
+                tabIndex={isMoveAllowed(n + 1) ? 0 : 'none'}
+                className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
+              >
                   {n+1}
               </text>
             </Fragment>
           ))}
-        <text x="5" y="30" fontSize="10" textAnchor="start"  fill="black">Az előző lépés: {board.previousMove === null ? "" : board.previousMove}</text>
-        <text x="5" y="10" fontSize="10" textAnchor="start"  fill="black">A mostani játékban n={board.numbersOnTable.length}</text>
       </svg>
     </section>
   )
@@ -61,15 +81,24 @@ const moves = {
     nextBoard.numbersOnTable[n - 1] = false;
     nextBoard.previousMove = n;
     events.endTurn();
-    if (nextBoard.numbersOnTable.filter(x => x).length === 0) {
+    if (isGameEnd(nextBoard)) {
       events.endGame();
     }
     return { nextBoard };
   }
 };
 
+const isGameEnd = board => {
+  const possibleMoves = range(board.numbersOnTable.length)
+    .filter(n => isAllowed(board, n + 1));
+  return possibleMoves.length === 0;
+}
+
 const aiBotStrategy = ({ board, moves }) => {
-  moves.removeNumber(board, 1);
+  const possibleMoves = range(board.numbersOnTable.length)
+    .filter(n => isAllowed(board, n + 1))
+    .map(x => x + 1);
+  moves.removeNumber(board, sample(possibleMoves));
 };
 
 const rule = <>
