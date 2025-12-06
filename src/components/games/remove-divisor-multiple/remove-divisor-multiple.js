@@ -47,7 +47,7 @@ const BoardClient = ({ board, ctx, moves }) => {
                 onKeyUp={(event) => {
                   if (event.key === 'Enter') removeNumber(n+1);
                 }}
-                tabIndex={isMoveAllowed(n + 1) ? 0 : 'none'}
+                tabIndex={isMoveAllowed(n + 1) && ctx.shouldRoleSelectorMoveNext ? 0 : 'none'}
                 className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
               />
               <text
@@ -63,7 +63,6 @@ const BoardClient = ({ board, ctx, moves }) => {
                 onKeyUp={(event) => {
                   if (event.key === 'Enter') removeNumber(n+1);
                 }}
-                tabIndex={isMoveAllowed(n + 1) ? 0 : 'none'}
                 className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
               >
                   {n+1}
