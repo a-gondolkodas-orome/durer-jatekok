@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, cloneDeep, sample } from 'lodash';
+import { strategyDict } from './bot-strategy';
 
 const isAllowed = (board, n) => {
   if (board.previousMove === null) {
@@ -93,12 +94,30 @@ const isGameEnd = board => {
   return possibleMoves.length === 0;
 }
 
-const aiBotStrategy = ({ board, moves }) => {
-  const possibleMoves = range(board.numbersOnTable.length)
-    .filter(n => isAllowed(board, n + 1))
-    .map(x => x + 1);
-  moves.removeNumber(board, sample(possibleMoves));
+const aiBotStrategy = ({ board, ctx, moves }) => {
+  const stateId = generateStateID(board);
+  const optimalMoves = strategyDict[board.numbersOnTable.length]
+    ? strategyDict[board.numbersOnTable.length][stateId]
+    : [];
+  if (optimalMoves.length) {
+    moves.removeNumber(board, sample(optimalMoves));
+  } else {
+    const possibleMoves = range(board.numbersOnTable.length)
+      .filter(n => isAllowed(board, n + 1))
+      .map(x => x + 1);
+    moves.removeNumber(board, sample(possibleMoves));
+  }
 };
+
+const generateStateID = (board) => {
+  let id = 0;
+  for (let i = 0; i < board.numbersOnTable.length; i++) {
+    if (board.numbersOnTable[i]){
+      id += 2**(i)
+    }
+  }
+  return (board.previousMove === null ? '-1' : board.previousMove) + "_" +id;
+}
 
 const rule = <>
   Egy táblára az <i>1</i>, <i>2</i>, <i>...</i>, <i>n</i> számok (<i>n &#8804; 9</i>)
