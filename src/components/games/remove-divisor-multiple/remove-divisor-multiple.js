@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { range, cloneDeep, sample } from 'lodash';
+import { range, cloneDeep, sample, random } from 'lodash';
 import { strategyDict } from './bot-strategy';
 
 const isAllowed = (board, n) => {
@@ -94,15 +94,17 @@ const isGameEnd = board => {
   return possibleMoves.length === 0;
 }
 
+// TODO: implement strategy for all cases
 const aiBotStrategy = ({ board, ctx, moves }) => {
+  const numCount = board.numbersOnTable.length;
   const stateId = generateStateID(board);
-  const optimalMoves = strategyDict[board.numbersOnTable.length]
-    ? strategyDict[board.numbersOnTable.length][stateId]
+  const optimalMoves = strategyDict[numCount]
+    ? strategyDict[numCount][stateId]
     : [];
   if (optimalMoves.length) {
     moves.removeNumber(board, sample(optimalMoves));
   } else {
-    const possibleMoves = range(board.numbersOnTable.length)
+    const possibleMoves = range(numCount)
       .filter(n => isAllowed(board, n + 1))
       .map(x => x + 1);
     moves.removeNumber(board, sample(possibleMoves));
@@ -120,7 +122,7 @@ const generateStateID = (board) => {
 }
 
 const rule = <>
-  Egy táblára az <i>1</i>, <i>2</i>, <i>...</i>, <i>n</i> számok (<i>n &#8804; 9</i>)
+  Egy táblára az <i>1</i>, <i>2</i>, <i>...</i>, <i>n</i> számok (<i>n &#8804; 15</i>)
   vannak felírva. Két játékos játszik, felváltva lépnek. A kezdőjátékos az első
   lépésében kiválaszt egy tetszőleges számot a tábláról és letörli azt. Ezután
   minden lépésben egy olyan számot kell letörölni, ami az előző (másik játékos
@@ -130,15 +132,22 @@ const rule = <>
 const getPlayerStepDescription = () =>
   'Válassz egyet a letörölhető számok közül.';
 
+const generateStartBoard = () => {
+  const numCount = random(0, 2) === 0
+    ? sample([6, 10])
+    : sample([7, 8, 9, 11, 12, 13, 14, 15]);
+  return ({
+    numbersOnTable: Array(numCount).fill(true),
+    previousMove: null
+  })
+}
+
 export const RemoveDivisorMultiple = strategyGameFactory({
   rule,
   title: 'Osztó/Többszörös Törlés',
   BoardClient,
   getPlayerStepDescription,
-  generateStartBoard: () => ({
-    numbersOnTable: Array(8).fill(true),
-    previousMove: null
-  }),
+  generateStartBoard,
   aiBotStrategy,
   moves
 });
