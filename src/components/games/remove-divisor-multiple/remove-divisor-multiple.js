@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
 import { range, cloneDeep, sample, random } from 'lodash';
 import { strategyDict } from './bot-strategy';
@@ -25,7 +25,6 @@ const BoardClient = ({ board, ctx, moves }) => {
     moves.removeNumber(board, n);
   }
 
-  // TODO: rewrite without svg
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <p className = "text-2xl">
@@ -34,43 +33,25 @@ const BoardClient = ({ board, ctx, moves }) => {
       <p className = "text-2xl">
         Az előző lépés: {board.previousMove === null ? "-" : board.previousMove}
       </p>
-      <svg width="100%" height="100%" viewBox='0 0 200 200'>
-        {
-          range(board.numbersOnTable.length).map(n => (
-            <Fragment key={n}>
-              <rect
-                key={`${n}rect`}
-                x={(n%5)*40+5} y={Math.floor(n/5)*40+5} width={30} height={30} fill="white"
-                stroke= {board.numbersOnTable[n] ? (isMoveAllowed(n + 1) ? "green" : "red") : "gray"}
-                opacity={ board.numbersOnTable[n] ? 1 : 0.5}
-                strokeWidth="1%"
-                onClick={() => removeNumber(n+1)}
-                onKeyUp={(event) => {
-                  if (event.key === 'Enter') removeNumber(n+1);
-                }}
-                tabIndex={isMoveAllowed(n + 1) && ctx.shouldRoleSelectorMoveNext ? 0 : 'none'}
-                className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
-              />
-              <text
-                key={`${n}text`}
-                x={(n%5)*40+20}
-                y={Math.floor(n/5)*40+20}
-                fontSize="100%"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                opacity={ board.numbersOnTable[n] ? 1 : 0.5}
-                fill="black"
-                onClick={() => removeNumber(n+1)}
-                onKeyUp={(event) => {
-                  if (event.key === 'Enter') removeNumber(n+1);
-                }}
-                className={!isMoveAllowed(n + 1) ? 'cursor-not-allowed' : ''}
-              >
-                  {n+1}
-              </text>
-            </Fragment>
-          ))}
-      </svg>
+      <div>
+        {range(1, board.numbersOnTable.length + 1).map(num =>
+          <button
+            key={num}
+            disabled={!isMoveAllowed(num) || !ctx.shouldRoleSelectorMoveNext}
+            onClick={() => removeNumber(num)}
+            className={`
+              m-1 min-h-28 w-18
+              border-4 shadow-md rounded-xl text-4xl
+              text-center font-bold
+              ${board.numbersOnTable[num - 1] ? '' : 'opacity-50 border-gray-600 text-gray-600'}
+              ${board.numbersOnTable[num - 1] ? (isMoveAllowed(num) ? 'border-green-600' : 'border-red-600') : ''}
+              enabled:hover:bg-green-600 enabled:focus:bg-green-600
+            `}
+          >
+            {num}
+          </button>
+        )}
+      </div>
     </section>
   )
 };
