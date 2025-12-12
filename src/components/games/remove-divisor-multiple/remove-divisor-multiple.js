@@ -75,7 +75,6 @@ const isGameEnd = board => {
   return possibleMoves.length === 0;
 }
 
-// TODO: implement strategy for all cases
 const aiBotStrategy = ({ board, ctx, moves }) => {
   const numCount = board.numbersOnTable.length;
   const stateId = generateStateID(board);
