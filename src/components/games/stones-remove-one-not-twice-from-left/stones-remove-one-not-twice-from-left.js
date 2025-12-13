@@ -3,6 +3,13 @@ import { strategyGameFactory } from '../strategy-game';
 import { cloneDeep, isEqual, sample, random } from 'lodash';
 
 const BoardClient = ({ board, ctx, moves }) => {
+  const isMoveAllowed = pileId => {
+    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (board.piles[pileId] === 0) return false;
+    if (pileId === 1 && board.isLastMoveFromLeftByPlayer[ctx.currentPlayer]) return false;
+    return true;
+  }
+
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <div className="flex flex-wrap">
@@ -10,7 +17,7 @@ const BoardClient = ({ board, ctx, moves }) => {
           <button
             className="cta-button"
             onClick = {() => moves.removeStone(board, 0)}
-            disabled={!ctx.shouldRoleSelectorMoveNext || board.isLastMoveFromLeftByPlayer[ctx.currentPlayer]}
+            disabled={!isMoveAllowed(0)}
           >
             Bal: {board.piles[0]}
           </button>
@@ -19,7 +26,7 @@ const BoardClient = ({ board, ctx, moves }) => {
           <button
             className="cta-button"
             onClick = {() => moves.removeStone(board, 1)}
-            disabled={!ctx.shouldRoleSelectorMoveNext}
+            disabled={!isMoveAllowed(1)}
           >
             Jobb: {board.piles[1]}
           </button>
