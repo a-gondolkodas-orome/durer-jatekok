@@ -73,8 +73,8 @@ const getPileOfRandomAllowedMove = (board, ctx) => {
 
 const rule = <>
   Két kupacban kavicsok vannak elhelyezve, a bal oldaliban <i>b</i>, a jobb
-  oldaliban <i>j</i> darab, amelyekkel két játékos játszik. Felváltva
-  lépnek, és minden lépés során egy kavicsot kell elvenniük valamelyik kupacból.
+  oldaliban <i>j</i> darab. A két játékos felváltva
+  lép, és minden lépés során egy kavicsot kell elvenniük valamelyik kupacból.
   Egy játékos azonban nem vehet el két egymást követő lépésben a bal oldali
   kupacból. Az veszít, aki nem tud lépni.
 </>;
