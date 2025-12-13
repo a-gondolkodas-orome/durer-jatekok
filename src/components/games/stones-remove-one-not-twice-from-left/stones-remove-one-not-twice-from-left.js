@@ -10,7 +10,7 @@ const BoardClient = ({ board, ctx, moves }) => {
           <button
             className="cta-button"
             onClick = {() => moves.removeStone(board, 0)}
-            disabled={!ctx.shouldRoleSelectorMoveNext || board.previousTouchedPile[ctx.currentPlayer] === 0}
+            disabled={!ctx.shouldRoleSelectorMoveNext || board.isLastMoveFromLeftByPlayer[ctx.currentPlayer]}
           >
             Bal: {board.piles[0]}
           </button>
@@ -33,14 +33,24 @@ const moves = {
   removeStone: (board, { ctx, events }, pileId) => {
     const nextBoard = cloneDeep(board);
     nextBoard.piles[pileId] = board.piles[pileId] - 1;
-    nextBoard.previousTouchedPile[ctx.currentPlayer] = pileId;
+    nextBoard.isLastMoveFromLeftByPlayer[ctx.currentPlayer] = (pileId === 0);
     events.endTurn();
-    if (isEqual(nextBoard.piles, [0, 0])) {
+    if (isGameEnd(nextBoard, ctx)) {
       events.endGame();
     }
     return { nextBoard };
   }
 };
+
+const isGameEnd = (board, ctx) => {
+  if (isEqual(board.piles, [0, 0])) {
+    return true;
+  }
+  if (board.piles[1] === 0 && board.isLastMoveFromLeftByPlayer[1 - ctx.currentPlayer]) {
+    return true;
+  }
+  return false;
+}
 
 const aiBotStrategy = ({ board, ctx, moves }) => {
   if (board.piles[1] > 0) {
@@ -63,8 +73,8 @@ const getPlayerStepDescription = () =>
 
 const generateStartBoard = () => {
   return {
-    piles: [6, 10],
-    previousTouchedPile: [null, null]
+    piles: [6, 3],
+    isLastMoveFromLeftByPlayer: [false, false]
   };
 }
 
