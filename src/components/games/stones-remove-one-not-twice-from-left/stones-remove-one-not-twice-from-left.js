@@ -1,6 +1,6 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { cloneDeep, isEqual, sample } from 'lodash';
+import { cloneDeep, isEqual, sample, random } from 'lodash';
 
 const BoardClient = ({ board, ctx, moves }) => {
   return (
@@ -53,12 +53,16 @@ const isGameEnd = (board, ctx) => {
 }
 
 const aiBotStrategy = ({ board, ctx, moves }) => {
-  if (board.piles[1] > 0) {
-    moves.removeStone(board, 1);
-  } else {
-    moves.removeStone(board, 0);
-  }
+  const randomMove = getPileOfRandomAllowedMove(board, ctx);
+  moves.removeStone(board, randomMove);
 };
+
+const getPileOfRandomAllowedMove = (board, ctx) => {
+  if (board.piles[0] === 0) return 1;
+  if (board.piles[1] === 0) return 0;
+  if (board.isLastMoveFromLeftByPlayer[ctx.currentPlayer]) return 1;
+  return random(0, 1);
+}
 
 const rule = <>
   Két kupacban kavicsok vannak elhelyezve, a bal oldaliban <i>b</i>, a jobb
