@@ -1,6 +1,6 @@
 import React from 'react';
 import { strategyGameFactory } from '../strategy-game';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep, isEqual, sample } from 'lodash';
 
 const BoardClient = ({ board, ctx, moves }) => {
   return (
@@ -72,8 +72,17 @@ const getPlayerStepDescription = () =>
   'Kattints a kupacra ahonnan el szeretnél venni egy kavicsot.';
 
 const generateStartBoard = () => {
+  const piles = sample([
+    [11, 8],
+    [9, 9],
+    [9, 8],
+    [9, 7],
+    [5, 8],
+    [8, 7],
+    [6, 4]
+  ])
   return {
-    piles: [6, 3],
+    piles,
     isLastMoveFromLeftByPlayer: [false, false]
   };
 }
