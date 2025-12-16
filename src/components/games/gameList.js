@@ -147,13 +147,15 @@ export const gameList = {
     year: { k: 'X. (16/17)', v: '16/17' },
     round: 'döntő',
     category: ['A'],
-    name: 'Átfordítás, elvétel (6)'
+    name: 'Átfordítás, elvétel (6)',
+    title: 'Átfordítás, elvétel (6 korong)'
   }
   , TenDiscs: {
     year: { k: 'X. (16/17)', v: '16/17' },
     round: 'döntő',
     category: ['B'],
-    name: 'Átfordítás, elvétel (10)'
+    name: 'Átfordítás, elvétel (10)',
+    title: 'Átfordítás, elvétel (10 korong)'
   }
   , PrimeExponentials: {
     year: { k: 'I. (07/08)', v: '07/08' },
@@ -189,7 +191,7 @@ export const gameList = {
     year: { k: 'XVIII. (24/25)', v: '24/25' },
     round: 'online',
     category: ['C', 'D', 'E'],
-    name: 'Bankrablók (7-10 bank)'
+    name: 'Bankrablók: 7-10 bank'
   }
   , Take1OrHalve: {
     year: { k: 'XVII. (23/24)', v: '23/24' },
@@ -201,13 +203,15 @@ export const gameList = {
     year: { k: 'XV. (21/22)', v: '21/22' },
     round: 'online',
     category: ['C'],
-    name: 'Békés kacsák (4 × 6)'
+    name: 'Békés kacsák (4 × 6)',
+    title: 'Békés kacsák a 4 × 6-os sakktáblán'
   }
   , ChessDucksE: {
     year: { k: 'XV. (21/22)', v: '21/22' },
     round: 'online',
     category: ['E'],
-    name: 'Békés kacsák (4 × 7)'
+    name: 'Békés kacsák (4 × 7)',
+    title: 'Békés kacsák a 4 × 7-es sakktáblán'
   }
   , TakePowerOfTwo: {
     year: { k: 'XV. (21/22)', v: '21/22' },

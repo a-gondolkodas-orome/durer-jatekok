@@ -6,7 +6,7 @@ import { partial, mapValues, wrap, _ } from 'lodash';
 
 export const strategyGameFactory = ({
   rule,
-  title,
+  metadata,
   roleLabels,
   BoardClient,
   generateStartBoard,
@@ -97,7 +97,7 @@ export const strategyGameFactory = ({
 
     return (
     <main className="p-2">
-      <GameHeader title={title} />
+      <GameHeader title={metadata.title || metadata.name} />
       <div className="flex justify-center">
         <div className="max-w-[100ch] w-full">
           <GameRule ruleDescription={rule} />
