@@ -96,9 +96,9 @@ export const strategyGameFactory = ({
     };
 
     return (
-    <main className="p-2">
+    <main className="flex flex-col p-2 min-h-screen">
       <GameHeader title={metadata.title || metadata.name} />
-      <div className="flex justify-center">
+      <div className="flex justify-center grow">
         <div className="max-w-[100ch] w-full">
           <GameRule ruleDescription={rule} />
           <div className="flex flex-wrap">
@@ -118,7 +118,7 @@ export const strategyGameFactory = ({
           </div>
         </div>
       </div>
-      <GameFooter />
+      <GameFooter credit={metadata.credit}/>
       <GameEndDialog
         isOpen={isGameEndDialogOpen}
         setIsOpen={setIsGameEndDialogOpen}
