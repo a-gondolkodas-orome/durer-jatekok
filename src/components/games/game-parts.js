@@ -82,8 +82,8 @@ export const GameFooter = ({ credit }) => {
     <footer className="text-right">
       { credit !== undefined && (
         <p className ="px-2 text-gray-800 font-light text-sm">
-          { credit.suggestedBy ? `A játékot javasolta: ${credit.suggestedBy}.` : ''}
-          { credit.developedBy ? ` A játékot programozta: ${credit.developedBy}.` : ''}
+          { (credit.suggestedBy || []).length ? `A játékot javasolta: ${credit.suggestedBy.join(', ')}.` : ''}
+          { (credit.developedBy || []).length ? ` A játékot programozta: ${credit.developedBy.join(', ')}.` : ''}
         </p>
       )}
       <a

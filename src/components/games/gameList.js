@@ -1,3 +1,23 @@
+/*
+Each element of gameList should look like the following:
+
+```
+// key should match path in router (app.js)
+DominoesOnChessboard : {
+  year: { k: 'III. (09/10)', v: '09/10' },
+  round: 'döntő',
+  category: ['C'],
+  // name on card in overview list
+  name: 'Sakktáblára Dominók',
+  // optional, longer title to show on game page instead of name
+  title: 'Sakktáblára Dominók felváltva',
+  // Optional credit with optional suggestedBy and developedBy fields.
+  // If present, both should be array even if only one person.
+  credit: { suggestedBy: ['???'], developedBy: ['Czeller Ildikó'] }
+}
+```
+*/
+
 export const gameList = {
   FiveFiveCard: {
     year: { k: 'VII. (13/14)', v: '13/14' },
@@ -27,7 +47,8 @@ export const gameList = {
     year: { k: 'VI. (12/13)', v: '12/13' },
     round: 'döntő',
     category: ['D'],
-    name: 'Hunyadi és a janicsárok'
+    name: 'Hunyadi és a janicsárok',
+    credit: { developedBy: ['Czeller Ildikó', 'Schweitzer Ádám'] }
   }
   , PileSplitter: {
     year: { k: 'VIII. (14/15)', v: '14/15' },
@@ -236,14 +257,14 @@ export const gameList = {
     round: 'döntő',
     category: ['C'],
     name: 'Háromszög színezés',
-    credit: { developedBy: 'Czeller Ildikó' }
+    credit: { developedBy: ['Czeller Ildikó'] }
   }
   , DominoesOnChessboard : {
     year: { k: 'III. (09/10)', v: '09/10' },
     round: 'döntő',
     category: ['C'],
     name: 'Sakktáblára Dominók',
-    credit: { suggestedBy: '???', developedBy: 'Czeller Ildikó'}
+    credit: { suggestedBy: ['???'], developedBy: ['Czeller Ildikó'] }
   }
   , PairsOfNumbers: {
     year: { k: 'XVIII. (24/25)', v: '24/25' },
@@ -268,6 +289,6 @@ export const gameList = {
     round: 'online',
     category: ['E'],
     name: 'Kavicsgyűjtés egyesével',
-    credit: { suggestedBy: 'Kartal (TBD!!)' }
+    credit: { developedBy: [], suggestedBy: ['TBD'] }
   }
 };
