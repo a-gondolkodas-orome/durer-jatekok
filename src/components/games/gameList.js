@@ -58,7 +58,8 @@ export const gameList = {
     year: { k: 'VIII. (14/15)', v: '14/15' },
     round: 'döntő',
     category: ['A'],
-    name: 'Kupac kettéosztó'
+    name: 'Kupac kettéosztó',
+    credit: { developedBy: ['Szűcs Gábor'] }
   }
   , PileSplitter3: {
     year: { k: 'VIII. (14/15)', v: '14/15' },
@@ -221,14 +222,14 @@ export const gameList = {
     round: 'döntő',
     category: ['C'],
     name: 'Cápa üldözés (4 x 4)',
-    credit: { developedBy: ['Csizmadia Miklós', 'Kempf Alex'] }
+    credit: { suggestedBy: ['Páhán Anita'], developedBy: ['Csizmadia Miklós', 'Kempf Alex'] }
   }
   , SharkChase5: {
     year: { k: 'XVII. (23/24)', v: '23/24' },
     round: 'döntő',
     category: ['D'],
     name: 'Cápa üldözés (5 x 5)',
-    credit: { developedBy: ['Szemerédi Levente'] }
+    credit: { suggestedBy: ['Páhán Anita'], developedBy: ['Szemerédi Levente'] }
   }
   , PlusOneTwoThree: {
     year: { k: 'V. (11/12)', v: '11/12' },
@@ -241,13 +242,15 @@ export const gameList = {
     year: { k: 'XVIII. (24/25)', v: '24/25' },
     round: 'online',
     category: ['C', 'D', 'E'],
-    name: 'Bankrablók: 7-10 bank'
+    name: 'Bankrablók: 7-10 bank',
+    credit: { developedBy: ['Hajós Balázs'] }
   }
   , Take1OrHalve: {
     year: { k: 'XVII. (23/24)', v: '23/24' },
     round: 'online',
     category: ['C', 'D', 'E'],
-    name: 'Egyet vegyél vagy felezz'
+    name: 'Egyet vegyél vagy felezz',
+    credit: { developedBy: ['Jánosik Áron'] }
   }
   , ChessDucksC: {
     year: { k: 'XV. (21/22)', v: '21/22' },
@@ -255,7 +258,7 @@ export const gameList = {
     category: ['C'],
     name: 'Békés kacsák (4 × 6)',
     title: 'Békés kacsák a 4 × 6-os sakktáblán',
-    credit: { developedBy: ['Czeller Ildikó'] }
+    credit: { developedBy: ['Jánosik Áron'] }
   }
   , ChessDucksE: {
     year: { k: 'XV. (21/22)', v: '21/22' },
@@ -263,13 +266,14 @@ export const gameList = {
     category: ['E'],
     name: 'Békés kacsák (4 × 7)',
     title: 'Békés kacsák a 4 × 7-es sakktáblán',
-    credit: { developedBy: ['Czeller Ildikó'] }
+    credit: { developedBy: ['Jánosik Áron'] }
   }
   , TakePowerOfTwo: {
     year: { k: 'XV. (21/22)', v: '21/22' },
     round: 'online',
     category: ['D'],
-    name: 'Kettőhatványok kivonása'
+    name: 'Kettőhatványok kivonása',
+    credit: { developedBy: ['Jánosik Áron'] }
   }
   , ThievesMean: {
     year: { k: 'XVIII. (24/25)', v: '24/25' },
@@ -311,7 +315,7 @@ export const gameList = {
     round: 'döntő',
     category: ['C', 'D'],
     name: 'Barangolás huszárral',
-    credit: { developedBy: ['Czeller Ildikó'] }
+    credit: { suggestedBy: ['Hegedűs Dániel'], developedBy: ['Czeller Ildikó'] }
   }
   , RemoveDivisorMultiple: {
     year: { k: 'XIX. (25/26)', v: '25/26' },
