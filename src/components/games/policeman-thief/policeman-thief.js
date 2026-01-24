@@ -25,7 +25,11 @@ const generateStartBoardB = () => {
     ...neighbours[policeStartPosition[0]],
     ...neighbours[policeStartPosition[1]]
   ];
-  const thiefStartPosition = sample(difference(range(0, 8), immediatePoliceWinPositions));
+  const thiefStartPositionOptions = difference(range(0, 8), immediatePoliceWinPositions);
+  if (thiefStartPositionOptions.length === 0) {
+    return generateStartBoardB();
+  }
+  const thiefStartPosition = sample(thiefStartPositionOptions);
   return {
     turnCount: 0,
     policemen: policeStartPosition,
