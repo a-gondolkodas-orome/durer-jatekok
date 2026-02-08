@@ -9,7 +9,24 @@ export default defineConfig(({ command }) => ({
     exclude: [],
     loader: 'jsx'
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx'
+      }
+    }
+  },
   server: {
-    port: 8012
+    host: true,
+    port: 8012,
+    watch: {
+      usePolling: true
+    }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    clearMocks: true,
+    restoreMocks: true
   }
 }));
