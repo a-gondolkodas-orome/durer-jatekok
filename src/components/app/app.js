@@ -1,60 +1,53 @@
-import React, { StrictMode, Suspense, lazy } from 'react';
+import React, { StrictMode } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router';
 import { Overview } from '../overview/overview';
 import { ErrorPage } from '../error-page';
-
-const lazyNamed = (importFn, name) =>
-  lazy(() => importFn().then(m => ({ default: m[name] })));
 
 /*
 Import all the games individually. Aim to keep abc ordering for easy navigation.
 */
 
-const AddReduceDouble = lazyNamed(() => import('../games/pile-splitting-games/add-reduce-double/add-reduce-double'), 'AddReduceDouble');
-const AntiTicTacToe = lazyNamed(() => import('../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe'), 'AntiTicTacToe');
-const Bacteria = lazyNamed(() => import('../games/bacteria/bacteria'), 'Bacteria');
-const BankRobbers = lazyNamed(() => import('../games/bank-robbers/bank-robbers'), 'BankRobbers');
-const ChessBishops = lazyNamed(() => import('../games/chess-bishops/chess-bishops'), 'ChessBishops');
-const ChessDucksC = lazyNamed(() => import('../games/chess-ducks/chess-ducks'), 'ChessDucksC');
-const ChessDucksE = lazyNamed(() => import('../games/chess-ducks/chess-ducks'), 'ChessDucksE');
-const ChessKnight = lazyNamed(() => import('../games/chess-knight/chess-knight'), 'ChessKnight');
-const ChessRook = lazyNamed(() => import('../games/chess-rook/chess-rook'), 'ChessRook');
-const Coin123 = lazyNamed(() => import('../games/coin-3-piles/coin123'), 'Coin123');
-const Coin357 = lazyNamed(() => import('../games/coin-3-piles/coin357'), 'Coin357');
-const CubeColoring = lazyNamed(() => import('../games/cube-coloring/cube-coloring'), 'CubeColoring');
-const DominoesOnChessboard = lazyNamed(() => import('../games/dominoes-on-chessboard/dominoes-on-chessboard'), 'DominoesOnChessboard');
-const FiveFiveCard = lazyNamed(() => import('../games/five-five-card/five-five-card'), 'FiveFiveCard');
-const FiveSquares = lazyNamed(() => import('../games/five-squares/five-squares'), 'FiveSquares');
-const FourPilesSpreadAhead = lazyNamed(() => import('../games/pile-splitting-games/four-piles-spread-ahead/four-piles-spread-ahead'), 'FourPilesSpreadAhead');
-const HunyadiAndTheJanissaries = lazyNamed(() => import('../games/hunyadi-and-the-janissaries/hunyadi-and-the-janissaries'), 'HunyadiAndTheJanissaries');
-const NumberCovering10 = lazyNamed(() => import('../games/number-covering/number-covering'), 'NumberCovering10');
-const NumberCovering8 = lazyNamed(() => import('../games/number-covering/number-covering'), 'NumberCovering8');
-const PairsOfNumbers = lazyNamed(() => import('../games/pairs-of-numbers/pairs-of-numbers'), 'PairsOfNumbers');
-const PileSplitter = lazyNamed(() => import('../games/pile-splitting-games/pile-splitter/pile-splitter'), 'PileSplitter');
-const PileSplitter3 = lazyNamed(() => import('../games/pile-splitting-games/pile-splitter-3/pile-splitter-3'), 'PileSplitter3');
-const PileSplitter4 = lazyNamed(() => import('../games/pile-splitting-games/pile-splitter-4/pile-splitter-4'), 'PileSplitter4');
-const PlusOneTwoThree = lazyNamed(() => import('../games/plus-one-two-three/plus-one-two-three'), 'PlusOneTwoThree');
-const PolicemanthiefA = lazyNamed(() => import('../games/policeman-thief/policeman-thief'), 'PolicemanthiefA');
-const PolicemanthiefB = lazyNamed(() => import('../games/policeman-thief/policeman-thief'), 'PolicemanthiefB');
-const PrimeExponentials = lazyNamed(() => import('../games/prime-exponentials/prime-exponentials'), 'PrimeExponentials');
-const RemoveDivisorMultiple = lazyNamed(() => import('../games/remove-divisor-multiple/remove-divisor-multiple'), 'RemoveDivisorMultiple');
-const RockPaperScissor = lazyNamed(() => import('../games/rock-paper-scissor/rock-paper-scissor'), 'RockPaperScissor');
-const SharkChase4 = lazyNamed(() => import('../games/shark-chase/shark-4-by-4/shark-chase'), 'SharkChase4');
-const SharkChase5 = lazyNamed(() => import('../games/shark-chase/shark-5-by-5/shark-chase'), 'SharkChase5');
-const SixDiscs = lazyNamed(() => import('../games/discs-turn-or-remove/discs-turn-or-remove'), 'SixDiscs');
-const StonesRemoveOneNotTwiceFromLeft = lazyNamed(() => import('../games/stones-remove-one-not-twice-from-left/stones-remove-one-not-twice-from-left'), 'StonesRemoveOneNotTwiceFromLeft');
-const SuperstitiousCounting = lazyNamed(() => import('../games/superstitious-counting/superstitious-counting'), 'SuperstitiousCounting');
-const Take1OrHalve = lazyNamed(() => import('../games/take-1-or-halve/take-1-or-halve'), 'Take1OrHalve');
-const TakePowerOfTwo = lazyNamed(() => import('../games/take-power-of-two/take-power-of-two'), 'TakePowerOfTwo');
-const TenDiscs = lazyNamed(() => import('../games/discs-turn-or-remove/discs-turn-or-remove'), 'TenDiscs');
-const ThievesMean7 = lazyNamed(() => import('../games/thieves-mean/thieves-mean-7/thieves-mean-7'), 'ThievesMean7');
-const ThievesMean9 = lazyNamed(() => import('../games/thieves-mean/thieves-mean-9/thieves-mean-9'), 'ThievesMean9');
-const TicTacToe = lazyNamed(() => import('../games/tictactoe-alikes/tictactoe/tictactoe'), 'TicTacToe');
-const TicTacToeDoubleStart = lazyNamed(() => import('../games/tictactoe-alikes/tictactoe-doublestart/tictactoe-doublestart'), 'TicTacToeDoubleStart');
-const TriangleColoring = lazyNamed(() => import('../games/triangle-coloring/triangle-coloring'), 'TriangleColoring');
-const TriangularGridRopes = lazyNamed(() => import('../games/triangular-grid-ropes/triangular-grid-ropes'), 'TriangularGridRopes');
-const TwelveSquares = lazyNamed(() => import('../games/twelve-squares/twelve-squares'), 'TwelveSquares');
-const TwoTimesTwo = lazyNamed(() => import('../games/two-times-two/two-times-two'), 'TwoTimesTwo');
+import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
+import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
+import { Bacteria } from '../games/bacteria/bacteria';
+import { BankRobbers } from '../games/bank-robbers/bank-robbers';
+import { ChessBishops } from '../games/chess-bishops/chess-bishops';
+import { ChessDucksC, ChessDucksE } from '../games/chess-ducks/chess-ducks';
+import { ChessKnight } from '../games/chess-knight/chess-knight';
+import { ChessRook } from '../games/chess-rook/chess-rook';
+import { Coin123 } from '../games/coin-3-piles/coin123';
+import { Coin357 } from '../games/coin-3-piles/coin357';
+import { CubeColoring } from '../games/cube-coloring/cube-coloring';
+import { DominoesOnChessboard } from '../games/dominoes-on-chessboard/dominoes-on-chessboard';
+import { FiveFiveCard } from '../games/five-five-card/five-five-card';
+import { FiveSquares } from '../games/five-squares/five-squares';
+import { FourPilesSpreadAhead } from '../games/pile-splitting-games/four-piles-spread-ahead/four-piles-spread-ahead';
+import { HunyadiAndTheJanissaries } from '../games/hunyadi-and-the-janissaries/hunyadi-and-the-janissaries';
+import { NumberCovering8, NumberCovering10 } from '../games/number-covering/number-covering';
+import { PairsOfNumbers } from '../games/pairs-of-numbers/pairs-of-numbers';
+import { PileSplitter } from '../games/pile-splitting-games/pile-splitter/pile-splitter';
+import { PileSplitter3 } from '../games/pile-splitting-games/pile-splitter-3/pile-splitter-3';
+import { PileSplitter4 } from '../games/pile-splitting-games/pile-splitter-4/pile-splitter-4';
+import { PlusOneTwoThree } from '../games/plus-one-two-three/plus-one-two-three';
+import { PolicemanthiefA, PolicemanthiefB } from '../games/policeman-thief/policeman-thief';
+import { PrimeExponentials } from '../games/prime-exponentials/prime-exponentials';
+import { RemoveDivisorMultiple } from '../games/remove-divisor-multiple/remove-divisor-multiple';
+import { RockPaperScissor } from '../games/rock-paper-scissor/rock-paper-scissor';
+import { SharkChase4 } from '../games/shark-chase/shark-4-by-4/shark-chase';
+import { SharkChase5 } from '../games/shark-chase/shark-5-by-5/shark-chase';
+import { SixDiscs, TenDiscs } from '../games/discs-turn-or-remove/discs-turn-or-remove';
+import { StonesRemoveOneNotTwiceFromLeft } from '../games/stones-remove-one-not-twice-from-left/stones-remove-one-not-twice-from-left';
+import { SuperstitiousCounting } from '../games/superstitious-counting/superstitious-counting';
+import { Take1OrHalve } from '../games/take-1-or-halve/take-1-or-halve';
+import { TakePowerOfTwo } from '../games/take-power-of-two/take-power-of-two';
+import { ThievesMean7 } from '../games/thieves-mean/thieves-mean-7/thieves-mean-7';
+import { ThievesMean9 } from '../games/thieves-mean/thieves-mean-9/thieves-mean-9';
+import { TicTacToe } from '../games/tictactoe-alikes/tictactoe/tictactoe';
+import { TicTacToeDoubleStart } from '../games/tictactoe-alikes/tictactoe-doublestart/tictactoe-doublestart';
+import { TriangleColoring } from '../games/triangle-coloring/triangle-coloring';
+import { TriangularGridRopes } from '../games/triangular-grid-ropes/triangular-grid-ropes';
+import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
+import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
 
 export const App = () => {
   const routes = [
@@ -111,8 +104,6 @@ export const App = () => {
   );
 
 return <StrictMode>
-    <Suspense fallback={<div>Loading game...</div>}>
-      <RouterProvider router={router} />
-    </Suspense>
+    <RouterProvider router={router}></RouterProvider>
   </StrictMode>;
 };
