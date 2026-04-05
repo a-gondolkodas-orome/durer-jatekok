@@ -5,6 +5,8 @@ import {
   Dialog, DialogPanel, DialogTitle,
   Description
 } from '@headlessui/react';
+import { useTranslation } from '../language/translate';
+import { LanguageSelector } from '../language/language-selector';
 
 export const GameSidebar = ({
   roleLabels,
@@ -12,11 +14,12 @@ export const GameSidebar = ({
   ctx,
   moves
 }) => {
+  const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.shouldRoleSelectorMoveNext;
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
       <p className="text-center font-bold text-lg basis-14">
-        {getCtaText(ctx)}
+        {getCtaText(ctx, t)}
       </p>
       {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext === false && (
         <div
@@ -34,13 +37,13 @@ export const GameSidebar = ({
             className="cta-button"
             onClick={() => moves.chooseRole(0)}
           >
-            {roleLabels ? roleLabels[0] : "Kezdő leszek"}
+            {roleLabels ? roleLabels[0] : t({ hu: 'Kezdő leszek', en: "I'll go first" })}
           </button>
           <button
             className="cta-button"
             onClick={() => moves.chooseRole(1)}
           >
-            {roleLabels ? roleLabels[1] : "Második leszek"}
+            {roleLabels ? roleLabels[1] : t({ hu: 'Második leszek', en: "I'll go second" })}
           </button>
         </span>
       )}
@@ -49,30 +52,32 @@ export const GameSidebar = ({
         disabled={!isNewGameAllowed}
         onClick={() => moves.startNewGame()}
       >
-        Új játék
+        {t({ hu: 'Új játék', en: 'New game' })}
       </button>
     </div>
   );
 };
 
 export const GameHeader = ({ title }) => {
+  const { t } = useTranslation();
   return (
   <>
     <header className="flex flex-wrap items-baseline">
       <Link
         to='/'
         className="rounded-lg px-2 md:px-4 bg-blue-400 hover:bg-blue-600 focus:bg-blue-600 md:basis-44 text-black no-underline"
-      >← <span className="hidden md:inline">Vissza a listához</span></Link>
+      >← <span className="hidden md:inline">{t({ hu: 'Vissza a listához', en: 'Back to list' })}</span></Link>
       <h1 className="grow text-blue-600 font-bold pb-4 text-center">
         {title}
       </h1>
-      <span className="basis-44 text-right hidden md:inline">
+      <span className="basis-44 text-right hidden md:flex items-center justify-end gap-2">
+        <LanguageSelector />
         <a
           href="https://forms.gle/7DwugmXNrvKgkiiu8"
           target="_blank"
           className="px-2"
         >
-          Hibabejelentő
+          {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
         </a>
       </span>
     </header>
@@ -81,12 +86,17 @@ export const GameHeader = ({ title }) => {
 };
 
 export const GameFooter = ({ credit }) => {
+  const { t } = useTranslation();
   return (
     <footer className="text-right">
       { credit !== undefined && (
         <p className ="px-2 text-gray-800 font-light text-sm">
-          { (credit.suggestedBy || []).length ? `A játékot javasolta: ${credit.suggestedBy.join(', ')}.` : ''}
-          { (credit.developedBy || []).length ? ` A játékot programozta: ${credit.developedBy.join(', ')}.` : ''}
+          { (credit.suggestedBy || []).length
+            ? t({ hu: `A játékot javasolta: ${credit.suggestedBy.join(', ')}.`, en: `Suggested by: ${credit.suggestedBy.join(', ')}.` })
+            : ''}
+          { (credit.developedBy || []).length
+            ? ' ' + t({ hu: `A játékot programozta: ${credit.developedBy.join(', ')}.`, en: `Developed by: ${credit.developedBy.join(', ')}.` })
+            : ''}
         </p>
       )}
       <a
@@ -94,25 +104,26 @@ export const GameFooter = ({ credit }) => {
         target="_blank"
         className="px-2 md:hidden"
       >
-        Hibabejelentő
+        {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
       </a>
     </footer>
   );
 };
 
 export const GameRule = ({ ruleDescription }) => {
+  const { t } = useTranslation();
   return <section className="flex justify-center mb-4 mt-1 max-w-[100ch]">
     <Disclosure defaultOpen>
       {({ open }) => (
         <div className="border-2 rounded-sm grow">
           <DisclosureButton className="w-full bg-slate-200 text-xl flex justify-center">
-            <span className="grow">Játékszabályok</span>
+            <span className="grow">{t({ hu: 'Játékszabályok', en: 'Game rules' })}</span>
             { !open && <span className="text-right pr-4">▽</span>}
             { open && <span className="text-right pr-4" style={{ transform: 'scaleY(-1)' }}>▽</span>}
           </DisclosureButton>
             <DisclosurePanel className="w-full p-2">
               <p className="text-justify">
-                {ruleDescription}
+                {t(ruleDescription)}
               </p>
             </DisclosurePanel>
         </div>
@@ -122,6 +133,7 @@ export const GameRule = ({ ruleDescription }) => {
 };
 
 export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorWinner }) => {
+  const { t } = useTranslation();
   return (
     <Dialog
       open={isOpen}
@@ -133,7 +145,7 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
         <DialogPanel className="rounded-sm bg-white max-w-sm w-full p-2">
           <header className="flex items-baseline mb-2">
             <DialogTitle className="grow block text-2xl text-center">
-              A játék véget ért
+              {t({ hu: 'A játék véget ért', en: 'Game over' })}
             </DialogTitle>
             <button
               onClick={() => setIsOpen(false)}
@@ -141,11 +153,11 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
             >×</button>
           </header>
           <Description className="text-lg block text-justify">
-            {getResultDescription(isRoleSelectorWinner)}
+            {getResultDescription(isRoleSelectorWinner, t)}
           </Description>
 
           <button onClick={() => startNewGame()} className="cta-button mt-2">
-            Új játék
+            {t({ hu: 'Új játék', en: 'New game' })}
           </button>
         </DialogPanel>
       </div>
@@ -153,12 +165,14 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
   );
 };
 
-const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }) => {
-  if (phase === 'roleSelection') return 'Válassz szerepet, utána indul a játék!';
-  if (phase === 'play') return shouldRoleSelectorMoveNext ? 'Te jössz' : 'Mi jövünk';
-  if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner);
+const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }, t) => {
+  if (phase === 'roleSelection') return t({ hu: 'Válassz szerepet, utána indul a játék!', en: 'Choose a role to start the game!' });
+  if (phase === 'play') { return shouldRoleSelectorMoveNext
+    ? t({ hu: 'Te jössz', en: 'Your turn' })
+    : t({ hu: 'Mi jövünk', en: "Computer's turn" }); }
+  if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner, t);
 };
 
-const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
-  ? 'Nyertél. Gratulálunk! :)'
-  : 'Sajnos, most nem nyertél, de ne add fel.';
+const getResultDescription = (isRoleSelectorWinner, t) => isRoleSelectorWinner
+  ? t({ hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' })
+  : t({ hu: 'Sajnos, most nem nyertél, de ne add fel.', en: "Unfortunately you didn't win this time, but don't give up." });

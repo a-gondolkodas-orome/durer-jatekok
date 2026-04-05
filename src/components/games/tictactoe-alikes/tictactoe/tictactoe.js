@@ -5,6 +5,7 @@ import { generateEmptyTicTacToeBoard } from '../helpers';
 import { aiBotStrategy } from './bot-strategy';
 import { inPlacingPhase, aiColor, isGameEnd } from './helpers';
 import { gameList } from '../../gameList';
+import * as en from './tictactoe-en';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);
@@ -87,20 +88,24 @@ const moves = {
   }
 }
 
-const getPlayerStepDescription = ({ board }) => {
-  return inPlacingPhase(board)
+const getPlayerStepDescription = ({ board }) => ({
+  hu: inPlacingPhase(board)
     ? 'Helyezz le egy korongot egy üres mezőre kattintással.'
-    : 'Kattints egy piros korongra.';
-};
+    : 'Kattints egy piros korongra.',
+  en: inPlacingPhase(board) ? en.stepPlacing : en.stepWhitening
+});
 
-const rule = <>
-  Két játékos játszik egy 3 × 3-as táblán kék és piros korongokkal a szokásos amőba
-  szabályai szerint, tehát felváltva tesznek le korongokat, és ha egy sorban, oszlopban vagy átlóban
-  összegyűlik három azonos színű korong, az adott játékos nyer. Ha az első 9 korong lehelyezése
-  után döntetlen az állás (azaz egyik játékos sem nyert), akkor tovább folytatják a játékot, a soron
-  következő játékos az ellenfél egy már lehelyezett korongját fehérre színezheti. Ezek után az nyer,
-  aki először hoz létre három fehér korongot egy sorban, oszlopban vagy átlóban.
-</>;
+const rule = {
+  hu: <>
+    Két játékos játszik egy 3 × 3-as táblán kék és piros korongokkal a szokásos amőba
+    szabályai szerint, tehát felváltva tesznek le korongokat, és ha egy sorban, oszlopban vagy átlóban
+    összegyűlik három azonos színű korong, az adott játékos nyer. Ha az első 9 korong lehelyezése
+    után döntetlen az állás (azaz egyik játékos sem nyert), akkor tovább folytatják a játékot, a soron
+    következő játékos az ellenfél egy már lehelyezett korongját fehérre színezheti. Ezek után az nyer,
+    aki először hoz létre három fehér korongot egy sorban, oszlopban vagy átlóban.
+  </>,
+  en: en.rule
+};
 
 export const TicTacToe = strategyGameFactory({
   rule,

@@ -313,7 +313,7 @@ export const gameList = {
     year: { k: "XIII.(19/20)", v: "19/20" },
     round: "döntő",
     category: ["C"],
-    name: "Átszínezős tic-tac-toe",
+    name: { hu: "Átszínezős tic-tac-toe", en: "Recolouring tic-tac-toe" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   TicTacToeDoubleStart: {
