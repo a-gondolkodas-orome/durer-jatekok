@@ -19,7 +19,10 @@ export const Overview = () => {
   }
 
   const shouldShow = game => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes('') && every(game.category, c => !selectedCategories.includes(c))) return false;
+    const noCategoryMatch = selectedCategories.length > 0
+      && !selectedCategories.includes('')
+      && every(game.category, c => !selectedCategories.includes(c));
+    if (noCategoryMatch) return false;
     if (selectedYears.length > 0 && !selectedYears.includes('') && !selectedYears.includes(game.year.v)) return false;
     return true;
   };
@@ -48,11 +51,15 @@ export const Overview = () => {
         setSelectedYears={setSelectedYears}
       ></YearFilter>
     </div>
-    <h2 className="font-bold my-4 text-center">{t({ hu: '5-8. osztályosoknak (A-B kategória)', en: 'For grades 5–8 (A–B category)' })}</h2>
+    <h2 className="font-bold my-4 text-center">
+      {t({ hu: '5-8. osztályosoknak (A-B kategória)', en: 'For grades 5–8 (A–B category)' })}
+    </h2>
     <div className="flex flex-wrap justify-center">
       {gamesToShow.filter(id => gameList[id].category[0] <= "B").map(id => Game(id, gameList[id], t))}
     </div>
-    <h2 className="font-bold my-4 text-center">{t({ hu: '9-12. osztályosoknak (C-D-E kategória)', en: 'For grades 9–12 (C–D–E category)' })}</h2>
+    <h2 className="font-bold my-4 text-center">
+      {t({ hu: '9-12. osztályosoknak (C-D-E kategória)', en: 'For grades 9–12 (C–D–E category)' })}
+    </h2>
     <div className="flex flex-wrap justify-center">
       {gamesToShow.filter(id => gameList[id].category[0] > "B").map(id => Game(id, gameList[id], t))}
     </div>
@@ -137,7 +144,9 @@ const YearFilter = ({ selectedYears, setSelectedYears }) => {
 const OverviewHeader = () => {
   const { t } = useTranslation();
   return <div className="pb-2"><div className="flex flex-wrap items-baseline">
-    <h1 className="text-blue-600 font-bold pb-4 grow">{t({ hu: 'Dürer stratégiás játékok', en: 'Dürer Strategy Games' })}</h1>
+    <h1 className="text-blue-600 font-bold pb-4 grow">
+      {t({ hu: 'Dürer stratégiás játékok', en: 'Dürer Strategy Games' })}
+    </h1>
     <span className="text-right flex items-center gap-2">
       <LanguageSelector />
       <a
@@ -150,8 +159,19 @@ const OverviewHeader = () => {
     </span>
   </div>
   {t({
-    hu: <>A <i>stratégiás játék</i> egy interaktív két szereplős játék, amelyet egy gép ellen játszhattok. Az alábbiakban a <a href="https://durerinfo.hu">Dürer Versenyen</a> feladott játékokat próbálhatjátok ki. A feladatok fokozatosan nehezednek az A kategóriától az E+ kategóriáig.</>,
-    en: <>A <i>strategy game</i> is an interactive two-player game played against a computer. Below you can try the games from the <a href="https://durerinfo.hu">Dürer Competition</a>. The difficulty increases from category A to E+.</>
+    hu: <>
+      A <i>stratégiás játék</i> egy interaktív két szereplős játék,
+      amelyet egy gép ellen játszhattok. Az alábbiakban
+      a <a href="https://durerinfo.hu">Dürer Versenyen</a> feladott
+      játékokat próbálhatjátok ki. A feladatok fokozatosan nehezednek
+      az A kategóriától az E+ kategóriáig.
+    </>,
+    en: <>
+      A <i>strategy game</i> is an interactive two-player game played against a computer.
+      Below you can try the games from
+      the <a href="https://durerinfo.hu">Dürer Competition</a>.
+      The difficulty increases from category A to E+.
+    </>
   })}
   </div>;
 };

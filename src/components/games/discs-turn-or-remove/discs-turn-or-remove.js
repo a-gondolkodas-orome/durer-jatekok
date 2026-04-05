@@ -181,7 +181,8 @@ const aiBotStrategy = ({ board, moves }) => {
 };
 
 const getPlayerStepDescription = () => {
-  return "Kattints egy korongra, hogy eltávolítsd vagy átfordítsd az adott és tőle jobbra levő korongo(ka)t az adott színből.";
+  return 'Kattints egy korongra, hogy eltávolítsd vagy átfordítsd' +
+    ' az adott és tőle jobbra levő korongo(ka)t az adott színből.';
 };
 
 const rule = (maxDiscs) => (

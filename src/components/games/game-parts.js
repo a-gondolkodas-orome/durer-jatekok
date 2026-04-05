@@ -65,7 +65,10 @@ export const GameHeader = ({ title }) => {
     <header className="flex flex-wrap items-baseline">
       <Link
         to='/'
-        className="rounded-lg px-2 md:px-4 bg-blue-400 hover:bg-blue-600 focus:bg-blue-600 md:basis-44 text-black no-underline"
+        className={
+          'rounded-lg px-2 md:px-4 bg-blue-400 hover:bg-blue-600' +
+          ' focus:bg-blue-600 md:basis-44 text-black no-underline'
+        }
       >← <span className="hidden md:inline">{t({ hu: 'Vissza a listához', en: 'Back to list' })}</span></Link>
       <h1 className="grow text-blue-600 font-bold pb-4 text-center">
         {title}
@@ -166,13 +169,23 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
 };
 
 const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }, t) => {
-  if (phase === 'roleSelection') return t({ hu: 'Válassz szerepet, utána indul a játék!', en: 'Choose a role to start the game!' });
-  if (phase === 'play') { return shouldRoleSelectorMoveNext
-    ? t({ hu: 'Te jössz', en: 'Your turn' })
-    : t({ hu: 'Mi jövünk', en: "Computer's turn" }); }
+  if (phase === 'roleSelection') {
+    return t({
+      hu: 'Válassz szerepet, utána indul a játék!',
+      en: 'Choose a role to start the game!'
+    });
+  }
+  if (phase === 'play') {
+    return shouldRoleSelectorMoveNext
+      ? t({ hu: 'Te jössz', en: 'Your turn' })
+      : t({ hu: 'Mi jövünk', en: "Computer's turn" });
+  }
   if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner, t);
 };
 
 const getResultDescription = (isRoleSelectorWinner, t) => isRoleSelectorWinner
   ? t({ hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' })
-  : t({ hu: 'Sajnos, most nem nyertél, de ne add fel.', en: "Unfortunately you didn't win this time, but don't give up." });
+  : t({
+    hu: 'Sajnos, most nem nyertél, de ne add fel.',
+    en: "Unfortunately you didn't win this time, but don't give up."
+  });
