@@ -37,7 +37,7 @@ here are the installation instructions:
 ### Compiles and hot-reloads for development
 
 ```bash
-npm run dev # use npm run dev:container within the devcontainer
+npm run dev
 ```
 
 ### Run tests
