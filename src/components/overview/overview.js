@@ -4,6 +4,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headless
 import { uniqBy, every, sortBy, orderBy } from 'lodash';
 import { Link } from 'react-router';
 import { useTranslation } from '../language/translate';
+import { useLanguage } from '../language/language-context';
 import { LanguageSelector } from '../language/language-selector';
 
 export const Overview = () => {
@@ -55,13 +56,15 @@ export const Overview = () => {
       {t({ hu: '5-8. osztályosoknak (A-B kategória)', en: 'For grades 5–8 (A–B category)' })}
     </h2>
     <div className="flex flex-wrap justify-center">
-      {gamesToShow.filter(id => gameList[id].category[0] <= "B").map(id => Game(id, gameList[id], t))}
+      {gamesToShow.filter(id => gameList[id].category[0] <= "B")
+        .map(id => <Game key={id} gameId={id} gameProps={gameList[id]} />)}
     </div>
     <h2 className="font-bold my-4 text-center">
       {t({ hu: '9-12. osztályosoknak (C-D-E kategória)', en: 'For grades 9–12 (C–D–E category)' })}
     </h2>
     <div className="flex flex-wrap justify-center">
-      {gamesToShow.filter(id => gameList[id].category[0] > "B").map(id => Game(id, gameList[id], t))}
+      {gamesToShow.filter(id => gameList[id].category[0] > "B")
+        .map(id => <Game key={id} gameId={id} gameProps={gameList[id]} />)}
     </div>
   </main>;
 };
@@ -176,13 +179,16 @@ const OverviewHeader = () => {
   </div>;
 };
 
-const Game = (gameId, gameProps, t) => {
+const Game = ({ gameId, gameProps }) => {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const hasEnglish = typeof gameProps.name === 'object' && 'en' in gameProps.name;
+
   const round = gameProps.round === 'döntő'
     ? t({ hu: 'döntő', en: 'final' })
     : gameProps.round;
 
   return <span
-    key={gameId}
     className="rounded-lg shadow-lg border p-2 m-1 max-w-[32ch] w-full flex flex-col js-game-card"
   >
     <h2 className="font-bold mb-4 text-center">{t(gameProps.name)}</h2>
@@ -196,6 +202,16 @@ const Game = (gameId, gameProps, t) => {
         className="rounded-lg bg-blue-200 px-1 m-0.5 whitespace-nowrap"
       >{gameProps.category.join(', ')}</span>
       <span className="rounded-lg bg-amber-200 px-1 m-0.5">{round}</span>
+      {language === 'en' && (
+        <span
+          className={`
+            rounded-lg px-1 m-0.5 whitespace-nowrap
+            ${hasEnglish ? 'bg-green-200' : 'bg-gray-100 text-gray-400'}
+          `}
+        >
+          {hasEnglish ? 'EN' : 'HU'}
+        </span>
+      )}
       <span className="grow"></span>
       <Link
         to={`/game/${gameId}`}
