@@ -37,13 +37,13 @@ export const GameSidebar = ({
             className="cta-button"
             onClick={() => moves.chooseRole(0)}
           >
-            {roleLabels ? roleLabels[0] : t({ hu: 'Kezdő leszek', en: "I'll go first" })}
+            {t(roleLabels ? roleLabels[0] : { hu: 'Kezdő leszek', en: "I'll go first" })}
           </button>
           <button
             className="cta-button"
             onClick={() => moves.chooseRole(1)}
           >
-            {roleLabels ? roleLabels[1] : t({ hu: 'Második leszek', en: "I'll go second" })}
+            {t(roleLabels ? roleLabels[1] : { hu: 'Második leszek', en: "I'll go second" })}
           </button>
         </span>
       )}
