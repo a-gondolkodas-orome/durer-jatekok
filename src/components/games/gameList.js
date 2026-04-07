@@ -163,7 +163,7 @@ export const gameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["E", "E+"],
-    name: "Számpár módosítás",
+    name: { hu: "Számpár módosítás", en: "Pairs of numbers" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   PileSplitter: {
