@@ -204,6 +204,17 @@ must be wrapped in setTimeout, this is not (yet) handled by the framework.
 - github pages as hosting
 - [goatcounter](https://agondolkodasorome.goatcounter.com/) as usage tracker (Ildi has access)
 
+## Internationalisation (i18n)
+
+The site supports Hungarian (default) and partially English. See `TicTacToe`
+for a complete example. English translations are added on a game-per-game bases,
+it is fine to add new games with Hungarian only.
+
+The `t()` helper from `translate.js` resolves a value to the active language.
+The value can be a plain string if there are no translations available, or a
+`{hu, en }` object. For longer strings, consider extracting the english versions
+to `<game-name>-en.js` to keep the main files more compact.
+
 # License
 
 Copyright (c) 2020-present [A Gondolkodás Öröme Alapítvány](https://agondolkodasorome.hu/).
