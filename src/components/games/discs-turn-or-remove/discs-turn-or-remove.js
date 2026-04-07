@@ -89,7 +89,10 @@ const gameBoardFactory = (maxDiscs) => {
                         <span
                           className={`
                             w-full aspect-square inline-block rounded-full mr-0.5
-                            ${ctx.shouldRoleSelectorMoveNext && isSelected(1, i) ? "opacity-75 bg-blue-800" : "bg-red-800"}
+                            ${ctx.shouldRoleSelectorMoveNext && isSelected(1, i)
+                              ? "opacity-75 bg-blue-800"
+                              : "bg-red-800"
+                            }
                           `}
                         ></span>
                       </button>
@@ -117,7 +120,10 @@ const gameBoardFactory = (maxDiscs) => {
                         <span
                           className={`
                             w-full aspect-square inline-block rounded-full mr-0.5
-                            ${ctx.shouldRoleSelectorMoveNext && isSelected(0, i) ? "opacity-50 bg-slate-600" : "bg-blue-800"}
+                            ${ctx.shouldRoleSelectorMoveNext && isSelected(0, i)
+                              ? "opacity-50 bg-slate-600"
+                              : "bg-blue-800"
+                            }
                           `}
                         ></span>
                       </button>
