@@ -88,12 +88,9 @@ const moves = {
   }
 }
 
-const getPlayerStepDescription = ({ board }) => ({
-  hu: inPlacingPhase(board)
-    ? 'Helyezz le egy korongot egy üres mezőre kattintással.'
-    : 'Kattints egy piros korongra.',
-  en: inPlacingPhase(board) ? en.stepPlacing : en.stepWhitening
-});
+const getPlayerStepDescription = ({ board }) => inPlacingPhase(board)
+  ? { hu: 'Helyezz le egy korongot egy üres mezőre kattintással.', en: en.stepPlacing }
+  : { hu: 'Kattints egy piros korongra.', en: en.stepWhitening };
 
 const rule = {
   hu: <>
