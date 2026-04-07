@@ -215,6 +215,9 @@ The value can be a plain string if there are no translations available, or a
 `{hu, en }` object. For longer strings, consider extracting the english versions
 to `<game-name>-en.js` to keep the main files more compact.
 
+Check the [Dürer Archive](https://durerinfo.hu/archivum/feladatsorok/) for
+existing translations.
+
 # License
 
 Copyright (c) 2020-present [A Gondolkodás Öröme Alapítvány](https://agondolkodasorome.hu/).

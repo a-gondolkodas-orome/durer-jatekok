@@ -1,11 +1,11 @@
 import React from 'react';
 
 export const rule = <>
-  Two players play on a 3 × 3 board with blue and red pieces following standard tic-tac-toe rules:
-  they alternate placing pieces, and the first to get three pieces of the same colour in a row,
-  column, or diagonal wins. If after all 9 pieces are placed neither player has won (a draw),
-  play continues: the next player may recolour one of their opponent&apos;s pieces to white.
-  From that point on, the winner is the first to form three white pieces in a row, column, or diagonal.
+  Two players play a game of ordinary tic-tac-toe on a 3 × 3 board with red and
+blue disks. That is, if there are three disks of the same colour in a row, column or diagonal,
+then the person placing that colour wins. In case no one wins after the placement of the first
+9 disks, the subsequent player colours one of the opponent&apos;s already placed disks white. Now
+whoever first creates three purple disks in a row, column or diagonal, wins.
 </>;
 
 export const stepPlacing = 'Click an empty cell to place a piece.';
