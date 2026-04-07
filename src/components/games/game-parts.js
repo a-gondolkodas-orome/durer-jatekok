@@ -95,10 +95,16 @@ export const GameFooter = ({ credit }) => {
       { credit !== undefined && (
         <p className ="px-2 text-gray-800 font-light text-sm">
           { (credit.suggestedBy || []).length
-            ? t({ hu: `A játékot javasolta: ${credit.suggestedBy.join(', ')}.`, en: `Suggested by: ${credit.suggestedBy.join(', ')}.` })
+            ? t({
+              hu: `A játékot javasolta: ${credit.suggestedBy.join(', ')}.`,
+              en: `Suggested by: ${credit.suggestedBy.join(', ')}.`
+            })
             : ''}
           { (credit.developedBy || []).length
-            ? ' ' + t({ hu: `A játékot programozta: ${credit.developedBy.join(', ')}.`, en: `Developed by: ${credit.developedBy.join(', ')}.` })
+            ? ' ' + t({
+              hu: `A játékot programozta: ${credit.developedBy.join(', ')}.`,
+              en: `Developed by: ${credit.developedBy.join(', ')}.`
+            })
             : ''}
         </p>
       )}
