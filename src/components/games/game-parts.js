@@ -19,7 +19,7 @@ export const GameSidebar = ({
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
       <p className="text-center font-bold text-lg basis-14">
-        {getCtaText(ctx, t)}
+        {t(getCtaText(ctx))}
       </p>
       {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext === false && (
         <div
@@ -162,7 +162,7 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
             >×</button>
           </header>
           <Description className="text-lg block text-justify">
-            {getResultDescription(isRoleSelectorWinner, t)}
+            {t(getResultDescription(isRoleSelectorWinner))}
           </Description>
 
           <button onClick={() => startNewGame()} className="cta-button mt-2">
@@ -174,24 +174,24 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
   );
 };
 
-const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }, t) => {
+const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }) => {
   if (phase === 'roleSelection') {
-    return t({
+    return {
       hu: 'Válassz szerepet, utána indul a játék!',
       en: 'Choose a role to start the game!'
-    });
+    };
   }
   if (phase === 'play') {
     return shouldRoleSelectorMoveNext
-      ? t({ hu: 'Te jössz', en: 'Your turn' })
-      : t({ hu: 'Mi jövünk', en: "Computer's turn" });
+      ? { hu: 'Te jössz', en: 'Your turn' }
+      : { hu: 'Mi jövünk', en: "Computer's turn" };
   }
-  if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner, t);
+  if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner);
 };
 
-const getResultDescription = (isRoleSelectorWinner, t) => isRoleSelectorWinner
-  ? t({ hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' })
-  : t({
+const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
+  ? { hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' }
+  : {
     hu: 'Sajnos, most nem nyertél, de ne add fel.',
     en: "Unfortunately you didn't win this time, but don't give up."
-  });
+  };
