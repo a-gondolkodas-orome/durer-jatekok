@@ -135,7 +135,7 @@ export const gameList = {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "döntő",
     category: ["E", "E+"],
-    name: "4 kupacban előrepakolás",
+    name: { hu: "4 kupacban előrepakolás", en: "4 piles: spread ahead" },
     credit: { suggestedBy: ["Fraknói Ádám"], developedBy: ["Matolcsi Dávid"] }
   },
   HunyadiAndTheJanissaries: {
