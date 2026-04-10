@@ -73,8 +73,10 @@ export const GameHeader = ({ title }) => {
       <h1 className="grow text-blue-600 font-bold pb-4 text-center">
         {title}
       </h1>
-      <span className="basis-44 text-right hidden md:flex items-center justify-end gap-2">
+      <span className="md:hidden ml-auto">
         <LanguageSelector />
+      </span>
+      <span className="basis-44 text-right hidden md:flex items-center justify-end gap-2">
         <a
           href="https://forms.gle/7DwugmXNrvKgkiiu8"
           target="_blank"
@@ -82,6 +84,7 @@ export const GameHeader = ({ title }) => {
         >
           {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
         </a>
+        <LanguageSelector />
       </span>
     </header>
     <hr />

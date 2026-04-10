@@ -164,7 +164,6 @@ const OverviewHeader = () => {
       {t({ hu: 'Dürer stratégiás játékok', en: 'Dürer Strategy Games' })}
     </h1>
     <span className="text-right flex items-center gap-2">
-      <LanguageSelector />
       <a
         href="https://forms.gle/7DwugmXNrvKgkiiu8"
         target="_blank"
@@ -172,6 +171,7 @@ const OverviewHeader = () => {
       >
         {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
       </a>
+      <LanguageSelector />
     </span>
   </div>
   {t({
@@ -207,7 +207,7 @@ const Game = ({ gameId, gameProps }) => {
     <h2 className="font-bold mb-4 text-center">
       {t(gameProps.name)}
       {language === 'en' && hasEnglish && (
-        <span className="ml-1 text-sm text-gray-400" title="English translation available">🌐</span>
+        <span className="ml-1 text-sm text-gray-400 align-middle" title="English translation available">🌐</span>
       )}
     </h2>
     <div className="grow"></div>
