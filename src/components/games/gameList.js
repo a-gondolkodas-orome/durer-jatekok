@@ -334,7 +334,7 @@ export const gameList = {
     year: { k: "XIV. (20/21)", v: "20/21" },
     round: "döntő",
     category: ["C", "D"],
-    name: "10 totemoszlop",
+    name: { hu: "10 totemoszlop", en: "10 totem poles" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   TwelveSquares: {
