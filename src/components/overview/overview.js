@@ -9,8 +9,10 @@ import { LanguageSelector } from '../language/language-selector';
 
 export const Overview = () => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
+  const [enOnly, setEnOnly] = useState(false);
 
   if (selectedCategories.includes('')) {
     setSelectedCategories([]);
@@ -25,6 +27,7 @@ export const Overview = () => {
       && every(game.category, c => !selectedCategories.includes(c));
     if (noCategoryMatch) return false;
     if (selectedYears.length > 0 && !selectedYears.includes('') && !selectedYears.includes(game.year.v)) return false;
+    if (enOnly && !(typeof game.name === 'object' && 'en' in game.name)) return false;
     return true;
   };
 
@@ -42,7 +45,7 @@ export const Overview = () => {
 
   return <main className="p-2">
     <OverviewHeader></OverviewHeader>
-    <div className="flex flex-wrap align-baseline">
+    <div className="flex flex-wrap align-baseline items-end">
       <CategoryFilter
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
@@ -51,6 +54,16 @@ export const Overview = () => {
         selectedYears={selectedYears}
         setSelectedYears={setSelectedYears}
       ></YearFilter>
+      {language === 'en' && (
+        <label className="mb-2 px-1 flex items-center gap-1 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={enOnly}
+            onChange={e => setEnOnly(e.target.checked)}
+          />
+          EN only
+        </label>
+      )}
     </div>
     <h2 className="font-bold my-4 text-center">
       {t({ hu: '5-8. osztályosoknak (A-B kategória)', en: 'For grades 5–8 (A–B category)' })}
@@ -191,7 +204,12 @@ const Game = ({ gameId, gameProps }) => {
   return <span
     className="rounded-lg shadow-lg border p-2 m-1 max-w-[32ch] w-full flex flex-col js-game-card"
   >
-    <h2 className="font-bold mb-4 text-center">{t(gameProps.name)}</h2>
+    <h2 className="font-bold mb-4 text-center">
+      {t(gameProps.name)}
+      {language === 'en' && hasEnglish && (
+        <span className="ml-1 text-sm text-gray-400" title="English translation available">🌐</span>
+      )}
+    </h2>
     <div className="grow"></div>
     <div className="flex flex-wrap items-baseline">
       <span
@@ -202,16 +220,6 @@ const Game = ({ gameId, gameProps }) => {
         className="rounded-lg bg-blue-200 px-1 m-0.5 whitespace-nowrap"
       >{gameProps.category.join(', ')}</span>
       <span className="rounded-lg bg-amber-200 px-1 m-0.5">{round}</span>
-      {language === 'en' && (
-        <span
-          className={`
-            rounded-lg px-1 m-0.5 whitespace-nowrap
-            ${hasEnglish ? 'bg-green-200' : 'bg-gray-100 text-gray-400'}
-          `}
-        >
-          {hasEnglish ? 'EN' : 'HU'}
-        </span>
-      )}
       <span className="grow"></span>
       <Link
         to={`/game/${gameId}`}
