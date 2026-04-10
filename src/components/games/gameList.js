@@ -93,14 +93,14 @@ export const gameList = {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
     category: ["B"],
-    name: "Érmék beváltása",
+    name: { hu: "Érmék beváltása", en: "Coin change" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   Coin357: {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
     category: ["A"],
-    name: "15 érme beváltása",
+    name: { hu: "15 érme beváltása", en: "Change 15 coins" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   CubeColoring: {
