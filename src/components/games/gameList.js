@@ -107,7 +107,7 @@ export const gameList = {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
     category: ["C", "D"],
-    name: { hu: "Kockaszínezés", en: "Cube coloring" },
+    name: { hu: "Kockaszínezés", en: "Cube colouring" },
     credit: { suggestedBy: ["Nagy Kartal"], developedBy: ["Szűcs Gábor"] }
   },
   DominoesOnChessboard: {
