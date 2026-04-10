@@ -25,7 +25,7 @@ export const gameList = {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "döntő",
     category: ["D"],
-    name: "Kettőt vesz, egyet kap",
+    name: { hu: "Kettőt vesz, egyet kap", en: "Add N, take 2N" },
     credit: { suggestedBy: ["Imolay András"], developedBy: ["Matolcsi Dávid"] }
   },
   AntiTicTacToe: {
