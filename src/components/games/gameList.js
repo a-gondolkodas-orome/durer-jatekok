@@ -191,7 +191,7 @@ export const gameList = {
     year: { k: "V. (11/12)", v: "11/12" },
     round: "döntő",
     category: ["A"],
-    name: "+1, +2, +3",
+    name: { hu: "+1, +2, +3", en: "+1, +2, +3" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   Policemanthief: {
