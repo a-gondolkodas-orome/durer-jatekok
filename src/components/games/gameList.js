@@ -76,7 +76,7 @@ export const gameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["C", "D"],
-    name: "Barangolás huszárral",
+    name: { hu: "Barangolás huszárral", en: "Roaming with a knight" },
     credit: {
       suggestedBy: ["Hegedűs Dániel"],
       developedBy: ["Czeller Ildikó"]
