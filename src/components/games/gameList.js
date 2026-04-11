@@ -184,7 +184,7 @@ export const gameList = {
     year: { k: "XIII.(19/20)", v: "19/20" },
     round: "döntő",
     category: ["E+"],
-    name: "Kupac kettéosztó 4 kupaccal",
+    name: { hu: "Kupac kettéosztó 4 kupaccal", en: "Pile splitting (4 piles)" },
     credit: { developedBy: ["Soós Máté"] }
   },
   PlusOneTwoThree: {
@@ -270,7 +270,7 @@ export const gameList = {
     year: { k: "XIII.(19/20)", v: "19/20" },
     round: "döntő",
     category: ["D", "E"],
-    name: "Babonás lépkedés",
+    name: { hu: "Babonás lépkedés", en: "Superstitious Counting" },
     credit: { developedBy: ["Soós Máté"] }
   },
   Take1OrHalve: {
