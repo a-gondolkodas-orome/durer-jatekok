@@ -170,14 +170,14 @@ export const gameList = {
     year: { k: "VIII. (14/15)", v: "14/15" },
     round: "döntő",
     category: ["A"],
-    name: "Kupac kettéosztó",
+    name: { hu: "Kupac kettéosztó", en: "Pile splitter" },
     credit: { developedBy: ["Szűcs Gábor"] }
   },
   PileSplitter3: {
     year: { k: "VIII. (14/15)", v: "14/15" },
     round: "döntő",
     category: ["B"],
-    name: "Kupac kettéosztó 3 kupaccal",
+    name: { hu: "Kupac kettéosztó 3 kupaccal", en: "Pile splitter (3 piles)" },
     credit: { developedBy: ["Soós Máté"] }
   },
   PileSplitter4: {
