@@ -39,7 +39,7 @@ export const gameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["C", "D"],
-    name: "Baktériumok terjedése",
+    name: { hu: "Baktériumok terjedése", en: "Spreading of bacteria" },
     credit: { developedBy: ["Tárkányi Damján"] }
   },
   BankRobbers: {
