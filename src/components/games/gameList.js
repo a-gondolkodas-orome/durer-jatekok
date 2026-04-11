@@ -255,8 +255,8 @@ export const gameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["A"],
-    name: "Átfordítás, elvétel (6)",
-    title: "Átfordítás, elvétel (6 korong)",
+    name: { hu: "Átfordítás, elvétel (6)", en: "Flip or remove (6)" },
+    title: { hu: "Átfordítás, elvétel (6 korong)", en: "Flip or remove (6 discs)" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   StonesRemoveOneNotTwiceFromLeft: {
@@ -291,8 +291,8 @@ export const gameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["B"],
-    name: "Átfordítás, elvétel (10)",
-    title: "Átfordítás, elvétel (10 korong)",
+    name: { hu: "Átfordítás, elvétel (10)", en: "Flip or remove (10)" },
+    title: { hu: "Átfordítás, elvétel (10 korong)", en: "Flip or remove (10 discs)" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   ThievesMean: {
