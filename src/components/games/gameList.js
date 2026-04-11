@@ -270,7 +270,7 @@ export const gameList = {
     year: { k: "XIII.(19/20)", v: "19/20" },
     round: "döntő",
     category: ["D", "E"],
-    name: { hu: "Babonás lépkedés", en: "Superstitious Counting" },
+    name: { hu: "Babonás lépkedés", en: "Superstitious counting" },
     credit: { developedBy: ["Soós Máté"] }
   },
   Take1OrHalve: {
