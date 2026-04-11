@@ -149,14 +149,14 @@ export const gameList = {
     year: { k: "XI. (17/18)", v: "17/18" },
     round: "döntő",
     category: ["A"],
-    name: "Számok lefedése 1-től 8-ig",
+    name: { hu: "Számok lefedése 1-től 8-ig", en: "Covering numbers 1 to 8" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   NumberCovering10: {
     year: { k: "XI. (17/18)", v: "17/18" },
     round: "döntő",
     category: ["B"],
-    name: "Számok lefedése 1-től 10-ig",
+    name: { hu: "Számok lefedése 1-től 10-ig", en: "Covering numbers 1 to 10" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   PairsOfNumbers: {
