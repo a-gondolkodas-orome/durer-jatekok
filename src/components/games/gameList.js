@@ -341,7 +341,7 @@ export const gameList = {
     year: { k: "VI. (12/13)", v: "12/13" },
     round: "döntő",
     category: ["A"],
-    name: "Tizenkét mező",
+    name: { hu: "Tizenkét mező", en: "Twelve squares" },
     credit: { developedBy: ["Melján Dávid"] }
   },
   TwoTimesTwo: {
