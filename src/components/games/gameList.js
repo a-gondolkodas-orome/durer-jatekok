@@ -263,7 +263,7 @@ export const gameList = {
     year: { k: "XIX. (25/26)", v: "25/26" },
     round: "online",
     category: ["E"],
-    name: "Kavicsgyűjtés egyesével",
+    name: { hu: "Kavicsgyűjtés egyesével", en: "Collecting stones 1 by 1" },
     credit: { developedBy: ["Turu Tamás"] }
   },
   SuperstitiousCounting: {
