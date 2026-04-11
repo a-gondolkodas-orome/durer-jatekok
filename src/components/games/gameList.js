@@ -228,7 +228,7 @@ export const gameList = {
     year: { k: "VII. (13/14)", v: "13/14" },
     round: "döntő",
     category: ["A"],
-    name: "Kő-papír-olló",
+    name: { hu: "Kő-papír-olló", en: "Rock-paper-scissors" },
     credit: { developedBy: ["Máté Lőrinc"] }
   },
   SharkChase4: {
