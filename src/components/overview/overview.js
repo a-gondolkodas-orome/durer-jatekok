@@ -164,7 +164,9 @@ const Game = ({ gameId, gameProps }) => {
     <h2 className="font-bold mb-4 text-center">
       {t(gameProps.name)}
       {language === 'en' && hasEnglish && (
-        <span className="ml-1 text-sm text-gray-400 align-middle" title="English translation available">🌐</span>
+        <span className="ml-1 text-sm text-gray-400 align-middle" title="English translation available">
+          {'\u2060'}🌐
+        </span>
       )}
     </h2>
     <div className="grow"></div>
