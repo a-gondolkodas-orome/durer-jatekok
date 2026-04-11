@@ -83,8 +83,10 @@ const ExponentsTable = ({
     </table>
     {hovered === null ? <br></br> : <p>
       {t({
-        hu: `Kivonandó prímhatvány: ${playerPrime}^${hovered} = ${playerPrime**hovered}. Eredmény: ${board-playerPrime**hovered}.`,
-        en: `Prime power to subtract: ${playerPrime}^${hovered} = ${playerPrime**hovered}. Result: ${board-playerPrime**hovered}.`
+        hu: `Kivonandó prímhatvány: ${playerPrime}^${hovered} = ${playerPrime**hovered}. ` +
+          `Eredmény: ${board-playerPrime**hovered}.`,
+        en: `Prime power to subtract: ${playerPrime}^${hovered} = ${playerPrime**hovered}. ` +
+          `Result: ${board-playerPrime**hovered}.`
       })}
     </p>}
     <button

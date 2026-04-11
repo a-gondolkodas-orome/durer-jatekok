@@ -31,7 +31,10 @@ const BoardClient = ({ board, ctx, moves }) => {
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <p className = "text-2xl">
-        {t({ hu: `A mostani játékban n=${board.numbersOnTable.length}`, en: `In this game n=${board.numbersOnTable.length}` })}
+        {t({
+          hu: `A mostani játékban n=${board.numbersOnTable.length}`,
+          en: `In this game n=${board.numbersOnTable.length}`
+        })}
       </p>
       <p className = "text-2xl">
         {t({ hu: 'Az előző lépés', en: 'Previous move' })}: {board.previousMove === null ? "-" : board.previousMove}
