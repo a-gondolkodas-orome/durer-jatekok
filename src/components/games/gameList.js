@@ -214,7 +214,7 @@ export const gameList = {
     year: { k: "I. (07/08)", v: "07/08" },
     round: "döntő",
     category: ["D"],
-    name: "Prímhatványok kivonása",
+    name: { hu: "Prímhatványok kivonása", en: "Subtract a prime power" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   RemoveDivisorMultiple: {
