@@ -198,16 +198,16 @@ export const gameList = {
     year: { k: "IX. (15/16)", v: "15/16" },
     round: "döntő",
     category: ["A"],
-    name: "Rendőrök, tolvaj (A)",
-    title: "Rendőrök, tolvaj (A kategória)",
+    name: { hu: "Rendőrök, tolvaj (A)", en: "Policemen and thief (A)" },
+    title: { hu: "Rendőrök, tolvaj (A kategória)", en: "Policemen and thief (category A)" },
     credit: { developedBy: ["Halasi Gergő"] }
   },
   PolicemanthiefB: {
     year: { k: "IX. (15/16)", v: "15/16" },
     round: "döntő",
     category: ["B"],
-    name: "Rendőrök, tolvaj (B)",
-    title: "Rendőrök, tolvaj (B kategória)",
+    name: { hu: "Rendőrök, tolvaj (B)", en: "Policemen and thief (B)" },
+    title: { hu: "Rendőrök, tolvaj (B kategória)", en: "Policemen and thief (category B)" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   PrimeExponentials: {
