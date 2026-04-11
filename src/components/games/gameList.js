@@ -299,14 +299,14 @@ export const gameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["A"],
-    name: "Tolvajnál átlag (1-7)",
+    name: { hu: "Tolvajnál átlag (1-7)", en: "Thief's mean (1–7)" },
     credit: { developedBy: ["Turu Tamás"] }
   },
   ThievesMean9: {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["B"],
-    name: "Tolvajnál átlag (1-9)",
+    name: { hu: "Tolvajnál átlag (1-9)", en: "Thief's mean (1–9)" },
     credit: { developedBy: ["Czeller Ildikó", "Turu Tamás"] }
   },
   TicTacToe: {
