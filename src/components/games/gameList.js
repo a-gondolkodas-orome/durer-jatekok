@@ -284,7 +284,7 @@ export const gameList = {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "online",
     category: ["D"],
-    name: "Kettőhatványok kivonása",
+    name: { hu: "Kettőhatványok kivonása", en: "Subtract 2^n" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   TenDiscs: {
