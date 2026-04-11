@@ -114,7 +114,8 @@ export const strategyGameFactory = ({
       chosenRoleIndex,
       currentPlayer,
       phase,
-      turnStage
+      turnStage,
+      mode
     };
 
     const events = {
