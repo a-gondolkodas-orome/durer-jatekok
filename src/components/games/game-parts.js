@@ -3,8 +3,7 @@ import { Link } from 'react-router';
 import {
   Disclosure, DisclosureButton, DisclosurePanel,
   Dialog, DialogPanel, DialogTitle,
-  Description,
-  Label, Field, Input
+  Description, Label, Field, Input
 } from '@headlessui/react';
 import { useTranslation } from '../language/translate';
 import { LanguageSelector } from '../language/language-selector';
@@ -13,42 +12,119 @@ export const GameSidebar = ({
   roleLabels,
   stepDescription,
   ctx,
-  moves
+  moves,
+  mode,
+  hasHHMode,
+  playerNames,
+  setPlayerNames,
+  currentPlayerName,
+  winnerName
 }) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.shouldRoleSelectorMoveNext;
+
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
-      <p className="text-center font-bold text-lg basis-14">
-        {t(getCtaText(ctx))}
-      </p>
-      {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext === false && (
-        <div
-          className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"
-        ></div>
+      {hasHHMode && (
+        <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
+          <button
+            className={`grow py-1 px-2 ${mode === 'vsComputer'
+              ? 'bg-blue-500 text-white font-semibold'
+              : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+            onClick={() => moves.switchMode('vsComputer')}
+          >
+            {t({ hu: 'Gép ellen', en: 'vs Computer' })}
+          </button>
+          <button
+            className={`grow py-1 px-2 ${mode === 'vsHuman'
+              ? 'bg-blue-500 text-white font-semibold'
+              : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+            onClick={() => moves.switchMode('vsHuman')}
+          >
+            {t({ hu: '2 játékos', en: '2 players' })}
+          </button>
+        </div>
       )}
-      {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext && (
-        <p className="italic text-justify basis-24">
-          {stepDescription}
-        </p>
+
+      {mode === 'vsComputer' && (
+        <>
+          <p className="text-center font-bold text-lg basis-14">
+            {t(getCtaText(ctx))}
+          </p>
+          {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext === false && (
+            <div
+              className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"
+            ></div>
+          )}
+          {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext && (
+            <p className="italic text-justify basis-24">
+              {stepDescription}
+            </p>
+          )}
+          {ctx.phase === 'roleSelection' && (
+            <span className="basis-24 flex flex-col gap-2">
+              {[
+                { hu: 'Kezdő leszek', en: "I'll go first" },
+                { hu: 'Második leszek', en: "I'll go second" }
+              ].map((defaultLabel, i) => (
+                <button
+                  key={i}
+                  className="rounded-lg py-2 px-4 w-full text-center font-semibold
+                    bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
+                  onClick={() => moves.chooseRole(i)}
+                >
+                  {t(roleLabels ? roleLabels[i] : defaultLabel)}
+                </button>
+              ))}
+            </span>
+          )}
+        </>
       )}
-      {ctx.phase === 'roleSelection' && (
-        <span className="basis-24 flex flex-col gap-2">
-          {[
-            { hu: 'Kezdő leszek', en: "I'll go first" },
-            { hu: 'Második leszek', en: "I'll go second" }
-          ].map((defaultLabel, i) => (
-            <button
-              key={i}
-              className={`rounded-lg py-2 px-4 w-full text-center font-semibold
-                bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white`}
-              onClick={() => moves.chooseRole(i)}
-            >
-              {t(roleLabels ? roleLabels[i] : defaultLabel)}
-            </button>
-          ))}
-        </span>
+
+      {mode === 'vsHuman' && (
+        <>
+          <p className="text-center font-bold text-lg basis-14">
+            {getCtaTextHH({ phase: ctx.phase, currentPlayerName, winnerName })}
+          </p>
+          {ctx.phase === 'play' && (
+            <p className="italic text-justify basis-24">
+              {stepDescription}
+            </p>
+          )}
+          {ctx.phase === 'roleSelection' && (
+            <span className="basis-24 flex flex-col gap-2">
+              <Field>
+                <Label className="font-bold">{t({ hu: 'Első: ', en: 'First: ' })}</Label>
+                <Input
+                  name="name_of_first_player"
+                  size="15"
+                  className="border border-slate-600 rounded-md text-slate-600"
+                  value={playerNames[0]}
+                  onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
+                />
+              </Field>
+              <Field>
+                <Label className="font-bold">{t({ hu: 'Második: ', en: 'Second: ' })}</Label>
+                <Input
+                  name="name_of_second_player"
+                  size="15"
+                  className="border border-slate-600 rounded-md text-slate-600"
+                  value={playerNames[1]}
+                  onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
+                />
+              </Field>
+              <button
+                className="rounded-lg py-2 px-4 w-full text-center font-semibold
+                  bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
+                onClick={() => moves.startHHGame()}
+              >
+                {t({ hu: 'Kezdhetjük!', en: "Let's go!" })}
+              </button>
+            </span>
+          )}
+        </>
       )}
+
       <button
         className={`mt-[2vh] rounded-lg py-1.5 px-4 w-full text-center border
           border-slate-300 text-slate-600 hover:bg-slate-50 focus:bg-slate-50
@@ -145,8 +221,13 @@ export const GameRule = ({ ruleDescription }) => {
   </section>;
 };
 
-export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorWinner }) => {
+export const GameEndDialog = ({
+  isOpen, setIsOpen, startNewGame, isRoleSelectorWinner, mode, winnerName
+}) => {
   const { t } = useTranslation();
+  const resultDescription = mode === 'vsHuman'
+    ? t({ hu: `A játékot nyerte: ${winnerName}`, en: `Winner: ${winnerName}` })
+    : t(getResultDescription(isRoleSelectorWinner));
   return (
     <Dialog
       open={isOpen}
@@ -166,9 +247,8 @@ export const GameEndDialog = ({ isOpen, setIsOpen, startNewGame, isRoleSelectorW
             >×</button>
           </header>
           <Description className="text-lg block text-justify">
-            {t(getResultDescription(isRoleSelectorWinner))}
+            {resultDescription}
           </Description>
-
           <button
             onClick={() => startNewGame()}
             className="cta-button mt-2"
@@ -202,98 +282,6 @@ const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
     hu: 'Sajnos, most nem nyertél, de ne add fel.',
     en: "Unfortunately you didn't win this time, but don't give up."
   };
-
-export const GameSidebarHH = ({
-  stepDescription,
-  ctx,
-  moves,
-  playerNames,
-  setPlayerNames
-}) => {
-  return (
-    <div className="p-2 flex flex-col grow shrink-0 basis-64">
-      <p className="text-center font-bold text-lg basis-[3.5rem]">
-        {getCtaTextHH(ctx)}
-      </p>
-      {ctx.phase === 'play' && (
-        <p className="italic text-justify basis-[6rem]">
-          {stepDescription}
-        </p>
-      )}
-      {ctx.phase === 'roleSelection' && (
-        <span className="basis-[6rem]">
-          <Field>
-            <Label className="font-bold">Első: </Label>
-            <Input
-              name="name_of_first_player"
-              size="15"
-              className="border border-slate-600 rounded-md text-slate-600"
-              value={playerNames[0]}
-              onChange={e => {
-                setPlayerNames([e.target.value.trim(), playerNames[1]]);
-              }}
-            />
-          </Field>
-          <Field>
-            <Label className="font-bold">Második: </Label>
-            <Input
-              name="name_of_second_player"
-              size="15"
-              className="border border-slate-600 rounded-md text-slate-600"
-              value={playerNames[1]}
-              onChange={e => {
-                setPlayerNames([playerNames[0], e.target.value.trim()]);
-              }}
-            />
-          </Field>
-          <button
-            className="cta-button"
-            onClick={() => moves.startHHGame()}
-          >
-            {'Kezdhetjük!'}
-          </button>
-        </span>
-      )}
-      <button
-        className="cta-button mt-[2vh]"
-        onClick={() => moves.startNewGame()}>
-        Új játék
-      </button>
-    </div>
-  );
-};
-
-export const GameEndDialogHH = ({ isOpen, setIsOpen, startNewGame, winnerName }) => {
-  return (
-    <Dialog
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      className="relative z-50"
-    >
-      <div className="fixed inset-0 bg-black/50" aria-hidden="true"></div>
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="rounded bg-white max-w-sm w-full p-2">
-          <header className="flex items-baseline mb-2">
-            <DialogTitle className="grow block text-2xl text-center">
-              A játék véget ért
-            </DialogTitle>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="bg-slate-200 rounded text-2xl px-1"
-            >×</button>
-          </header>
-          <Description className="text-lg block text-justify">
-            A játékot nyerte: {winnerName}
-          </Description>
-
-          <button onClick={() => startNewGame()} className="cta-button mt-2">
-            Új játék
-          </button>
-        </DialogPanel>
-      </div>
-    </Dialog>
-  );
-};
 
 const getCtaTextHH = ({ phase, currentPlayerName, winnerName }) => {
   if (phase === 'roleSelection') return 'Döntsétek el, hogy ki kezd.';

@@ -51,7 +51,6 @@ import { TriangleColoring } from '../games/triangle-coloring/triangle-coloring';
 import { TriangularGridRopes } from '../games/triangular-grid-ropes/triangular-grid-ropes';
 import { TwelveSquares } from '../games/twelve-squares/twelve-squares';
 import { TwoTimesTwo } from '../games/two-times-two/two-times-two';
-import { PlusOneTwoThree2H } from '../games/plus-one-two-three/plus-one-two-three-2h';
 
 const RootLayout = () => (
   <LanguageProvider>
@@ -106,8 +105,7 @@ export const App = () => {
     { path: '/game/TriangleColoring', element: <TriangleColoring />},
     { path: '/game/TriangularGridRopes', element: <TriangularGridRopes /> },
     { path: '/game/TwelveSquares', element: <TwelveSquares />},
-    { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> },
-    { path: '/game/hh/PlusOneTwoThree', element: <PlusOneTwoThree2H />}
+    { path: '/game/TwoTimesTwo', element: <TwoTimesTwo /> }
   ];
 
   const router = createHashRouter([{

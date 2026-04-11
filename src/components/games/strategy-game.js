@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog,
-  GameEndDialogHH, GameSidebarHH
+  GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog
 } from './game-parts';
 import { partial, mapValues, wrap, _ } from 'lodash';
 import { useTranslation } from '../language/translate';
@@ -15,11 +14,12 @@ export const strategyGameFactory = ({
   moves,
   aiBotStrategy,
   getPlayerStepDescription,
-  endOfTurnMove
+  endOfTurnMove,
+  supportsHHMode
 }) => {
   return () => {
     const { t } = useTranslation();
-    const [board, setBoard] = useState(generateStartBoard())
+    const [board, setBoard] = useState(generateStartBoard());
     const [phase, setPhase] = useState('roleSelection');
     const [chosenRoleIndex, setChosenRoleIndex] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState(null);
@@ -27,12 +27,17 @@ export const strategyGameFactory = ({
     const [winnerIndex, setWinnerIndex] = useState(null);
     const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
     const [turnStage, setTurnStage] = useState(null);
+    const [mode, setMode] = useState('vsComputer');
+    const [playerNames, setPlayerNames] = useState([
+      t({ hu: 'Első játékos', en: 'First player' }),
+      t({ hu: 'Második játékos', en: 'Second player' })
+    ]);
 
     useEffect(() => {
-      if (phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
+      if (mode === 'vsComputer' && phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
         doAiTurn();
       }
-    }, [currentPlayer])
+    }, [currentPlayer]);
 
     let wrappedMoves;
 
@@ -47,7 +52,7 @@ export const strategyGameFactory = ({
       return moveResult;
     };
 
-    const startNewGame = () => {
+    const resetGameState = () => {
       setBoard(generateStartBoard());
       setPhase('roleSelection');
       setChosenRoleIndex(null);
@@ -58,12 +63,33 @@ export const strategyGameFactory = ({
       setTurnStage(null);
     };
 
-    const shouldRoleSelectorMoveNext = (phase === 'play' && currentPlayer === chosenRoleIndex);
+    const startNewGame = () => {
+      resetGameState();
+    };
+
+    const switchMode = (newMode) => {
+      setMode(newMode);
+      resetGameState();
+    };
+
+    const shouldRoleSelectorMoveNext = mode === 'vsHuman'
+      ? phase === 'play'
+      : phase === 'play' && currentPlayer === chosenRoleIndex;
     const isRoleSelectorWinner = winnerIndex === chosenRoleIndex;
+
+    const playerNameOf = (index) => {
+      if (index === null) return null;
+      return playerNames[index] || t({
+        hu: index === 0 ? 'Első játékos' : 'Második játékos',
+        en: index === 0 ? 'First player' : 'Second player'
+      });
+    };
+
+    const currentPlayerName = playerNameOf(currentPlayer);
+    const winnerName = playerNameOf(winnerIndex);
 
     const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
       setPhase('gameEnd');
-      // default: last player to move is the winner
       setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
       setIsGameEndDialogOpen(true);
     };
@@ -76,6 +102,11 @@ export const strategyGameFactory = ({
       setPhase('play');
       setCurrentPlayer(0);
       setChosenRoleIndex(playerIdx);
+    };
+
+    const startHHGame = () => {
+      setPhase('play');
+      setCurrentPlayer(0);
     };
 
     const ctx = {
@@ -124,7 +155,13 @@ export const strategyGameFactory = ({
               roleLabels={roleLabels}
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={{ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }}
-              moves={{ chooseRole, startNewGame }}
+              moves={{ chooseRole, startNewGame, startHHGame, switchMode }}
+              mode={mode}
+              hasHHMode={!!supportsHHMode}
+              playerNames={playerNames}
+              setPlayerNames={setPlayerNames}
+              currentPlayerName={currentPlayerName}
+              winnerName={winnerName}
             />
           </div>
         </div>
@@ -135,6 +172,8 @@ export const strategyGameFactory = ({
         setIsOpen={setIsGameEndDialogOpen}
         startNewGame={startNewGame}
         isRoleSelectorWinner={isRoleSelectorWinner}
+        mode={mode}
+        winnerName={winnerName}
       />
     </main>
     );
@@ -146,114 +185,3 @@ export const dummyEvents = {
   endGame: () => {},
   setTurnStage: () => {}
 }
-
-export const strategyHHGameFactory = ({
-  rule,
-  title,
-  BoardClient,
-  generateStartBoard,
-  moves,
-  getPlayerStepDescription
-}) => {
-  return () => {
-    const [board, setBoard] = useState(generateStartBoard())
-    const [phase, setPhase] = useState('roleSelection');
-    const [playerNames, setPlayerNames] = useState(['Első játékos', 'Második játékos']);
-    const [currentPlayer, setCurrentPlayer] = useState(null);
-    const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
-    const [winnerIndex, setWinnerIndex] = useState(null);
-    const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
-    const [turnStage, setTurnStage] = useState(null);
-
-    const winnerName = winnerIndex ? playerNames[1] || 'Második játékos': playerNames[0] || 'Első játékos';
-    const currentPlayerName = currentPlayer ? playerNames[1] || 'Második játékos' : playerNames[0] || 'Első játékos';
-
-    const moveWrapper = (moveFunc, ...args) => {
-      const moveResult = moveFunc(...args);
-      setBoard(moveResult.nextBoard);
-      return moveResult;
-    };
-
-    const startNewGame = () => {
-      setBoard(generateStartBoard());
-      setPhase('roleSelection');
-      setCurrentPlayer(null);
-      setIsGameEndDialogOpen(false);
-      setWinnerIndex(null);
-      setGameUuid(crypto.randomUUID());
-      setTurnStage(null);
-    };
-
-    const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
-      setPhase('gameEnd');
-      // default: last player to move is the winner
-      setWinnerIndex(winnerIndex === null ? currentPlayer : winnerIndex);
-      setIsGameEndDialogOpen(true);
-    };
-
-    const endTurn = () => {
-      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
-    };
-
-    const startHHGame = (names) => {
-      setPhase('play');
-      setCurrentPlayer(0);
-    };
-
-    const ctx = {
-      winnerIndex,
-      currentPlayer,
-      phase,
-      turnStage,
-      winnerName,
-      currentPlayerName
-    };
-
-    const events = {
-      endTurn,
-      endGame,
-      setTurnStage
-    };
-
-    // only second argument of move's is fixed here (_ special syntax)
-    // board (first argument) needs to be handled by ai strategy as
-    // it may change between moves but for AI strategy there is no re-render between moves
-    // in some cases there are multiple moves following single user event in that
-    // case there is also no re-render on client side between moves
-    const wrappedMoves = mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper));
-
-    return (
-    <main className="p-2">
-      <GameHeader title={title} />
-      <div className="flex justify-center">
-        <div className="max-w-[100ch] w-full">
-          <GameRule ruleDescription={rule} />
-          <div className="flex flex-wrap">
-            <BoardClient
-              key={gameUuid}
-              board={board}
-              ctx={ctx}
-              events={events}
-              moves={wrappedMoves}
-            />
-            <GameSidebarHH
-              stepDescription={getPlayerStepDescription({ board, ctx })}
-              ctx={{ phase, currentPlayerName, winnerName }}
-              moves={{ startNewGame, startHHGame }}
-              playerNames={playerNames}
-              setPlayerNames={setPlayerNames}
-            />
-          </div>
-        </div>
-      </div>
-      <GameFooter />
-      <GameEndDialogHH
-        isOpen={isGameEndDialogOpen}
-        setIsOpen={setIsGameEndDialogOpen}
-        startNewGame={startNewGame}
-        winnerName={winnerName}
-      />
-    </main>
-    );
-  };
-};
