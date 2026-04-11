@@ -128,7 +128,7 @@ export const gameList = {
     year: { k: "XIII.(19/20)", v: "19/20" },
     round: "döntő",
     category: ["B"],
-    name: "5 mezőbe különbözőt",
+    name: { hu: "5 mezőbe különbözőt", en: "5 distinct squares" },
     credit: { developedBy: ["Soós Máté"] }
   },
   FourPilesSpreadAhead: {
