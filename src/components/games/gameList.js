@@ -235,7 +235,7 @@ export const gameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["C"],
-    name: "Cápa üldözés (4 x 4)",
+    name: { hu: "Cápa üldözés (4 x 4)", en: "Shark chase (4 × 4)" },
     credit: {
       suggestedBy: ["Páhán Anita"],
       developedBy: ["Csizmadia Miklós", "Kempf Alex"]
@@ -245,7 +245,7 @@ export const gameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["D"],
-    name: "Cápa üldözés (5 x 5)",
+    name: { hu: "Cápa üldözés (5 x 5)", en: "Shark chase (5 × 5)" },
     credit: {
       suggestedBy: ["Páhán Anita"],
       developedBy: ["Szemerédi Levente"]
