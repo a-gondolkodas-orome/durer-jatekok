@@ -327,7 +327,7 @@ export const gameList = {
     year: { k: "VII. (13/14)", v: "13/14" },
     round: "döntő",
     category: ["C"],
-    name: "Háromszög színezés",
+    name: { hu: "Háromszög színezés", en: "Triangle colouring" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   TriangularGridRopes: {

@@ -101,7 +101,7 @@ const rule = {
   </>,
   en: <>
     A 1 × 12 board is given with one piece on each end. Players move toward
-    each other taking alternating turns, moving one or two places at a time.
+    each other taking turns, moving one or two places at a time.
     You must not move to a square already occupied by the other player's piece.
     The player jumping over their opponent's piece wins.
   </>
