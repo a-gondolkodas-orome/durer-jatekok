@@ -41,7 +41,7 @@ const BoardClient = ({ board, ctx, moves }) => {
         key={`${from}-${to}`}
         x1={vertices[from].cx} y1={vertices[from].cy}
         x2={vertices[to].cx} y2={vertices[to].cy}
-        stroke={idx % 2 === ctx.chosenRoleIndex ? 'blue' : 'green'}
+        stroke={idx % 2 === 0 ? 'blue' : 'green'}
         strokeWidth="4"
       />
     ))}
@@ -51,7 +51,7 @@ const BoardClient = ({ board, ctx, moves }) => {
       <line
       x1={candidateFromV.cx} y1={candidateFromV.cy}
       x2={candidateToV.cx} y2={candidateToV.cy}
-      stroke={isCandidateAllowed ? 'blue' : 'red'}
+      stroke={isCandidateAllowed ? (ctx.currentPlayer === 0 ? "blue" : "green") : 'red'}
       strokeWidth="2" strokeDasharray="4"
       />
     )}
@@ -62,7 +62,10 @@ const BoardClient = ({ board, ctx, moves }) => {
         key={vertex.id}
         cx={vertex.cx} cy={vertex.cy} r="2%" fill="black"
         className={`
-          ${vertex.id === firstNode ? 'fill-blue-500' : ''}
+          ${vertex.id === firstNode
+            ? (ctx.currentPlayer === 0 ? "fill-blue-500" : "fill-emerald-800")
+            : ''
+          }
           ${
             (
               firstNode !== null &&
@@ -134,5 +137,6 @@ export const TriangularGridRopes = strategyGameFactory({
   }),
   generateStartBoard: () => [],
   moves,
-  aiBotStrategy
+  aiBotStrategy,
+  supportsHHMode: true
 });
