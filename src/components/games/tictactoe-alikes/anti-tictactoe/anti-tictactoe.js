@@ -4,6 +4,7 @@ import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { isGameEnd, hasFirstPlayerWon } from './helpers';
 import { aiBotStrategy } from './bot-strategy';
+import { gameList } from '../../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isMoveAllowed = (id) => {
@@ -21,19 +22,23 @@ const BoardClient = ({ board, ctx, moves }) => {
     return 'bg-blue-600';
   };
 
+  /*
+  Due to simulating borders with the background peeking through gaps, we need
+  to explicitly give bg-white to children.
+  */
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
-    <div className="grid grid-cols-3 gap-0 border-2">
+    <div className="grid grid-cols-3 bg-slate-200 gap-1 p-1">
       {range(9).map(id => (
         <button
           key={id}
           disabled={!isMoveAllowed(id)}
           onClick={() => clickField(id)}
-          className="aspect-square p-[25%] border-2"
+          className="aspect-square p-[25%] bg-white"
         >
           {board[id] && (
             <span
-              className={`w-full aspect-square inline-block rounded-full mb-[-0.5rem] ${pieceColor(id)}`}
+              className={`w-full aspect-square block rounded-full ${pieceColor(id)}`}
             ></span>
           )}
       </button>
@@ -55,17 +60,27 @@ const moves = {
   }
 }
 
-const rule = <>
-  A 3×3-as antiamőba játékban a kezdő piros, a második kék korongokat rak le. Felváltva
-  lépnek, és az veszít, akinek először lesz a saját színéből három korongja egy sorban, oszlopban vagy
-  átlóban. Ha mind a kilenc mező foglalt és nincs ilyen koronghármas, akkor a kezdő nyer.
-</>;
+const rule = {
+  hu: <>
+    A 3×3-as antiamőba játékban a kezdő piros, a második kék korongokat rak le. Felváltva
+    lépnek, és az veszít, akinek először lesz a saját színéből három korongja egy sorban, oszlopban vagy
+    átlóban. Ha mind a kilenc mező foglalt és nincs ilyen koronghármas, akkor a kezdő nyer.
+  </>,
+  en: <>
+    In the 3×3 anti-tic-tac-toe game the first player places red, the second places blue pieces.
+    They alternate turns, and the first player to get three of their own colour in a row, column,
+    or diagonal loses. If all nine squares are occupied and no such triple exists, the first player wins.
+  </>
+};
 
 export const AntiTicTacToe = strategyGameFactory({
   rule,
-  title: '3x3-as antiamőba',
+  metadata: gameList.AntiTicTacToe,
   BoardClient,
-  getPlayerStepDescription: () => 'Helyezz le egy korongot egy üres mezőre kattintással.',
+  getPlayerStepDescription: () => ({
+    hu: 'Helyezz le egy korongot egy üres mezőre kattintással.',
+    en: 'Click on an empty square to place a piece.'
+  }),
   generateStartBoard: generateEmptyTicTacToeBoard,
   moves,
   aiBotStrategy

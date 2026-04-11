@@ -11,6 +11,7 @@ import {
   isDangerous,
   moves
 } from "./helpers";
+import { gameList } from "../gameList";
 
 const boardWidth = 11;
 
@@ -141,7 +142,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
       <table
-        className="m-2 w-[95%] table-fixed"
+        className="w-[95%] table-fixed"
         style={{ transform: "scaleY(-1)" }}
       >
         <tbody>
@@ -155,7 +156,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
                   <button
                     disabled={isDisabled({ row, col })}
                     className={`
-                      aspect-[4/3] w-full
+                      aspect-4/3 w-full
                       ${row % 2 === 1 && col === boardWidth - 1 ? "" : "border-2"}
                       ${isGoal({ row, col }) ? "bg-blue-800" : ""}
                       ${isDangerous(nextBoard, { row, col }) ? "" : ""}
@@ -179,17 +180,21 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
 
 const getPlayerStepDescription = ({ ctx }) => {
   if (ctx.chosenRoleIndex === 0) {
-    return "".concat(
-      "Kattints egy mezőre, amin van baktérium és hajtsd végre ",
-      "a három lehetséges támadás egyikét egy további szabályos kattintással."
-    );
+    return {
+      hu: "Kattints egy mezőre, amin van baktérium és hajtsd végre " +
+        "a három lehetséges támadás egyikét egy további szabályos kattintással.",
+      en: "Click on a square with bacteria and perform one of the three possible attacks with a second valid click."
+    };
   } else {
-    return "Kattints egy mezőre, amin van baktérium, hogy eltávolíts egy bakériumot onnan.";
+    return {
+      hu: "Kattints egy mezőre, amin van baktérium, hogy eltávolíts egy bakériumot onnan.",
+      en: "Click on a square with bacteria to remove one bacterium from it."
+    };
   }
 };
 
-const rule = (
-  <>
+const rule = {
+  hu: <>
     A tábla B betűvel jelölt mezőin 1-1 baktérium található, a tábla
     felső sorában a kijelölt (szomszédos) mezők CÉL mezők. A játékban egy Támadó és Védekező
     játékos felváltva lép. A Védekező játékos minden körében levesz pontosan 1
@@ -205,13 +210,31 @@ const rule = (
     ill. jobbra előre lép.
     <br />A Támadó akkor nyer, ha legalább egy baktérium bejut valamelyik CÉL
     mezőbe; a Védekező pedig akkor, ha az összes baktérium eltűnt a pályáról.
+  </>,
+  en: <>
+    The squares marked with B each contain one bacterium; the designated (adjacent) squares
+    in the top row are GOAL squares. An Attacker and a Defender take turns. On each turn the
+    Defender removes exactly 1 bacterium from any square of their choice.
+    The Attacker chooses one of the following three moves:
+    <br />
+    1. Move all bacteria on one square one step left or right.
+    <br />
+    2. Move a single bacterium forward by two rows (a jump).
+    <br />
+    3. Select a square where cell division occurs: every bacterium on that square divides, and
+    one copy moves diagonally forward-left and one copy moves diagonally forward-right.
+    <br />The Attacker wins if at least one bacterium reaches a GOAL square; the Defender wins
+    if all bacteria are removed from the board.
   </>
-);
+};
 
 export const Bacteria = strategyGameFactory({
   rule,
-  title: "Baktérimok terjedése",
-  roleLabels: ["Támadó leszek", "Védekező leszek"],
+  metadata: gameList.Bacteria,
+  roleLabels: [
+    { hu: "Támadó leszek", en: "I'll be the Attacker" },
+    { hu: "Védekező leszek", en: "I'll be the Defender" }
+  ],
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,

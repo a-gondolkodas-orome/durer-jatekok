@@ -4,8 +4,11 @@ import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import { aiBotStrategy } from './bot-strategy';
 import { generateStartBoard, moves } from './helpers';
+import { gameList } from '../gameList';
+import { useTranslation } from '../../language/translate';
 
 const BoardClient = ({ board, ctx, moves }) => {
+  const { t } = useTranslation();
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const isPlayerSultan = ctx.chosenRoleIndex === 0;
@@ -27,14 +30,7 @@ const BoardClient = ({ board, ctx, moves }) => {
       moves.setGroupOfSoldiers(board, [{ rowIndex, pieceIndex, group }]);
     } else {
       const group = board[rowIndex][pieceIndex];
-      const { nextBoard, isGameEnd } = moves.killGroup(board, group);
-      // TODO: ideally this is not a player initiated move but something that happens at the
-      // end of turn by game engine
-      if (!isGameEnd) {
-        setTimeout(() => {
-          moves.stepUp(nextBoard);
-        }, 750)
-      }
+      moves.killGroup(board, group);
     }
   };
 
@@ -63,7 +59,11 @@ const BoardClient = ({ board, ctx, moves }) => {
       {[1, 2, 3, 4, 5, 6].map(rowIndex => (
         <div
           key={rowIndex}
-          style={{ 'aspectRatio': rowIndex === 6 ? 24 : 8, 'marginLeft': (6-rowIndex) + 'rem', 'marginRight': (6-rowIndex) + 'rem' }}
+          style={{
+            aspectRatio: rowIndex === 6 ? 24 : 8,
+            marginLeft: (6-rowIndex) + 'rem',
+            marginRight: (6-rowIndex) + 'rem'
+          }}
           className="border-t-black border-t-2 p-0.5 text-center whitespace-nowrap"
         >
           {board[rowIndex] && board[rowIndex].map((group, pieceIndex) => (
@@ -96,7 +96,7 @@ const BoardClient = ({ board, ctx, moves }) => {
           disabled={!ctx.shouldRoleSelectorMoveNext}
           onClick={() => moves.finalizeSeparation(board)}
         >
-          Befejezem a kettéosztást
+          {t({ hu: 'Befejezem a kettéosztást', en: 'Finish the split' })}
         </button>
       )}
     </section>
@@ -105,26 +105,45 @@ const BoardClient = ({ board, ctx, moves }) => {
 
 const getPlayerStepDescription = ({ ctx: { chosenRoleIndex } }) => {
   return chosenRoleIndex === 0
-  ? 'Kattints a katonákra és válaszd két részre a seregedet.'
-  : 'Kattints egy katonára, hogy megsemmisítsd a vele azonos színű sereget.';
+    ? {
+      hu: 'Kattints a katonákra és válaszd két részre a seregedet.',
+      en: 'Click soldiers to split your army in two.'
+    }
+    : {
+      hu: 'Kattints egy katonára, hogy megsemmisítsd a vele azonos színű sereget.',
+      en: 'Click a soldier to destroy all troops of that colour.'
+    };
 };
 
-const rule = <>
-  A török szultán serege megtámadta Hunyadi várát. A várlépcső egyes fokain néhány janicsár áll.
-  Minden reggel a szultán kettéosztja a hadseregét egy piros és egy kék hadtestre.
-  Hunyadi a nap folyamán vagy a piros, vagy a kék sereget megsemmisíti, választása szerint. Éjszaka minden megmaradt
-  janicsár egy lépcsőfokot fellép.
-  Hunyadi nyer, ha a szultán egész seregét megsemmisítette.
-  A szultán nyer, ha lesz olyan janicsár, aki felér a várhoz.
-</>;
+const rule = {
+  hu: <>
+    A török szultán serege megtámadta Hunyadi várát. A várlépcső egyes fokain néhány janicsár áll.
+    Minden reggel a szultán kettéosztja a hadseregét egy piros és egy kék hadtestre.
+    Hunyadi a nap folyamán vagy a piros, vagy a kék sereget megsemmisíti, választása szerint. Éjszaka minden megmaradt
+    janicsár egy lépcsőfokot fellép.
+    Hunyadi nyer, ha a szultán egész seregét megsemmisítette.
+    A szultán nyer, ha lesz olyan janicsár, aki felér a várhoz.
+  </>,
+  en: <>
+    The Turkish sultan's army is attacking Hunyadi's castle. Some janissaries stand on various
+    steps of the castle staircase. Each morning the sultan splits his army into a red and a blue
+    force. Hunyadi then destroys either the red or the blue force, as he chooses. At night every
+    surviving janissary moves up one step. Hunyadi wins if he destroys the sultan's entire army.
+    The sultan wins if any janissary reaches the castle.
+  </>
+};
 
 export const HunyadiAndTheJanissaries = strategyGameFactory({
   rule,
-  title: 'Hunyadi és a janicsárok',
-  roleLabels: ['Szultán leszek', 'Hunyadi leszek'],
+  metadata: gameList.HunyadiAndTheJanissaries,
+  roleLabels: [
+    { hu: 'Szultán leszek', en: "I'll be the Sultan" },
+    { hu: 'Hunyadi leszek', en: "I'll be Hunyadi" }
+  ],
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,
   moves,
-  aiBotStrategy
+  aiBotStrategy,
+  endOfTurnMove: 'stepUp'
 });

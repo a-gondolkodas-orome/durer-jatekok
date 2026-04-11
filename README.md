@@ -24,19 +24,23 @@ TL;DR;
 
 ## Project setup
 
+There is a (fairly minimal) devcontainer setup if you prefer that. Alternatively,
+here are the installation instructions:
+
+### Installing locally 
+
 - install Node.js on your computer globally (or use nvm)
 - in the project directory terminal run `npm ci`
 
 ## Useful npm commands
+<details>
+<summary>The commands</summary>
 
 ### Compiles and hot-reloads for development
 
 ```bash
 npm run dev
 ```
-
-If you are using Windows and you see `Error: The specified module could not be found. ... code: 'ERR_DLOPEN_FAILED'`
-https://github.com/parcel-bundler/parcel/issues/7104#issuecomment-967260755 might help you.
 
 ### Run tests
 
@@ -57,6 +61,9 @@ npm run lint:fix
 npm run build
 ```
 
+</details>
+
+
 ## IDE setup
 
 Recommended VS Code extensions:
@@ -76,6 +83,10 @@ with this factory (so that you can focus on game logic and designing the board i
 *It is recommended to copy and modify an existing, similar game.*
 
 ## Minimal demonstrative example
+
+<details>
+
+<summary>The code</summary>
 
 ```js
 const moves = {
@@ -109,7 +120,7 @@ const aiBotStrategy = ({ board, moves }) => {
 // React component added to router in app.js
 export const PlusOneTwo = strategyGameFactory({
   rule: <>0-ról +1/+2 20-ig</>,
-  title: '+1, +2',
+  metadata: { name: '+1, +2' },
   BoardClient,
   // a function returning a string, receives optional { board, ctx }
   getPlayerStepDescription: () => 'Válaszd ki, hogy hánnyal növelsz.',
@@ -118,8 +129,12 @@ export const PlusOneTwo = strategyGameFactory({
   moves
 });
 ```
+</details>
 
 ## Must have for a new game
+
+<details>
+<summary>The details</summary>
 
 ### board object
 
@@ -177,6 +192,7 @@ must be wrapped in setTimeout, this is not (yet) handled by the framework.
 - `endTurn`: a function
 - `endGame`: a function with optional winnerIndex specified, if not, last player to move is the winner
 - `setTurnStage`: a function to set `turnStage`
+</details>
 
 ## Things to look out for
 
@@ -192,12 +208,47 @@ must be wrapped in setTimeout, this is not (yet) handled by the framework.
 - check for console errors/warnings as well, i.e. missing keys on react components
 - pretend AI is thinking in turns with multiple moves (for one move it is handled by framework)
 
+## Internationalisation (i18n)
+
+The site supports Hungarian (default) and partially English. See `TicTacToe`
+for a complete example. English translations are added on a game-per-game bases,
+it is fine to add new games with Hungarian only.
+
+The `t()` helper from `translate.js` resolves a value to the active language.
+The value can be a plain string if there are no translations available, or a
+`{hu, en }` object. For longer strings, consider extracting the english versions
+to `<game-name>-en.js` to keep the main files more compact.
+
+Check the [Dürer Archive](https://durerinfo.hu/archivum/feladatsorok/) for
+existing translations.
+
+Example internationalization of existing games:
+[Pairs of
+numbers](https://github.com/a-gondolkodas-orome/durer-jatekok/pull/213/changes/b574233c4e0c3e7d8c9dde3a2388a47133f93e10),
+[4 piles: spread
+ahead](https://github.com/a-gondolkodas-orome/durer-jatekok/pull/213/changes/1981715efa316e7bf1608c7b441dc0898ea6ed2f),
+[Add N, take
+2N](https://github.com/a-gondolkodas-orome/durer-jatekok/pull/213/changes/16158b67ece84ff68f25afbe9365f6650c7273d3)
+
 ## Technologies used
+
+<details>
 
 - Node.js for the development server and building the application
 - React frontend framework ([official tutorial](https://react.dev/learn) is a good starting point)
 - [optional] Tailwindcss for styling with utility classes
-- [optional] jest for unit testing
+- [optional] vitest for unit testing
 - github actions for CI/CD.
 - github pages as hosting
 - [goatcounter](https://agondolkodasorome.goatcounter.com/) as usage tracker (Ildi has access)
+
+</details>
+
+# License
+
+Copyright (c) 2020-present [A Gondolkodás Öröme Alapítvány](https://agondolkodasorome.hu/).
+
+The promblems originate from the [Dürer Math Competition](https://durerinfo.hu/) and remain the intellectual property of their respective authors.
+
+This project is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+You may share and adapt this material for non-commercial purposes, provided you give appropriate credit and distribute your contributions under the same license.

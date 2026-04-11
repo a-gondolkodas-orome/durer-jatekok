@@ -4,6 +4,7 @@ import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { isGameEnd, hasFirstPlayerWon } from './helpers';
+import { gameList } from '../../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isMoveAllowed = (id) => {
@@ -20,19 +21,23 @@ const BoardClient = ({ board, ctx, moves }) => {
     return 'bg-blue-600';
   };
 
+  /*
+  Due to simulating borders with the background peeking through gaps, we need
+  to explicitly give bg-white to children.
+  */
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
-    <div className="grid grid-cols-3 gap-0 border-2">
+    <div className="grid grid-cols-3  bg-slate-200 gap-1 p-1">
       {range(9).map(id => (
         <button
         key={id}
         disabled={!isMoveAllowed(id)}
         onClick={() => clickField(id)}
-        className="aspect-square p-[25%] border-2"
+        className="aspect-square p-[25%] bg-white"
         >
           {board[id] && (
             <span
-            className={`w-full aspect-square inline-block rounded-full mb-[-0.5rem] ${pieceColor(id)}`}
+              className={`w-full aspect-square block rounded-full ${pieceColor(id)}`}
             ></span>
           )}
       </button>
@@ -62,21 +67,37 @@ const moves = {
 
 const getPlayerStepDescription = ({ board }) => {
   return isDuringFirstMove(board)
-    ? 'Helyezz le két korongot egy-egy üres mezőre kattintással.'
-    : 'Helyezz le egy korongot egy üres mezőre kattintással.';
+    ? {
+      hu: 'Helyezz le két korongot egy-egy üres mezőre kattintással.',
+      en: 'Click two empty cells to place two pieces.'
+    }
+    : {
+      hu: 'Helyezz le egy korongot egy üres mezőre kattintással.',
+      en: 'Click an empty cell to place a piece.'
+    };
 };
 
-const rule = <>
-  A 3 × 3-as duplánkezdő amőba játékban először a kezdő tesz le két piros korongot, majd
-  a második egy kék korongot és innentől felváltva egy-egy korongot tesznek le a saját színükből, amíg
-  be nem telik a tábla. A kezdő nyer, ha a játék végén van valahol három piros egy sorban, oszlopban
-  vagy átlóban, de sehol sincs három kék egy sorban, oszlopban vagy átlóban; egyébként a második
-  nyer.
-</>;
+const rule = {
+  hu: <>
+    A 3 × 3-as duplánkezdő amőba játékban először a kezdő tesz le két piros korongot, majd
+    a második egy kék korongot és innentől felváltva egy-egy korongot tesznek le a saját színükből, amíg
+    be nem telik a tábla. A kezdő nyer, ha a játék végén van valahol három piros egy sorban, oszlopban
+    vagy átlóban, de sehol sincs három kék egy sorban, oszlopban vagy átlóban; egyébként a második
+    nyer.
+  </>,
+  en: <>
+    In the game of doublestarting tic-tac-toe on a 3 × 3 board, the first player starts
+    with placing two red disks in two cells.
+    After that, they alternate turns and place one disk on an empty cell in each turn,
+    the first using red, the second player using blue disks. The game ends when the board is full.
+    The first player wins if there are three red disks in a row, column or diagonal, but there
+    are no three blue disks in a row, column or diagonal. Otherwise, the second player wins.
+  </>
+};
 
 export const TicTacToeDoubleStart = strategyGameFactory({
   rule,
-  title: 'Duplánkezdő 3x3 amőba',
+  metadata: gameList.TicTacToeDoubleStart,
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard: generateEmptyTicTacToeBoard,

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { range, isEqual, random, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
+import { gameList } from '../../gameList';
 
 const generateStartBoard = () => {
   const x = random(2, 8) * 2 + 1;
@@ -91,7 +92,7 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
               className={`
-                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5
+                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5 mt-0.5
                 ${pileId === removedPileId ? 'bg-red-600' : ''}
                 ${pileId === removedPileId ? 'opacity-50' : ''}
                 ${toBeLeft({ pileId, pieceId }) ? 'bg-blue-900' : ''}
@@ -134,19 +135,29 @@ const moves = {
   }
 };
 
-const getPlayerStepDescription = () =>
-  'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.';
+const getPlayerStepDescription = () => ({
+  hu: 'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.',
+  en: 'First click the pile to remove, then click the piece where you want to split another pile.'
+});
 
-const rule = <>
-  A pályán kezdetben 37 korong van, három kupacban.
-  A soron következő játékos először az egyik kupacot teljes egészében kiveszi a játékból;
-  majd egy másik kupacot kettéoszt két kisebb kupacra (mindkettőbe legalább 1 korongnak kerülnie kell).
-  Egy lépést követően tehát újra három kupac marad. Az veszít, aki nem tud lépni.
-</>;
+const rule = {
+  hu: <>
+    A pályán kezdetben 37 korong van, három kupacban.
+    A soron következő játékos először az egyik kupacot teljes egészében kiveszi a játékból;
+    majd egy másik kupacot kettéoszt két kisebb kupacra (mindkettőbe legalább 1 korongnak kerülnie kell).
+    Egy lépést követően tehát újra három kupac marad. Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    There are 37 pieces on the board at the start, in three piles. The current player first removes
+    one pile entirely from the game, then splits another pile into two smaller piles (each must
+    contain at least 1 piece). After each move there are again three piles. The player who cannot
+    move loses.
+  </>
+};
 
 export const PileSplitter3 = strategyGameFactory({
   rule,
-  title: 'Kupac kettéosztó 3 kupaccal',
+  metadata: gameList.PileSplitter3,
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,

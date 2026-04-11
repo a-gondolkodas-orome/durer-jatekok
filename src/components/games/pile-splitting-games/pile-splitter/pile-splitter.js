@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { range, isEqual, random, _, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
+import { gameList } from '../../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
@@ -67,7 +68,7 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
               className={`
-                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5
+                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5 mt-0.5
                 ${toBeRemoved({ pileId }) ? 'opacity-50 bg-red-600' : ''}
                 ${toBeLeft({ pileId, pieceId }) ? 'bg-blue-900' : ''}
               `}
@@ -84,8 +85,10 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const getPlayerStepDescription = () =>
-  'Kattints a korongra, ahol ketté akarod vágni a kupacot.';
+const getPlayerStepDescription = () => ({
+  hu: 'Kattints a korongra, ahol ketté akarod vágni a kupacot.',
+  en: 'Click the piece where you want to split the pile.'
+});
 
 const moves = {
   removePile: (board, _, pileId) => {
@@ -103,16 +106,23 @@ const moves = {
   }
 }
 
-const rule = <>
-  A pályán mindig két kupac korong található.
-  A soron következő játékos választ egy kupacot, és azt szétosztja két kisebb kupacra (mindkettőbe
-  legalább 1 korongnak kerülnie kell), a másik kupacot pedig kidobjuk.
-  Az veszít, aki nem tud lépni.
-</>;
+const rule = {
+  hu: <>
+    A pályán mindig két kupac korong található.
+    A soron következő játékos választ egy kupacot, és azt szétosztja két kisebb kupacra (mindkettőbe
+    legalább 1 korongnak kerülnie kell), a másik kupacot pedig kidobjuk.
+    Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    There are always two piles of pieces on the board. The current player chooses one pile and
+    splits it into two smaller piles (each must contain at least 1 piece); the other pile is
+    discarded. The player who cannot move loses.
+  </>
+};
 
 export const PileSplitter = strategyGameFactory({
   rule,
-  title: 'Kupac kettéosztó',
+  metadata: gameList.PileSplitter,
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard: () => ([random(3, 10), random(3, 10)]),

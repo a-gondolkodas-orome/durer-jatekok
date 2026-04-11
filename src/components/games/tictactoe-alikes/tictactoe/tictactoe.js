@@ -4,6 +4,8 @@ import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { aiBotStrategy } from './bot-strategy';
 import { inPlacingPhase, aiColor, isGameEnd } from './helpers';
+import { gameList } from '../../gameList';
+import * as en from './tictactoe-en';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);
@@ -31,24 +33,28 @@ const BoardClient = ({ board, ctx, moves }) => {
     return 'bg-blue-600';
   };
 
+  /*
+  Due to simulating borders with the background peeking through gaps, we need
+  to explicitly give bg-white to children.
+  */
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
-    <div className="grid grid-cols-3 gap-0 border-2">
+    <div className="grid grid-cols-3 bg-slate-200 gap-1 p-1">
       {range(9).map(id => (
         <button
           key={id}
           disabled={!isMoveAllowed(id)}
           onClick={() => clickField(id)}
           className={`
-            aspect-square p-[25%] border-2
+            aspect-square p-[25%]
             ${!isMoveAllowed(id) && ctx.shouldRoleSelectorMoveNext ? 'cursor-not-allowed' : ''}
-            ${!gameIsInPlacingPhase && isMoveAllowed(id) ? 'bg-green-100' : ''}
+            ${!gameIsInPlacingPhase && isMoveAllowed(id) ? 'bg-green-100' : 'bg-white'}
           `}
         >
           {board[id] && (
             <span
               className={`
-                w-full aspect-square inline-block rounded-full mb-[-0.5rem]
+                w-full aspect-square block rounded-full
                 ${pieceColor(id)}
                 ${pieceColor(id) === 'bg-white' ? 'border-4 border-slate-600' : ''}
               `}
@@ -82,24 +88,25 @@ const moves = {
   }
 }
 
-const getPlayerStepDescription = ({ board }) => {
-  return inPlacingPhase(board)
-    ? 'Helyezz le egy korongot egy üres mezőre kattintással.'
-    : 'Kattints egy piros korongra.';
-};
+const getPlayerStepDescription = ({ board }) => inPlacingPhase(board)
+  ? { hu: 'Helyezz le egy korongot egy üres mezőre kattintással.', en: en.stepPlacing }
+  : { hu: 'Kattints egy piros korongra.', en: en.stepWhitening };
 
-const rule = <>
-  Két játékos játszik egy 3 × 3-as táblán kék és piros korongokkal a szokásos amőba
-  szabályai szerint, tehát felváltva tesznek le korongokat, és ha egy sorban, oszlopban vagy átlóban
-  összegyűlik három azonos színű korong, az adott játékos nyer. Ha az első 9 korong lehelyezése
-  után döntetlen az állás (azaz egyik játékos sem nyert), akkor tovább folytatják a játékot, a soron
-  következő játékos az ellenfél egy már lehelyezett korongját fehérre színezheti. Ezek után az nyer,
-  aki először hoz létre három fehér korongot egy sorban, oszlopban vagy átlóban.
-</>;
+const rule = {
+  hu: <>
+    Két játékos játszik egy 3 × 3-as táblán kék és piros korongokkal a szokásos amőba
+    szabályai szerint, tehát felváltva tesznek le korongokat, és ha egy sorban, oszlopban vagy átlóban
+    összegyűlik három azonos színű korong, az adott játékos nyer. Ha az első 9 korong lehelyezése
+    után döntetlen az állás (azaz egyik játékos sem nyert), akkor tovább folytatják a játékot, a soron
+    következő játékos az ellenfél egy már lehelyezett korongját fehérre színezheti. Ezek után az nyer,
+    aki először hoz létre három fehér korongot egy sorban, oszlopban vagy átlóban.
+  </>,
+  en: en.rule
+};
 
 export const TicTacToe = strategyGameFactory({
   rule,
-  title: 'Átszínezős tic-tac-toe',
+  metadata: gameList.TicTacToe,
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard: generateEmptyTicTacToeBoard,

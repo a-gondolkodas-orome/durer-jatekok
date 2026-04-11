@@ -1,3 +1,4 @@
+CLAUDE.md
 /dist
 .DS_Store
 .idea
@@ -5,3 +6,5 @@ node_modules
 npm-debug.log*
 .parcel-cache
 .vscode
+# rollup-plugin-visualizer output
+stats.html

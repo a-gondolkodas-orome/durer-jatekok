@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { range, isEqual, random, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
+import { gameList } from '../../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const [hoveredPiece, setHoveredPiece] = useState(null);
@@ -51,7 +52,9 @@ const BoardClient = ({ board, ctx, moves }) => {
     if (!ctx.shouldRoleSelectorMoveNext) return pieceCountInPile;
     if (!hoveredPiece) return pieceCountInPile;
 
-    if (hoveredPiece.pileId !== pileId) return `${pieceCountInPile} → ${pieceCountInPile + (hoveredPiece.pieceId+1)/2 }`;
+    if (hoveredPiece.pileId !== pileId) {
+      return `${pieceCountInPile} → ${pieceCountInPile + (hoveredPiece.pieceId+1)/2 }`;
+    }
 
     return `${pieceCountInPile} → ${pieceCountInPile - hoveredPiece.pieceId - 1}`;
   };
@@ -76,11 +79,15 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
               className={`
-                inline-block w-[20%] aspect-square rounded-full mx-0.5
+                w-[18%] aspect-square rounded-full mx-0.5 mt-0.5
                 ${isDisabled({ pileId, pieceId }) && 'cursor-not-allowed'}
                 ${toAppear({ pileId, pieceId }) && nonExistent({ pileId, pieceId }) ? 'bg-blue-900 opacity-30' : ''}
                 ${toBeRemoved({ pileId, pieceId }) ? 'bg-red-600 opacity-50' : ''}
-                ${(nonExistent({ pileId, pieceId }) && !toAppear({ pileId, pieceId })) ? 'bg-white' : ''}
+                ${
+                  (nonExistent({ pileId, pieceId }) && !toAppear({ pileId, pieceId }))
+                    ? 'invisible inline-block'
+                    : 'inline-block'
+                }
                 ${!nonExistent({ pileId, pieceId }) && !toBeRemoved({ pileId, pieceId }) ? 'bg-blue-900' : ''}
               `}
               onClick={() => clickPiece({ pileId, pieceId })}
@@ -111,17 +118,27 @@ const moves = {
   }
 }
 
-const rule = <>
-  A pályán mindig két kupac korong található. Egy lépésben az éppen soron következő játékos az egyik
-  kupacból elvesz páros sok korongot (legalább kettőt), és a másik kupachoz hozzáad feleannyit.
-  Az veszít, aki nem tud lépni.
-</>;
+const rule = {
+  hu: <>
+    A pályán mindig két kupac korong található. Egy lépésben az éppen soron következő játékos az egyik
+    kupacból elvesz páros sok korongot (legalább kettőt), és a másik kupachoz hozzáad feleannyit.
+    Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    We have two piles of pucks. In each step, the player in turn adds at least one puck
+    to one of the piles and takes away two times as many pucks from the other pile. The one who
+    cannot make a new step, loses.
+  </>
+};
 
 export const AddReduceDouble = strategyGameFactory({
   rule,
-  title: 'Kettőt vesz, egyet kap',
+  metadata: gameList.AddReduceDouble,
   BoardClient,
-  getPlayerStepDescription: () => 'Kattints egy korongra, hogy jelezd, hány korongot szeretnél elvenni a kupacból.',
+  getPlayerStepDescription: () => ({
+    hu: 'Kattints egy korongra, hogy jelezd, hány korongot szeretnél elvenni a kupacból.',
+    en: 'Click a piece to indicate how many you want to remove.'
+  }),
   generateStartBoard: () => ([random(3, 10), random(3, 10)]),
   moves,
   aiBotStrategy

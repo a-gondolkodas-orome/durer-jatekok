@@ -3,6 +3,7 @@ import { range, isEqual, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
 import { generateStartBoard } from './helpers';
+import { gameList } from '../../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const [removedPileId, setRemovedPileId] = useState(null);
@@ -100,7 +101,7 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
               className={`
-                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5
+                inline-block bg-blue-600 w-[20%] aspect-square rounded-full mx-0.5 mt-0.5
                 ${pileId === removedPileId ? 'bg-red-600 opacity-50' : ''}
                 ${toBeLeft({ pileId, pieceId }) ? 'bg-blue-900' : ''}
               `}
@@ -142,19 +143,28 @@ const moves = {
   }
 };
 
-const getPlayerStepDescription = () =>
-  'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.';
+const getPlayerStepDescription = () => ({
+  hu: 'Először kattints az eltávolítandó kupacra, majd arra a korongra, ahol ketté akarod vágni a kupacot.',
+  en: 'First click the pile you wish to remove, then the disk where you want to split.'
+});
 
-const rule = <>
-  A pályán kezdetben négy kupac korong van.
-  A soron következő játékos először az egyik kupacot teljes egészében kiveszi a játékból;
-  majd egy másik kupacot kettéoszt két kisebb kupacra (mindkettőbe legalább 1 korongnak kerülnie kell).
-  Egy lépést követően tehát újra 4 kupac marad. Az veszít, aki nem tud lépni.
-</>;
+const rule = {
+  hu: <>
+    A pályán kezdetben négy kupac korong van.
+    A soron következő játékos először az egyik kupacot teljes egészében kiveszi a játékból;
+    majd egy másik kupacot kettéoszt két kisebb kupacra (mindkettőbe legalább 1 korongnak kerülnie kell).
+    Egy lépést követően tehát újra 4 kupac marad. Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    At the beginning of the game there are 4 piles of disks on the table.
+    The player who is in turn takes away a pile, then divides one of the remaining piles into
+    two nonempty piles. Whoever is unable to move, loses.
+  </>
+};
 
 export const PileSplitter4 = strategyGameFactory({
   rule,
-  title: 'Kupac kettéosztó 4 kupaccal',
+  metadata: gameList.PileSplitter4,
   BoardClient,
   getPlayerStepDescription,
   generateStartBoard,

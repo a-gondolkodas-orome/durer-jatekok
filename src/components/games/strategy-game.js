@@ -3,27 +3,29 @@ import {
   GameSidebar, GameFooter, GameHeader, GameRule, GameEndDialog,
   GameEndDialogHH, GameSidebarHH
 } from './game-parts';
-import { v4 as uuidv4 } from 'uuid';
 import { partial, mapValues, wrap, _ } from 'lodash';
+import { useTranslation } from '../language/translate';
 
 export const strategyGameFactory = ({
   rule,
-  title,
+  metadata,
   roleLabels,
   BoardClient,
   generateStartBoard,
   moves,
   aiBotStrategy,
-  getPlayerStepDescription
+  getPlayerStepDescription,
+  endOfTurnMove
 }) => {
   return () => {
+    const { t } = useTranslation();
     const [board, setBoard] = useState(generateStartBoard())
     const [phase, setPhase] = useState('roleSelection');
     const [chosenRoleIndex, setChosenRoleIndex] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
     const [winnerIndex, setWinnerIndex] = useState(null);
-    const [gameUuid, setGameUuid] = useState(uuidv4());
+    const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
     const [turnStage, setTurnStage] = useState(null);
 
     useEffect(() => {
@@ -32,9 +34,16 @@ export const strategyGameFactory = ({
       }
     }, [currentPlayer])
 
+    let wrappedMoves;
+
     const moveWrapper = (moveFunc, ...args) => {
       const moveResult = moveFunc(...args);
       setBoard(moveResult.nextBoard);
+      if (endOfTurnMove && moveResult.autoEndOfTurn) {
+        setTimeout(() => {
+          wrappedMoves[endOfTurnMove](moveResult.nextBoard);
+        }, 750);
+      }
       return moveResult;
     };
 
@@ -45,7 +54,7 @@ export const strategyGameFactory = ({
       setCurrentPlayer(null);
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
-      setGameUuid(uuidv4());
+      setGameUuid(crypto.randomUUID());
       setTurnStage(null);
     };
 
@@ -88,7 +97,7 @@ export const strategyGameFactory = ({
     // it may change between moves but for AI strategy there is no re-render between moves
     // in some cases there are multiple moves following single user event in that
     // case there is also no re-render on client side between moves
-    const wrappedMoves = mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper));
+    wrappedMoves = mapValues(moves, f => wrap(partial(f, _, { ctx, events }), moveWrapper));
 
     const doAiTurn = () => {
       const time = Math.floor(Math.random() * 500 + 1000);
@@ -98,11 +107,11 @@ export const strategyGameFactory = ({
     };
 
     return (
-    <main className="p-2">
-      <GameHeader title={title} />
-      <div className="flex justify-center">
+    <main className="flex flex-col p-2 min-h-screen">
+      <GameHeader title={t(metadata.title || metadata.name)} />
+      <div className="flex justify-center grow">
         <div className="max-w-[100ch] w-full">
-          <GameRule ruleDescription={rule} />
+          <GameRule ruleDescription={t(rule)} />
           <div className="flex flex-wrap">
             <BoardClient
               key={gameUuid}
@@ -113,14 +122,14 @@ export const strategyGameFactory = ({
             />
             <GameSidebar
               roleLabels={roleLabels}
-              stepDescription={getPlayerStepDescription({ board, ctx })}
+              stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={{ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }}
               moves={{ chooseRole, startNewGame }}
             />
           </div>
         </div>
       </div>
-      <GameFooter />
+      <GameFooter credit={metadata.credit}/>
       <GameEndDialog
         isOpen={isGameEndDialogOpen}
         setIsOpen={setIsGameEndDialogOpen}
@@ -131,6 +140,12 @@ export const strategyGameFactory = ({
     );
   };
 };
+
+export const dummyEvents = {
+  endTurn: () => {},
+  endGame: () => {},
+  setTurnStage: () => {}
+}
 
 export const strategyHHGameFactory = ({
   rule,

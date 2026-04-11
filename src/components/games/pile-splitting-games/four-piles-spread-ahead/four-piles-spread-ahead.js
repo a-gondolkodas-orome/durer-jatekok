@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { range, random, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
+import { gameList } from '../../gameList';
+import { useLanguage } from '../../../language/language-context';
 
 const generateStartBoard = () => ([random(0, 9), random(0, 9), random(0, 9), random(4, 9)]);
 
 const BoardClient = ({ board, ctx, moves }) => {
+  const { language } = useLanguage();
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
   const nonExistent = ({ pileId, pieceId }) => {
@@ -51,18 +54,33 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   const currentChoiceDescription = (pileId) => {
     const pieceCountInPile = board[pileId];
+    const pileName = language == 'en' ? 'pile' : 'kupac';
 
     if (!ctx.shouldRoleSelectorMoveNext || !hoveredPiece) {
-      return `${pileId+1}. kupac: ${pieceCountInPile} `;
+      return `${pileId+1}. ${pileName}: ${pieceCountInPile} `;
     }
 
     if (pileId===hoveredPiece.pileId) {
-      return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile - hoveredPiece.pieceId - 1}`;
+      return `${pileId+1}. ${pileName}: ${pieceCountInPile} → ${pieceCountInPile - hoveredPiece.pieceId - 1}`;
     }
     if ((pileId<hoveredPiece.pileId) && (pileId>hoveredPiece.pileId-hoveredPiece.pieceId-2)) {
-      return `${pileId+1}. kupac: ${pieceCountInPile} → ${pieceCountInPile + 1}`;
+      return `${pileId+1}. ${pileName}: ${pieceCountInPile} → ${pieceCountInPile + 1}`;
     }
-    return `${pileId+1}. kupac: ${pieceCountInPile} `;
+    return `${pileId+1}. ${pileName}: ${pieceCountInPile} `;
+  };
+
+  const leftBorder = (pileId) => {
+    return (
+      (pileId === 1 && board[1] > board[0]) ||
+      (pileId === 3 && board[3] > board[2])
+    );
+  };
+
+  const rightBorder = (pileId) => {
+    return (
+      (pileId === 0 && board[1] <= board[0]) ||
+      (pileId === 2 && board[3] <= board[2])
+    );
   };
 
   return (
@@ -70,7 +88,12 @@ const BoardClient = ({ board, ctx, moves }) => {
     {[0, 1, 2, 3].map(pileId => (
       <div
         key={pileId}
-        className={`w-[50%] pl-1 inline-block text-center`}
+        className={`
+          w-[50%] pl-1 inline-block text-center
+          ${pileId < 2 ? 'border-t-2': ''}
+          ${rightBorder(pileId) ? 'border-r-2' : ''}
+          ${leftBorder(pileId) ? 'border-l-2' : ''}
+        `}
         style={{ transform: 'scaleY(-1)' }}
       >
         <p className="text-xl" style={{ transform: 'scaleY(-1)' }}>
@@ -81,12 +104,24 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceId}
               disabled={isDisabled({ pileId, pieceId })}
               className={`
-                inline-block w-[20%] aspect-square rounded-full mx-0.5
+                w-[18%] aspect-square rounded-full mx-0.5 mt-0.5
                 ${toAppear({ pileId, pieceId }) ? 'bg-blue-600 opacity-50' : ''}
                 ${isDisabled({ pileId, pieceId }) && 'cursor-not-allowed bg-blue-600'}
                 ${toBeRemoved({ pileId, pieceId }) ? 'bg-red-600 opacity-50' : ''}
-                ${(nonExistent({ pileId, pieceId }) && !toAppear({ pileId, pieceId })) ? 'invisible' : ''}
-                ${!nonExistent({ pileId, pieceId }) && !isDisabled({ pileId, pieceId }) && !toBeRemoved({ pileId, pieceId }) ? 'bg-blue-900' : ''}
+                ${
+                  (nonExistent({ pileId, pieceId }) && !toAppear({ pileId, pieceId }))
+                  ? 'invisible inline-block'
+                  : 'inline-block'
+                }
+                ${
+                  (
+                    !nonExistent({ pileId, pieceId }) &&
+                    !isDisabled({ pileId, pieceId }) &&
+                    !toBeRemoved({ pileId, pieceId })
+                  )
+                  ? 'bg-blue-900'
+                  : ''
+                }
               `}
               onClick={() => clickPiece({ pileId, pieceId })}
               onFocus={() => hoverPiece({ pileId, pieceId })}
@@ -118,18 +153,32 @@ const moves = {
   }
 }
 
-const rule = <>
-  Adott négy, korongokból álló kupac, melyek 1-től 4-ig vannak számozva. Egy lépésben a
-  soron következő játékos választ m és n egész számokat, melyekre 1 ≤ m &lt; n ≤ 4, majd az n sorszámú
-  kupacból elvesz m korongot, és az n − 1, n − 2, . . . , n − m sorszámú kupacokba egyesével szétosztja az
-  elvett korongokat. Az veszít, aki nem tud lépni.
-</>;
+const rule = {
+  hu: <>
+    Adott négy, korongokból álló kupac, melyek 1-től 4-ig vannak számozva. Egy lépésben a
+    soron következő játékos választ m és n egész számokat,
+    melyekre <code className="whitespace-nowrap">1 ≤ m &lt; n ≤ 4</code>,
+    majd az n sorszámú kupacból elvesz m korongot, és
+    az <code className="whitespace-nowrap">n − 1, n − 2, . . . , n − m</code> sorszámú
+    kupacokba egyesével szétosztja az elvett korongokat. Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    There are four piles of discs given, numbered from 1 to 4. Every turn the current
+    player chooses integers m and n that satisfy <code className="whitespace-nowrap">1 ≤ m &lt; n ≤ 4</code> and
+    takes m discs from pile number n and distributes them into the
+    piles <code className="whitespace-nowrap">n − 1, n − 2, . . . , n − m</code> by
+    adding one disc to every pile. The player that has no available moves loses.
+  </>
+};
 
 export const FourPilesSpreadAhead = strategyGameFactory({
   rule,
-  title: '4 kupacban előrepakolás',
+  metadata: gameList.FourPilesSpreadAhead,
   BoardClient,
-  getPlayerStepDescription: () => 'Kattints egy korongra, hogy jelezd, hány korongot szeretnél elvenni a kupacból.',
+  getPlayerStepDescription: () => ({
+    hu: 'Kattints egy korongra, hogy jelezd, hány korongot szeretnél elvenni a kupacból.',
+    en: 'Click on a disc to indicate the number of discs you want to remove.'
+  }),
   generateStartBoard,
   moves,
   aiBotStrategy
