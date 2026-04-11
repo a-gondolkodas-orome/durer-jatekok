@@ -84,7 +84,7 @@ export const GameSidebar = ({
       {mode === 'vsHuman' && (
         <>
           <p className="text-center font-bold text-lg basis-14">
-            {getCtaTextHH({ phase: ctx.phase, currentPlayerName, winnerName })}
+            {t(getCtaTextHH({ phase: ctx.phase, currentPlayerName, winnerName }))}
           </p>
           {ctx.phase === 'play' && (
             <p className="italic text-justify basis-24">
@@ -284,7 +284,22 @@ const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
   };
 
 const getCtaTextHH = ({ phase, currentPlayerName, winnerName }) => {
-  if (phase === 'roleSelection') return 'Döntsétek el, hogy ki kezd.';
-  if (phase === 'play') return `Következik: ${currentPlayerName}`;
-  if (phase === 'gameEnd') return `A játékot nyerte: ${winnerName}`;
+  if (phase === 'roleSelection') {
+    return {
+      hu: 'Döntsétek el, hogy ki kezd.',
+      en: 'Decide who goes first.'
+    };
+  }
+  if (phase === 'play') {
+    return {
+      hu: `Következik: ${currentPlayerName}`,
+      en: `Next: ${currentPlayerName}`
+    };
+  }
+  if (phase === 'gameEnd') {
+    return {
+      hu: `A játékot nyerte: ${winnerName}`,
+      en: `Winner: ${winnerName}`
+    };
+  }
 };
