@@ -114,7 +114,7 @@ export const gameList = {
     year: { k: "III. (09/10)", v: "09/10" },
     round: "döntő",
     category: ["C"],
-    name: "Sakktáblára Dominók",
+    name: { hu: "Sakktáblára Dominók", en: "Dominoes on a chessboard" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   FiveFiveCard: {
