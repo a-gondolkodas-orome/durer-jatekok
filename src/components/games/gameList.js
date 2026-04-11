@@ -121,7 +121,7 @@ export const gameList = {
     year: { k: "VII. (13/14)", v: "13/14" },
     round: "döntő",
     category: ["B"],
-    name: "Párbaj 5 lappal",
+    name: { hu: "Párbaj 5 lappal", en: "Duel with 5 cards" },
     credit: { developedBy: ["Máté Lőrinc"] }
   },
   FiveSquares: {
