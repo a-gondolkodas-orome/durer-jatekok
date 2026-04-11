@@ -320,7 +320,7 @@ export const gameList = {
     year: { k: "XII. (18/19)", v: "18/19" },
     round: "döntő",
     category: ["A"],
-    name: "Duplánkezdő 3x3 amőba",
+    name: { hu: "Duplánkezdő 3x3 amőba", en: "Doublestarting tic-tac-toe" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   TriangleColoring: {
