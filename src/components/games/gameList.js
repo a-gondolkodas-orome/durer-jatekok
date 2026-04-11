@@ -32,7 +32,7 @@ export const gameList = {
     year: { k: "XII. (18/19)", v: "18/19" },
     round: "döntő",
     category: ["B"],
-    name: "3x3-as antiamőba",
+    name: { hu: "3x3-as antiamőba", en: "3×3 anti-tic-tac-toe" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   Bacteria: {
