@@ -162,7 +162,7 @@ export const strategyHHGameFactory = ({
     const [currentPlayer, setCurrentPlayer] = useState(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
     const [winnerIndex, setWinnerIndex] = useState(null);
-    const [gameUuid, setGameUuid] = useState(uuidv4());
+    const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
     const [turnStage, setTurnStage] = useState(null);
 
     const winnerName = winnerIndex ? playerNames[1] || 'Második játékos': playerNames[0] || 'Első játékos';
@@ -180,7 +180,7 @@ export const strategyHHGameFactory = ({
       setCurrentPlayer(null);
       setIsGameEndDialogOpen(false);
       setWinnerIndex(null);
-      setGameUuid(uuidv4());
+      setGameUuid(crypto.randomUUID());
       setTurnStage(null);
     };
 
