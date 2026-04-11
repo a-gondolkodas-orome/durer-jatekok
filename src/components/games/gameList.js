@@ -60,16 +60,16 @@ export const gameList = {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "online",
     category: ["C"],
-    name: "Békés kacsák (4 × 6)",
-    title: "Békés kacsák a 4 × 6-os sakktáblán",
+    name: { hu: "Békés kacsák (4 × 6)", en: "Peaceful ducks (4 × 6)" },
+    title: { hu: "Békés kacsák a 4 × 6-os sakktáblán", en: "Peaceful ducks on the 4 × 6 board" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   ChessDucksE: {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "online",
     category: ["E"],
-    name: "Békés kacsák (4 × 7)",
-    title: "Békés kacsák a 4 × 7-es sakktáblán",
+    name: { hu: "Békés kacsák (4 × 7)", en: "Peaceful ducks (4 × 7)" },
+    title: { hu: "Békés kacsák a 4 × 7-es sakktáblán", en: "Peaceful ducks on the 4 × 7 board" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   ChessKnight: {
