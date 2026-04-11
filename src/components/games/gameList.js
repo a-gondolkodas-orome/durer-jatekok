@@ -86,7 +86,7 @@ export const gameList = {
     year: { k: "I. (07/08)", v: "07/08" },
     round: "döntő",
     category: ["C"],
-    name: "Barangolás bástyával",
+    name: { hu: "Barangolás bástyával", en: "Roaming with a rook" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   Coin123: {
