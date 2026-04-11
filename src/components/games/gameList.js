@@ -142,7 +142,7 @@ export const gameList = {
     year: { k: "VI. (12/13)", v: "12/13" },
     round: "döntő",
     category: ["D"],
-    name: "Hunyadi és a janicsárok",
+    name: { hu: "Hunyadi és a janicsárok", en: "Hunyadi and the janissaries" },
     credit: { developedBy: ["Czeller Ildikó", "Schweitzer Ádám"] }
   },
   NumberCovering8: {
