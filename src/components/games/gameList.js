@@ -277,7 +277,7 @@ export const gameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "online",
     category: ["C", "D", "E"],
-    name: "Egyet vegyél vagy felezz",
+    name: { hu: "Egyet vegyél vagy felezz", en: "Take one or halve" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   TakePowerOfTwo: {
