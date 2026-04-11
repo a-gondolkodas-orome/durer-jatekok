@@ -46,7 +46,7 @@ export const gameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "online",
     category: ["C", "D", "E"],
-    name: "Bankrablók: 7-10 bank",
+    name: { hu: "Bankrablók: 7-10 bank", en: "Bank robbers: 7–10 banks" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   ChessBishops: {
