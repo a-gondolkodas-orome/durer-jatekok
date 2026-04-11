@@ -21,7 +21,7 @@ export const GameSidebar = ({
   winnerName
 }) => {
   const { t } = useTranslation();
-  const isNewGameAllowed = ctx.phase !== 'play' || ctx.shouldRoleSelectorMoveNext;
+  const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
@@ -51,12 +51,12 @@ export const GameSidebar = ({
           <p className="text-center font-bold text-lg basis-14">
             {t(getCtaText(ctx))}
           </p>
-          {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext === false && (
+          {ctx.phase === 'play' && ctx.isClientMoveAllowed === false && (
             <div
               className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"
             ></div>
           )}
-          {ctx.phase === 'play' && ctx.shouldRoleSelectorMoveNext && (
+          {ctx.phase === 'play' && ctx.isClientMoveAllowed && (
             <p className="italic text-justify basis-24">
               {stepDescription}
             </p>
@@ -261,7 +261,7 @@ export const GameEndDialog = ({
   );
 };
 
-const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }) => {
+const getCtaText = ({ phase, isClientMoveAllowed, isRoleSelectorWinner }) => {
   if (phase === 'roleSelection') {
     return {
       hu: 'Válassz szerepet, utána indul a játék!',
@@ -269,7 +269,7 @@ const getCtaText = ({ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner })
     };
   }
   if (phase === 'play') {
-    return shouldRoleSelectorMoveNext
+    return isClientMoveAllowed
       ? { hu: 'Te jössz', en: 'Your turn' }
       : { hu: 'Mi jövünk', en: "Computer's turn" };
   }

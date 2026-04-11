@@ -11,7 +11,7 @@ import { useTranslation } from '../../language/translate';
 const BoardClient = ({ board, ctx, moves }) => {
   const { t } = useTranslation();
   const isMoveAllowed = (symbolIdx) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     return board[1 - ctx.chosenRoleIndex][symbolIdx] !== null;
   };
 

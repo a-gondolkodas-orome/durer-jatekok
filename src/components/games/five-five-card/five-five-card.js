@@ -8,7 +8,7 @@ import { useTranslation } from '../../language/translate';
 const BoardClient = ({ board, ctx, moves }) => {
   const { t } = useTranslation();
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     return board[1 - ctx.chosenRoleIndex][id] !== null;
   };
   const clickField = (id) => {

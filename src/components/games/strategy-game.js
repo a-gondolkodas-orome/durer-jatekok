@@ -72,7 +72,7 @@ export const strategyGameFactory = ({
       resetGameState();
     };
 
-    const shouldRoleSelectorMoveNext = mode === 'vsHuman'
+    const isClientMoveAllowed = mode === 'vsHuman'
       ? phase === 'play'
       : phase === 'play' && currentPlayer === chosenRoleIndex;
     const isRoleSelectorWinner = winnerIndex === chosenRoleIndex;
@@ -110,7 +110,7 @@ export const strategyGameFactory = ({
     };
 
     const ctx = {
-      shouldRoleSelectorMoveNext,
+      isClientMoveAllowed,
       chosenRoleIndex,
       currentPlayer,
       phase,
@@ -154,7 +154,7 @@ export const strategyGameFactory = ({
             <GameSidebar
               roleLabels={roleLabels}
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
-              ctx={{ phase, shouldRoleSelectorMoveNext, isRoleSelectorWinner }}
+              ctx={{ phase, isClientMoveAllowed, isRoleSelectorWinner }}
               moves={{ chooseRole, startNewGame, startHHGame, switchMode }}
               mode={mode}
               hasHHMode={!!supportsHHMode}

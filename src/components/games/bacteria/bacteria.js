@@ -75,7 +75,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
   const isGoal = ({ row, col }) => row === (bacteria.length - 1) && goals.includes(col);
 
   const clickField = ({ row, col }) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return;
+    if (!ctx.isClientMoveAllowed) return;
     if (attackRow === null && !bacteria[row][col] >= 1) return;
     if (isPlayerAttacker && attackRow === row && attackCol === col) {
       setAttackRow(null);
@@ -134,7 +134,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
   };
 
   const isDisabled = ({ row, col }) => (
-    !ctx.shouldRoleSelectorMoveNext
+    !ctx.isClientMoveAllowed
     || isForbidden({ row, col })
     || (row % 2 === 1 && col === (boardWidth - 1))
   );

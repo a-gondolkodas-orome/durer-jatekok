@@ -28,7 +28,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
   };
 
   const isClickable = (vertex) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     if (ctx.chosenRoleIndex === 1) {
       return neighbours[board.thief].includes(vertex);
     }

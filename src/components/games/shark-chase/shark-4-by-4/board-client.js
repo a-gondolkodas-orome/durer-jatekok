@@ -9,7 +9,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
   const [chosenPiece, setChosenPiece] = useState(null);
 
   let possibleMoves=[]
-  if (ctx.shouldRoleSelectorMoveNext) {
+  if (ctx.isClientMoveAllowed) {
     if (ctx.chosenRoleIndex === 1) {
       possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
     } else if (chosenPiece !== null) {
@@ -18,19 +18,19 @@ export const BoardClient = ({ board, ctx, moves }) => {
   }
 
   const isAllowed_choosePiece = (id) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     if (ctx.chosenRoleIndex === 0) return board.submarines[id] >= 1;
     if (ctx.chosenRoleIndex === 1) return board.shark === id;
   }
 
   const isAllowed_movePiece = (id) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     if (ctx.chosenRoleIndex === 0) return distance(chosenPiece, id) === 1;
     if (ctx.chosenRoleIndex === 1) return distance(board.shark, id) <= 1;
   }
 
   const clickField = (id) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return;
+    if (!ctx.isClientMoveAllowed) return;
     if (ctx.chosenRoleIndex === 0) {
       if (chosenPiece === null) {
         if (!isAllowed_choosePiece(id)) return;
@@ -82,7 +82,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
               <use xlinkHref="#shark" />
             </svg>
           )}
-          {board.shark === id && ctx.chosenRoleIndex === 1 && ctx.shouldRoleSelectorMoveNext && (
+          {board.shark === id && ctx.chosenRoleIndex === 1 && ctx.isClientMoveAllowed && (
             <span
               className="absolute z-50 w-[75%] text-black border-2 rounded-sm bg-white opacity-80"
             >{t({ hu: 'Itt maradok', en: 'Stay here' })}</span>

@@ -19,7 +19,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     }
   };
   const isMoveAllowed = (id) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     if (gameIsInPlacingPhase) {
       return board[id] === null;
     } else {
@@ -47,7 +47,7 @@ const BoardClient = ({ board, ctx, moves }) => {
           onClick={() => clickField(id)}
           className={`
             aspect-square p-[25%]
-            ${!isMoveAllowed(id) && ctx.shouldRoleSelectorMoveNext ? 'cursor-not-allowed' : ''}
+            ${!isMoveAllowed(id) && ctx.isClientMoveAllowed ? 'cursor-not-allowed' : ''}
             ${!gameIsInPlacingPhase && isMoveAllowed(id) ? 'bg-green-100' : 'bg-white'}
           `}
         >

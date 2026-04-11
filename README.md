@@ -102,7 +102,7 @@ const moves = {
 
 const BoardClient = ({ board, ctx, moves }) => {
   const clickNumber = (number) => {
-    if (!ctx.shouldRoleSelectorMoveNext) return;
+    if (!ctx.isClientMoveAllowed) return;
     moves.addNumber(board, number);
   };
 
@@ -183,7 +183,7 @@ must be wrapped in setTimeout, this is not (yet) handled by the framework.
 `board` is updated after every move
 
 `ctx` is an object and will contain the following (extendable):
-- `shouldRoleSelectorMoveNext`: boolean
+- `isClientMoveAllowed`: boolean
 - `chosenRoleIndex`: null/0/1 (the role that the player chooses at the beginning)
 - `turnStage`: in game with multi-stage turns you may use this param to track to stage
     if you need it in common parts such as step description as well
@@ -203,7 +203,7 @@ must be wrapped in setTimeout, this is not (yet) handled by the framework.
 - is it clear what the player should do next?
 - can the player undo their last interaction in turns with multiple moves?
 - is it easy to guess the winning strategy from watching the AI play?
-- do not allow the player interacting with the game while the other player's step is in progress, use `ctx.shouldRoleSelectorMoveNext`
+- do not allow the player interacting with the game while the other player's step is in progress, use `ctx.isClientMoveAllowed`
 - never modify react state (e.g. the board) in place
 - check for console errors/warnings as well, i.e. missing keys on react components
 - pretend AI is thinking in turns with multiple moves (for one move it is handled by framework)

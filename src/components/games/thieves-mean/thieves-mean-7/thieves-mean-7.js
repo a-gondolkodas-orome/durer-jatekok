@@ -15,7 +15,7 @@ const CARD_COUNT = 7;
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isAllowedMove = index => {
-    if (!ctx.shouldRoleSelectorMoveNext) return false;
+    if (!ctx.isClientMoveAllowed) return false;
     return getUntakenCards(board, CARD_COUNT).includes(index);
   }
 

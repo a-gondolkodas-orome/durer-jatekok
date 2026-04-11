@@ -6,7 +6,7 @@ import { gameList } from '../gameList';
 
 const BoardClient = ({ board, ctx, moves }) => {
   const isMoveAllowed = (step) => {
-	  if(!ctx.shouldRoleSelectorMoveNext) return false;
+	  if(!ctx.isClientMoveAllowed) return false;
     if (step === board.right - board.left) return false;
     return step === 1 || step === 2;
   };
