@@ -65,7 +65,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
   const [attackCol, setAttackCol] = useState(null);
 
   const nextBoard = { bacteria: cloneDeep(bacteria), goals };
-  const isPlayerAttacker = ctx.chosenRoleIndex === 0;
+  const isPlayerAttacker = ctx.currentPlayer === 0;
 
   const isAllowedAttack = ({ row, col }) => {
     if (bacteria[row][col] === undefined) return false;
@@ -179,7 +179,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
 };
 
 const getPlayerStepDescription = ({ ctx }) => {
-  if (ctx.chosenRoleIndex === 0) {
+  if (ctx.currentPlayer === 0) {
     return {
       hu: "Kattints egy mezőre, amin van baktérium és hajtsd végre " +
         "a három lehetséges támadás egyikét egy további szabályos kattintással.",
