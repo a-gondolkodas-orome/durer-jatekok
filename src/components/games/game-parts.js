@@ -12,118 +12,39 @@ export const GameSidebar = ({
   roleLabels,
   stepDescription,
   ctx,
-  moves,
-  isHumanVsHumanGame,
-  playerNames,
-  setPlayerNames,
-  currentPlayerName,
-  winnerName
+  moves
 }) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
-      <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
-        <button
-          className={`grow py-1 px-2 ${!isHumanVsHumanGame
-            ? 'bg-blue-500 text-white font-semibold'
-            : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-          onClick={() => moves.switchMode('vsComputer')}
-        >
-          {t({ hu: 'Gép ellen', en: 'vs Computer' })}
-        </button>
-        <button
-          className={`grow py-1 px-2 ${isHumanVsHumanGame
-            ? 'bg-blue-500 text-white font-semibold'
-            : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-          onClick={() => moves.switchMode('vsHuman')}
-        >
-          {t({ hu: '2 játékos', en: '2 players' })}
-        </button>
-      </div>
+      <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
 
-      {!isHumanVsHumanGame && (
-        <>
-          <p className="text-center font-bold text-lg basis-14">
-            {t(getCtaText(ctx))}
-          </p>
-          {ctx.phase === 'play' && ctx.isClientMoveAllowed === false && (
-            <div
-              className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"
-            ></div>
-          )}
-          {ctx.phase === 'play' && ctx.isClientMoveAllowed && (
-            <p className="italic text-justify basis-24">
-              {stepDescription}
-            </p>
-          )}
-          {ctx.phase === 'roleSelection' && (
-            <span className="basis-24 flex flex-col gap-2">
-              {[
-                { hu: 'Kezdő leszek', en: "I'll go first" },
-                { hu: 'Második leszek', en: "I'll go second" }
-              ].map((defaultLabel, i) => (
-                <button
-                  key={i}
-                  className="rounded-lg py-2 px-4 w-full text-center font-semibold
-                    bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
-                  onClick={() => moves.chooseRole(i)}
-                >
-                  {t(roleLabels ? roleLabels[i] : defaultLabel)}
-                </button>
-              ))}
-            </span>
-          )}
-        </>
+      <p className="text-center font-bold text-lg basis-14">
+        {t(getCtaText(ctx))}
+      </p>
+
+      {!ctx.isHumanVsHumanGame && ctx.phase === 'play' && !ctx.isClientMoveAllowed && (
+        <Spinner />
       )}
 
-      {isHumanVsHumanGame && (
-        <>
-          <p className="text-center font-bold text-lg basis-14">
-            {t(getCtaTextHH({ phase: ctx.phase, currentPlayerName, winnerName }))}
-          </p>
-          {ctx.phase === 'play' && (
-            <p className="italic text-justify basis-24">
-              {stepDescription}
-            </p>
-          )}
-          {ctx.phase === 'roleSelection' && (
-            <span className="basis-24 flex flex-col gap-2">
-              <Field>
-                <Label className="font-bold">
-                  {t(roleLabels ? roleLabels[0] : { hu: 'Első', en: 'First' }) + ': '}
-                </Label>
-                <Input
-                  name="name_of_first_player"
-                  size="15"
-                  className="border border-slate-600 rounded-md text-slate-600"
-                  value={playerNames[0]}
-                  onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
-                />
-              </Field>
-              <Field>
-                <Label className="font-bold">
-                {t(roleLabels ? roleLabels[1] : { hu: 'Második', en: 'Second' }) + ': '}
-                </Label>
-                <Input
-                  name="name_of_second_player"
-                  size="15"
-                  className="border border-slate-600 rounded-md text-slate-600"
-                  value={playerNames[1]}
-                  onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
-                />
-              </Field>
-              <button
-                className="rounded-lg py-2 px-4 w-full text-center font-semibold
-                  bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
-                onClick={() => moves.startHHGame()}
-              >
-                {t({ hu: 'Kezdhetjük!', en: "Let's go!" })}
-              </button>
-            </span>
-          )}
-        </>
+      {ctx.phase === 'play' && ctx.isClientMoveAllowed && (
+        <p className="italic text-justify basis-24">{stepDescription}</p>
+      )}
+
+      {ctx.phase === 'roleSelection' && (
+        ctx.isHumanVsHumanGame
+          ? <PlayerNameSetup
+              roleLabels={roleLabels}
+              playerNames={ctx.playerNames}
+              setPlayerNames={moves.setPlayerNames}
+              onStart={moves.startGame}
+            />
+          : <RoleSelector
+              roleLabels={roleLabels}
+              onRoleSelection={moves.startGame}
+            />
       )}
 
       <button
@@ -131,7 +52,7 @@ export const GameSidebar = ({
           border-slate-300 text-slate-600 hover:bg-slate-50 focus:bg-slate-50
           disabled:opacity-40 disabled:cursor-not-allowed`}
         disabled={!isNewGameAllowed}
-        onClick={() => moves.startNewGame()}
+        onClick={moves.startNewGame}
       >
         {t({ hu: 'Új játék', en: 'New game' })}
       </button>
@@ -223,12 +144,9 @@ export const GameRule = ({ ruleDescription }) => {
 };
 
 export const GameEndDialog = ({
-  isOpen, setIsOpen, startNewGame, isRoleSelectorWinner, isHumanVsHumanGame, winnerName
+  isOpen, setIsOpen, startNewGame, ctx
 }) => {
   const { t } = useTranslation();
-  const resultDescription = isHumanVsHumanGame
-    ? t({ hu: `A játékot nyerte: ${winnerName}`, en: `Winner: ${winnerName}` })
-    : t(getResultDescription(isRoleSelectorWinner));
   return (
     <Dialog
       open={isOpen}
@@ -248,10 +166,10 @@ export const GameEndDialog = ({
             >×</button>
           </header>
           <Description className="text-lg block text-justify">
-            {resultDescription}
+            {t(getCtaText(ctx))}
           </Description>
           <button
-            onClick={() => startNewGame()}
+            onClick={startNewGame}
             className="cta-button mt-2"
           >
             {t({ hu: 'Új játék', en: 'New game' })}
@@ -262,45 +180,120 @@ export const GameEndDialog = ({
   );
 };
 
-const getCtaText = ({ phase, isClientMoveAllowed, isRoleSelectorWinner }) => {
-  if (phase === 'roleSelection') {
-    return {
-      hu: 'Válassz szerepet, utána indul a játék!',
-      en: 'Choose a role to start the game!'
-    };
-  }
-  if (phase === 'play') {
-    return isClientMoveAllowed
-      ? { hu: 'Te jössz', en: 'Your turn' }
-      : { hu: 'Mi jövünk', en: "Computer's turn" };
-  }
-  if (phase === 'gameEnd') return getResultDescription(isRoleSelectorWinner);
+const RoleSelector = ({ roleLabels, onRoleSelection }) => {
+  const { t } = useTranslation();
+  return <span className="basis-24 flex flex-col gap-2">
+    {[
+      { hu: 'Kezdő leszek', en: "I'll go first" },
+      { hu: 'Második leszek', en: "I'll go second" }
+    ].map((defaultLabel, i) => (
+      <button
+        key={i}
+        className="rounded-lg py-2 px-4 w-full text-center font-semibold
+          bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
+        onClick={() => onRoleSelection(i)}
+      >
+        {t(roleLabels ? roleLabels[i] : defaultLabel)}
+      </button>
+    ))}
+  </span>;
 };
 
-const getResultDescription = isRoleSelectorWinner => isRoleSelectorWinner
-  ? { hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' }
-  : {
-    hu: 'Sajnos, most nem nyertél, de ne add fel.',
-    en: "Unfortunately you didn't win this time, but don't give up."
-  };
+const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) => {
+  const { t } = useTranslation();
+  return (
+  <span className="basis-24 flex flex-col gap-2">
+    <Field>
+      <Label className="font-bold">
+        {t(roleLabels ? roleLabels[0] : { hu: 'Első', en: 'First' }) + ': '}
+      </Label>
+      <Input
+        name="name_of_first_player"
+        size="15"
+        className="border border-slate-600 rounded-md text-slate-600"
+        value={playerNames[0]}
+        onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
+      />
+    </Field>
+    <Field>
+      <Label className="font-bold">
+        {t(roleLabels ? roleLabels[1] : { hu: 'Második', en: 'Second' }) + ': '}
+      </Label>
+      <Input
+        name="name_of_second_player"
+        size="15"
+        className="border border-slate-600 rounded-md text-slate-600"
+        value={playerNames[1]}
+        onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
+      />
+    </Field>
+    <button
+      className="rounded-lg py-2 px-4 w-full text-center font-semibold
+        bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
+      onClick={onStart}
+    >
+      {t({ hu: 'Kezdhetjük!', en: "Let's go!" })}
+    </button>
+  </span>
+  );
+};
 
-const getCtaTextHH = ({ phase, currentPlayerName, winnerName }) => {
+const Spinner = () => (
+  <div className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"></div>
+);
+
+const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
+      <button
+        className={`grow py-1 px-2 ${!isHumanVsHumanGame
+          ? 'bg-blue-500 text-white font-semibold'
+          : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+        onClick={() => onSwitchMode('vsComputer')}
+      >
+        {t({ hu: 'Gép ellen', en: 'vs Computer' })}
+      </button>
+      <button
+        className={`grow py-1 px-2 ${isHumanVsHumanGame
+          ? 'bg-blue-500 text-white font-semibold'
+          : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+        onClick={() => onSwitchMode('vsHuman')}
+      >
+        {t({ hu: '2 játékos', en: '2 players' })}
+      </button>
+    </div>
+  );
+};
+
+const getCtaText = ({
+  phase,
+  isHumanVsHumanGame,
+  isClientMoveAllowed,
+  isRoleSelectorWinner,
+  currentPlayerName,
+  winnerName
+}) => {
   if (phase === 'roleSelection') {
-    return {
-      hu: 'Döntsétek el, hogy ki kezd.',
-      en: 'Decide who goes first.'
-    };
+    return isHumanVsHumanGame
+      ? { hu: 'Döntsétek el, hogy ki kezd.', en: 'Decide who goes first.' }
+      : { hu: 'Válassz szerepet, utána indul a játék!', en: 'Choose a role to start the game!' };
   }
   if (phase === 'play') {
-    return {
-      hu: `Következik: ${currentPlayerName}`,
-      en: `Next: ${currentPlayerName}`
-    };
+    return isHumanVsHumanGame
+      ? { hu: `Következik: ${currentPlayerName}`, en: `Next: ${currentPlayerName}` }
+      : isClientMoveAllowed
+        ? { hu: 'Te jössz', en: 'Your turn' }
+        : { hu: 'Mi jövünk', en: "Computer's turn" };
   }
   if (phase === 'gameEnd') {
-    return {
-      hu: `A játékot nyerte: ${winnerName}`,
-      en: `Winner: ${winnerName}`
-    };
+    return isHumanVsHumanGame
+      ? { hu: `A játékot nyerte: ${winnerName}`, en: `Winner: ${winnerName}` }
+      : isRoleSelectorWinner
+        ? { hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' }
+        : {
+          hu: 'Sajnos, most nem nyertél, de ne add fel.',
+          en: "Unfortunately you didn't win this time, but don't give up."
+        };
   }
 };
