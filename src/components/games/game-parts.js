@@ -18,19 +18,18 @@ export const GameSidebar = ({
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
 
   return (
-    <div className="p-2 flex flex-col grow shrink-0 basis-64">
+    <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
       <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
 
-      <p className="text-center font-bold text-lg basis-14">
+      <p className="text-center font-bold text-lg">
         {t(getCtaText(ctx))}
       </p>
 
-      {!ctx.isHumanVsHumanGame && ctx.phase === 'play' && !ctx.isClientMoveAllowed && (
-        <Spinner />
-      )}
-
-      {ctx.phase === 'play' && ctx.isClientMoveAllowed && (
-        <p className="italic text-justify basis-24">{stepDescription}</p>
+      {ctx.phase === 'play' && (
+        <div className="h-24 flex justify-center">
+          {!ctx.isHumanVsHumanGame && !ctx.isClientMoveAllowed && <Spinner />}
+          {ctx.isClientMoveAllowed && <p className="italic text-justify">{stepDescription}</p>}
+        </div>
       )}
 
       {ctx.phase === 'roleSelection' && (
@@ -48,7 +47,7 @@ export const GameSidebar = ({
       )}
 
       <button
-        className={`mt-[2vh] rounded-lg py-1.5 px-4 w-full text-center border
+        className={`rounded-lg py-1.5 px-4 w-full text-center border
           border-slate-300 text-slate-600 hover:bg-slate-50 focus:bg-slate-50
           disabled:opacity-40 disabled:cursor-not-allowed`}
         disabled={!isNewGameAllowed}
@@ -203,27 +202,30 @@ const RoleSelector = ({ roleLabels, onRoleSelection }) => {
 const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) => {
   const { t } = useTranslation();
   return (
-  <span className="basis-24 flex flex-col gap-2">
-    <Field>
-      <Label className="font-bold">
-        {t(roleLabels ? roleLabels[0] : { hu: 'Első', en: 'First' }) + ': '}
+  <span className="flex flex-col gap-3">
+    <p className="text-sm text-slate-500 italic">
+      {t({ hu: 'Neveitek (nem kötelező):', en: 'Your names (optional):' })}
+    </p>
+    <Field className="flex items-center gap-2">
+      <Label className="font-semibold shrink-0 w-16 text-right text-sm">
+        {t(roleLabels ? roleLabels[0] : { hu: 'Első', en: 'First' }) + ':'}
       </Label>
       <Input
         name="name_of_first_player"
-        size="15"
-        className="border border-slate-600 rounded-md text-slate-600"
+        className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
+          focus:outline-none focus:ring-1 focus:ring-blue-400"
         value={playerNames[0]}
         onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
       />
     </Field>
-    <Field>
-      <Label className="font-bold">
-        {t(roleLabels ? roleLabels[1] : { hu: 'Második', en: 'Second' }) + ': '}
+    <Field className="flex items-center gap-2">
+      <Label className="font-semibold shrink-0 w-16 text-right text-sm">
+        {t(roleLabels ? roleLabels[1] : { hu: 'Második', en: 'Second' }) + ':'}
       </Label>
       <Input
         name="name_of_second_player"
-        size="15"
-        className="border border-slate-600 rounded-md text-slate-600"
+        className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
+          focus:outline-none focus:ring-1 focus:ring-blue-400"
         value={playerNames[1]}
         onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
       />
@@ -241,13 +243,13 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) =
 };
 
 const Spinner = () => (
-  <div className="animate-spin h-8 w-8 place-self-center border-t-blue-600 rounded-full border-4 mb-16"></div>
+  <div className="animate-spin h-8 w-8 border-t-blue-600 rounded-full border-4"></div>
 );
 
 const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
+    <div className="flex rounded-lg overflow-hidden border border-slate-300 text-sm">
       <button
         className={`grow py-1 px-2 ${!isHumanVsHumanGame
           ? 'bg-blue-500 text-white font-semibold'
