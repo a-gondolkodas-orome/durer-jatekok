@@ -3,16 +3,8 @@ import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { aiBotStrategy } from './bot-strategy';
-import { inPlacingPhase, isGameEnd, pColor, aiColor } from './helpers';
+import { inPlacingPhase, isGameEnd, currentPlayerColor, otherPlayerColor } from './helpers';
 import { gameList } from '../../gameList';
-
-/*
-Color logic (should be simplified)
-
-In vsComputer mode, player is always blue, bot is always red, regardless of role
-
-In humanVsHuman mode, first player is always blue, second player is red.
-*/
 
 const BoardClient = ({ board, ctx, moves }) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);
@@ -30,11 +22,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     if (gameIsInPlacingPhase) {
       return board[id] === null;
     } else {
-      if (ctx.isHumanVsHumanGame) {
-        return board[id] === (ctx.currentPlayer === 1 ? 'blue' : 'red');
-      } else {
-        return board[id] === aiColor;
-      }
+      return board[id] === otherPlayerColor(ctx);
     }
   };
   const pieceColor = (id) => {
@@ -81,9 +69,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 const moves = {
   placePiece: (board, { ctx, events }, id) => {
     const nextBoard = cloneDeep(board);
-    nextBoard[id] = ctx.isHumanVsHumanGame ?
-      (ctx.currentPlayer === 0 ? 'blue' : 'red')
-      : (ctx.currentPlayer === ctx.chosenRoleIndex ? pColor : aiColor);
+    nextBoard[id] = currentPlayerColor(ctx);
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame();
@@ -102,17 +88,14 @@ const moves = {
 }
 
 const getPlayerStepDescription = ({ board, ctx }) => {
-  const enemyColor= ctx.isHumanVsHumanGame ?
-      (ctx.currentPlayer === 0 ? 'red' : 'blue')
-      : (ctx.currentPlayer === ctx.chosenRoleIndex ? aiColor : pColor);
   return inPlacingPhase(board)
     ? {
       hu: 'Helyezz le egy korongot egy üres mezőre kattintással.',
       en: 'Click an empty cell to place a piece.'
     }
     : {
-      hu: `Kattints egy ${enemyColor === 'red' ? 'piros' : 'kék'} korongra.`,
-      en: `Click a ${enemyColor} piece.`
+      hu: `Kattints egy ${otherPlayerColor(ctx) === 'red' ? 'piros' : 'kék'} korongra.`,
+      en: `Click a ${otherPlayerColor(ctx)} piece.`
     };
 }
 
