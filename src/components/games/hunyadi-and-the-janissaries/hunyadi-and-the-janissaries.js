@@ -11,7 +11,7 @@ const BoardClient = ({ board, ctx, moves }) => {
   const { t } = useTranslation();
   const [hoveredPiece, setHoveredPiece] = useState(null);
 
-  const isPlayerSultan = ctx.chosenRoleIndex === 0;
+  const isPlayerSultan = ctx.currentPlayer === 0;
   const groupOfHoveredPiece = hoveredPiece
     ? board[hoveredPiece.rowIndex][hoveredPiece.pieceIndex]
     : null;
@@ -103,8 +103,8 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const getPlayerStepDescription = ({ ctx: { chosenRoleIndex } }) => {
-  return chosenRoleIndex === 0
+const getPlayerStepDescription = ({ ctx }) => {
+  return ctx.currentPlayer === 0
     ? {
       hu: 'Kattints a katonákra és válaszd két részre a seregedet.',
       en: 'Click soldiers to split your army in two.'
