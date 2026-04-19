@@ -94,7 +94,9 @@ export const GameSidebar = ({
           {ctx.phase === 'roleSelection' && (
             <span className="basis-24 flex flex-col gap-2">
               <Field>
-                <Label className="font-bold">{t({ hu: 'Első: ', en: 'First: ' })}</Label>
+                <Label className="font-bold">
+                  {t(roleLabels ? roleLabels[0] : { hu: 'Első', en: 'First' }) + ': '}
+                </Label>
                 <Input
                   name="name_of_first_player"
                   size="15"
@@ -104,7 +106,9 @@ export const GameSidebar = ({
                 />
               </Field>
               <Field>
-                <Label className="font-bold">{t({ hu: 'Második: ', en: 'Second: ' })}</Label>
+                <Label className="font-bold">
+                {t(roleLabels ? roleLabels[1] : { hu: 'Második', en: 'Second' }) + ': '}
+                </Label>
                 <Input
                   name="name_of_second_player"
                   size="15"

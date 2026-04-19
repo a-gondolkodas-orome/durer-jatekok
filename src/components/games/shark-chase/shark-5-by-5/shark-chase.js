@@ -110,8 +110,8 @@ export const SharkChase5 = strategyGameFactory({
   rule,
   metadata: gameList.SharkChase5,
   roleLabels: [
-    { hu: 'Kutató leszek!', en: "I'll be a researcher!" },
-    { hu: 'Cápa leszek!', en: "I'll be the shark!" }
+    { hu: 'Kutató', en: "Researcher" },
+    { hu: 'Cápa', en: "Shark" }
   ],
   BoardClient,
   getPlayerStepDescription,

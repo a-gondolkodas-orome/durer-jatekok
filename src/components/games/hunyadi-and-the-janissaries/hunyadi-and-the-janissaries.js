@@ -137,8 +137,8 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
   rule,
   metadata: gameList.HunyadiAndTheJanissaries,
   roleLabels: [
-    { hu: 'Szultán leszek', en: "I'll be the Sultan" },
-    { hu: 'Hunyadi leszek', en: "I'll be Hunyadi" }
+    { hu: 'Szultán', en: "Sultan" },
+    { hu: 'Hunyadi', en: "Hunyadi" }
   ],
   BoardClient,
   getPlayerStepDescription,

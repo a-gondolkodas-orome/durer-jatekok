@@ -232,8 +232,8 @@ export const Bacteria = strategyGameFactory({
   rule,
   metadata: gameList.Bacteria,
   roleLabels: [
-    { hu: "Támadó leszek", en: "I'll be the Attacker" },
-    { hu: "Védekező leszek", en: "I'll be the Defender" }
+    { hu: "Támadó", en: "Attacker" },
+    { hu: "Védekező", en: "Defender" }
   ],
   BoardClient,
   getPlayerStepDescription,

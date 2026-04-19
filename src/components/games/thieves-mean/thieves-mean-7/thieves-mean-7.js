@@ -108,8 +108,8 @@ export const ThievesMean7 = strategyGameFactory({
   BoardClient,
   getPlayerStepDescription: () => ({ hu: 'Válassz egy kártyát.', en: 'Pick a card.' }),
   roleLabels: [
-    { hu: 'Nyomozó leszek', en: "I'll be the Sheriff" },
-    { hu: 'Tolvaj leszek', en: "I'll be the Thief" }
+    { hu: 'Nyomozó', en: "Sheriff" },
+    { hu: 'Tolvaj', en: "Thief" }
   ],
   generateStartBoard,
   moves,
