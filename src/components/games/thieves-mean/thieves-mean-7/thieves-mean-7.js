@@ -42,7 +42,7 @@ const BoardClient = ({ board, ctx, moves }) => {
             m-1 min-h-28 w-18
             border-2 shadow-md border-slate-800 rounded-xl text-4xl
             text-center font-bold
-            ${ctx.chosenRoleIndex === Thief
+            ${ctx.currentPlayer === Thief
               ? "enabled:hover:bg-red-400 enabled:focus:bg-red-400"
               : "enabled:hover:bg-blue-400 enabled:focus:bg-blue-400"
             }
