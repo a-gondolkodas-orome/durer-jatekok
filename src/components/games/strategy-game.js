@@ -27,10 +27,7 @@ export const strategyGameFactory = ({
     const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
     const [turnStage, setTurnStage] = useState(null);
     const [mode, setMode] = useState('vsComputer');
-    const [playerNames, setPlayerNames] = useState([
-      t({ hu: '1. játékos', en: '1st player' }),
-      t({ hu: '2. játékos', en: '2nd player' })
-    ]);
+    const [playerNames, setPlayerNames] = useState(['', '']);
 
     const isHumanVsHumanGame = mode === 'vsHuman';
 

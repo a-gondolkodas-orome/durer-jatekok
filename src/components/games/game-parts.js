@@ -216,6 +216,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) =
         name="name_of_first_player"
         className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
           focus:outline-none focus:ring-1 focus:ring-blue-400"
+        placeholder={t({ hu: '1. játékos', en: '1st player' })}
         value={playerNames[0]}
         onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
       />
@@ -228,6 +229,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) =
         name="name_of_second_player"
         className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
           focus:outline-none focus:ring-1 focus:ring-blue-400"
+        placeholder={t({ hu: '2. játékos', en: '2nd player' })}
         value={playerNames[1]}
         onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
       />
@@ -260,7 +262,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
         {t({ hu: 'Játékmód', en: 'Game mode' })}
       </legend>
       <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
-        focus-within:ring-2 focus-within:ring-red-400 focus-within:ring-offset-1`}>
+        has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
         <label className={labelClass(!isHumanVsHumanGame)}>
           <input
             type="radio"
