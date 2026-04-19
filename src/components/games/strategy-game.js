@@ -28,8 +28,8 @@ export const strategyGameFactory = ({
     const [turnStage, setTurnStage] = useState(null);
     const [mode, setMode] = useState('vsComputer');
     const [playerNames, setPlayerNames] = useState([
-      t({ hu: 'Első játékos', en: 'First player' }),
-      t({ hu: 'Második játékos', en: 'Second player' })
+      t({ hu: '1. játékos', en: '1st player' }),
+      t({ hu: '2. játékos', en: '2nd player' })
     ]);
 
     const isHumanVsHumanGame = mode === 'vsHuman';
@@ -92,8 +92,8 @@ export const strategyGameFactory = ({
     const playerNameOf = (index) => {
       if (index === null) return null;
       return playerNames[index] || t({
-        hu: index === 0 ? 'Első játékos' : 'Második játékos',
-        en: index === 0 ? 'First player' : 'Second player'
+        hu: index === 0 ? '1. játékos' : '2. játékos',
+        en: index === 0 ? '1st player' : '2nd player'
       });
     };
 

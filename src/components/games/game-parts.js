@@ -21,33 +21,35 @@ export const GameSidebar = ({
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
       <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
 
-      <p className="text-center font-bold text-lg">
-        {t(getCtaText(ctx))}
-      </p>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex flex-col gap-3">
+        <p className="text-center font-bold text-lg">
+          {t(getCtaText(ctx))}
+        </p>
 
-      {ctx.phase === 'play' && (
-        <div className="h-24 flex justify-center">
-          {!ctx.isHumanVsHumanGame && !ctx.isClientMoveAllowed && <Spinner />}
-          {ctx.isClientMoveAllowed && <p className="italic text-justify">{stepDescription}</p>}
-        </div>
-      )}
+        {ctx.phase === 'play' && (
+          <div className="h-24 flex justify-center">
+            {!ctx.isHumanVsHumanGame && !ctx.isClientMoveAllowed && <Spinner />}
+            {ctx.isClientMoveAllowed && <p className="italic text-justify">{stepDescription}</p>}
+          </div>
+        )}
 
-      {ctx.phase === 'roleSelection' && (
-        ctx.isHumanVsHumanGame
-          ? <PlayerNameSetup
-              roleLabels={roleLabels}
-              playerNames={ctx.playerNames}
-              setPlayerNames={moves.setPlayerNames}
-              onStart={moves.startGame}
-            />
-          : <RoleSelector
-              roleLabels={roleLabels}
-              onRoleSelection={moves.startGame}
-            />
-      )}
+        {ctx.phase === 'roleSelection' && (
+          ctx.isHumanVsHumanGame
+            ? <PlayerNameSetup
+                roleLabels={roleLabels}
+                playerNames={ctx.playerNames}
+                setPlayerNames={moves.setPlayerNames}
+                onStart={moves.startGame}
+              />
+            : <RoleSelector
+                roleLabels={roleLabels}
+                onRoleSelection={moves.startGame}
+              />
+        )}
+      </div>
 
       <button
-        className={`rounded-lg py-1.5 px-4 w-full text-center border
+        className={`mt-auto rounded-lg py-1.5 px-4 w-full text-center border
           border-slate-300 text-slate-600 hover:bg-slate-50 focus:bg-slate-50
           disabled:opacity-40 disabled:cursor-not-allowed`}
         disabled={!isNewGameAllowed}
@@ -248,27 +250,41 @@ const Spinner = () => (
 
 const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
   const { t } = useTranslation();
+  const labelClass = (active) => `grow py-1 px-2 text-center cursor-pointer
+    ${active
+      ? 'bg-blue-500 text-white font-semibold'
+      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
   return (
-    <div className="flex rounded-lg overflow-hidden border border-slate-300 text-sm">
-      <button
-        className={`grow py-1 px-2 ${!isHumanVsHumanGame
-          ? 'bg-blue-500 text-white font-semibold'
-          : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-        onClick={() => onSwitchMode('vsComputer')}
-        data-testid="mode-vsComputer"
-      >
-        {t({ hu: 'Gép ellen', en: 'vs Computer' })}
-      </button>
-      <button
-        className={`grow py-1 px-2 ${isHumanVsHumanGame
-          ? 'bg-blue-500 text-white font-semibold'
-          : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-        onClick={() => onSwitchMode('vsHuman')}
-        data-testid="mode-vsHuman"
-      >
-        {t({ hu: '2 játékos', en: '2 players' })}
-      </button>
-    </div>
+    <fieldset>
+      <legend className="text-xs text-slate-500 mb-1.5">
+        {t({ hu: 'Játékmód', en: 'Game mode' })}
+      </legend>
+      <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
+        focus-within:ring-2 focus-within:ring-red-400 focus-within:ring-offset-1`}>
+        <label className={labelClass(!isHumanVsHumanGame)}>
+          <input
+            type="radio"
+            name="mode"
+            className="sr-only"
+            data-testid="mode-vsComputer"
+            checked={!isHumanVsHumanGame}
+            onChange={() => onSwitchMode('vsComputer')}
+          />
+          🤖 {t({ hu: 'Gép ellen', en: 'vs Computer' })}
+        </label>
+        <label className={labelClass(isHumanVsHumanGame)}>
+          <input
+            type="radio"
+            name="mode"
+            className="sr-only"
+            data-testid="mode-vsHuman"
+            checked={isHumanVsHumanGame}
+            onChange={() => onSwitchMode('vsHuman')}
+          />
+          🤝 {t({ hu: '2 játékos', en: '2 players' })}
+        </label>
+      </div>
+    </fieldset>
   );
 };
 
