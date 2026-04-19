@@ -3,7 +3,7 @@ import { strategyGameFactory } from '../../strategy-game';
 import { aiBotStrategy } from './bot-strategy';
 import { BoardClient } from './board-client';
 import { isGameEnd, getWinnerIndex } from './helpers';
-import { capitalize, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { gameList } from '../../gameList';
 
 const generateStartBoard = () => {

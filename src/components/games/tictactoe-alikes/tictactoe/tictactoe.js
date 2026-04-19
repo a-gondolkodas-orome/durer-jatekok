@@ -1,5 +1,5 @@
 import React from 'react';
-import { range, cloneDeep, capitalize } from 'lodash';
+import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { aiBotStrategy } from './bot-strategy';
