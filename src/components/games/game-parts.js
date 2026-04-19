@@ -189,6 +189,7 @@ const RoleSelector = ({ roleLabels, onRoleSelection }) => {
     ].map((defaultLabel, i) => (
       <button
         key={i}
+        data-testid={`role-btn-${i}`}
         className="rounded-lg py-2 px-4 w-full text-center font-semibold
           bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
         onClick={() => onRoleSelection(i)}
@@ -228,6 +229,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) =
       />
     </Field>
     <button
+      data-testid="start-hh-game"
       className="rounded-lg py-2 px-4 w-full text-center font-semibold
         bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
       onClick={onStart}
@@ -251,6 +253,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
           ? 'bg-blue-500 text-white font-semibold'
           : 'bg-white text-slate-600 hover:bg-slate-50'}`}
         onClick={() => onSwitchMode('vsComputer')}
+        data-testid="mode-vsComputer"
       >
         {t({ hu: 'Gép ellen', en: 'vs Computer' })}
       </button>
@@ -259,6 +262,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
           ? 'bg-blue-500 text-white font-semibold'
           : 'bg-white text-slate-600 hover:bg-slate-50'}`}
         onClick={() => onSwitchMode('vsHuman')}
+        data-testid="mode-vsHuman"
       >
         {t({ hu: '2 játékos', en: '2 players' })}
       </button>
@@ -266,7 +270,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
   );
 };
 
-const getCtaText = ({
+export const getCtaText = ({
   phase,
   isHumanVsHumanGame,
   isClientMoveAllowed,
