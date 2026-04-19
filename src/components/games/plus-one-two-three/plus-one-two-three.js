@@ -89,6 +89,5 @@ export const PlusOneTwoThree = strategyGameFactory({
   }),
   generateStartBoard: () => 0,
   aiBotStrategy,
-  moves,
-  supportsHHMode: true
+  moves
 });

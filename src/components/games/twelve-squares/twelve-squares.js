@@ -120,6 +120,5 @@ export const TwelveSquares = strategyGameFactory({
     },
   generateStartBoard: () => ({ left: 1, right: 12 }),
   aiBotStrategy,
-  moves,
-  supportsHHMode: true
+  moves
 });

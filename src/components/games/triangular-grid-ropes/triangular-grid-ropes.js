@@ -137,6 +137,5 @@ export const TriangularGridRopes = strategyGameFactory({
   }),
   generateStartBoard: () => [],
   moves,
-  aiBotStrategy,
-  supportsHHMode: true
+  aiBotStrategy
 });

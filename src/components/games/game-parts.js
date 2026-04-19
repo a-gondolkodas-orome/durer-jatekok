@@ -13,8 +13,7 @@ export const GameSidebar = ({
   stepDescription,
   ctx,
   moves,
-  mode,
-  hasHHMode,
+  isHumanVsHumanGame,
   playerNames,
   setPlayerNames,
   currentPlayerName,
@@ -25,28 +24,26 @@ export const GameSidebar = ({
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64">
-      {hasHHMode && (
-        <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
-          <button
-            className={`grow py-1 px-2 ${mode === 'vsComputer'
-              ? 'bg-blue-500 text-white font-semibold'
-              : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-            onClick={() => moves.switchMode('vsComputer')}
-          >
-            {t({ hu: 'Gép ellen', en: 'vs Computer' })}
-          </button>
-          <button
-            className={`grow py-1 px-2 ${mode === 'vsHuman'
-              ? 'bg-blue-500 text-white font-semibold'
-              : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-            onClick={() => moves.switchMode('vsHuman')}
-          >
-            {t({ hu: '2 játékos', en: '2 players' })}
-          </button>
-        </div>
-      )}
+      <div className="flex rounded-lg overflow-hidden border border-slate-300 mb-3 text-sm">
+        <button
+          className={`grow py-1 px-2 ${!isHumanVsHumanGame
+            ? 'bg-blue-500 text-white font-semibold'
+            : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+          onClick={() => moves.switchMode('vsComputer')}
+        >
+          {t({ hu: 'Gép ellen', en: 'vs Computer' })}
+        </button>
+        <button
+          className={`grow py-1 px-2 ${isHumanVsHumanGame
+            ? 'bg-blue-500 text-white font-semibold'
+            : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+          onClick={() => moves.switchMode('vsHuman')}
+        >
+          {t({ hu: '2 játékos', en: '2 players' })}
+        </button>
+      </div>
 
-      {mode === 'vsComputer' && (
+      {!isHumanVsHumanGame && (
         <>
           <p className="text-center font-bold text-lg basis-14">
             {t(getCtaText(ctx))}
@@ -81,7 +78,7 @@ export const GameSidebar = ({
         </>
       )}
 
-      {mode === 'vsHuman' && (
+      {isHumanVsHumanGame && (
         <>
           <p className="text-center font-bold text-lg basis-14">
             {t(getCtaTextHH({ phase: ctx.phase, currentPlayerName, winnerName }))}
@@ -226,10 +223,10 @@ export const GameRule = ({ ruleDescription }) => {
 };
 
 export const GameEndDialog = ({
-  isOpen, setIsOpen, startNewGame, isRoleSelectorWinner, mode, winnerName
+  isOpen, setIsOpen, startNewGame, isRoleSelectorWinner, isHumanVsHumanGame, winnerName
 }) => {
   const { t } = useTranslation();
-  const resultDescription = mode === 'vsHuman'
+  const resultDescription = isHumanVsHumanGame
     ? t({ hu: `A játékot nyerte: ${winnerName}`, en: `Winner: ${winnerName}` })
     : t(getResultDescription(isRoleSelectorWinner));
   return (

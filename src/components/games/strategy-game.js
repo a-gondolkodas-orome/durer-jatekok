@@ -14,8 +14,7 @@ export const strategyGameFactory = ({
   moves,
   aiBotStrategy,
   getPlayerStepDescription,
-  endOfTurnMove,
-  supportsHHMode
+  endOfTurnMove
 }) => {
   return () => {
     const { t } = useTranslation();
@@ -33,8 +32,10 @@ export const strategyGameFactory = ({
       t({ hu: 'Második játékos', en: 'Second player' })
     ]);
 
+    const isHumanVsHumanGame = mode === 'vsHuman';
+
     useEffect(() => {
-      if (mode === 'vsComputer' && phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
+      if (!isHumanVsHumanGame && phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
         doAiTurn();
       }
     }, [currentPlayer]);
@@ -72,9 +73,9 @@ export const strategyGameFactory = ({
       resetGameState();
     };
 
-    const isClientMoveAllowed = mode === 'vsHuman'
+    const isClientMoveAllowed = isHumanVsHumanGame
       ? phase === 'play'
-      : phase === 'play' && currentPlayer === chosenRoleIndex;
+      : (phase === 'play' && currentPlayer === chosenRoleIndex);
     const isRoleSelectorWinner = winnerIndex === chosenRoleIndex;
 
     const playerNameOf = (index) => {
@@ -115,7 +116,7 @@ export const strategyGameFactory = ({
       currentPlayer,
       phase,
       turnStage,
-      mode
+      isHumanVsHumanGame
     };
 
     const events = {
@@ -157,8 +158,7 @@ export const strategyGameFactory = ({
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={{ phase, isClientMoveAllowed, isRoleSelectorWinner }}
               moves={{ chooseRole, startNewGame, startHHGame, switchMode }}
-              mode={mode}
-              hasHHMode={!!supportsHHMode}
+              isHumanVsHumanGame={isHumanVsHumanGame}
               playerNames={playerNames}
               setPlayerNames={setPlayerNames}
               currentPlayerName={currentPlayerName}
@@ -173,7 +173,7 @@ export const strategyGameFactory = ({
         setIsOpen={setIsGameEndDialogOpen}
         startNewGame={startNewGame}
         isRoleSelectorWinner={isRoleSelectorWinner}
-        mode={mode}
+        isHumanVsHumanGame={isHumanVsHumanGame}
         winnerName={winnerName}
       />
     </main>
