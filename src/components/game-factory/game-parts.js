@@ -12,14 +12,28 @@ export const GameSidebar = ({
   roleLabels,
   stepDescription,
   ctx,
-  moves
+  moves,
+  variants,
+  selectedVariantIndex
 }) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
 
+  const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
+  const relevantVariants = variants
+    .map((v, i) => ({ ...v, originalIndex: i }))
+    .filter(v => ctx.isHumanVsHumanGame ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex) : true);
+
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
       <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
+      {relevantVariants.length > 1 && (
+        <DifficultySelector
+          variants={relevantVariants}
+          selectedIndex={selectedVariantIndex}
+          onSelect={moves.setDifficulty}
+        />
+      )}
 
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex flex-col gap-3">
         <p className="text-center font-bold text-lg">
@@ -255,6 +269,36 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) =
 const Spinner = () => (
   <div className="animate-spin h-8 w-8 border-t-blue-600 rounded-full border-4"></div>
 );
+
+const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
+  const { t } = useTranslation();
+  const labelClass = (active) => `grow py-1 px-2 text-center cursor-pointer
+    ${active
+      ? 'bg-blue-500 text-white font-semibold'
+      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+  return (
+    <fieldset className="overflow-hidden">
+      <legend className="text-xs text-slate-500 mb-1.5">
+        {t({ hu: 'Nehézség', en: 'Difficulty' })}
+      </legend>
+      <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
+        has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
+        {variants.map(v => (
+          <label key={v.originalIndex} className={`min-w-0 ${labelClass(v.originalIndex === selectedIndex)}`}>
+            <input
+              type="radio"
+              name="difficulty"
+              className="sr-only"
+              checked={v.originalIndex === selectedIndex}
+              onChange={() => onSelect(v.originalIndex)}
+            />
+            {t(v.label)}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+};
 
 const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
   const { t } = useTranslation();

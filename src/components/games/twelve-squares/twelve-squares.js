@@ -65,7 +65,12 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const optimalBotStrategy = ({ board, moves }) => {
+  const step = getOptimalAiStep(board);
+  moves.step(board, step);
+};
+
+const easyBotStrategy = ({ board, moves }) => {
   const step = getOptimalAiStep(board);
   moves.step(board, step);
 };
@@ -118,7 +123,21 @@ export const TwelveSquares = strategyGameFactory({
       hu: 'Kattints a mezőre ahova lépni szeretnél a jobb oldali bábuval.',
       en: 'Click the square you want to move to with the right piece.'
     },
-  generateStartBoard: () => ({ left: 1, right: 12 }),
-  aiBotStrategy,
+  variants: [
+    {
+      label: { hu: 'Medium', en: 'Medium' },
+      generateStartBoard: () => ({ left: 3, right: 10 })
+    },
+    {
+      label: { hu: 'Optimális', en: 'Optimal' },
+      botStrategy: optimalBotStrategy
+      , generateStartBoard: () => ({ left: 1, right: 12 })
+      , isDefault: true
+    },
+    {
+      label: { hu: 'Redundant', en: 'Redundant' },
+      botStrategy: optimalBotStrategy
+    }
+  ],
   moves
 });

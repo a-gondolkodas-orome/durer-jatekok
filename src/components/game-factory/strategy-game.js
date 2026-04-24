@@ -13,12 +13,32 @@ export const strategyGameFactory = ({
   generateStartBoard,
   moves,
   aiBotStrategy,
+  variants,
   getPlayerStepDescription,
   endOfTurnMove
 }) => {
+  if (variants && (aiBotStrategy || generateStartBoard)) {
+    throw new Error('strategyGameFactory: use either variants or aiBotStrategy/generateStartBoard, not both');
+  }
+  if (!variants && !aiBotStrategy && !generateStartBoard) {
+    throw new Error('strategyGameFactory: provide either variants or aiBotStrategy/generateStartBoard');
+  }
+  if (variants && variants.filter(v => v.isDefault).length !== 1) {
+    throw new Error('strategyGameFactory: exactly one variant must have isDefault: true');
+  }
+
+  const strategies = variants
+    ?? [{ label: null, botStrategy: aiBotStrategy, generateStartBoard }];
+
   return () => {
     const { t } = useTranslation();
-    const [board, setBoard] = useState(generateStartBoard());
+    const defaultStrategyIndex = Math.max(strategies.findIndex(s => s.isDefault), 0);
+    const [selectedStrategyIndex, setSelectedStrategyIndex] = useState(defaultStrategyIndex);
+    const activeStrategy = strategies[selectedStrategyIndex] ?? strategies[0];
+    const defaultGenerateStartBoard = strategies[defaultStrategyIndex].generateStartBoard;
+    const activeGenerateStartBoard = activeStrategy.generateStartBoard ?? defaultGenerateStartBoard;
+
+    const [board, setBoard] = useState(activeGenerateStartBoard());
     const [phase, setPhase] = useState('roleSelection');
     const [chosenRoleIndex, setChosenRoleIndex] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState(null);
@@ -50,8 +70,8 @@ export const strategyGameFactory = ({
       return moveResult;
     };
 
-    const resetGameState = () => {
-      setBoard(generateStartBoard());
+    const resetGameState = (generateBoard = activeGenerateStartBoard) => {
+      setBoard(generateBoard());
       setPhase('roleSelection');
       setChosenRoleIndex(null);
       setCurrentPlayer(null);
@@ -68,6 +88,12 @@ export const strategyGameFactory = ({
     const switchMode = (newMode) => {
       setMode(newMode);
       resetGameState();
+    };
+
+    const setDifficulty = (index) => {
+      setSelectedStrategyIndex(index);
+      const newStrategy = strategies[index] ?? strategies[0];
+      resetGameState(newStrategy.generateStartBoard ?? defaultGenerateStartBoard);
     };
 
     const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
@@ -130,9 +156,12 @@ export const strategyGameFactory = ({
     );
 
     const doAiTurn = () => {
+      const botStrategy = activeStrategy.botStrategy
+        ?? strategies[defaultStrategyIndex].botStrategy;
+      if (!botStrategy) return;
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
-        aiBotStrategy({ board, ctx, moves: wrappedMoves });
+        botStrategy({ board, ctx, moves: wrappedMoves });
       }, time);
     };
 
@@ -154,7 +183,9 @@ export const strategyGameFactory = ({
               roleLabels={roleLabels}
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={ctx}
-              moves={{ startGame, startNewGame, switchMode, setPlayerNames }}
+              moves={{ startGame, startNewGame, switchMode, setPlayerNames, setDifficulty }}
+              variants={strategies}
+              selectedVariantIndex={selectedStrategyIndex}
             />
           </div>
         </div>
