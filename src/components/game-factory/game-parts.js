@@ -22,12 +22,17 @@ export const GameSidebar = ({
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
-      <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
+      <ModeSelector
+        isHumanVsHumanGame={ctx.isHumanVsHumanGame}
+        onSwitchMode={moves.switchMode}
+        disabled={!isNewGameAllowed}
+      />
       {variants.length > 1 && (
         <DifficultySelector
           variants={variants}
           selectedIndex={selectedVariantIndex}
           onSelect={moves.setDifficulty}
+          disabled={!isNewGameAllowed}
         />
       )}
 
@@ -210,7 +215,7 @@ const RoleSelector = ({ roleLabels, onRoleSelection, disabled }) => {
         data-testid={`role-btn-${i}`}
         className="rounded-lg py-2 px-4 w-full text-center font-semibold
           bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white
-          disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:focus:bg-blue-500"
         disabled={disabled}
         onClick={() => onRoleSelection(i)}
       >
@@ -269,13 +274,13 @@ const Spinner = () => (
   <div className="animate-spin h-8 w-8 border-t-blue-600 rounded-full border-4"></div>
 );
 
-const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
+const DifficultySelector = ({ variants, selectedIndex, onSelect, disabled: fieldsetDisabled }) => {
   const { t } = useTranslation();
-  const labelClass = (active, disabled) => `min-w-0 grow py-1 px-2 text-center
-    ${disabled
-      ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
-      : active
-        ? 'bg-blue-500 text-white font-semibold cursor-pointer'
+  const labelClass = (active, variantDisabled) => `min-w-0 grow py-1 px-2 text-center
+    ${active && !variantDisabled
+      ? `bg-blue-500 text-white font-semibold ${fieldsetDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
+      : variantDisabled || fieldsetDisabled
+        ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
         : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`;
   return (
     <fieldset className="overflow-hidden">
@@ -296,7 +301,7 @@ const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
               className="sr-only"
               checked={v.originalIndex === selectedIndex}
               onChange={() => onSelect(v.originalIndex)}
-              disabled={v.disabled}
+              disabled={v.disabled || fieldsetDisabled}
             />
             {t(v.label ?? { hu: `${v.originalIndex + 1}. szint`, en: `Level ${v.originalIndex + 1}` })}
           </label>
@@ -306,12 +311,14 @@ const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
   );
 };
 
-const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
+const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode, disabled }) => {
   const { t } = useTranslation();
-  const labelClass = (active) => `grow py-1 px-2 text-center cursor-pointer
+  const labelClass = (active) => `grow py-1 px-2 text-center
     ${active
-      ? 'bg-blue-500 text-white font-semibold'
-      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+      ? `bg-blue-500 text-white font-semibold ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
+      : disabled
+        ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
+        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`;
   return (
     <fieldset>
       <legend className="text-xs text-slate-500 mb-1.5">
@@ -327,6 +334,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
             data-testid="mode-vsComputer"
             checked={!isHumanVsHumanGame}
             onChange={() => onSwitchMode('vsComputer')}
+            disabled={disabled}
           />
           🤖 {t({ hu: 'Gép ellen', en: 'vs Computer' })}
         </label>
@@ -338,6 +346,7 @@ const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode }) => {
             data-testid="mode-vsHuman"
             checked={isHumanVsHumanGame}
             onChange={() => onSwitchMode('vsHuman')}
+            disabled={disabled}
           />
           🤝 {t({ hu: '2 játékos', en: '2 players' })}
         </label>
