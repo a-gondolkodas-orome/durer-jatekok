@@ -121,7 +121,8 @@ export const TwelveSquares = strategyGameFactory({
   variants: [
     {
       botStrategy: optimalBotStrategy,
-      generateStartBoard: () => ({ left: 2, right: 12 })
+      generateStartBoard: () => ({ left: 1, right: 12 }),
+      isDefault: true
     }
   ],
   moves
