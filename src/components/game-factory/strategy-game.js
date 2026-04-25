@@ -5,6 +5,24 @@ import {
 import { partial, mapValues, wrap, _ } from 'lodash';
 import { useTranslation } from '../language/translate';
 
+export const resolveVariants = (variants) => {
+  if (!variants || variants.length === 0) {
+    throw new Error('strategyGameFactory: variants must be a non-empty array');
+  }
+  if (variants.length > 1 && variants.filter(v => v.isDefault).length !== 1) {
+    throw new Error('strategyGameFactory: exactly one variant must have isDefault: true');
+  }
+  const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
+  const defaultVariant = variants[defaultVariantIndex];
+  if (!defaultVariant.generateStartBoard) {
+    throw new Error('strategyGameFactory: the default variant must define generateStartBoard');
+  }
+  const fallbackBotStrategy = defaultVariant.botStrategy
+    ?? variants.find(v => v.botStrategy)?.botStrategy;
+  const resolvedVariants = variants.map(v => ({ ...v, botStrategy: v.botStrategy ?? fallbackBotStrategy }));
+  return { defaultVariantIndex, resolvedVariants };
+};
+
 export const strategyGameFactory = ({
   rule,
   metadata,
@@ -15,21 +33,7 @@ export const strategyGameFactory = ({
   getPlayerStepDescription,
   endOfTurnMove
 }) => {
-  if (!variants || variants.length === 0) {
-    throw new Error('strategyGameFactory: variants must be a non-empty array');
-  }
-  if (variants.length > 1 && variants.filter(v => v.isDefault).length !== 1) {
-    throw new Error('strategyGameFactory: exactly one variant must have isDefault: true');
-  }
-  const defaultVariant = variants.find(v => v.isDefault) ?? variants[0];
-  if (!defaultVariant.generateStartBoard) {
-    throw new Error('strategyGameFactory: the default variant must define generateStartBoard');
-  }
-
-  const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
-  const fallbackBotStrategy = variants[defaultVariantIndex]?.botStrategy
-    ?? variants.find(v => v.botStrategy)?.botStrategy;
-  const resolvedVariants = variants.map(v => ({ ...v, botStrategy: v.botStrategy ?? fallbackBotStrategy }));
+  const { defaultVariantIndex, resolvedVariants } = resolveVariants(variants);
 
   return () => {
     const { t } = useTranslation();
