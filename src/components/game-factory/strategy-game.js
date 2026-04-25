@@ -38,7 +38,7 @@ export const strategyGameFactory = ({
   return () => {
     const { t } = useTranslation();
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
-    const activeVariant = resolvedVariants[selectedVariantIndex] ?? resolvedVariants[0];
+    const activeVariant = resolvedVariants[selectedVariantIndex] ?? resolvedVariants[defaultVariantIndex];
     const defaultGenerateStartBoard = resolvedVariants[defaultVariantIndex].generateStartBoard;
     const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
 
