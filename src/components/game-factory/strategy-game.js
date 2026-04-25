@@ -173,6 +173,13 @@ export const strategyGameFactory = ({
       }, time);
     };
 
+    const visibleVariants = resolvedVariants
+      .map((v, i) => ({ ...v, originalIndex: i, disabled: !isHumanVsHumanGame && !v.botStrategy }))
+      .filter(v => isHumanVsHumanGame
+        ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex)
+        : true
+      );
+
     return (
     <main className="flex flex-col p-2 min-h-screen">
       <GameHeader title={t(metadata.title || metadata.name)} />
@@ -192,7 +199,7 @@ export const strategyGameFactory = ({
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={ctx}
               moves={{ startGame, startNewGame, switchMode, setPlayerNames, setDifficulty }}
-              variants={resolvedVariants}
+              variants={visibleVariants}
               selectedVariantIndex={selectedVariantIndex}
             />
           </div>

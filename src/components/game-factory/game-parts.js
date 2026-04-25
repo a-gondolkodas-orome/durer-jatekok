@@ -18,27 +18,14 @@ export const GameSidebar = ({
 }) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
-
-  const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
-  const relevantVariants = variants
-    .map((v, i) => ({
-      ...v,
-      originalIndex: i,
-      disabled: !ctx.isHumanVsHumanGame && !v.botStrategy
-    }))
-    .filter(
-      v => ctx.isHumanVsHumanGame
-        ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex)
-        : true
-    );
-  const activeVariantHasBotStrategy = !!variants[selectedVariantIndex]?.botStrategy;
+  const activeVariantHasBotStrategy = !!variants.find(v => v.originalIndex === selectedVariantIndex)?.botStrategy;
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
       <ModeSelector isHumanVsHumanGame={ctx.isHumanVsHumanGame} onSwitchMode={moves.switchMode} />
-      {relevantVariants.length > 1 && (
+      {variants.length > 1 && (
         <DifficultySelector
-          variants={relevantVariants}
+          variants={variants}
           selectedIndex={selectedVariantIndex}
           onSelect={moves.setDifficulty}
         />

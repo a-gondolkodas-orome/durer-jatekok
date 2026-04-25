@@ -52,7 +52,7 @@ describe('getCtaText', () => {
   });
 });
 
-const defaultVariants = [{ botStrategy: () => {}, generateStartBoard: () => {} }];
+const defaultVariants = [{ botStrategy: () => {}, generateStartBoard: () => {}, originalIndex: 0, disabled: false }];
 
 const renderSidebar = (ctxOverrides = {}, movesOverrides = {}, variants = defaultVariants) => {
   const ctx = {
