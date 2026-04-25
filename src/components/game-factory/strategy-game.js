@@ -20,7 +20,7 @@ export const resolveVariants = (variants) => {
   const fallbackBotStrategy = defaultVariant.botStrategy
     ?? variants.find(v => v.botStrategy)?.botStrategy;
   const resolvedVariants = variants.map(v => ({ ...v, botStrategy: v.botStrategy ?? fallbackBotStrategy }));
-  return { defaultVariantIndex, resolvedVariants };
+  return { defaultVariantIndex, defaultVariant, resolvedVariants };
 };
 
 export const strategyGameFactory = ({
@@ -33,13 +33,13 @@ export const strategyGameFactory = ({
   getPlayerStepDescription,
   endOfTurnMove
 }) => {
-  const { defaultVariantIndex, resolvedVariants } = resolveVariants(variants);
+  const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
 
   return () => {
     const { t } = useTranslation();
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
-    const activeVariant = resolvedVariants[selectedVariantIndex] ?? resolvedVariants[defaultVariantIndex];
-    const defaultGenerateStartBoard = resolvedVariants[defaultVariantIndex].generateStartBoard;
+    const activeVariant = resolvedVariants[selectedVariantIndex] ?? defaultVariant;
+    const defaultGenerateStartBoard = defaultVariant.generateStartBoard;
     const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
 
     const [board, setBoard] = useState(activeGenerateStartBoard());
@@ -93,7 +93,7 @@ export const strategyGameFactory = ({
       setMode(newMode);
       if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
         setSelectedVariantIndex(defaultVariantIndex);
-        resetGameState(resolvedVariants[defaultVariantIndex].generateStartBoard);
+        resetGameState(defaultVariant.generateStartBoard);
       } else {
         resetGameState();
       }
@@ -101,7 +101,7 @@ export const strategyGameFactory = ({
 
     const setDifficulty = (index) => {
       setSelectedVariantIndex(index);
-      const newVariant = resolvedVariants[index] ?? resolvedVariants[defaultVariantIndex];
+      const newVariant = resolvedVariants[index] ?? defaultVariant;
       resetGameState(newVariant.generateStartBoard ?? defaultGenerateStartBoard);
     };
 
@@ -175,10 +175,7 @@ export const strategyGameFactory = ({
 
     const visibleVariants = resolvedVariants
       .map((v, i) => ({ ...v, originalIndex: i, disabled: !isHumanVsHumanGame && !v.botStrategy }))
-      .filter(v => isHumanVsHumanGame
-        ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex)
-        : true
-      );
+      .filter(v => !isHumanVsHumanGame || !!v.generateStartBoard);
 
     return (
     <main className="flex flex-col p-2 min-h-screen">

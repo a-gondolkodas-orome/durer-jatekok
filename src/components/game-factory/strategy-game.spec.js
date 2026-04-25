@@ -40,9 +40,11 @@ describe('resolveVariants', () => {
   });
 
   it('picks the variant marked isDefault as the default', () => {
-    const variants = [makeVariant(), makeVariant({ isDefault: true })];
-    const { defaultVariantIndex } = resolveVariants(variants);
+    const generateStartBoard = () => [];
+    const variants = [makeVariant(), makeVariant({ isDefault: true, generateStartBoard })];
+    const { defaultVariantIndex, defaultVariant } = resolveVariants(variants);
     expect(defaultVariantIndex).toBe(1);
+    expect(defaultVariant.generateStartBoard).toBe(generateStartBoard);
   });
 
   it('fills missing botStrategy from the default variant', () => {
