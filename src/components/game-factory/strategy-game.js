@@ -92,8 +92,8 @@ export const strategyGameFactory = ({
     const switchMode = (newMode) => {
       setMode(newMode);
       if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
-        setSelectedVariantIndex(defaultStrategyIndex);
-        resetGameState(resolvedVariants[defaultStrategyIndex].generateStartBoard);
+        setSelectedVariantIndex(defaultVariantIndex);
+        resetGameState(resolvedVariants[defaultVariantIndex].generateStartBoard);
       } else {
         resetGameState();
       }
@@ -101,7 +101,7 @@ export const strategyGameFactory = ({
 
     const setDifficulty = (index) => {
       setSelectedVariantIndex(index);
-      const newVariant = resolvedVariants[index] ?? resolvedVariants[0];
+      const newVariant = resolvedVariants[index] ?? resolvedVariants[defaultVariantIndex];
       resetGameState(newVariant.generateStartBoard ?? defaultGenerateStartBoard);
     };
 
