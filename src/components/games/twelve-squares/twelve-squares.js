@@ -70,11 +70,6 @@ const optimalBotStrategy = ({ board, moves }) => {
   moves.step(board, step);
 };
 
-const easyBotStrategy = ({ board, moves }) => {
-  const step = getOptimalAiStep(board);
-  moves.step(board, step);
-};
-
 const getOptimalAiStep = ({ left, right }) => {
   let dst = right-left;
   if(dst === 1) return 2;
@@ -125,18 +120,8 @@ export const TwelveSquares = strategyGameFactory({
     },
   variants: [
     {
-      label: { hu: 'Medium', en: 'Medium' },
-      generateStartBoard: () => ({ left: 3, right: 10 })
-    },
-    {
-      label: { hu: 'Optimális', en: 'Optimal' },
-      botStrategy: optimalBotStrategy
-      , generateStartBoard: () => ({ left: 1, right: 12 })
-      , isDefault: true
-    },
-    {
-      label: { hu: 'Redundant', en: 'Redundant' },
-      botStrategy: optimalBotStrategy
+      botStrategy: optimalBotStrategy,
+      generateStartBoard: () => ({ left: 2, right: 12 })
     }
   ],
   moves

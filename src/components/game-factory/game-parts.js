@@ -21,8 +21,17 @@ export const GameSidebar = ({
 
   const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
   const relevantVariants = variants
-    .map((v, i) => ({ ...v, originalIndex: i }))
-    .filter(v => ctx.isHumanVsHumanGame ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex) : true);
+    .map((v, i) => ({
+      ...v,
+      originalIndex: i,
+      disabled: !ctx.isHumanVsHumanGame && !v.botStrategy
+    }))
+    .filter(
+      v => ctx.isHumanVsHumanGame
+        ? (v.generateStartBoard || v.originalIndex === defaultVariantIndex)
+        : true
+    );
+  const activeVariantHasBotStrategy = !!variants[selectedVariantIndex]?.botStrategy;
 
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
@@ -64,6 +73,7 @@ export const GameSidebar = ({
             : <RoleSelector
                 roleLabels={roleLabels}
                 onRoleSelection={moves.startGame}
+                disabled={!activeVariantHasBotStrategy}
               />
         )}
       </div>
@@ -201,7 +211,7 @@ export const GameEndDialog = ({
   );
 };
 
-const RoleSelector = ({ roleLabels, onRoleSelection }) => {
+const RoleSelector = ({ roleLabels, onRoleSelection, disabled }) => {
   const { t } = useTranslation();
   return <span className="basis-24 flex flex-col gap-2">
     {[
@@ -212,7 +222,9 @@ const RoleSelector = ({ roleLabels, onRoleSelection }) => {
         key={i}
         data-testid={`role-btn-${i}`}
         className="rounded-lg py-2 px-4 w-full text-center font-semibold
-          bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white"
+          bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 text-white
+          disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled={disabled}
         onClick={() => onRoleSelection(i)}
       >
         {t(roleLabels ? roleLabels[i] : defaultLabel)}
@@ -272,10 +284,12 @@ const Spinner = () => (
 
 const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
   const { t } = useTranslation();
-  const labelClass = (active) => `grow py-1 px-2 text-center cursor-pointer
-    ${active
-      ? 'bg-blue-500 text-white font-semibold'
-      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+  const labelClass = (active, disabled) => `min-w-0 grow py-1 px-2 text-center
+    ${disabled
+      ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
+      : active
+        ? 'bg-blue-500 text-white font-semibold cursor-pointer'
+        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`;
   return (
     <fieldset className="overflow-hidden">
       <legend className="text-xs text-slate-500 mb-1.5">
@@ -284,15 +298,20 @@ const DifficultySelector = ({ variants, selectedIndex, onSelect }) => {
       <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
         has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
         {variants.map(v => (
-          <label key={v.originalIndex} className={`min-w-0 ${labelClass(v.originalIndex === selectedIndex)}`}>
+          <label
+            key={v.originalIndex}
+            className={labelClass(v.originalIndex === selectedIndex, v.disabled)}
+            title={v.disabled ? t({ hu: 'Nincs gépi stratégia megadva', en: 'No bot strategy defined' }) : undefined}
+          >
             <input
               type="radio"
               name="difficulty"
               className="sr-only"
               checked={v.originalIndex === selectedIndex}
               onChange={() => onSelect(v.originalIndex)}
+              disabled={v.disabled}
             />
-            {t(v.label)}
+            {t(v.label ?? { hu: `${v.originalIndex + 1}. szint`, en: `Level ${v.originalIndex + 1}` })}
           </label>
         ))}
       </div>
