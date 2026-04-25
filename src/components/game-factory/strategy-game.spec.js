@@ -11,9 +11,8 @@ const minimalConfig = (moves, endOfTurnMove) => ({
   rule: <></>,
   metadata: { name: 'Test' },
   BoardClient: MinimalBoardClient,
-  generateStartBoard: () => ['initial'],
   moves,
-  aiBotStrategy: () => {},
+  variants: [{ botStrategy: () => {}, generateStartBoard: () => ['initial'] }],
   getPlayerStepDescription: () => '',
   endOfTurnMove
 });
@@ -31,18 +30,20 @@ const CtxAwareBoardClient = ({ board, ctx, moves }) => (
   >move</button>
 );
 
-const ctxAwareConfig = (overrides = {}) => ({
-  rule: <></>,
-  metadata: { name: 'Test' },
-  BoardClient: CtxAwareBoardClient,
-  generateStartBoard: () => ['initial'],
-  moves: {
-    mainMove: (board, { events }) => { events.endTurn(); return { nextBoard: board }; }
-  },
-  aiBotStrategy: () => {},
-  getPlayerStepDescription: () => '',
-  ...overrides
-});
+const ctxAwareConfig = (overrides = {}) => {
+  const { botStrategy, ...rest } = overrides;
+  return {
+    rule: <></>,
+    metadata: { name: 'Test' },
+    BoardClient: CtxAwareBoardClient,
+    moves: {
+      mainMove: (board, { events }) => { events.endTurn(); return { nextBoard: board }; }
+    },
+    variants: [{ botStrategy: botStrategy ?? (() => {}), generateStartBoard: () => ['initial'] }],
+    getPlayerStepDescription: () => '',
+    ...rest
+  };
+};
 
 describe('isClientMoveAllowed', () => {
   it('allows both players to move in vsHuman mode', () => {
@@ -59,32 +60,32 @@ describe('isClientMoveAllowed', () => {
     const { getByTestId } = renderGame(ctxAwareConfig());
     fireEvent.click(getByTestId('role-btn-0'));
     expect(getByTestId('move-btn').disabled).toBe(false);
-    fireEvent.click(getByTestId('move-btn')); // endTurn → AI's turn
+    fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn
     expect(getByTestId('move-btn').disabled).toBe(true);
   });
 });
 
-describe('AI behavior by mode', () => {
+describe('Bot behavior by mode', () => {
   beforeEach(() => { vi.useFakeTimers(); });
   afterEach(() => { vi.useRealTimers(); });
 
-  it('does not call aiBotStrategy in vsHuman mode', () => {
-    const aiBotStrategy = vi.fn();
-    const { getByTestId } = renderGame(ctxAwareConfig({ aiBotStrategy }));
+  it('does not call botStrategy in vsHuman mode', () => {
+    const botStrategy = vi.fn();
+    const { getByTestId } = renderGame(ctxAwareConfig({ botStrategy }));
     fireEvent.click(getByTestId('mode-vsHuman'));
     fireEvent.click(getByTestId('start-hh-game'));
     fireEvent.click(getByTestId('move-btn')); // endTurn → currentPlayer 1
     act(() => { vi.advanceTimersByTime(1500); });
-    expect(aiBotStrategy).not.toHaveBeenCalled();
+    expect(botStrategy).not.toHaveBeenCalled();
   });
 
-  it('calls aiBotStrategy when it becomes the computer turn', () => {
-    const aiBotStrategy = vi.fn();
-    const { getByTestId } = renderGame(ctxAwareConfig({ aiBotStrategy }));
+  it('calls botStrategy when it becomes the computer turn', () => {
+    const botStrategy = vi.fn();
+    const { getByTestId } = renderGame(ctxAwareConfig({ botStrategy }));
     fireEvent.click(getByTestId('role-btn-0'));
-    fireEvent.click(getByTestId('move-btn')); // endTurn → AI's turn
+    fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn
     act(() => { vi.advanceTimersByTime(1500); });
-    expect(aiBotStrategy).toHaveBeenCalledOnce();
+    expect(botStrategy).toHaveBeenCalledOnce();
   });
 });
 

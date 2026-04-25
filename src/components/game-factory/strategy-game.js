@@ -10,40 +10,33 @@ export const strategyGameFactory = ({
   metadata,
   roleLabels,
   BoardClient,
-  generateStartBoard,
   moves,
-  aiBotStrategy,
   variants,
   getPlayerStepDescription,
   endOfTurnMove
 }) => {
-  if (variants && (aiBotStrategy || generateStartBoard)) {
-    throw new Error('strategyGameFactory: use either variants or aiBotStrategy/generateStartBoard, not both');
+  if (!variants || variants.length === 0) {
+    throw new Error('strategyGameFactory: variants must be a non-empty array');
   }
-  if (!variants && !aiBotStrategy && !generateStartBoard) {
-    throw new Error('strategyGameFactory: provide either variants or aiBotStrategy/generateStartBoard');
-  }
-  if (variants && variants.length > 1 && variants.filter(v => v.isDefault).length !== 1) {
+  if (variants.length > 1 && variants.filter(v => v.isDefault).length !== 1) {
     throw new Error('strategyGameFactory: exactly one variant must have isDefault: true');
   }
-  const defaultVariant = variants && (variants.find(v => v.isDefault) ?? variants[0]);
-  if (defaultVariant && !defaultVariant.generateStartBoard) {
+  const defaultVariant = variants.find(v => v.isDefault) ?? variants[0];
+  if (!defaultVariant.generateStartBoard) {
     throw new Error('strategyGameFactory: the default variant must define generateStartBoard');
   }
 
-  const strategies = variants
-    ?? [{ label: null, botStrategy: aiBotStrategy, generateStartBoard }];
-  const defaultStrategyIndex = Math.max(strategies.findIndex(s => s.isDefault), 0);
-  const fallbackBotStrategy = strategies[defaultStrategyIndex]?.botStrategy
-    ?? strategies.find(s => s.botStrategy)?.botStrategy;
-  const resolvedStrategies = strategies.map(s => ({ ...s, botStrategy: s.botStrategy ?? fallbackBotStrategy }));
+  const defaultVariantIndex = Math.max(variants.findIndex(v => v.isDefault), 0);
+  const fallbackBotStrategy = variants[defaultVariantIndex]?.botStrategy
+    ?? variants.find(v => v.botStrategy)?.botStrategy;
+  const resolvedVariants = variants.map(v => ({ ...v, botStrategy: v.botStrategy ?? fallbackBotStrategy }));
 
   return () => {
     const { t } = useTranslation();
-    const [selectedStrategyIndex, setSelectedStrategyIndex] = useState(defaultStrategyIndex);
-    const activeStrategy = resolvedStrategies[selectedStrategyIndex] ?? resolvedStrategies[0];
-    const defaultGenerateStartBoard = resolvedStrategies[defaultStrategyIndex].generateStartBoard;
-    const activeGenerateStartBoard = activeStrategy.generateStartBoard ?? defaultGenerateStartBoard;
+    const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
+    const activeVariant = resolvedVariants[selectedVariantIndex] ?? resolvedVariants[0];
+    const defaultGenerateStartBoard = resolvedVariants[defaultVariantIndex].generateStartBoard;
+    const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
 
     const [board, setBoard] = useState(activeGenerateStartBoard());
     const [phase, setPhase] = useState('roleSelection');
@@ -60,7 +53,7 @@ export const strategyGameFactory = ({
 
     useEffect(() => {
       if (!isHumanVsHumanGame && phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
-        doAiTurn();
+        doBotTurn();
       }
     }, [currentPlayer]);
 
@@ -94,18 +87,18 @@ export const strategyGameFactory = ({
 
     const switchMode = (newMode) => {
       setMode(newMode);
-      if (newMode === 'vsHuman' && !activeStrategy.generateStartBoard) {
-        setSelectedStrategyIndex(defaultStrategyIndex);
-        resetGameState(resolvedStrategies[defaultStrategyIndex].generateStartBoard);
+      if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
+        setSelectedVariantIndex(defaultStrategyIndex);
+        resetGameState(resolvedVariants[defaultStrategyIndex].generateStartBoard);
       } else {
         resetGameState();
       }
     };
 
     const setDifficulty = (index) => {
-      setSelectedStrategyIndex(index);
-      const newStrategy = resolvedStrategies[index] ?? resolvedStrategies[0];
-      resetGameState(newStrategy.generateStartBoard ?? defaultGenerateStartBoard);
+      setSelectedVariantIndex(index);
+      const newVariant = resolvedVariants[index] ?? resolvedVariants[0];
+      resetGameState(newVariant.generateStartBoard ?? defaultGenerateStartBoard);
     };
 
     const endGame = ({ winnerIndex } = { winnerIndex: null }) => {
@@ -157,8 +150,8 @@ export const strategyGameFactory = ({
 
     /*
     Only second argument of move's is fixed here (_ special syntax). board
-    (first argument) needs to be handled by ai strategy as it may change between
-    moves, but for AI strategy there is no re-render between moves. In some
+    (first argument) needs to be handled by the bot as it may change between
+    moves, but for the bot there is no re-render between moves. In some
     cases there are multiple moves following single user event, in that case,
     there is also no re-render on client side between moves.
     */
@@ -167,8 +160,8 @@ export const strategyGameFactory = ({
       f => wrap(partial(f, _, { ctx, events }), moveWrapper)
     );
 
-    const doAiTurn = () => {
-      const { botStrategy } = activeStrategy;
+    const doBotTurn = () => {
+      const { botStrategy } = activeVariant;
       if (!botStrategy) throw new Error('strategyGameFactory: no botStrategy available for vsComputer mode');
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
@@ -195,8 +188,8 @@ export const strategyGameFactory = ({
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={ctx}
               moves={{ startGame, startNewGame, switchMode, setPlayerNames, setDifficulty }}
-              variants={resolvedStrategies}
-              selectedVariantIndex={selectedStrategyIndex}
+              variants={resolvedVariants}
+              selectedVariantIndex={selectedVariantIndex}
             />
           </div>
         </div>
