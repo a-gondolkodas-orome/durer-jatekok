@@ -97,6 +97,21 @@ const moves = {
   }
 };
 
+const randomBotStrategy = ({ board, moves }) => {
+  const turnsLeft = totalDigits - board.digits.length;
+  const currentPlayer = (totalDigits - turnsLeft) % 2;
+
+  if (turnsLeft === 1) {
+    const winningDigits = availableDigits.filter(
+      d => winnerFromState((board.sumMod9 + d) % 9, 0) === currentPlayer
+    );
+    moves.chooseDigit(board, sample(winningDigits.length > 0 ? winningDigits : availableDigits));
+    return;
+  }
+
+  moves.chooseDigit(board, sample(availableDigits));
+};
+
 const aiBotStrategy = ({ board, moves }) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
@@ -153,5 +168,16 @@ export const TenDigitNumber = strategyGameFactory({
   },
   BoardClient,
   gameplay: { moves },
-  variants: [{ botStrategy: aiBotStrategy, generateStartBoard: () => ({ digits: [], sumMod9: 0 }) }]
+  variants: [
+    {
+      botStrategy: randomBotStrategy,
+      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+    },
+    {
+      botStrategy: aiBotStrategy,
+      generateStartBoard: () => ({ digits: [], sumMod9: 0 }),
+      label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
+      isDefault: true
+    }
+  ]
 });
