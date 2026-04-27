@@ -54,7 +54,9 @@ const BoardClient = ({ board, ctx, moves }) => {
             className={`border-2 w-10 h-12 flex items-center justify-center text-2xl font-bold
               ${d !== null
                 ? 'border-slate-600'
-                : 'bg-slate-100 border-slate-400 text-slate-400'}`}
+                : i === board.digits.length && ctx.phase === 'play'
+                  ? 'border-blue-400 bg-blue-50 text-blue-400'
+                  : 'bg-slate-100 border-slate-300 text-slate-300'}`}
           >
             {d !== null ? d : '?'}
           </div>
@@ -69,7 +71,7 @@ const BoardClient = ({ board, ctx, moves }) => {
                 key={d}
                 onClick={(e) => { moves.chooseDigit(board, d); e.currentTarget.blur(); }}
                 className="border-2 border-slate-300 rounded-xl text-2xl w-12 h-12 font-bold shadow-sm
-                  hover:bg-sky-100 hover:border-sky-300 focus:bg-sky-100 focus:border-sky-300 transition-colors"
+                  hover:bg-blue-100 hover:border-blue-300 focus:bg-blue-100 focus:border-blue-300 transition-colors"
               >
                 {d}
               </button>
