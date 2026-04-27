@@ -25,7 +25,7 @@ const winnerFromState = (() => {
     return (memo[key] = 1 - currentPlayer);
   };
   for (let t = 0; t <= totalDigits; t++) for (let s = 0; s < 9; s++) compute(s, t);
-  return compute;
+  return (sumMod9, turnsLeft) => memo[`${sumMod9},${turnsLeft}`];
 })();
 
 const BoardClient = ({ board, ctx, moves }) => {
@@ -36,9 +36,9 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   let numberSummary = null;
   if (board.digits.length === totalDigits) {
-    const num = parseInt(board.digits.join(''), 10);
-    const quotient = Math.floor(num / 9);
+    const num = board.digits.reduce((acc, d) => acc * 10 + d, 0);
     const remainder = board.sumMod9;
+    const quotient = (num - remainder) / 9;
     const expr = remainder === 0
       ? `${num} = ${quotient} · 9`
       : `${num} = ${quotient} · 9 + ${remainder}`;
@@ -115,8 +115,9 @@ const aiBotStrategy = ({ board, moves }) => {
       d2 => winnerFromState((nextSumMod9 + d2) % 9, turnsLeft - 2) === (1 - currentPlayer)
     ).length;
   };
-  const minCount = Math.min(...availableDigits.map(opponentWinCount));
-  const leastBadDigits = availableDigits.filter(d => opponentWinCount(d) === minCount);
+  const counts = availableDigits.map(opponentWinCount);
+  const minCount = Math.min(...counts);
+  const leastBadDigits = availableDigits.filter((_, i) => counts[i] === minCount);
   moves.chooseDigit(board, sample(leastBadDigits));
 };
 
@@ -127,9 +128,9 @@ const rule = {
     Béla nyer, ha a kapott szám osztható 9-cel, egyébként Jenő nyer.
   </>,
   en: <>
-    Jenő and Béla alternately choose a digit from &#123;1, 2, 3, 4, 5, 6&#125; (Jenő starts),
+    Alice and Bob alternately choose a digit from &#123;1, 2, 3, 4, 5, 6&#125; (Alice starts),
     writing them one after another to build a 10-digit number together.
-    Béla wins if the resulting number is divisible by 9; otherwise Jenő wins.
+    Bob wins if the resulting number is divisible by 9; otherwise Alice wins.
   </>
 };
 
@@ -140,8 +141,8 @@ export const TenDigitNumber = strategyGameFactory({
     title: title || name,
     credit,
     roleLabels: [
-      { hu: 'Jenő (1.)', en: 'Jenő (1.)' },
-      { hu: 'Béla (2.)', en: 'Béla (2.)' }
+      { hu: 'Jenő (1.)', en: 'Alice (1st)' },
+      { hu: 'Béla (2.)', en: 'Bob (2nd)' }
     ],
     getPlayerStepDescription: () => ({
       hu: 'Válassz egy számjegyet 1 és 6 között.',
