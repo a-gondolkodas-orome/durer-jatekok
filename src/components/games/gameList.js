@@ -291,7 +291,7 @@ export const gameList = {
     year: { k: "V. (11/12)", v: "11/12" },
     round: "döntő",
     category: ["D"],
-    name: { hu: "Szám összeállítás jegyenként", en: "Building a number digit by digit" }
+    name: { hu: "Párbaj számjegyekkel", en: "Digit duel" }
   },
   TenDiscs: {
     year: { k: "X. (16/17)", v: "16/17" },
