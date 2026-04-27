@@ -99,9 +99,9 @@ const aiBotStrategy = ({ board, moves }) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
 
-  // Jenő (player 0) always has a winning strategy: on the first move any digit works;
-  // on later moves, 7 minus Béla's last digit guarantees the total sum ≡ d₁+28 (mod 9),
-  // which is never 0. Pick randomly among all winning moves.
+  // Jenő (player 0) wins with optimal play. The unique winning first move is 1: any other d₁
+  // lets Béla respond with 8−d₁ then mirror (7−Jₖ), giving sum 36≡0. With d₁=1, Béla would
+  // need 7 (out of range), so Jenő mirrors instead: 1+4×7+B₅=29+B₅∈{30…35}, never div. by 9.
   const winningDigits = availableDigits.filter(
     d => winnerFromState((board.sumMod9 + d) % 9, turnsLeft - 1) === currentPlayer
   );
