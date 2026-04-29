@@ -26,7 +26,7 @@ Before proceeding further, also collect the following metadata if not already pr
 ### 2. Plan the AI strategy
 A game is useful even without an optimal AI: human vs human mode lets real players test and play immediately, and a placeholder random/simple bot is enough to get started. Ask the user whether they want the optimal strategy implemented now or later.
 
-- **If now:** reason through the winning strategy before writing code, and explain your reasoning to the user before proceeding.
+- **If now:** spend up to ~3 minutes reasoning through the winning strategy. If you arrive at a clear characterisation, explain it to the user before writing code. If after ~3 minutes you haven't found a clean solution, say so explicitly — don't keep the user waiting longer — and ask if they have any hints (e.g. from the official solution, a known invariant, or their own intuition). If hints resolve it, proceed; otherwise fall back to "later" and leave a placeholder.
 - **If later:** implement a simple or random bot strategy as a placeholder and note clearly in a code comment that it is not optimal yet.
 
 Note: written solutions typically only describe what to do from a winning position. The AI also needs a strategy for losing positions — i.e. when the opponent holds the winning advantage but hasn't played optimally. In that case the bot should still play as well as possible: making moves that are hardest to respond to correctly, maximising the chance the human makes a mistake. Ask the user how they want this handled if it isn't obvious from the solution.
