@@ -16,6 +16,8 @@ If the game rules weren't provided in $ARGUMENTS, ask for them before proceeding
 Past Dürer competition problem sets (including written solutions) are archived at https://durerinfo.hu/archivum/feladatsorok/. If the user provides a reference to a specific PDF (year, round, problem number), fetch it and read the problem statement and solution. If they paste the solution text directly, use that. Either way, use the written solution to inform both the board design and the AI strategy — it often contains the key invariant or characterisation that makes the optimal strategy straightforward to implement.
 
 Before proceeding further, also collect the following metadata if not already provided in $ARGUMENTS — they are quick to answer and needed throughout implementation:
+
+> **Reminder:** Once the game is identified, ask the user to mark it as **in progress** in the [game tracking spreadsheet](https://docs.google.com/spreadsheets/d/1-6u9PCtvf_gDHrs65x36pmDzFt4nZZx_IUuXrgS2aZk/edit?gid=0#gid=0) before implementation starts, to avoid duplicate work by other developers.
 - **year**: display string (e.g. `"XVI. (22/23)"`) and sort string (e.g. `"22/23"`)
 - **category**: one or more of A, B, C, D, E, E+
 - **round**: `online` or `döntő`
