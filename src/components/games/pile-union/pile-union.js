@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { sample, range } from 'lodash';
+import React, { useState } from 'react';
+import { sample, range, random } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { gameList } from '../gameList';
 import { useTranslation } from '../../language/translate';
 
-const canMove = (board) => board.length > 0;
 
 // TODO: implement optimal AI strategy — this is a random placeholder
 const randomBotStrategy = ({ board, moves }) => {
@@ -23,17 +22,21 @@ const randomBotStrategy = ({ board, moves }) => {
   }
 };
 
+const Matchstick = ({ dimmed }) => (
+  <div
+    className={`w-3 h-14 flex flex-col items-center ${dimmed ? 'opacity-40' : ''}`}
+    style={{ transform: 'scaleY(-1)' }}
+  >
+    <div className="w-2 h-3 bg-red-800 rounded-sm" />
+    <div className="w-1.5 grow bg-stone-400" />
+  </div>
+);
+
 const BoardClient = ({ board, ctx, moves }) => {
   const { t } = useTranslation();
   const [uiMode, setUiMode] = useState('remove');
   const [mergeFirst, setMergeFirst] = useState(null);
-
-  useEffect(() => {
-    if (board.length < 2) {
-      setUiMode('remove');
-      setMergeFirst(null);
-    }
-  }, [board]);
+  const [hoveredPile, setHoveredPile] = useState(null);
 
   const canInteract = ctx.isClientMoveAllowed;
 
@@ -41,6 +44,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     if (!canInteract) return;
     if (uiMode === 'remove') {
       moves.removeOne(board, pileIndex);
+      setUiMode('remove');
     } else {
       if (mergeFirst === null) {
         setMergeFirst(pileIndex);
@@ -56,52 +60,73 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
-      {canInteract && board.length > 0 && (
-        <div className="flex gap-2 mb-4">
-          <button
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors
-              ${uiMode === 'remove'
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-700 text-slate-200 hover:bg-slate-600'}`}
-            onClick={() => { setUiMode('remove'); setMergeFirst(null); }}
-          >
-            {t({ hu: 'Elveszünk 1-et', en: 'Remove 1' })}
-          </button>
-          {board.length >= 2 && (
-            <button
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors
-                ${uiMode === 'merge'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-slate-200 hover:bg-slate-600'}`}
-              onClick={() => { setUiMode('merge'); setMergeFirst(null); }}
-            >
-              {t({ hu: 'Egyesítünk', en: 'Merge' })}
-            </button>
-          )}
-        </div>
+      {board.length > 0 && (
+        <fieldset className="mb-4 max-w-[40ch]" disabled={!canInteract}>
+          <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
+            has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
+            <label className={`grow py-1 px-2 text-center
+              ${uiMode === 'remove' && canInteract
+                ? 'bg-blue-500 text-white font-semibold cursor-pointer'
+                : !canInteract
+                  ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`}>
+              <input type="radio" className="sr-only"
+                checked={uiMode === 'remove'}
+                onChange={() => setUiMode('remove')} />
+              {t({ hu: 'Elveszek 1-et', en: 'Remove 1' })}
+            </label>
+            <div className="w-px bg-slate-300" />
+            <label className={`grow py-1 px-2 text-center
+              ${uiMode === 'merge' && canInteract
+                ? 'bg-blue-500 text-white font-semibold cursor-pointer'
+                : !canInteract || board.length < 2
+                  ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`}>
+              <input type="radio" className="sr-only"
+                checked={uiMode === 'merge'}
+                onChange={() => { setUiMode('merge'); setMergeFirst(null); }}
+                disabled={board.length < 2} />
+              {t({ hu: 'Egyesítek', en: 'Merge' })}
+            </label>
+          </div>
+        </fieldset>
       )}
 
       <div className="flex flex-wrap gap-4 items-end">
         {board.map((size, pileIndex) => {
           const isSelected = uiMode === 'merge' && mergeFirst === pileIndex;
+          const isRemoveHovered = uiMode === 'remove' && hoveredPile === pileIndex;
+          const isMergeHovered = uiMode === 'merge' && hoveredPile === pileIndex;
           return (
             <button
               key={pileIndex}
               disabled={!canInteract}
               onClick={() => handlePileClick(pileIndex)}
+              onMouseEnter={() => setHoveredPile(pileIndex)}
+              onMouseLeave={() => setHoveredPile(null)}
+              onFocus={() => setHoveredPile(pileIndex)}
+              onBlur={() => setHoveredPile(null)}
               className={`
                 flex flex-col items-center gap-1 p-2 rounded border-2 transition-colors
-                ${isSelected ? 'border-blue-400 bg-blue-950' : 'border-transparent'}
-                ${canInteract && !isSelected ? 'hover:border-slate-500 hover:bg-slate-800' : ''}
+                ${isSelected ? 'border-blue-300 bg-blue-600/40' :
+                  isRemoveHovered ? 'border-slate-200 bg-slate-800/5' :
+                  isMergeHovered ? 'border-blue-300 bg-blue-600/20' :
+                  'border-transparent'}
                 disabled:cursor-default
               `}
             >
-              <div className="flex flex-col gap-0.5 items-center">
+              <div className="flex flex-col gap-0.5 items-center" style={{ transform: 'scaleY(-1)' }}>
                 {range(Math.ceil(size / 5)).map(row => (
                   <div key={row} className="flex gap-0.5">
-                    {range(Math.min(5, size - row * 5)).map(col => (
-                      <div key={col} className="w-3 h-14 bg-amber-600 rounded-t-sm" />
-                    ))}
+                    {range(Math.min(5, size - row * 5)).map(col => {
+                      const isLastMatch = row * 5 + col === size - 1;
+                      return (
+                        <Matchstick
+                          key={col}
+                          dimmed={isRemoveHovered && isLastMatch}
+                        />
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -114,8 +139,10 @@ const BoardClient = ({ board, ctx, moves }) => {
       {uiMode === 'merge' && mergeFirst !== null && canInteract && (
         <p className="mt-3 text-sm text-slate-400">
           {t({
-            hu: `Kiválasztva: ${board[mergeFirst]} gyufás kupac. Kattints egy másik kupacra az egyesítéshez.`,
-            en: `Selected: pile of ${board[mergeFirst]}. Click another pile to merge.`
+            hu: `Kattints egy másik kupacra az egyesítéshez,` +
+              ` vagy ugyanerre a kupacra a kijelölés visszavonásához.`,
+            en: `Click another pile to merge,` +
+              ` or the same pile again to deselect.`
           })}
         </p>
       )}
@@ -132,7 +159,7 @@ const moves = {
       ...board.slice(pileIndex + 1)
     ];
     events.endTurn();
-    if (!canMove(nextBoard)) events.endGame();
+    if (nextBoard.length === 0) events.endGame();
     return { nextBoard };
   },
   mergePiles: (board, { events }, [pileIndex1, pileIndex2]) => {
@@ -148,7 +175,7 @@ const moves = {
 const getPlayerStepDescription = ({ board }) => {
   if (board.length === 1) {
     return {
-      hu: 'Vegyél el 1 gyufát a kupacból.',
+      hu: 'Vegyél el egy gyufát a kupacból.',
       en: 'Remove 1 match from the pile.'
     };
   }
@@ -184,8 +211,8 @@ export const PileUnion = strategyGameFactory({
   variants: [{
     botStrategy: randomBotStrategy,
     generateStartBoard: () => {
-      const numPiles = Math.floor(Math.random() * 3) + 2;
-      return Array.from({ length: numPiles }, () => Math.floor(Math.random() * 4) + 2);
+      const numPiles = random(2, 5);
+      return Array.from({ length: numPiles }, () => random(2, 5));
     }
   }]
 });
