@@ -5,16 +5,76 @@ import { gameList } from '../gameList';
 import { useTranslation } from '../../language/translate';
 
 
-// TODO: implement optimal AI strategy — this is a random placeholder
-const randomBotStrategy = ({ board, moves }) => {
-  const validMoves = [];
-  board.forEach((_, i) => validMoves.push({ type: 'remove', i }));
+const memo = new Map();
+
+const isLosing = (board) => {
+  const sorted = [...board].sort((a, b) => a - b);
+  const key = sorted.join(',');
+  if (memo.has(key)) return memo.get(key);
+  if (sorted.length === 0) { memo.set(key, true); return true; }
+
+  const hasWinningMove = sorted.some((size, i) => {
+    const afterRemove = sorted.filter((_, idx) => idx !== i);
+    if (size > 1) afterRemove.push(size - 1);
+    if (isLosing(afterRemove)) return true;
+    return sorted.slice(i + 1).some((_, rel) => {
+      const j = i + 1 + rel;
+      const afterMerge = sorted.filter((_, idx) => idx !== i && idx !== j);
+      afterMerge.push(sorted[i] + sorted[j]);
+      return isLosing(afterMerge);
+    });
+  });
+
+  memo.set(key, !hasWinningMove);
+  return !hasWinningMove;
+};
+
+const aiBotStrategy = ({ board, moves }) => {
+  const winningMoves = [];
+
+  board.forEach((_, i) => {
+    const next = board.filter((_, idx) => idx !== i);
+    if (board[i] > 1) next.push(board[i] - 1);
+    if (isLosing(next)) winningMoves.push({ type: 'remove', i });
+  });
+
   for (let i = 0; i < board.length; i++) {
     for (let j = i + 1; j < board.length; j++) {
-      validMoves.push({ type: 'merge', i, j });
+      const next = board.filter((_, idx) => idx !== i && idx !== j);
+      next.push(board[i] + board[j]);
+      if (isLosing(next)) winningMoves.push({ type: 'merge', i, j });
     }
   }
-  const chosen = sample(validMoves);
+
+  const allMoves = [];
+  board.forEach((_, i) => allMoves.push({ type: 'remove', i }));
+  for (let i = 0; i < board.length; i++) {
+    for (let j = i + 1; j < board.length; j++) allMoves.push({ type: 'merge', i, j });
+  }
+
+  const chosen = sample(winningMoves.length > 0 ? winningMoves : allMoves);
+  if (chosen.type === 'remove') {
+    moves.removeOne(board, chosen.i);
+  } else {
+    moves.mergePiles(board, [chosen.i, chosen.j]);
+  }
+};
+
+const randomBotStrategy = ({ board, moves }) => {
+  const winIn1 = [];
+  board.forEach((_, i) => {
+    const next = board.filter((_, idx) => idx !== i);
+    if (board[i] > 1) next.push(board[i] - 1);
+    if (next.length === 0) winIn1.push({ type: 'remove', i });
+  });
+
+  const allMoves = [];
+  board.forEach((_, i) => allMoves.push({ type: 'remove', i }));
+  for (let i = 0; i < board.length; i++) {
+    for (let j = i + 1; j < board.length; j++) allMoves.push({ type: 'merge', i, j });
+  }
+
+  const chosen = sample(winIn1.length > 0 ? winIn1 : allMoves);
   if (chosen.type === 'remove') {
     moves.removeOne(board, chosen.i);
   } else {
@@ -208,11 +268,19 @@ export const PileUnion = strategyGameFactory({
   },
   BoardClient,
   gameplay: { moves },
-  variants: [{
-    botStrategy: randomBotStrategy,
-    generateStartBoard: () => {
-      const numPiles = random(2, 5);
-      return Array.from({ length: numPiles }, () => random(2, 5));
+  variants: [
+    {
+      botStrategy: randomBotStrategy,
+      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+    },
+    {
+      botStrategy: aiBotStrategy,
+      generateStartBoard: () => {
+        const numPiles = random(2, 4);
+        return Array.from({ length: numPiles }, () => random(2, 5));
+      },
+      label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
+      isDefault: true
     }
-  }]
+  ]
 });
