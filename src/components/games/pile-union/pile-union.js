@@ -115,28 +115,25 @@ const Matchstick = ({ dimmed }) => (
   </div>
 );
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, events, moves }) => {
   const { t } = useTranslation();
-  const [uiMode, setUiMode] = useState('remove');
-  const [mergeFirst, setMergeFirst] = useState(null);
+  const [moveType, setMoveType] = useState('remove');
   const [hoveredPile, setHoveredPile] = useState(null);
 
   const canInteract = ctx.isClientMoveAllowed;
-
   const handlePileClick = (pileIndex) => {
     if (!canInteract) return;
-    if (uiMode === 'remove') {
+    if (moveType === 'remove') {
       moves.removeOne(board, pileIndex);
-      setUiMode('remove');
     } else {
-      if (mergeFirst === null) {
-        setMergeFirst(pileIndex);
-      } else if (mergeFirst === pileIndex) {
-        setMergeFirst(null);
+      if (ctx.turnStage === null) {
+        events.setTurnStage({ moveType: 'merge', firstSelectedPile: pileIndex });
+      } else if (ctx.turnStage.firstSelectedPile === pileIndex) {
+        events.setTurnStage(null);
       } else {
-        moves.mergePiles(board, [mergeFirst, pileIndex]);
-        setMergeFirst(null);
-        setUiMode('remove');
+        moves.mergePiles(board, [ctx.turnStage.firstSelectedPile, pileIndex]);
+        events.setTurnStage(null);
+        setMoveType('remove');
       }
     }
   };
@@ -148,26 +145,26 @@ const BoardClient = ({ board, ctx, moves }) => {
           <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
             has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
             <label className={`grow py-1 px-2 text-center
-              ${uiMode === 'remove' && canInteract
+              ${moveType === 'remove' && canInteract
                 ? 'bg-blue-500 text-white font-semibold cursor-pointer'
                 : !canInteract
                   ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`}>
               <input type="radio" className="sr-only"
-                checked={uiMode === 'remove'}
-                onChange={() => setUiMode('remove')} />
+                checked={moveType === 'remove'}
+                onChange={() => { setMoveType('remove'); events.setTurnStage(null); }} />
               {t({ hu: 'Elveszek 1-et', en: 'Remove 1' })}
             </label>
             <div className="w-px bg-slate-300" />
             <label className={`grow py-1 px-2 text-center
-              ${uiMode === 'merge' && canInteract
+              ${moveType === 'merge' && canInteract
                 ? 'bg-blue-500 text-white font-semibold cursor-pointer'
                 : !canInteract || board.length < 2
                   ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'}`}>
               <input type="radio" className="sr-only"
-                checked={uiMode === 'merge'}
-                onChange={() => { setUiMode('merge'); setMergeFirst(null); }}
+                checked={moveType === 'merge'}
+                onChange={() => { setMoveType('merge'); events.setTurnStage(null); }}
                 disabled={board.length < 2} />
               {t({ hu: 'Egyesítek', en: 'Merge' })}
             </label>
@@ -177,9 +174,9 @@ const BoardClient = ({ board, ctx, moves }) => {
 
       <div className="flex flex-wrap gap-4 items-end">
         {board.map((size, pileIndex) => {
-          const isSelected = uiMode === 'merge' && mergeFirst === pileIndex;
-          const isRemoveHovered = uiMode === 'remove' && hoveredPile === pileIndex;
-          const isMergeHovered = uiMode === 'merge' && hoveredPile === pileIndex;
+          const isSelected = moveType === 'merge' && ctx.turnStage?.firstSelectedPile === pileIndex;
+          const isRemoveHovered = moveType === 'remove' && hoveredPile === pileIndex;
+          const isMergeHovered = moveType === 'merge' && hoveredPile === pileIndex;
           return (
             <button
               key={pileIndex}
@@ -219,16 +216,6 @@ const BoardClient = ({ board, ctx, moves }) => {
         })}
       </div>
 
-      {uiMode === 'merge' && mergeFirst !== null && canInteract && (
-        <p className="mt-3 text-sm text-slate-400">
-          {t({
-            hu: `Kattints egy másik kupacra az egyesítéshez,` +
-              ` vagy ugyanerre a kupacra a kijelölés visszavonásához.`,
-            en: `Click another pile to merge,` +
-              ` or the same pile again to deselect.`
-          })}
-        </p>
-      )}
     </section>
   );
 };
@@ -255,7 +242,13 @@ const moves = {
   }
 };
 
-const getPlayerStepDescription = ({ board }) => {
+const getPlayerStepDescription = ({ board, ctx }) => {
+  if (ctx.turnStage !== null) {
+    return {
+      hu: 'Kattints egy másik kupacra az egyesítéshez, vagy ugyanerre a kupacra a kijelölés visszavonásához.',
+      en: 'Click another pile to merge, or the same pile again to deselect.'
+    };
+  }
   if (board.length === 1) {
     return {
       hu: 'Vegyél el egy gyufát a kupacból.',
