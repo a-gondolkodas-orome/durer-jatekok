@@ -44,7 +44,7 @@ const getOptimalArchitectPath = (board) => {
 
   if (day === 2) {
     // Architect is at E(4). Find which vertex among 0-4 was destroyed night 1.
-    const night1 = missing.find((v) => v <= 4) ?? null;
+    const night1 = missing.find((v) => v <= 4);
     if (night1 === 2) return [5, 6, 7, 6]; // C: E→F→G→H→G
     if (night1 === 3) return [5, 6, 7];     // D: E→F→G→H
     return [5, 6, 7, 0];                    // A, E, B, or none: E→F→G→H→A
@@ -129,11 +129,7 @@ const executeBanditStrategy = (board, moves) => {
 
 const octDist = (a, b) => Math.min((b - a + 8) % 8, (a - b + 8) % 8);
 
-const shortestPathTo = (from, to) => {
-  if (from === to) return [];
-  const cw = (to - from + 8) % 8;
-  const ccw = (from - to + 8) % 8;
-  const step = cw <= ccw ? 1 : -1;
+const directedPath = (from, to, step) => {
   const path = [];
   let cur = from;
   while (cur !== to) {
@@ -143,22 +139,12 @@ const shortestPathTo = (from, to) => {
   return path;
 };
 
-const clockwisePath = (from, to) => {
-  const path = [];
-  let cur = from;
-  while (cur !== to) {
-    cur = (cur + 1) % 8;
-    path.push(cur);
-  }
-  return path;
+const shortestPathTo = (from, to) => {
+  if (from === to) return [];
+  const step = (to - from + 8) % 8 <= (from - to + 8) % 8 ? 1 : -1;
+  return directedPath(from, to, step);
 };
 
-const counterclockwisePath = (from, to) => {
-  const path = [];
-  let cur = from;
-  while (cur !== to) {
-    cur = (cur + 7) % 8;
-    path.push(cur);
-  }
-  return path;
-};
+const clockwisePath = (from, to) => directedPath(from, to, 1);
+
+const counterclockwisePath = (from, to) => directedPath(from, to, -1);
