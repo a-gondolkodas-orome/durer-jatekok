@@ -39,7 +39,16 @@ export const gameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["A"],
-    name: { hu: "Építészek és banditák", en: "Architects and Bandits" },
+    name: { hu: "Építészek és banditák (A)", en: "Architects and Bandits (A)" },
+    title: { hu: "Építészek és banditák (8 torony)", en: "Architects and Bandits (8 towers)" },
+    credit: { developedBy: ["Czeller Ildikó"] }
+  },
+  ArchitectsAndBanditsB: {
+    year: { k: "XVII. (23/24)", v: "23/24" },
+    round: "döntő",
+    category: ["B"],
+    name: { hu: "Építészek és banditák (B)", en: "Architects and Bandits (B)" },
+    title: { hu: "Építészek és banditák (10 torony)", en: "Architects and Bandits (10 towers)" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   Bacteria: {
