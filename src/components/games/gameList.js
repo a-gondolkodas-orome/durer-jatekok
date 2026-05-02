@@ -35,20 +35,20 @@ export const gameList = {
     name: { hu: "3x3-as antiamőba", en: "3×3 anti-tic-tac-toe" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
-  ArchitectsAndBandits: {
+  ArchitectAndBandits: {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["A"],
-    name: { hu: "Építészek és banditák (A)", en: "Architects and Bandits (A)" },
-    title: { hu: "Építészek és banditák (8 torony)", en: "Architects and Bandits (8 towers)" },
+    name: { hu: "Építész és banditák (A)", en: "Architect and Bandits (A)" },
+    title: { hu: "Építész és banditák (8 torony)", en: "Architect and Bandits (8 towers)" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
-  ArchitectsAndBanditsB: {
+  ArchitectAndBanditsB: {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["B"],
-    name: { hu: "Építészek és banditák (B)", en: "Architects and Bandits (B)" },
-    title: { hu: "Építészek és banditák (10 torony)", en: "Architects and Bandits (10 towers)" },
+    name: { hu: "Építész és banditák (B)", en: "Architect and Bandits (B)" },
+    title: { hu: "Építész és banditák (10 torony)", en: "Architect and Bandits (10 towers)" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
   Bacteria: {

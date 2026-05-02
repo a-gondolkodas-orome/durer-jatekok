@@ -80,9 +80,9 @@ const rule = {
   </>
 };
 
-const { name, title, credit } = gameList.ArchitectsAndBanditsB;
+const { name, title, credit } = gameList.ArchitectAndBanditsB;
 
-export const ArchitectsAndBanditsB = strategyGameFactory({
+export const ArchitectAndBanditsB = strategyGameFactory({
   presentation: {
     rule,
     title: title || name,

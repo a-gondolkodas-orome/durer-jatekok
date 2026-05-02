@@ -10,8 +10,8 @@ Import all the games individually. Aim to keep abc ordering for easy navigation.
 
 import { AddReduceDouble } from '../games/pile-splitting-games/add-reduce-double/add-reduce-double';
 import { AntiTicTacToe } from '../games/tictactoe-alikes/anti-tictactoe/anti-tictactoe';
-import { ArchitectsAndBandits } from '../games/architects-and-bandits/architects-and-bandits';
-import { ArchitectsAndBanditsB } from '../games/architects-and-bandits-b/architects-and-bandits-b';
+import { ArchitectAndBandits } from '../games/architect-and-bandits/architect-and-bandits';
+import { ArchitectAndBanditsB } from '../games/architect-and-bandits-b/architect-and-bandits-b';
 import { Bacteria } from '../games/bacteria/bacteria';
 import { BankRobbers } from '../games/bank-robbers/bank-robbers';
 import { ChessBishops } from '../games/chess-bishops/chess-bishops';
@@ -67,8 +67,8 @@ export const App = () => {
     { path: '/', element: <Overview /> },
     { path: '/game/AddReduceDouble', element: <AddReduceDouble /> },
     { path: '/game/AntiTicTacToe', element: <AntiTicTacToe /> },
-    { path: '/game/ArchitectsAndBandits', element: <ArchitectsAndBandits /> },
-    { path: '/game/ArchitectsAndBanditsB', element: <ArchitectsAndBanditsB /> },
+    { path: '/game/ArchitectAndBandits', element: <ArchitectAndBandits /> },
+    { path: '/game/ArchitectAndBanditsB', element: <ArchitectAndBanditsB /> },
     { path: '/game/Bacteria', element: <Bacteria />},
     { path: '/game/BankRobbers', element: <BankRobbers /> },
     { path: '/game/ChessBishops', element: <ChessBishops /> },
