@@ -1,5 +1,5 @@
-// Optimal strategies based on the official competition solution.
-//
+import { sample } from 'lodash';
+
 // Vertices A(0)..H(7) clockwise. Each edge = 10 km, max 4 edges/day.
 // Architect wins by visiting all 8 vertices over 4 days despite 3 nightly destructions.
 //
@@ -13,41 +13,23 @@
 //   Day 3: rebuild remaining missing towers from night 2, position for day 4
 //   Day 4: visit any towers destroyed on night 3 (always reachable ≤ 4 edges)
 
-const octDist = (a, b) => Math.min((b - a + 8) % 8, (a - b + 8) % 8);
-
-// Shortest path from `from` to `to` (array of vertices to visit, excluding start).
-const shortestPathTo = (from, to) => {
-  if (from === to) return [];
-  const cw = (to - from + 8) % 8;
-  const ccw = (from - to + 8) % 8;
-  const step = cw <= ccw ? 1 : -1;
-  const path = [];
-  let cur = from;
-  while (cur !== to) {
-    cur = (cur + step + 8) % 8;
-    path.push(cur);
+export const aiBotStrategy = ({ board, ctx, moves }) => {
+  if (ctx.currentPlayer === 0) {
+    const path = getOptimalArchitectPath(board);
+    executeArchitectPath(path, board, moves);
+  } else {
+    executeBanditStrategy(board, moves);
   }
-  return path;
 };
 
-const clockwisePath = (from, to) => {
-  const path = [];
-  let cur = from;
-  while (cur !== to) {
-    cur = (cur + 1) % 8;
-    path.push(cur);
+const executeArchitectPath = (path, board, moves) => {
+  if (path.length === 0) {
+    moves.endDay(board);
+    return;
   }
-  return path;
-};
-
-const counterclockwisePath = (from, to) => {
-  const path = [];
-  let cur = from;
-  while (cur !== to) {
-    cur = (cur + 7) % 8;
-    path.push(cur);
-  }
-  return path;
+  const [next, ...rest] = path;
+  const { nextBoard } = moves.moveArchitect(board, next);
+  setTimeout(() => executeArchitectPath(rest, nextBoard, moves), 600);
 };
 
 const getOptimalArchitectPath = (board) => {
@@ -124,20 +106,17 @@ const getOptimalArchitectPath = (board) => {
   return [];
 };
 
-const executeArchitectPath = (path, board, moves) => {
-  if (path.length === 0) {
-    moves.endDay(board);
-    return;
-  }
-  const [next, ...rest] = path;
-  const { nextBoard } = moves.moveArchitect(board, next);
-  setTimeout(() => executeArchitectPath(rest, nextBoard, moves), 600);
-};
-
-// Bandit heuristic: destroy the towered vertex farthest from the architect.
+// Bandit heuristic: day 1 random (not architect's vertex), later days farthest from architect.
 const executeBanditStrategy = (board, moves) => {
   const towered = board.towers.map((t, i) => (t ? i : null)).filter((i) => i !== null);
   if (towered.length === 0) return;
+
+  if (board.day === 1) {
+    const candidates = towered.filter((v) => v !== board.architectPosition);
+    moves.destroyTower(board, sample(candidates.length > 0 ? candidates : towered));
+    return;
+  }
+
   const best = towered.reduce(
     (acc, v) => {
       const d = octDist(v, board.architectPosition);
@@ -148,11 +127,38 @@ const executeBanditStrategy = (board, moves) => {
   moves.destroyTower(board, best.v);
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
-  if (ctx.currentPlayer === 0) {
-    const path = getOptimalArchitectPath(board);
-    executeArchitectPath(path, board, moves);
-  } else {
-    executeBanditStrategy(board, moves);
+const octDist = (a, b) => Math.min((b - a + 8) % 8, (a - b + 8) % 8);
+
+const shortestPathTo = (from, to) => {
+  if (from === to) return [];
+  const cw = (to - from + 8) % 8;
+  const ccw = (from - to + 8) % 8;
+  const step = cw <= ccw ? 1 : -1;
+  const path = [];
+  let cur = from;
+  while (cur !== to) {
+    cur = (cur + step + 8) % 8;
+    path.push(cur);
   }
+  return path;
+};
+
+const clockwisePath = (from, to) => {
+  const path = [];
+  let cur = from;
+  while (cur !== to) {
+    cur = (cur + 1) % 8;
+    path.push(cur);
+  }
+  return path;
+};
+
+const counterclockwisePath = (from, to) => {
+  const path = [];
+  let cur = from;
+  while (cur !== to) {
+    cur = (cur + 7) % 8;
+    path.push(cur);
+  }
+  return path;
 };

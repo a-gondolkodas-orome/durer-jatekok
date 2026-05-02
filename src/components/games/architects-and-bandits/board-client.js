@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from '../../language/translate';
-import { capitalize } from 'lodash';
 
 const VERTEX_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
