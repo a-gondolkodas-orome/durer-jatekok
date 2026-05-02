@@ -88,13 +88,12 @@ export const BoardClient = ({ board, ctx, moves }) => {
               role={clickable ? 'button' : undefined}
               aria-label={clickable ? VERTEX_LABELS[i] : undefined}
             >
-              {/* Vertex base circle — gold + thick border when tower present */}
-              <circle
-                cx={x} cy={y} r={4.5}
-                fill={hasTower ? '#fbbf24' : '#f3f4f6'}
-                stroke={hasTower ? '#92400e' : '#6b7280'}
-                strokeWidth={hasTower ? 1.2 : clickable ? 0.8 : 0.5}
-                opacity={clickable && ctx.currentPlayer === 0 ? 0.75 : 1}
+              {/* Vertex base square — + thick border when tower present */}
+              <rect
+                x={x - 4.5} y={y - 4.5} width={9} height={9}
+                fill={hasTower ? '#c2b280' : '#f3f4f6'}
+                stroke={hasTower ? '#374151' : '#6b7280'}
+                strokeWidth={hasTower ? 1.2 : 0.5}
               />
 
               {/* Architect marker: person emoji */}
@@ -139,7 +138,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
           onClick={() => moves.endDay(board)}
           className="mt-3 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 font-medium"
         >
-          {t({ hu: 'Nap vége', en: 'End Day' })}
+          {t({ hu: 'Befejezem a napot', en: 'End Day' })}
         </button>
       )}
     </section>

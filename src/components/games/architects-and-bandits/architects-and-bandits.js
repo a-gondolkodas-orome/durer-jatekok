@@ -9,7 +9,11 @@ import { aiBotStrategy } from './bot-strategy';
 
 const generateStartBoard = () => {
   const towers = Array(8).fill(false);
-  towers[0] = true; // architect touches A at the start of day 1
+  /*
+  Workaround to have a tower at the start of day 1, as startOfTurnMove or
+  similar is not supported by framework.
+  */
+  towers[0] = true;
   return {
     architectPosition: 0,
     towers,
@@ -29,7 +33,6 @@ const moves = {
 
   endDay: (board, { events }) => {
     const nextBoard = cloneDeep(board);
-    nextBoard.towers[nextBoard.architectPosition] = true; // touch at end counts
     nextBoard.kmUsedToday = 0;
     if (board.day === 4) {
       const allTowers = nextBoard.towers.every(t => t);
@@ -39,13 +42,15 @@ const moves = {
     events.endTurn();
     return { nextBoard };
   },
-
-  destroyTower: (board, { events }, vertex) => {
+  destroyTower: (board, _ctx, vertex) => {
     const nextBoard = cloneDeep(board);
     nextBoard.towers[vertex] = false;
+    return { nextBoard, autoEndOfTurn: true };
+  },
+  startNextDay: (board, { events }) => {
+    const nextBoard = cloneDeep(board);
     nextBoard.day += 1;
     nextBoard.kmUsedToday = 0;
-    // architect touches starting vertex at beginning of new day
     nextBoard.towers[nextBoard.architectPosition] = true;
     events.endTurn();
     return { nextBoard };
@@ -103,12 +108,12 @@ export const ArchitectsAndBandits = strategyGameFactory({
         };
       }
       return {
-        hu: `${board.day}. éjszaka: Kattints egy tornyos csúcsra a leromboláshoz.`,
-        en: `Night ${board.day}: Click a vertex with a tower to destroy it.`
+        hu: `${board.day}. éjszaka: Kattints egy toronyra, hogy lerombold.`,
+        en: `Night ${board.day}: Click a tower to destroy it.`
       };
     }
   },
   BoardClient,
-  gameplay: { moves },
+  gameplay: { moves, endOfTurnMove: 'startNextDay' },
   variants: [{ botStrategy: aiBotStrategy, generateStartBoard }]
 });
