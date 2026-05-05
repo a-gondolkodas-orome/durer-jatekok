@@ -139,8 +139,8 @@ const gameBoardFactory = (maxDiscs) => {
         </table>
         {t({
           hu: `${board[1]} piros és ${board[0]} kék korong`,
-          en: `${board[1]} red and ${board[0]} blue discs` }
-        )}
+          en: `${board[1]} red and ${board[0]} blue discs`
+        })}
         {nextBoardDescription()}
       </section>
     );
