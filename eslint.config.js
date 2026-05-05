@@ -23,7 +23,8 @@ export default [
       'object-curly-newline': ['error', { 'consistent': true }],
       'object-property-newline': ['error', { 'allowAllPropertiesOnSameLine': true }],
       'array-bracket-newline': ['error', 'consistent'],
-      'array-element-newline': ['error', 'consistent']
+      'array-element-newline': ['error', 'consistent'],
+      'react/jsx-key': ['error']
     }
   },
   {
