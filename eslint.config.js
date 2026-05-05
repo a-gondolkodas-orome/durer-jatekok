@@ -21,7 +21,7 @@ export default [
       'no-trailing-spaces': 'error',
       'no-var': 'warn',
       'object-curly-newline': ['error', { 'consistent': true }],
-      //'object-property-newline': ['error', { 'allowAllPropertiesOnSameLine': true }],
+      'object-property-newline': ['error', { 'allowAllPropertiesOnSameLine': true }],
       'array-bracket-newline': ['error', 'consistent'],
       'array-element-newline': ['error', 'consistent']
     }
