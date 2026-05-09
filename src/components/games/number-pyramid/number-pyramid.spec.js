@@ -18,7 +18,8 @@ const mockEvents = () => {
   return {
     events: {
       endTurn: () => { calls.endTurn++; },
-      endGame: ({ winnerIndex }) => { calls.endGame = winnerIndex; }
+      endGame: ({ winnerIndex }) => { calls.endGame = winnerIndex; },
+      setTurnState: () => {}
     },
     calls
   };

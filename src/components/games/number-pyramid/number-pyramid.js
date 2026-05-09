@@ -1,38 +1,29 @@
-import React, { useState } from 'react';
-import { cloneDeep, sumBy } from 'lodash';
+import React from 'react';
+import { cloneDeep, isEqual, sumBy } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { useTranslation } from '../../language/translate';
 import { activeCount, aiBotStrategy, generateStartBoard, randomBotStrategy } from './strategy';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState(null);
 
-  const handleClick = (levelIdx, slotIdx) => {
+  const handleClick = ({ levelIdx, slotIdx }) => {
     if (!ctx.isClientMoveAllowed) return;
     const slot = board.levels[levelIdx][slotIdx];
     if (!slot || slot.state !== 'active') return;
 
-    if (selected === null) {
+    if (ctx.turnState === null) {
       if (activeCount(board.levels[levelIdx]) < 2) return;
-      setSelected({ levelIdx, slotIdx: slotIdx });
-      events.setTurnState('selectSecond');
+      events.setTurnState({ levelIdx, slotIdx });
       return;
     }
-    const clearSelection = () => { setSelected(null); events.setTurnState(null); };
-
-    if (selected.levelIdx === levelIdx && selected.slotIdx === slotIdx) {
-      clearSelection();
+    if (isEqual(ctx.turnState, { levelIdx, slotIdx })) {
+      events.setTurnState(null);
       return;
     }
-    if (selected.levelIdx !== levelIdx) return;
 
-    moves.combineTwo(board, { levelIdx, indices: [selected.slotIdx, slotIdx] });
-    clearSelection();
+    moves.combineTwo(board, { levelIdx, indices: [ctx.turnState.slotIdx, slotIdx] });
   };
-
-  const levelLabel = (levelIdx) =>
-    t({ hu: `${levelIdx + 1}. szint`, en: `Level ${levelIdx + 1}` });
 
   const activeChipClass = (isSelected, isDisabled) => {
     const base = 'rounded-lg border-2 px-3 py-2 font-bold text-lg min-w-12 text-center transition-colors ';
@@ -52,8 +43,8 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       <div className="flex flex-col gap-3">
         {[3, 2, 1, 0].map((levelIdx) => {
           const level = board.levels[levelIdx];
-          const isWrongLevel = selected !== null && selected.levelIdx !== levelIdx;
-          const isLoneLevel = selected === null && activeCount(level) < 2;
+          const isWrongLevel = ctx.turnState !== null && ctx.turnState.levelIdx !== levelIdx;
+          const isLoneLevel = ctx.turnState === null && activeCount(level) < 2;
           return (
             <div key={levelIdx} className="flex flex-col items-center gap-1">
               <div className="flex flex-wrap justify-center gap-2">
@@ -84,15 +75,14 @@ const BoardClient = ({ board, ctx, events, moves }) => {
                       </div>
                     );
                   }
-                  const isSelected = selected &&
-                    selected.levelIdx === levelIdx && selected.slotIdx === slotIdx;
+                  const isSelected = isEqual(ctx.turnState, { levelIdx, slotIdx });
                   const isDisabled = isWrongLevel || isLoneLevel || !ctx.isClientMoveAllowed;
                   const chipCls = activeChipClass(isSelected, isDisabled);
                   return (
                     <button
                       key={slotIdx}
                       className={chipCls}
-                      onClick={() => handleClick(levelIdx, slotIdx)}
+                      onClick={() => handleClick({ levelIdx, slotIdx })}
                       disabled={isDisabled}
                     >
                       {slot.value}
@@ -100,7 +90,9 @@ const BoardClient = ({ board, ctx, events, moves }) => {
                   );
                 })}
               </div>
-              <span className="text-xs text-slate-400">{levelLabel(levelIdx)}</span>
+              <span className="text-xs text-slate-400">
+                {t({ hu: `${levelIdx + 1}. szint`, en: `Level ${levelIdx + 1}` })}
+              </span>
             </div>
           );
         })}
@@ -120,6 +112,7 @@ export const moves = {
     const emptyIdx = nextBoard.levels[levelIdx + 1].findIndex((s) => s === null);
     nextBoard.levels[levelIdx + 1][emptyIdx] = { value: combinedValue, state: 'active' };
 
+    events.setTurnState(null);
     if (combinedValue >= board.k) {
       events.endGame({ winnerIndex: ctx.currentPlayer });
       return { nextBoard };
@@ -145,10 +138,11 @@ const rule = {
 };
 
 const getPlayerStepDescription = ({ ctx }) => {
-  if (ctx.turnState === 'selectSecond') {
+  if (ctx.turnState) {
+    const level = ctx.turnState.levelIdx + 1;
     return {
-      hu: 'Válassz egy másik számot ugyanarról a szintről.',
-      en: 'Select another number from the same level.'
+      hu: `Válassz egy másik számot a ${level}. szintről.`,
+      en: `Select another number from level ${level}.`
     };
   }
   return {
