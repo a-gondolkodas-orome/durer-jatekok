@@ -1,41 +1,8 @@
 import React, { useState } from 'react';
-import { random, sample, cloneDeep, shuffle } from 'lodash';
+import { cloneDeep, sumBy } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { useTranslation } from '../../language/translate';
-
-// Level sizes: levels[0]=8 slots, levels[1]=4, levels[2]=2, levels[3]=1
-const MAX_SLOTS = [8, 4, 2, 1];
-
-// Slot states: null = empty placeholder, { value, state:'active'|'consumed' }
-const activeSlotIndices = (level) =>
-  level.flatMap((s, i) => (s?.state === 'active' ? [i] : []));
-
-const activeCount = (level) => activeSlotIndices(level).length;
-
-const twoLargestActiveIndices = (level) => {
-  let first = -1, second = -1;
-  for (let i = 0; i < level.length; i++) {
-    if (level[i]?.state !== 'active') continue;
-    if (first === -1 || level[i].value >= level[first].value) { second = first; first = i; }
-    else if (second === -1 || level[i].value >= level[second].value) { second = i; }
-  }
-  return [first, second];
-};
-
-const twoSmallestActiveIndices = (level) => {
-  let first = -1, second = -1;
-  for (let i = 0; i < level.length; i++) {
-    if (level[i]?.state !== 'active') continue;
-    if (first === -1 || level[i].value <= level[first].value) { second = first; first = i; }
-    else if (second === -1 || level[i].value <= level[second].value) { second = i; }
-  }
-  return [first, second];
-};
-
-const isP2WinningPosition = (sortedInitial, k) => {
-  const s = sortedInitial;
-  return s[0] + s[1] + s[6] + s[7] < k && s[2] + s[3] + s[4] + s[5] >= k;
-};
+import { activeCount, aiBotStrategy, generateStartBoard, randomBotStrategy } from './strategy';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const { t } = useTranslation();
@@ -48,28 +15,31 @@ const BoardClient = ({ board, ctx, events, moves }) => {
 
     if (selected === null) {
       if (activeCount(board.levels[levelIdx]) < 2) return;
-      setSelected({ levelIdx, numIdx: slotIdx });
+      setSelected({ levelIdx, slotIdx: slotIdx });
       events.setTurnState('selectSecond');
       return;
     }
-    if (selected.levelIdx === levelIdx && selected.numIdx === slotIdx) {
-      setSelected(null);
-      events.setTurnState(null);
+    const clearSelection = () => { setSelected(null); events.setTurnState(null); };
+
+    if (selected.levelIdx === levelIdx && selected.slotIdx === slotIdx) {
+      clearSelection();
       return;
     }
     if (selected.levelIdx !== levelIdx) return;
 
-    moves.combineTwo(board, { levelIdx, idx1: selected.numIdx, idx2: slotIdx });
-    setSelected(null);
-    events.setTurnState(null);
+    moves.combineTwo(board, { levelIdx, indices: [selected.slotIdx, slotIdx] });
+    clearSelection();
   };
 
-  const levelLabels = [
-    t({ hu: '4. szint', en: 'Level 4' }),
-    t({ hu: '3. szint', en: 'Level 3' }),
-    t({ hu: '2. szint', en: 'Level 2' }),
-    t({ hu: '1. szint', en: 'Level 1' })
-  ];
+  const levelLabel = (levelIdx) =>
+    t({ hu: `${levelIdx + 1}. szint`, en: `Level ${levelIdx + 1}` });
+
+  const activeChipClass = (isSelected, isDisabled) => {
+    const base = 'rounded-lg border-2 px-3 py-2 font-bold text-lg min-w-12 text-center transition-colors ';
+    if (isSelected) return base + 'bg-blue-600 border-blue-700 text-white';
+    if (isDisabled) return base + 'bg-slate-100 border-slate-300 text-slate-500 cursor-default';
+    return base + 'bg-white border-slate-400 hover:bg-blue-50 hover:border-blue-400 cursor-pointer';
+  };
 
   return (
     <section className="p-2 shrink-0 grow basis-2/3">
@@ -115,30 +85,22 @@ const BoardClient = ({ board, ctx, events, moves }) => {
                     );
                   }
                   const isSelected = selected &&
-                    selected.levelIdx === levelIdx && selected.numIdx === slotIdx;
-                  const baseChip = 'rounded-lg border-2 px-3 py-2 font-bold' +
-                    ' text-lg min-w-12 text-center transition-colors ';
-                  let chipCls = baseChip;
-                  if (isSelected) {
-                    chipCls += 'bg-blue-600 border-blue-700 text-white';
-                  } else if (isWrongLevel || isLoneLevel || !ctx.isClientMoveAllowed) {
-                    chipCls += 'bg-slate-100 border-slate-300 text-slate-500 cursor-default';
-                  } else {
-                    chipCls += 'bg-white border-slate-400 hover:bg-blue-50 hover:border-blue-400 cursor-pointer';
-                  }
+                    selected.levelIdx === levelIdx && selected.slotIdx === slotIdx;
+                  const isDisabled = isWrongLevel || isLoneLevel || !ctx.isClientMoveAllowed;
+                  const chipCls = activeChipClass(isSelected, isDisabled);
                   return (
                     <button
                       key={slotIdx}
                       className={chipCls}
                       onClick={() => handleClick(levelIdx, slotIdx)}
-                      disabled={!ctx.isClientMoveAllowed || isWrongLevel || isLoneLevel}
+                      disabled={isDisabled}
                     >
                       {slot.value}
                     </button>
                   );
                 })}
               </div>
-              <span className="text-xs text-slate-400">{levelLabels[3 - levelIdx]}</span>
+              <span className="text-xs text-slate-400">{levelLabel(levelIdx)}</span>
             </div>
           );
         })}
@@ -147,138 +109,24 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   );
 };
 
-const moves = {
-  combineTwo: (board, { ctx, events }, { levelIdx, idx1, idx2 }) => {
+export const moves = {
+  combineTwo: (board, { ctx, events }, { levelIdx, indices }) => {
     const nextBoard = cloneDeep(board);
-    const slot1 = nextBoard.levels[levelIdx][idx1];
-    const slot2 = nextBoard.levels[levelIdx][idx2];
-    const sum = slot1.value + slot2.value;
-    slot1.state = 'consumed';
-    slot2.state = 'consumed';
+
+    const slots = indices.map((idx) => nextBoard.levels[levelIdx][idx]);
+    const combinedValue = sumBy(slots, 'value');
+    slots.forEach((slot) => { slot.state = 'consumed'; });
+
     const emptyIdx = nextBoard.levels[levelIdx + 1].findIndex((s) => s === null);
-    nextBoard.levels[levelIdx + 1][emptyIdx] = { value: sum, state: 'active' };
-    if (sum >= board.k) {
+    nextBoard.levels[levelIdx + 1][emptyIdx] = { value: combinedValue, state: 'active' };
+
+    if (combinedValue >= board.k) {
       events.endGame({ winnerIndex: ctx.currentPlayer });
       return { nextBoard };
     }
     events.endTurn();
     return { nextBoard };
   }
-};
-
-const randomBotStrategy = ({ board, moves }) => {
-  const { levels, k } = board;
-
-  for (let li = 0; li < 3; li++) {
-    const actives = activeSlotIndices(levels[li]);
-    for (let ii = 0; ii < actives.length; ii++) {
-      for (let jj = ii + 1; jj < actives.length; jj++) {
-        const i = actives[ii], j = actives[jj];
-        if (levels[li][i].value + levels[li][j].value >= k) {
-          moves.combineTwo(board, { levelIdx: li, idx1: i, idx2: j });
-          return;
-        }
-      }
-    }
-  }
-
-  const available = [];
-  for (let li = 0; li < 3; li++) {
-    if (activeCount(levels[li]) >= 2) available.push(li);
-  }
-  const li = sample(available);
-  const actives = activeSlotIndices(levels[li]);
-  const i = sample(actives);
-  const j = sample(actives.filter((x) => x !== i));
-  moves.combineTwo(board, { levelIdx: li, idx1: i, idx2: j });
-};
-
-const aiBotStrategy = ({ board, ctx, moves }) => {
-  const { levels, k, sortedInitial } = board;
-
-  for (let li = 0; li < 3; li++) {
-    const actives = activeSlotIndices(levels[li]);
-    for (let ii = 0; ii < actives.length; ii++) {
-      for (let jj = ii + 1; jj < actives.length; jj++) {
-        const i = actives[ii], j = actives[jj];
-        if (levels[li][i].value + levels[li][j].value >= k) {
-          moves.combineTwo(board, { levelIdx: li, idx1: i, idx2: j });
-          return;
-        }
-      }
-    }
-  }
-
-  const p2Wins = isP2WinningPosition(sortedInitial, k);
-  const botIsWinner = (ctx.currentPlayer === 0 && !p2Wins) || (ctx.currentPlayer === 1 && p2Wins);
-
-  if (botIsWinner) {
-    if (ctx.currentPlayer === 0) {
-      if (activeCount(levels[1]) >= 2) {
-        const [i, j] = twoLargestActiveIndices(levels[1]);
-        moves.combineTwo(board, { levelIdx: 1, idx1: i, idx2: j });
-        return;
-      }
-      if (activeCount(levels[0]) >= 2) {
-        const [i, j] = twoLargestActiveIndices(levels[0]);
-        moves.combineTwo(board, { levelIdx: 0, idx1: i, idx2: j });
-        return;
-      }
-      if (activeCount(levels[2]) >= 2) {
-        const [i, j] = twoLargestActiveIndices(levels[2]);
-        moves.combineTwo(board, { levelIdx: 2, idx1: i, idx2: j });
-        return;
-      }
-    } else {
-      if (activeCount(levels[1]) >= 2) {
-        const [i, j] = twoLargestActiveIndices(levels[1]);
-        moves.combineTwo(board, { levelIdx: 1, idx1: i, idx2: j });
-        return;
-      }
-      if (activeCount(levels[0]) >= 2) {
-        const [i, j] = twoSmallestActiveIndices(levels[0]);
-        moves.combineTwo(board, { levelIdx: 0, idx1: i, idx2: j });
-        return;
-      }
-    }
-  }
-
-  for (let li = 0; li < 3; li++) {
-    if (activeCount(levels[li]) >= 2) {
-      const [i, j] = twoLargestActiveIndices(levels[li]);
-      moves.combineTwo(board, { levelIdx: li, idx1: i, idx2: j });
-      return;
-    }
-  }
-};
-
-const generateStartBoard = () => {
-  let nums, k;
-  do {
-    nums = Array.from({ length: 8 }, () => random(2, 15));
-    nums.sort((a, b) => b - a);
-    const top2bot2 = nums[0] + nums[1] + nums[6] + nums[7];
-    const mid4 = nums[2] + nums[3] + nums[4] + nums[5];
-    const total = nums.reduce((s, n) => s + n, 0);
-    const a1a2 = nums[0] + nums[1];
-    k = null;
-    if (random(0, 1) === 0 && top2bot2 < mid4 && top2bot2 > a1a2) {
-      k = random(top2bot2 + 1, mid4);
-    } else if (mid4 < total && mid4 > a1a2) {
-      k = random(mid4 + 1, total);
-    }
-  } while (k === null);
-
-  return {
-    levels: [
-      shuffle(nums).map((n) => ({ value: n, state: 'active' })),
-      Array(MAX_SLOTS[1]).fill(null),
-      Array(MAX_SLOTS[2]).fill(null),
-      Array(MAX_SLOTS[3]).fill(null)
-    ],
-    k,
-    sortedInitial: [...nums]
-  };
 };
 
 const rule = {
