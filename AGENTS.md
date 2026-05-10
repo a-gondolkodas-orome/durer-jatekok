@@ -13,6 +13,7 @@ The goal is to eventually include all past Dürer competition games. Currently r
 - **Tailwind CSS 4** — styling
 - **Vitest** + **@testing-library/react** — unit and component tests
 - **ESLint** — linting
+- **lodash** — utility library; feel free to use lodash functions if it helps readability, it's already used extensively in the project
 
 No backend, no database, no auth. Deployed as a static build to GitHub Pages.
 
