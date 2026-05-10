@@ -3,7 +3,7 @@ import { isP2WinningPosition, findImmediateWin, aiBotStrategy } from './strategy
 const active = (value) => ({ value, state: 'active' });
 const consumed = (value) => ({ value, state: 'consumed' });
 
-const makeBoard = (level0Values, k, { sortedInitial } = {}) => {
+const makeBoard = (level0Values, target, { sortedInitial } = {}) => {
   const sorted = sortedInitial ?? [...level0Values].sort((a, b) => b - a);
   return {
     levels: [
@@ -12,7 +12,7 @@ const makeBoard = (level0Values, k, { sortedInitial } = {}) => {
       Array(2).fill(null),
       Array(1).fill(null)
     ],
-    k,
+    target,
     sortedInitial: sorted
   };
 };
@@ -72,7 +72,7 @@ describe('aiBotStrategy', () => {
   const makeMoveCapture = () => {
     const captured = [];
     return {
-      moves: { combineTwo: (board, arg) => { captured.push(arg); } },
+      moves: { combineTwo: (_board, arg) => { captured.push(arg); } },
       captured
     };
   };
@@ -91,7 +91,7 @@ describe('aiBotStrategy', () => {
     const s = [8, 7, 6, 5, 4, 4, 3, 3];
     const board = {
       levels: [s.map(active), Array(4).fill(null), Array(2).fill(null), Array(1).fill(null)],
-      k: 23,
+      target: 23,
       sortedInitial: s
     };
     const { moves: mockMoves, captured } = makeMoveCapture();
@@ -106,7 +106,7 @@ describe('aiBotStrategy', () => {
     const s = [9, 8, 7, 6, 5, 4, 2, 2];
     const board = {
       levels: [s.map(active), Array(4).fill(null), Array(2).fill(null), Array(1).fill(null)],
-      k: 22,
+      target: 22,
       sortedInitial: s
     };
     const { moves: mockMoves, captured } = makeMoveCapture();

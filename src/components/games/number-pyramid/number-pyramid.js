@@ -37,7 +37,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
       <p className="text-center text-lg font-semibold mb-4">
         {t({ hu: 'Célszám (k)', en: 'Target (k)' })}:{' '}
         <span className="text-2xl font-bold text-blue-600">
-          {board.k}
+          {board.target}
         </span>
       </p>
       <div className="flex flex-col gap-3">
@@ -113,7 +113,7 @@ export const moves = {
     nextBoard.levels[levelIdx + 1][emptyIdx] = { value: combinedValue, state: 'active' };
 
     events.setTurnState(null);
-    if (combinedValue >= board.k) {
+    if (combinedValue >= board.target) {
       events.endGame({ winnerIndex: ctx.currentPlayer });
       return { nextBoard };
     }

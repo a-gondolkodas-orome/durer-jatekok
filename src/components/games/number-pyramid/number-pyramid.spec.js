@@ -2,14 +2,14 @@ import { moves } from './number-pyramid';
 
 const active = (value) => ({ value, state: 'active' });
 
-const makeBoard = (level0Values, k) => ({
+const makeBoard = (level0Values, target) => ({
   levels: [
     level0Values.map(active),
     Array(4).fill(null),
     Array(2).fill(null),
     Array(1).fill(null)
   ],
-  k,
+  target,
   sortedInitial: [...level0Values].sort((a, b) => b - a)
 });
 
