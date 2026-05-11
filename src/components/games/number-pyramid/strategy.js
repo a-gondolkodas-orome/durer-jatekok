@@ -46,20 +46,24 @@ export const isP2WinningPosition = (sortedInitial, target) => {
   return s[0] + s[1] + s[6] + s[7] < target && s[2] + s[3] + s[4] + s[5] >= target;
 };
 
-export const generateStartBoard = () => {
+export const generateStartBoard = (tries = 0) => {
+  if (tries >= 100) throw new Error('generateStartBoard: too many retries');
   const nums = Array.from({ length: 8 }, () => random(2, 15));
   nums.sort((a, b) => b - a);
   const extremes = nums[0] + nums[1] + nums[6] + nums[7];
   const innerSum = nums[2] + nums[3] + nums[4] + nums[5];
   const total = sum(nums);
   const topTwo = nums[0] + nums[1];
-  let target = null;
-  if (random(0, 1) === 0 && extremes < innerSum && extremes > topTwo) {
-    target = random(extremes + 1, innerSum);
-  } else if (innerSum < total && innerSum > topTwo) {
-    target = random(innerSum + 1, total);
-  }
-  if (target === null) return generateStartBoard();
+
+  const p2Gens = extremes < innerSum ? [() => random(extremes + 1, innerSum)] : [];
+  const p1Gens = [];
+  if (innerSum + 1 <= total) p1Gens.push(() => random(innerSum + 1, total));
+  const lowerP1Max = Math.min(extremes, innerSum);
+  if (topTwo + 1 <= lowerP1Max) p1Gens.push(() => random(topTwo + 1, lowerP1Max));
+
+  const pool = random(0, 1) === 0 ? p2Gens : p1Gens;
+  if (pool.length === 0) return generateStartBoard(tries + 1);
+  const target = sample(pool)();
 
   return {
     levels: [
