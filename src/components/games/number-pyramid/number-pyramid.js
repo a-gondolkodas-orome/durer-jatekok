@@ -2,7 +2,7 @@ import React from 'react';
 import { cloneDeep, isEqual, sumBy } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { useTranslation } from '../../language/translate';
-import { activeCount, aiBotStrategy, generateStartBoard, randomBotStrategy } from './strategy';
+import { hasActivePair, aiBotStrategy, generateStartBoard, randomBotStrategy } from './strategy';
 
 const BoardClient = ({ board, ctx, events, moves }) => {
   const { t } = useTranslation();
@@ -13,7 +13,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
     if (!slot || slot.state !== 'active') return;
 
     if (ctx.turnState === null) {
-      if (activeCount(board.levels[levelIdx]) < 2) return;
+      if (!hasActivePair(board.levels[levelIdx])) return;
       events.setTurnState({ levelIdx, slotIdx });
       return;
     }
@@ -44,7 +44,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
         {[3, 2, 1, 0].map((levelIdx) => {
           const level = board.levels[levelIdx];
           const isWrongLevel = ctx.turnState !== null && ctx.turnState.levelIdx !== levelIdx;
-          const isLoneLevel = ctx.turnState === null && activeCount(level) < 2;
+          const isLoneLevel = ctx.turnState === null && !hasActivePair(level);
           return (
             <div key={levelIdx} className="flex flex-col items-center gap-1">
               <div className="flex flex-wrap justify-center gap-2">

@@ -1,4 +1,4 @@
-import { isP2WinningPosition, findImmediateWin, aiBotStrategy } from './strategy';
+import { isP2WinningPosition, randomBotStrategy, aiBotStrategy } from './strategy';
 
 const active = (value) => ({ value, state: 'active' });
 const consumed = (value) => ({ value, state: 'consumed' });
@@ -14,6 +14,14 @@ const makeBoard = (level0Values, target, { sortedInitial } = {}) => {
     ],
     target,
     sortedInitial: sorted
+  };
+};
+
+const makeMoveCapture = () => {
+  const captured = [];
+  return {
+    moves: { combineTwo: (_board, arg) => { captured.push(arg); } },
+    captured
   };
 };
 
@@ -37,46 +45,45 @@ describe('isP2WinningPosition', () => {
   });
 });
 
-describe('findImmediateWin', () => {
-  it('returns null when no pair in any level reaches k', () => {
-    const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 20);
-    expect(findImmediateWin(board.levels, 20)).toBeNull();
-  });
-
-  it('finds winning pair on level 0', () => {
+describe('randomBotStrategy', () => {
+  it('takes winning pair on level 0 when available', () => {
     const board = makeBoard([10, 9, 3, 2, 2, 2, 2, 2], 15);
-    const result = findImmediateWin(board.levels, 15);
-    expect(result).not.toBeNull();
-    expect(result.levelIdx).toBe(0);
-    const vals = result.indices.map((i) => board.levels[0][i].value);
+    const { moves: mockMoves, captured } = makeMoveCapture();
+    randomBotStrategy({ board, moves: mockMoves });
+    expect(captured[0].levelIdx).toBe(0);
+    const vals = captured[0].indices.map((i) => board.levels[0][i].value);
     expect(vals[0] + vals[1]).toBeGreaterThanOrEqual(15);
   });
 
-  it('finds winning pair on a higher level', () => {
+  it('takes winning pair on a higher level when available', () => {
     const board = makeBoard([3, 3, 3, 3, 3, 3, 3, 3], 100);
     board.levels[1][0] = active(60);
     board.levels[1][1] = active(50);
-    const result = findImmediateWin(board.levels, 100);
-    expect(result).not.toBeNull();
-    expect(result.levelIdx).toBe(1);
+    const { moves: mockMoves, captured } = makeMoveCapture();
+    randomBotStrategy({ board, moves: mockMoves });
+    expect(captured[0].levelIdx).toBe(1);
   });
 
-  it('ignores consumed slots', () => {
+  it('ignores consumed slots when checking for a win', () => {
+    // 10 is consumed, so 9+3=12 < 15: no win available, bot picks any pair
     const board = makeBoard([10, 9, 3, 2, 2, 2, 2, 2], 15);
     board.levels[0][0] = consumed(10);
-    expect(findImmediateWin(board.levels, 15)).toBeNull();
+    const { moves: mockMoves, captured } = makeMoveCapture();
+    randomBotStrategy({ board, moves: mockMoves });
+    const vals = captured[0].indices.map((i) => board.levels[0][i].value);
+    expect(vals[0] + vals[1]).toBeLessThan(15);
+  });
+
+  it('makes a valid move when no winning pair exists', () => {
+    const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 20);
+    const { moves: mockMoves, captured } = makeMoveCapture();
+    randomBotStrategy({ board, moves: mockMoves });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].indices).toHaveLength(2);
   });
 });
 
 describe('aiBotStrategy', () => {
-  const makeMoveCapture = () => {
-    const captured = [];
-    return {
-      moves: { combineTwo: (_board, arg) => { captured.push(arg); } },
-      captured
-    };
-  };
-
   it('takes an immediate winning move when available', () => {
     const board = makeBoard([10, 9, 3, 2, 2, 2, 2, 2], 15);
     const { moves: mockMoves, captured } = makeMoveCapture();
