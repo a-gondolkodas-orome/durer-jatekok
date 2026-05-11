@@ -87,7 +87,7 @@ strategyGameFactory({
 ### New game checklist
 
 - Game works correctly in both `vsComputer` and `vsHuman` mode
-- Starting positions representative of the game's complexity
+- Starting positions representative of the game's complexity; each player wins with ~50% probability across random starting boards
 - Player cannot win with a non-winning strategy (i.e. AI is truly optimal)
 - Clear what the player should do next (`getPlayerStepDescription`)
 - Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
