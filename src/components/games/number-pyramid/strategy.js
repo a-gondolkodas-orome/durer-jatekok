@@ -56,8 +56,7 @@ export const generateStartBoard = (tries = 0) => {
   const topTwo = nums[0] + nums[1];
 
   const p2Gens = extremes < innerSum ? [() => random(extremes + 1, innerSum)] : [];
-  const p1Gens = [];
-  if (innerSum + 1 <= total) p1Gens.push(() => random(innerSum + 1, total));
+  const p1Gens = [() => random(innerSum + 1, total)];
   const lowerP1Max = Math.min(extremes, innerSum);
   if (topTwo + 1 <= lowerP1Max) p1Gens.push(() => random(topTwo + 1, lowerP1Max));
 
