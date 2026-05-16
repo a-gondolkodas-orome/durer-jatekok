@@ -36,6 +36,8 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
     }
   }
 
+  // TODO: is this optimal if bot does not have winning initial position but
+  // other player does not play according to winning strategy?
   for (let li = 0; li < 3; li++) {
     if (tryLevel(li)) return;
   }
