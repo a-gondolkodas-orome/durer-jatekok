@@ -3,32 +3,45 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { GameSidebar } from './game-sidebar';
 
+type SidebarProps = React.ComponentProps<typeof GameSidebar>
+type SidebarCtx = SidebarProps['ctx']
+type SidebarMoves = SidebarProps['moves']
+
 beforeAll(() => {
   const { unmount } = render(<MemoryRouter><div /></MemoryRouter>);
   unmount();
 });
 
-const defaultVariants = [{ botStrategy: () => {}, generateStartBoard: () => {}, originalIndex: 0, disabled: false }];
+const defaultVariants: SidebarProps['variants'] = [
+  { botStrategy: () => {}, originalIndex: 0, disabled: false }
+];
 
-const renderSidebar = (ctxOverrides = {}, movesOverrides = {}, variants = defaultVariants) => {
-  const ctx = {
-    isHumanVsHumanGame: false,
-    phase: 'roleSelection',
-    isClientMoveAllowed: false,
-    isRoleSelectorWinner: false,
-    playerNames: ['Player 1', 'Player 2'],
-    currentPlayerName: 'Player 1',
-    winnerName: null,
-    ...ctxOverrides
-  };
-  const moves = {
-    switchMode: vi.fn(),
-    startGame: vi.fn(),
-    startNewGame: vi.fn(),
-    setPlayerNames: vi.fn(),
-    setDifficulty: vi.fn(),
-    ...movesOverrides
-  };
+const defaultCtx: SidebarCtx = {
+  isHumanVsHumanGame: false,
+  phase: 'roleSelection',
+  isClientMoveAllowed: false,
+  isRoleSelectorWinner: false,
+  playerNames: ['Player 1', 'Player 2'],
+  currentPlayerName: 'Player 1',
+  currentPlayer: 0,
+  winnerName: null
+};
+
+const defaultMoves: SidebarMoves = {
+  switchMode: vi.fn(),
+  startGame: vi.fn(),
+  setPlayerNames: vi.fn(),
+  setDifficulty: vi.fn(),
+  resetGameState: vi.fn()
+};
+
+const renderSidebar = (
+  ctxOverrides: Partial<SidebarCtx> = {},
+  movesOverrides: Partial<SidebarMoves> = {},
+  variants: SidebarProps['variants'] = defaultVariants
+) => {
+  const ctx = { ...defaultCtx, ...ctxOverrides };
+  const moves = { ...defaultMoves, ...movesOverrides };
   const { container } = render(
     <MemoryRouter>
       <GameSidebar
