@@ -3,6 +3,11 @@ import { render, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { strategyGameFactory, resolveVariants } from './strategy-game';
 
+beforeAll(() => {
+  const { unmount } = render(<MemoryRouter><div /></MemoryRouter>);
+  unmount();
+});
+
 const makeVariant = (overrides = {}) => ({
   generateStartBoard: () => [],
   botStrategy: () => {},
