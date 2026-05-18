@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useTranslation, Translatable } from '../../language/translate';
+import { useTranslation } from '../../language/translate';
 import { LanguageSelector } from '../../language/language-selector';
 import { gameList } from '../../games/gameList';
 
@@ -73,7 +73,7 @@ export const GameFooter = () => {
   );
 };
 
-export const GameRule = ({ ruleDescription }: { ruleDescription: Translatable }) => {
+export const GameRule = ({ ruleDescription }: { ruleDescription: React.ReactNode }) => {
   const { t } = useTranslation();
   return <section className="flex justify-center mb-4 mt-1 max-w-[100ch]">
     <Disclosure defaultOpen>
@@ -86,7 +86,7 @@ export const GameRule = ({ ruleDescription }: { ruleDescription: Translatable })
           </DisclosureButton>
             <DisclosurePanel className="w-full p-2">
               <p className="text-justify">
-                {t(ruleDescription)}
+                {ruleDescription}
               </p>
             </DisclosurePanel>
         </div>
