@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-interface Stats { win: number; loss: number }
+export interface Stats { win: number; loss: number }
 
 const EMPTY_STATS: Stats = { win: 0, loss: 0 };
 

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useTranslation } from '../../language/translate';
+import { useTranslation, Translatable } from '../../language/translate';
 import { LanguageSelector } from '../../language/language-selector';
 import { gameList } from '../../games/gameList';
 
 export const GameHeader = () => {
   const { t } = useTranslation();
   const gameId = useLocation().pathname.split('/').pop();
-  const gameEntry = gameList[gameId];
-  const title = t(gameEntry?.title || gameEntry?.name);
+  const gameEntry = gameList[gameId!];
+  const title = t(gameEntry?.title ?? gameEntry?.name ?? '');
   return (
   <>
     <header className="flex flex-wrap items-baseline">
@@ -42,21 +42,21 @@ export const GameHeader = () => {
 export const GameFooter = () => {
   const { t } = useTranslation();
   const gameId = useLocation().pathname.split('/').pop();
-  const credit = gameList[gameId]?.credit;
+  const credit = gameList[gameId!]?.credit;
   return (
     <footer className="text-right">
       { credit !== undefined && (
         <p className ="px-2 text-gray-800 font-light text-sm">
           { (credit.suggestedBy || []).length
             ? t({
-              hu: `A játékot javasolta: ${credit.suggestedBy.join(', ')}.`,
-              en: `Suggested by: ${credit.suggestedBy.join(', ')}.`
+              hu: `A játékot javasolta: ${credit.suggestedBy!.join(', ')}.`,
+              en: `Suggested by: ${credit.suggestedBy!.join(', ')}.`
             })
             : ''}
           { (credit.developedBy || []).length
             ? ' ' + t({
-              hu: `A játékot programozta: ${credit.developedBy.join(', ')}.`,
-              en: `Developed by: ${credit.developedBy.join(', ')}.`
+              hu: `A játékot programozta: ${credit.developedBy!.join(', ')}.`,
+              en: `Developed by: ${credit.developedBy!.join(', ')}.`
             })
             : ''}
         </p>
@@ -73,7 +73,7 @@ export const GameFooter = () => {
   );
 };
 
-export const GameRule = ({ ruleDescription }) => {
+export const GameRule = ({ ruleDescription }: { ruleDescription: Translatable }) => {
   const { t } = useTranslation();
   return <section className="flex justify-center mb-4 mt-1 max-w-[100ch]">
     <Disclosure defaultOpen>

@@ -1,7 +1,42 @@
 import React from 'react';
 import { Label, Field, Input } from '@headlessui/react';
-import { useTranslation } from '../../language/translate';
-import { ModeSelector, DifficultySelector, getCtaText, DEFAULT_PLAYER_NAMES } from './game-controls';
+import { useTranslation, I18nString } from '../../language/translate';
+import {
+  ModeSelector,
+  DifficultySelector,
+  getCtaText,
+  DEFAULT_PLAYER_NAMES,
+  CtaContext,
+  Variant
+} from './game-controls';
+import { Stats } from '../use-game-stats';
+
+interface SidebarCtx extends CtaContext {
+  isClientMoveAllowed: boolean
+  playerNames: string[]
+  currentPlayer: number
+  winnerIndex?: number
+}
+
+interface SidebarMoves {
+  switchMode: (mode: string) => void
+  startGame: (roleIndex?: number) => void
+  setPlayerNames: (names: string[]) => void
+  setDifficulty: (index: number) => void
+  resetGameState: () => void
+}
+
+interface GameSidebarProps {
+  roleLabels?: [I18nString, I18nString] | null
+  stepDescription: React.ReactNode
+  ctx: SidebarCtx
+  gameEndDisplayCtx?: CtaContext | null
+  moves: SidebarMoves
+  variants: Variant[]
+  selectedVariantIndex: number
+  stats?: Stats | null
+  onResetStats?: () => void
+}
 
 export const GameSidebar = ({
   roleLabels,
@@ -13,7 +48,7 @@ export const GameSidebar = ({
   selectedVariantIndex,
   stats,
   onResetStats
-}) => {
+}: GameSidebarProps) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
   const activeVariantHasBotStrategy = !!variants.find(v => v.originalIndex === selectedVariantIndex)?.botStrategy;
@@ -110,13 +145,17 @@ export const GameSidebar = ({
         </button>
       </div>
       {!ctx.isHumanVsHumanGame && stats && (
-        <WinLossCounter stats={stats} onReset={onResetStats} />
+        <WinLossCounter stats={stats} onReset={onResetStats!} />
       )}
     </div>
   );
 };
 
-const RoleSelector = ({ roleLabels, onRoleSelection, disabled }) => {
+const RoleSelector = ({ roleLabels, onRoleSelection, disabled }: {
+  roleLabels?: GameSidebarProps['roleLabels']
+  onRoleSelection: (roleIndex: number) => void
+  disabled: boolean
+}) => {
   const { t } = useTranslation();
   return <span className="basis-24 flex flex-col gap-2">
     {[
@@ -138,7 +177,12 @@ const RoleSelector = ({ roleLabels, onRoleSelection, disabled }) => {
   </span>;
 };
 
-const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }) => {
+const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }: {
+  roleLabels?: GameSidebarProps['roleLabels']
+  playerNames: string[]
+  setPlayerNames: (names: string[]) => void
+  onStart: () => void
+}) => {
   const { t } = useTranslation();
   return (
   <span className="flex flex-col gap-3">
@@ -190,9 +234,9 @@ const Spinner = () => (
   ></div>
 );
 
-const PlayerTurnPanel = ({ ctx }) => {
+const PlayerTurnPanel = ({ ctx }: { ctx: SidebarCtx }) => {
   const { t } = useTranslation();
-  const playerName = (i) => ctx.playerNames[i] || t(DEFAULT_PLAYER_NAMES[i]);
+  const playerName = (i: number) => ctx.playerNames[i] || t(DEFAULT_PLAYER_NAMES[i]);
   const isEnd = ctx.phase === 'gameEnd';
 
   return (
@@ -218,7 +262,7 @@ const PlayerTurnPanel = ({ ctx }) => {
   );
 };
 
-const WinLossCounter = ({ stats, onReset }) => {
+const WinLossCounter = ({ stats, onReset }: { stats: Stats; onReset: () => void }) => {
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between text-sm text-slate-500">
