@@ -2,6 +2,7 @@ import { I18nString } from '../language/translate';
 
 export type Category = 'A' | 'B' | 'C' | 'D' | 'E' | 'E+'
 export type Round = 'döntő' | 'online'
+export type GameList = Record<string, GameEntry>;
 
 export interface GameEntry {
   year: { k: string; v: string }
@@ -14,7 +15,7 @@ export interface GameEntry {
 
 // Key must match the path registered in the router (app.js).
 // Keep entries ordered by year first, category second.
-export const gameList: Record<string, GameEntry> = {
+export const gameList: GameList = {
   ChessBishops: {
     year: { k: "I. (07/08)", v: "07/08" },
     round: "döntő",
