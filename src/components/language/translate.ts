@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from './language-context';
 
-export interface I18nString { hu: string; en: string }
+export interface I18nString { hu: string; en?: string }
 export type Language = keyof I18nString
 export type Translatable = I18nString | string
 

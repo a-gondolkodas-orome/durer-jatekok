@@ -1,9 +1,12 @@
 import { I18nString } from '../language/translate';
 
-interface GameEntry {
+export type Category = 'A' | 'B' | 'C' | 'D' | 'E' | 'E+'
+export type Round = 'döntő' | 'online'
+
+export interface GameEntry {
   year: { k: string; v: string }
-  round: string
-  category: string[]
+  round: Round
+  category: Category[]
   name: I18nString // shown on the card in the overview list.
   title?: I18nString // longer title shown on the game page instead of name
   credit?: { suggestedBy?: string[]; developedBy?: string[] }
