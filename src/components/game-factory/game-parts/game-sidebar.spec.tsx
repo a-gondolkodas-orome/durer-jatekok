@@ -8,7 +8,18 @@ type SidebarCtx = SidebarProps['ctx']
 type SidebarMoves = SidebarProps['moves']
 
 beforeAll(() => {
-  const { unmount } = render(<MemoryRouter><div /></MemoryRouter>);
+  const { unmount } = render(
+    <MemoryRouter>
+      <GameSidebar
+        roleLabels={undefined}
+        stepDescription=""
+        ctx={{ ...defaultCtx, isHumanVsHumanGame: true, phase: 'roleSelection' }}
+        moves={defaultMoves}
+        variants={defaultVariants}
+        selectedVariantIndex={0}
+      />
+    </MemoryRouter>
+  );
   unmount();
 });
 
