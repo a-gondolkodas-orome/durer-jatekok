@@ -89,7 +89,7 @@ const CategoryFilter = ({ selected, onChange }: {
 };
 
 const OverviewHeader = () => {
-  const { t, tNode } = useTranslation();
+  const { t } = useTranslation();
   return <div className="pb-2">
     <div className="flex justify-end items-center gap-2 mb-1">
       <a
@@ -106,7 +106,7 @@ const OverviewHeader = () => {
       {t({ hu: 'Dürer stratégiás játékok', en: 'Dürer Strategy Games' })}
     </h1>
     <div className="max-w-[100ch] mx-auto">
-      {tNode({
+      {t({
         hu: <>
           A <i>stratégiás játék</i> egy két szereplős játék,
           amelyben nincs szerencsefaktor: optimális stratégiával mindig nyerni lehet,

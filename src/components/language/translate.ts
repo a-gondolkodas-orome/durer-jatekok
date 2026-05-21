@@ -11,22 +11,21 @@ export type TranslatableNode = I18nNode | React.ReactNode
 const isI18nLike = (v: unknown): v is I18nNode =>
   typeof v === 'object' && v !== null && 'hu' in v;
 
-export const translate = (texts: Translatable, lang: Language): string => {
-  if (typeof texts === 'string') return texts;
-  return texts[lang] ?? texts.hu;
-};
-
-export const translateNode = (texts: TranslatableNode, lang: Language): React.ReactNode => {
+export function translate(texts: Translatable, lang: Language): string;
+export function translate(texts: TranslatableNode, lang: Language): React.ReactNode;
+export function translate(texts: TranslatableNode, lang: Language): React.ReactNode {
   if (texts == null) return null;
   if (isI18nLike(texts)) return texts[lang] ?? texts.hu;
   return texts;
-};
+}
 
-/** Hook that returns `t()` (string) and `tNode()` (ReactNode) bound to the current language. */
+/** Hook that returns `t()` bound to the current language. */
 export const useTranslation = () => {
   const { language } = useLanguage();
-  return {
-    t: (texts: Translatable): string => translate(texts, language),
-    tNode: (texts: TranslatableNode): React.ReactNode => translateNode(texts, language)
-  };
+  function t(texts: Translatable): string;
+  function t(texts: TranslatableNode): React.ReactNode;
+  function t(texts: TranslatableNode): React.ReactNode {
+    return translate(texts, language);
+  }
+  return { t };
 };

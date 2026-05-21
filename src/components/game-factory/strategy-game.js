@@ -37,7 +37,7 @@ export const strategyGameFactory = ({
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
 
   return () => {
-    const { t, tNode } = useTranslation();
+    const { t } = useTranslation();
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
     const activeVariant = resolvedVariants[selectedVariantIndex] ?? defaultVariant;
     const defaultGenerateStartBoard = defaultVariant.generateStartBoard;
@@ -196,7 +196,7 @@ export const strategyGameFactory = ({
       <GameHeader />
       <div className="flex justify-center grow">
         <div className="max-w-[100ch] w-full">
-          <GameRule ruleDescription={tNode(rule)} />
+          <GameRule ruleDescription={t(rule)} />
           <div className="flex flex-wrap">
             <BoardClient
               key={gameUuid}
