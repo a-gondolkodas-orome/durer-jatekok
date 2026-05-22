@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { strategyGameFactory } from '../../game-factory/strategy-game';
+import { strategyGameFactory, type Events, type GameMoves } from '../../game-factory/strategy-game';
 import { random, range } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
 type Board = number
 type HoveredAction = 'take1' | 'halve' | null
 
-const CoinPile = ({ count, hoveredAction }) => (
+const CoinPile = ({ count, hoveredAction }: { count: number, hoveredAction: HoveredAction }) => (
   <div className="flex flex-wrap justify-center gap-2 p-4" style={{ transform: 'scaleY(-1)' }}>
     {range(count).map(i => {
       const isDimmed =
@@ -24,7 +24,7 @@ const CoinPile = ({ count, hoveredAction }) => (
   </div>
 );
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: { board: Board; moves: GameMoves<Board>; [key: string]: any }) => {
   const { t } = useTranslation();
   const [hoveredAction, setHoveredAction] = useState<HoveredAction>(null);
   return(
@@ -56,20 +56,20 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  take1: (board: Board, { events }) => {
+  take1: (board: Board, { events }: { events: Events }) => {
     events.endTurn();
     if (board === 1) {
       events.endGame();
     }
     return { nextBoard: board - 1 }
   },
-  halve: (board: Board, { events }) => {
+  halve: (board: Board, { events }: { events: Events }) => {
     events.endTurn();
     return { nextBoard: board / 2 };
   }
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
   if (board % 2 === 0 && random(0, 1) === 0) {
     moves.halve(board);
   } else {
@@ -77,7 +77,7 @@ const randomBotStrategy = ({ board, moves }) => {
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
   if (board !== 4 && board % 4 === 0) {
     moves.take1(board);
   } else if (board === 6) {
@@ -102,7 +102,7 @@ const rule = {
   </>
 };
 
-const getPlayerStepDescription = ({ board }) => {
+const getPlayerStepDescription = ({ board }: { board: Board }) => {
   if (board % 2 === 1) {
     return { hu: 'Vegyél el egy zsetont.', en: 'Take one token.' };
   } else {

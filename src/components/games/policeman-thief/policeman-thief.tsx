@@ -1,5 +1,5 @@
 import { range, random, sample, difference, cloneDeep } from "lodash";
-import { strategyGameFactory, type Events } from "../../game-factory/strategy-game";
+import { strategyGameFactory, type Ctx, type Events } from "../../game-factory/strategy-game";
 import { neighbours } from "./helpers";
 import { aiBotStrategy } from "./bot-strategy";
 import { BoardClient } from "./board-client";
@@ -128,7 +128,7 @@ const ruleB = {
   </>
 }
 
-const getPlayerStepDescription = ({ board, ctx }) => {
+const getPlayerStepDescription = ({ board, ctx }: { board: Board; ctx: Ctx }) => {
   if (ctx.currentPlayer === 0) {
     return {
       hu: `Kattints arra az útkereszteződésre, ahová a ` +

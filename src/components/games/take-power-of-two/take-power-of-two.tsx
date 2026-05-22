@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { strategyGameFactory } from '../../game-factory/strategy-game';
+import { strategyGameFactory, type GameMoves, type Events } from '../../game-factory/strategy-game';
 import { range, random, reverse, sample } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
@@ -71,7 +71,7 @@ const ExponentsTable = ({ board, choosePower, hovered, setHovered }) => {
 }
 
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: { board: Board; moves: GameMoves<Board>; [key: string]: any }) => {
   const [hoveredPower, setHoveredPower] = useState(null);
 
   const choosePower = (e: number) => {
@@ -102,11 +102,11 @@ const generateTestStartBoard = () => {
   }
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: { board: Board, moves: GameMoves<Board> }) => {
   moves.subtractPowerOfTwo(board, sample(getAvailableExponents(board)));
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: { board: Board, moves: GameMoves<Board> }) => {
   if (board === 1) {
     moves.subtractPowerOfTwo(board, 0);
     return;
@@ -132,7 +132,7 @@ const getPlayerStepDescription = () => ({
 });
 
 const moves = {
-  subtractPowerOfTwo: (board: Board, { events }, exponent: number) => {
+  subtractPowerOfTwo: (board: Board, { events }: { events: Events }, exponent: number) => {
     const nextBoard = board - 2 ** exponent;
     events.endTurn();
     if (nextBoard === 0) {

@@ -35,13 +35,13 @@ export type MoveResult<TBoard> = { nextBoard: TBoard; autoEndOfTurn?: boolean }
 export type MoveFunction<TBoard> = (
   board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: any[]
 ) => MoveResult<TBoard>
-export type WrappedMoves<TBoard> = Record<string, (board: TBoard, ...args: any[]) => MoveResult<TBoard>>
+export type GameMoves<TBoard> = Record<string, (board: TBoard, ...args: any[]) => MoveResult<TBoard>>
 
 interface VariantInput<TBoard> {
   label?: I18nString
   isDefault?: boolean
   generateStartBoard?: () => TBoard
-  botStrategy?: (args: { board: TBoard; ctx: Ctx; moves: WrappedMoves<TBoard> }) => void
+  botStrategy?: (args: { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }) => void
 }
 
 interface Presentation<TBoard> {
@@ -57,7 +57,7 @@ interface Gameplay<TBoard> {
 
 interface StrategyGameFactoryParams<TBoard> {
   presentation: Presentation<TBoard>
-  BoardClient: React.ComponentType<{ board: TBoard; ctx: Ctx; events: Events; moves: WrappedMoves<TBoard> }>
+  BoardClient: React.ComponentType<{ board: TBoard; ctx: Ctx; events: Events; moves: GameMoves<TBoard> }>
   gameplay: Gameplay<TBoard>
   variants: VariantInput<TBoard>[]
 }
@@ -120,14 +120,14 @@ export const strategyGameFactory = <TBoard,>({
       }
     }, [currentPlayer]);
 
-    let wrappedMoves: WrappedMoves<TBoard> = {} as WrappedMoves<TBoard>;
+    let wrappedGameMoves: GameMoves<TBoard> = {} as GameMoves<TBoard>;
 
     const moveWrapper = (doMove: () => MoveResult<TBoard>): MoveResult<TBoard> => {
       const moveResult = doMove();
       setBoard(moveResult.nextBoard);
       if (endOfTurnMove && moveResult.autoEndOfTurn) {
         setTimeout(() => {
-          wrappedMoves[endOfTurnMove]!(moveResult.nextBoard);
+          wrappedGameMoves[endOfTurnMove]!(moveResult.nextBoard);
         }, 750);
       }
       return moveResult;
@@ -219,17 +219,17 @@ export const strategyGameFactory = <TBoard,>({
       setTurnState
     };
 
-    wrappedMoves = mapValues(
+    wrappedGameMoves = mapValues(
       moves,
       (f) => (board: TBoard, ...args: unknown[]) => moveWrapper(() => f(board, { ctx, events }, ...args))
-    ) as WrappedMoves<TBoard>;
+    ) as GameMoves<TBoard>;
 
     const doBotTurn = () => {
       const { botStrategy } = activeVariant;
       if (!botStrategy) throw new Error('strategyGameFactory: no botStrategy available for vsComputer mode');
       const time = Math.floor(Math.random() * 500 + 1000);
       setTimeout(() => {
-        botStrategy({ board, ctx, moves: wrappedMoves });
+        botStrategy({ board, ctx, moves: wrappedGameMoves });
       }, time);
     };
 
@@ -249,7 +249,7 @@ export const strategyGameFactory = <TBoard,>({
               board={board}
               ctx={ctx}
               events={events}
-              moves={wrappedMoves}
+              moves={wrappedGameMoves}
             />
             <GameSidebar
               roleLabels={roleLabels}
