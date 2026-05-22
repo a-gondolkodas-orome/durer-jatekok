@@ -1,6 +1,7 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { range } from "lodash";
 import { neighbours } from "./helpers";
+import type { Board } from "./policeman-thief";
 
 const cubeCoords = [
   { cx: "30%", cy: "30%" },
@@ -13,7 +14,7 @@ const cubeCoords = [
   { cx: "90%", cy: "90%" }
 ];
 
-export const BoardClient = ({ board, ctx, moves }) => {
+export const BoardClient = ({ board, ctx, moves }: { board: Board; [key: string]: any }) => {
   const handleCircleClick = (vertex) => {
     if (!isClickable(vertex)) return;
     if (ctx.currentPlayer === 1) {

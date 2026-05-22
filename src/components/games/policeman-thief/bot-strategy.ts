@@ -1,9 +1,8 @@
-"use strict";
-
 import { random } from "lodash";
 import { neighbours } from "./helpers";
+import type { Board } from "./policeman-thief";
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: { board: Board; [key: string]: any }) => {
   if (ctx.chosenRoleIndex === 0) {
     moveThiefOptimally({ board, moves });
   } else {
@@ -11,11 +10,11 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
   }
 };
 
-const movePolicemenOptimally = ({ board, moves }) => {
+const movePolicemenOptimally = ({ board, moves }: { board: Board; [key: string]: any }) => {
   //policeman0 Step
   let index0 = board.policemen[0];
   let canWeCatch0 = false;
-  let nextBoard;
+  let nextBoard: Board;
   for (let i = 0; i < 3; i++) {
     if (neighbours[board.policemen[0]][i] === board.thief) {
       index0 = neighbours[board.policemen[0]][i];
@@ -73,7 +72,7 @@ const movePolicemenOptimally = ({ board, moves }) => {
 
 };
 
-const moveThiefOptimally = ({ board, moves }) => {
+const moveThiefOptimally = ({ board, moves }: { board: Board; [key: string]: any }) => {
   let index = board.thief;
   for (let i = 0; i < 3; i++) {
     if (
