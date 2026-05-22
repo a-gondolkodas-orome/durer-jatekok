@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation,I18nString } from '../../language/translate';
+import type { Phase } from '../strategy-game';
 
 export interface Variant {
   originalIndex: number
@@ -9,7 +10,7 @@ export interface Variant {
 }
 
 export interface CtaContext {
-  phase: 'roleSelection' | 'play' | 'gameEnd'
+  phase: Phase
   isHumanVsHumanGame: boolean
   isClientMoveAllowed?: boolean
   isRoleSelectorWinner?: boolean

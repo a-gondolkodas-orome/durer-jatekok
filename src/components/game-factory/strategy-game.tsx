@@ -8,7 +8,7 @@ import { useTranslation, TranslatableNode, Translatable, I18nString } from '../l
 import { useLocation } from 'react-router';
 import { useGameStats } from './use-game-stats';
 
-type Phase = 'roleSelection' | 'play' | 'gameEnd'
+export type Phase = 'roleSelection' | 'play' | 'gameEnd'
 type PlayerIndex = 0 | 1
 
 export interface Ctx {
@@ -33,9 +33,9 @@ export interface Events {
 
 export type MoveResult<TBoard> = { nextBoard: TBoard; autoEndOfTurn?: boolean }
 export type MoveFunction<TBoard> = (
-  board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: unknown[]
+  board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: any[]
 ) => MoveResult<TBoard>
-export type WrappedMoves<TBoard> = Record<string, (board: TBoard, ...args: unknown[]) => MoveResult<TBoard>>
+export type WrappedMoves<TBoard> = Record<string, (board: TBoard, ...args: any[]) => MoveResult<TBoard>>
 
 interface VariantInput<TBoard> {
   label?: I18nString
