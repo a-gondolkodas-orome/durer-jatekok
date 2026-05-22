@@ -14,13 +14,13 @@ import { Stats } from '../use-game-stats';
 interface SidebarCtx extends CtaContext {
   isClientMoveAllowed: boolean
   playerNames: string[]
-  currentPlayer: number
-  winnerIndex?: number
+  currentPlayer: number | null
+  winnerIndex?: number | null
 }
 
 interface SidebarMoves {
   switchMode: (mode: string) => void
-  startGame: (roleIndex?: number) => void
+  startGame: (roleIndex?: number | null) => void
   setPlayerNames: (names: string[]) => void
   setDifficulty: (index: number) => void
   resetGameState: () => void

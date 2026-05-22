@@ -2,13 +2,67 @@ import React, { useState, useEffect } from 'react';
 import { GameHeader, GameFooter, GameRule } from './game-parts/game-chrome';
 import { GameSidebar } from './game-parts/game-sidebar';
 import { GameEndDialog } from './game-parts/game-end-dialog';
-import { DEFAULT_PLAYER_NAMES } from './game-parts/game-controls';
-import { partial, mapValues, wrap, _ } from 'lodash';
-import { useTranslation } from '../language/translate';
+import { DEFAULT_PLAYER_NAMES, CtaContext, Variant as DisplayVariant } from './game-parts/game-controls';
+import { mapValues } from 'lodash';
+import { useTranslation, TranslatableNode, Translatable, I18nString } from '../language/translate';
 import { useLocation } from 'react-router';
 import { useGameStats } from './use-game-stats';
 
-export const resolveVariants = (variants) => {
+type Phase = 'roleSelection' | 'play' | 'gameEnd'
+type PlayerIndex = 0 | 1
+
+export interface Ctx {
+  isHumanVsHumanGame: boolean
+  playerNames: string[]
+  chosenRoleIndex: PlayerIndex | null
+  phase: Phase
+  turnState: unknown
+  currentPlayer: PlayerIndex | null
+  currentPlayerName: string | null
+  isClientMoveAllowed: boolean
+  isRoleSelectorWinner: boolean
+  winnerIndex: PlayerIndex | null
+  winnerName: string | null
+}
+
+export interface Events {
+  endTurn: () => void
+  endGame: (options?: { winnerIndex?: PlayerIndex | null }) => void
+  setTurnState: (state: unknown) => void
+}
+
+export type MoveResult<TBoard> = { nextBoard: TBoard; autoEndOfTurn?: boolean }
+export type MoveFunction<TBoard> = (
+  board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: unknown[]
+) => MoveResult<TBoard>
+export type WrappedMoves<TBoard> = Record<string, (board: TBoard, ...args: unknown[]) => MoveResult<TBoard>>
+
+interface VariantInput<TBoard> {
+  label?: I18nString
+  isDefault?: boolean
+  generateStartBoard?: () => TBoard
+  botStrategy?: (args: { board: TBoard; ctx: Ctx; moves: WrappedMoves<TBoard> }) => void
+}
+
+interface Presentation<TBoard> {
+  rule: TranslatableNode
+  roleLabels?: [I18nString, I18nString]
+  getPlayerStepDescription: (args: { board: TBoard; ctx: Ctx }) => Translatable
+}
+
+interface Gameplay<TBoard> {
+  moves: Record<string, MoveFunction<TBoard>>
+  endOfTurnMove?: string
+}
+
+interface StrategyGameFactoryParams<TBoard> {
+  presentation: Presentation<TBoard>
+  BoardClient: React.ComponentType<{ board: TBoard; ctx: Ctx; events: Events; moves: WrappedMoves<TBoard> }>
+  gameplay: Gameplay<TBoard>
+  variants: VariantInput<TBoard>[]
+}
+
+export const resolveVariants = <TBoard,>(variants: VariantInput<TBoard>[]) => {
   if (!variants || variants.length === 0) {
     throw new Error('strategyGameFactory: variants must be a non-empty array');
   }
@@ -26,12 +80,12 @@ export const resolveVariants = (variants) => {
   return { defaultVariantIndex, defaultVariant, resolvedVariants };
 };
 
-export const strategyGameFactory = ({
+export const strategyGameFactory = <TBoard,>({
   presentation,
   BoardClient,
   gameplay,
   variants
-}) => {
+}: StrategyGameFactoryParams<TBoard>) => {
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
   const { moves, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
@@ -40,40 +94,40 @@ export const strategyGameFactory = ({
     const { t } = useTranslation();
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
     const activeVariant = resolvedVariants[selectedVariantIndex] ?? defaultVariant;
-    const defaultGenerateStartBoard = defaultVariant.generateStartBoard;
+    const defaultGenerateStartBoard = defaultVariant.generateStartBoard!;
     const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
 
-    const [board, setBoard] = useState(activeGenerateStartBoard());
-    const [phase, setPhase] = useState('roleSelection');
-    const [chosenRoleIndex, setChosenRoleIndex] = useState(null);
-    const [currentPlayer, setCurrentPlayer] = useState(null);
+    const [board, setBoard] = useState<TBoard>(activeGenerateStartBoard());
+    const [phase, setPhase] = useState<Phase>('roleSelection');
+    const [chosenRoleIndex, setChosenRoleIndex] = useState<PlayerIndex | null>(null);
+    const [currentPlayer, setCurrentPlayer] = useState<PlayerIndex | null>(null);
     const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
-    const [winnerIndex, setWinnerIndex] = useState(null);
+    const [winnerIndex, setWinnerIndex] = useState<PlayerIndex | null>(null);
     const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
-    const [turnState, setTurnState] = useState(null);
+    const [turnState, setTurnState] = useState<unknown>(null);
     const [mode, setMode] = useState('vsComputer');
     const [playerNames, setPlayerNames] = useState(['', '']);
-    const [gameEndDisplayCtx, setGameEndDisplayCtx] = useState(null);
+    const [gameEndDisplayCtx, setGameEndDisplayCtx] = useState<CtaContext | null>(null);
 
     const isHumanVsHumanGame = mode === 'vsHuman';
 
-    const gameId = useLocation().pathname.split('/').pop();
+    const gameId = useLocation().pathname.split('/').pop()!;
     const { stats, recordResult, resetStats } = useGameStats(gameId, selectedVariantIndex);
 
     useEffect(() => {
-      if (!isHumanVsHumanGame && phase === 'play' && currentPlayer === (1 - chosenRoleIndex)) {
+      if (!isHumanVsHumanGame && phase === 'play' && currentPlayer === (1 - chosenRoleIndex!)) {
         doBotTurn();
       }
     }, [currentPlayer]);
 
-    let wrappedMoves;
+    let wrappedMoves: WrappedMoves<TBoard> = {} as WrappedMoves<TBoard>;
 
-    const moveWrapper = (moveFunc, ...args) => {
-      const moveResult = moveFunc(...args);
+    const moveWrapper = (doMove: () => MoveResult<TBoard>): MoveResult<TBoard> => {
+      const moveResult = doMove();
       setBoard(moveResult.nextBoard);
       if (endOfTurnMove && moveResult.autoEndOfTurn) {
         setTimeout(() => {
-          wrappedMoves[endOfTurnMove](moveResult.nextBoard);
+          wrappedMoves[endOfTurnMove]!(moveResult.nextBoard);
         }, 750);
       }
       return moveResult;
@@ -84,7 +138,7 @@ export const strategyGameFactory = ({
       let boardGenerator = generateBoard;
       if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
         setSelectedVariantIndex(defaultVariantIndex);
-        boardGenerator = defaultVariant.generateStartBoard;
+        boardGenerator = defaultGenerateStartBoard;
       }
       setBoard(boardGenerator());
       setPhase('roleSelection');
@@ -97,26 +151,26 @@ export const strategyGameFactory = ({
       setGameEndDisplayCtx(null);
     };
 
-    const setDifficulty = (index) => {
+    const setDifficulty = (index: number) => {
       setSelectedVariantIndex(index);
       const newVariant = resolvedVariants[index] ?? defaultVariant;
       resetGameState({ generateBoard: newVariant.generateStartBoard ?? defaultGenerateStartBoard });
     };
 
-    const changeMode = (newMode) => {
+    const changeMode = (newMode: string) => {
       setMode(newMode);
       if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
         setSelectedVariantIndex(defaultVariantIndex);
       }
     };
 
-    const playerNameOf = (index) => {
+    const playerNameOf = (index: PlayerIndex | null): string | null => {
       if (index === null) return null;
       return playerNames[index] || t(DEFAULT_PLAYER_NAMES[index]);
     };
 
-    const endGame = ({ winnerIndex = null } = {}) => {
-      const resolvedWinner = winnerIndex === null ? currentPlayer : winnerIndex;
+    const endGame = ({ winnerIndex: wIdx = null }: { winnerIndex?: PlayerIndex | null } = {}) => {
+      const resolvedWinner = wIdx === null ? currentPlayer : wIdx;
       setPhase('gameEnd');
       setWinnerIndex(resolvedWinner);
       setIsGameEndDialogOpen(true);
@@ -128,25 +182,24 @@ export const strategyGameFactory = ({
         isHumanVsHumanGame,
         isRoleSelectorWinner: resolvedWinner === chosenRoleIndex,
         winnerName: playerNameOf(resolvedWinner),
-        winnerIndex: resolvedWinner,
-        playerNames
+        currentPlayerName: playerNameOf(currentPlayer)
       });
     };
 
     const endTurn = () => {
-      setCurrentPlayer(currentPlayer => 1 - currentPlayer);
+      setCurrentPlayer(p => (1 - p!) as PlayerIndex);
     };
 
-    const startGame = (roleIndex = null) => {
+    const startGame = (roleIndex: number | null = null) => {
       setPhase('play');
       setCurrentPlayer(0);
-      setChosenRoleIndex(roleIndex);
+      setChosenRoleIndex(roleIndex as PlayerIndex | null);
     };
 
     const isClientMoveAllowed = phase === 'play'
       && (isHumanVsHumanGame || currentPlayer === chosenRoleIndex);
 
-    const ctx = {
+    const ctx: Ctx = {
       isHumanVsHumanGame,
       playerNames,
       chosenRoleIndex,
@@ -160,23 +213,16 @@ export const strategyGameFactory = ({
       winnerName: playerNameOf(winnerIndex)
     };
 
-    const events = {
+    const events: Events = {
       endTurn,
       endGame,
       setTurnState
     };
 
-    /*
-    Only second argument of move's is fixed here (_ special syntax). board
-    (first argument) needs to be handled by the bot as it may change between
-    moves, but for the bot there is no re-render between moves. In some
-    cases there are multiple moves following single user event, in that case,
-    there is also no re-render on client side between moves.
-    */
     wrappedMoves = mapValues(
       moves,
-      f => wrap(partial(f, _, { ctx, events }), moveWrapper)
-    );
+      (f) => (board: TBoard, ...args: unknown[]) => moveWrapper(() => f(board, { ctx, events }, ...args))
+    ) as WrappedMoves<TBoard>;
 
     const doBotTurn = () => {
       const { botStrategy } = activeVariant;
@@ -187,7 +233,7 @@ export const strategyGameFactory = ({
       }, time);
     };
 
-    const visibleVariants = resolvedVariants
+    const visibleVariants: DisplayVariant[] = resolvedVariants
       .map((v, i) => ({ ...v, originalIndex: i, disabled: !isHumanVsHumanGame && !v.botStrategy }))
       .filter(v => !isHumanVsHumanGame || !!v.generateStartBoard);
 
@@ -242,8 +288,8 @@ export const strategyGameFactory = ({
   };
 };
 
-export const dummyEvents = {
+export const dummyEvents: Events = {
   endTurn: () => {},
   endGame: () => {},
   setTurnState: () => {}
-}
+};

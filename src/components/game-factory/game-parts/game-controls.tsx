@@ -13,7 +13,7 @@ export interface CtaContext {
   isHumanVsHumanGame: boolean
   isClientMoveAllowed?: boolean
   isRoleSelectorWinner?: boolean
-  currentPlayerName?: string
+  currentPlayerName?: string | null
   winnerName?: string | null
 }
 
