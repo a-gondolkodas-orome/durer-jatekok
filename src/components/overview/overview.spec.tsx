@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { Overview } from './overview';
-import { gameList, GameList } from '../games/gameList';
+import { gameList, type GameList } from '../games/gameList';
 import { HashRouter } from 'react-router';
 
 vi.mock('../games/gameList', (): { gameList: GameList } => ({
