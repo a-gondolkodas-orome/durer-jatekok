@@ -4,7 +4,8 @@ import { MemoryRouter } from 'react-router';
 import { strategyGameFactory, resolveVariants } from './strategy-game';
 
 beforeAll(() => {
-  const { unmount } = render(<MemoryRouter><div /></MemoryRouter>);
+  const { getByTestId, unmount } = renderGame(ctxAwareConfig());
+  fireEvent.click(getByTestId('mode-vsHuman')); // warms up PlayerNameSetup (Headless UI)
   unmount();
 });
 
@@ -187,8 +188,9 @@ describe('isClientMoveAllowed', () => {
 });
 
 describe('Bot behavior by mode', () => {
-  beforeEach(() => { vi.useFakeTimers(); });
-  afterEach(() => { vi.useRealTimers(); });
+  beforeAll(() => { vi.useFakeTimers(); });
+  afterAll(() => { vi.useRealTimers(); });
+  afterEach(() => { vi.clearAllTimers(); });
 
   it('does not call botStrategy in vsHuman mode', () => {
     const botStrategy = vi.fn();
@@ -230,8 +232,9 @@ describe('switchMode', () => {
 });
 
 describe('strategyGameFactory endOfTurnMove', () => {
-  beforeEach(() => { vi.useFakeTimers(); });
-  afterEach(() => { vi.useRealTimers(); });
+  beforeAll(() => { vi.useFakeTimers(); });
+  afterAll(() => { vi.useRealTimers(); });
+  afterEach(() => { vi.clearAllTimers(); });
 
   it('calls endOfTurnMove after 750ms when a move returns autoEndOfTurn: true', () => {
     const autoMove = vi.fn((board) => ({ nextBoard: board }));
