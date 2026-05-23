@@ -1,9 +1,9 @@
 import { random } from "lodash";
 import { neighbours } from "./helpers";
 import type { Board } from "./policeman-thief";
-import type { Ctx, GameMoves } from "../../game-factory/types";
+import type { StrategyArgs, GameMoves } from "../../game-factory/types";
 
-export const aiBotStrategy = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board> }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
     moveThiefOptimally({ board, moves });
   } else {

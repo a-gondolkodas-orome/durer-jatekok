@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import type { Events, GameMoves, Ctx } from '../../game-factory/types';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { random, range } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
@@ -25,7 +25,7 @@ const CoinPile = ({ count, hoveredAction }: { count: number, hoveredAction: Hove
   </div>
 );
 
-const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board>; }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const [hoveredAction, setHoveredAction] = useState<HoveredAction>(null);
   return(
@@ -70,7 +70,7 @@ const moves = {
   }
 };
 
-const randomBotStrategy = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (board % 2 === 0 && random(0, 1) === 0) {
     moves.halve(board);
   } else {
@@ -78,7 +78,7 @@ const randomBotStrategy = ({ board, moves }: { board: Board; moves: GameMoves<Bo
   }
 };
 
-const aiBotStrategy = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (board !== 4 && board % 4 === 0) {
     moves.take1(board);
   } else if (board === 6) {

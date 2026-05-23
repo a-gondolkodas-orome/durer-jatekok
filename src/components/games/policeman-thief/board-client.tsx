@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { range } from "lodash";
 import { neighbours } from "./helpers";
 import type { Board } from "./policeman-thief";
-import type { Ctx, GameMoves } from "../../game-factory/types";
+import type { BoardClientProps } from "../../game-factory/types";
 
 const cubeCoords = [
   { cx: "30%", cy: "30%" },
@@ -15,7 +15,7 @@ const cubeCoords = [
   { cx: "90%", cy: "90%" }
 ];
 
-export const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board> }) => {
+export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const handleCircleClick = (vertex: number) => {
     if (!isClickable(vertex)) return;
     if (ctx.currentPlayer === 1) {

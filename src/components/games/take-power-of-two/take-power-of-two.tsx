@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import type { GameMoves, Events, Ctx } from '../../game-factory/types';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { range, random, reverse, sample } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
@@ -72,7 +72,7 @@ const ExponentsTable = ({ board, choosePower, hovered, setHovered }) => {
 }
 
 
-const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board>; }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const [hoveredPower, setHoveredPower] = useState(null);
 
   const choosePower = (e: number) => {
@@ -103,11 +103,11 @@ const generateTestStartBoard = () => {
   }
 };
 
-const randomBotStrategy = ({ board, moves }: { board: Board, moves: GameMoves<Board> }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.subtractPowerOfTwo(board, sample(getAvailableExponents(board)));
 };
 
-const aiBotStrategy = ({ board, moves }: { board: Board, moves: GameMoves<Board> }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (board === 1) {
     moves.subtractPowerOfTwo(board, 0);
     return;
