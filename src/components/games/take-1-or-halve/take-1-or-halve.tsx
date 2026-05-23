@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import type { Events, GameMoves } from '../../game-factory/types';
+import type { Events, GameMoves, Ctx } from '../../game-factory/types';
 import { random, range } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
@@ -25,7 +25,7 @@ const CoinPile = ({ count, hoveredAction }: { count: number, hoveredAction: Hove
   </div>
 );
 
-const BoardClient = ({ board, ctx, moves }: { board: Board; moves: GameMoves<Board>; [key: string]: any }) => {
+const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board>; }) => {
   const { t } = useTranslation();
   const [hoveredAction, setHoveredAction] = useState<HoveredAction>(null);
   return(

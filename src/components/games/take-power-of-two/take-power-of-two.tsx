@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import type { GameMoves, Events } from '../../game-factory/types';
+import type { GameMoves, Events, Ctx } from '../../game-factory/types';
 import { range, random, reverse, sample } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
@@ -72,7 +72,7 @@ const ExponentsTable = ({ board, choosePower, hovered, setHovered }) => {
 }
 
 
-const BoardClient = ({ board, ctx, moves }: { board: Board; moves: GameMoves<Board>; [key: string]: any }) => {
+const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board>; }) => {
   const [hoveredPower, setHoveredPower] = useState(null);
 
   const choosePower = (e: number) => {
