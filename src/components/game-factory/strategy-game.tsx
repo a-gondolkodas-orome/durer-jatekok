@@ -2,47 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { GameHeader, GameFooter, GameRule } from './game-parts/game-chrome';
 import { GameSidebar } from './game-parts/game-sidebar';
 import { GameEndDialog } from './game-parts/game-end-dialog';
-import { DEFAULT_PLAYER_NAMES, CtaContext, Variant as DisplayVariant } from './game-parts/game-controls';
+import { DEFAULT_PLAYER_NAMES } from './game-parts/game-controls';
 import { mapValues } from 'lodash';
 import { useTranslation, TranslatableNode, Translatable, I18nString } from '../language/translate';
 import { useLocation } from 'react-router';
 import { useGameStats } from './use-game-stats';
+import type {
+  Phase, PlayerIndex, Ctx, Events, MoveResult, MoveFunction, GameMoves,
+  CtaContext, Variant as DisplayVariant, VariantInput
+} from './types';
 
-export type Phase = 'roleSelection' | 'play' | 'gameEnd'
-type PlayerIndex = 0 | 1
-
-export interface Ctx {
-  isHumanVsHumanGame: boolean
-  playerNames: string[]
-  chosenRoleIndex: PlayerIndex | null
-  phase: Phase
-  turnState: unknown
-  currentPlayer: PlayerIndex | null
-  currentPlayerName: string | null
-  isClientMoveAllowed: boolean
-  isRoleSelectorWinner: boolean
-  winnerIndex: PlayerIndex | null
-  winnerName: string | null
-}
-
-export interface Events {
-  endTurn: () => void
-  endGame: (options?: { winnerIndex?: PlayerIndex | null }) => void
-  setTurnState: (state: unknown) => void
-}
-
-export type MoveResult<TBoard> = { nextBoard: TBoard; autoEndOfTurn?: boolean }
-export type MoveFunction<TBoard> = (
-  board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: any[]
-) => MoveResult<TBoard>
-export type GameMoves<TBoard> = Record<string, (board: TBoard, ...args: any[]) => MoveResult<TBoard>>
-
-interface VariantInput<TBoard> {
-  label?: I18nString
-  isDefault?: boolean
-  generateStartBoard?: () => TBoard
-  botStrategy?: (args: { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }) => void
-}
+export type { Phase, Ctx, Events, MoveResult, MoveFunction, GameMoves } from './types';
 
 interface Presentation<TBoard> {
   rule: TranslatableNode

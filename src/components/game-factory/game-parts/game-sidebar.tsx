@@ -5,10 +5,9 @@ import {
   ModeSelector,
   DifficultySelector,
   getCtaText,
-  DEFAULT_PLAYER_NAMES,
-  CtaContext,
-  Variant
+  DEFAULT_PLAYER_NAMES
 } from './game-controls';
+import type { CtaContext, Variant } from '../types';
 import { Stats } from '../use-game-stats';
 
 interface SidebarCtx extends CtaContext {

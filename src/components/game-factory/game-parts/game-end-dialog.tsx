@@ -1,7 +1,7 @@
-import React from 'react';
 import { Dialog, DialogPanel, DialogTitle, Description } from '@headlessui/react';
 import { useTranslation } from '../../language/translate';
-import { ModeSelector, DifficultySelector, getCtaText, CtaContext, Variant } from './game-controls';
+import { ModeSelector, DifficultySelector, getCtaText } from './game-controls';
+import type { CtaContext, Variant } from '../types';
 
 interface GameEndDialogProps {
   isOpen: boolean

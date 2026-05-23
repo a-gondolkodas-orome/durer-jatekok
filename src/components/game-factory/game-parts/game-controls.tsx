@@ -1,22 +1,7 @@
-import React from 'react';
 import { useTranslation,I18nString } from '../../language/translate';
-import type { Phase } from '../strategy-game';
+import type { Variant, CtaContext } from '../types';
 
-export interface Variant {
-  originalIndex: number
-  disabled?: boolean
-  label?: I18nString
-  botStrategy?: unknown
-}
-
-export interface CtaContext {
-  phase: Phase
-  isHumanVsHumanGame: boolean
-  isClientMoveAllowed?: boolean
-  isRoleSelectorWinner?: boolean
-  currentPlayerName?: string | null
-  winnerName?: string | null
-}
+export type { Variant, CtaContext } from '../types';
 
 export const DEFAULT_PLAYER_NAMES: I18nString[] = [
   { hu: '1. játékos', en: '1st player' },

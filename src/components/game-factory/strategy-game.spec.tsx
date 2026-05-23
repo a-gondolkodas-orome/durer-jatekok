@@ -1,7 +1,10 @@
-import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { strategyGameFactory, resolveVariants } from './strategy-game';
+import type { Ctx, Events, GameMoves, VariantInput } from './types';
+
+type Board = string[];
+type BoardClientProps = { board: Board; ctx: Ctx; events: Events; moves: GameMoves<Board> };
 
 beforeAll(() => {
   const { getByTestId, unmount } = renderGame(ctxAwareConfig());
@@ -9,8 +12,8 @@ beforeAll(() => {
   unmount();
 });
 
-const makeVariant = (overrides = {}) => ({
-  generateStartBoard: () => [],
+const makeVariant = (overrides: VariantInput<Board> = {}) => ({
+  generateStartBoard: (): Board => [],
   botStrategy: () => {},
   ...overrides
 });
@@ -21,7 +24,7 @@ describe('resolveVariants', () => {
   });
 
   it('throws when variants is missing', () => {
-    expect(() => resolveVariants(undefined)).toThrow('variants must be a non-empty array');
+    expect(() => resolveVariants(undefined as any)).toThrow('variants must be a non-empty array');
   });
 
   it('throws when multiple variants have no isDefault', () => {
@@ -40,13 +43,13 @@ describe('resolveVariants', () => {
   });
 
   it('uses the single variant as default without requiring isDefault', () => {
-    const generateStartBoard = () => [];
+    const generateStartBoard = (): Board => [];
     const { defaultVariantIndex } = resolveVariants([makeVariant({ generateStartBoard })]);
     expect(defaultVariantIndex).toBe(0);
   });
 
   it('picks the variant marked isDefault as the default', () => {
-    const generateStartBoard = () => [];
+    const generateStartBoard = (): Board => [];
     const variants = [makeVariant(), makeVariant({ isDefault: true, generateStartBoard })];
     const { defaultVariantIndex, defaultVariant } = resolveVariants(variants);
     expect(defaultVariantIndex).toBe(1);
@@ -92,33 +95,33 @@ describe('resolveVariants', () => {
   });
 });
 
-const MinimalBoardClient = ({ board, moves }) => (
+const MinimalBoardClient = ({ board, moves }: BoardClientProps) => (
   <button data-testid="move-btn" onClick={() => moves.mainMove(board)}>move</button>
 );
 
-const minimalConfig = (moves, endOfTurnMove) => ({
+const minimalConfig = (moves: GameMoves<Board>, endOfTurnMove?: string) => ({
   presentation: {
     rule: <></>,
     getPlayerStepDescription: () => ''
   },
   BoardClient: MinimalBoardClient,
   gameplay: { moves, endOfTurnMove },
-  variants: [{ botStrategy: () => {}, generateStartBoard: () => ['initial'] }]
+  variants: [{ botStrategy: () => {}, generateStartBoard: (): Board => ['initial'] }]
 });
 
-const renderGame = (config) => {
+const renderGame = (config: Parameters<typeof strategyGameFactory<Board>>[0]) => {
   const Game = strategyGameFactory(config);
   return render(<MemoryRouter><Game /></MemoryRouter>);
 };
 
-const GameEndingBoardClient = ({ board, moves }) => (
+const GameEndingBoardClient = ({ board, moves }: BoardClientProps) => (
   <>
     <button data-testid="end-win-btn" onClick={() => moves.endWin(board)}>win</button>
     <button data-testid="end-lose-btn" onClick={() => moves.endLose(board)}>lose</button>
   </>
 );
 
-const gameEndingConfig = (overrides = {}) => ({
+const gameEndingConfig = () => ({
   presentation: {
     rule: <></>,
     getPlayerStepDescription: () => ''
@@ -126,21 +129,20 @@ const gameEndingConfig = (overrides = {}) => ({
   BoardClient: GameEndingBoardClient,
   gameplay: {
     moves: {
-      endWin: (board, { ctx, events }) => {
+      endWin: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }) => {
         events.endGame({ winnerIndex: ctx.currentPlayer });
         return { nextBoard: board };
       },
-      endLose: (board, { ctx, events }) => {
-        events.endGame({ winnerIndex: 1 - ctx.currentPlayer });
+      endLose: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }) => {
+        events.endGame({ winnerIndex: ctx.currentPlayer === 0 ? 1 : 0 });
         return { nextBoard: board };
       }
     }
   },
-  variants: [{ botStrategy: () => {}, generateStartBoard: () => ['initial'] }],
-  ...overrides
+  variants: [{ botStrategy: () => {}, generateStartBoard: (): Board => ['initial'] }]
 });
 
-const CtxAwareBoardClient = ({ board, ctx, moves }) => (
+const CtxAwareBoardClient = ({ board, ctx, moves }: BoardClientProps) => (
   <button
     data-testid="move-btn"
     disabled={!ctx.isClientMoveAllowed}
@@ -148,42 +150,40 @@ const CtxAwareBoardClient = ({ board, ctx, moves }) => (
   >move</button>
 );
 
-const ctxAwareConfig = (overrides = {}) => {
-  const { botStrategy, endOfTurnMove, ...rest } = overrides;
-  return {
-    presentation: {
-      rule: <></>,
-      getPlayerStepDescription: () => ''
-    },
-    BoardClient: CtxAwareBoardClient,
-    gameplay: {
-      moves: {
-        mainMove: (board, { events }) => { events.endTurn(); return { nextBoard: board }; }
-      },
-      endOfTurnMove
-    },
-    variants: [{ botStrategy: botStrategy ?? (() => {}), generateStartBoard: () => ['initial'] }],
-    ...rest
-  };
-};
+const ctxAwareConfig = (botStrategy: () => void = () => {}) => ({
+  presentation: {
+    rule: <></>,
+    getPlayerStepDescription: () => ''
+  },
+  BoardClient: CtxAwareBoardClient,
+  gameplay: {
+    moves: {
+      mainMove: (board: Board, { events }: { events: Events }) => {
+        events.endTurn();
+        return { nextBoard: board };
+      }
+    }
+  },
+  variants: [{ botStrategy, generateStartBoard: (): Board => ['initial'] }]
+});
 
 describe('isClientMoveAllowed', () => {
   it('allows both players to move in vsHuman mode', () => {
     const { getByTestId } = renderGame(ctxAwareConfig());
     fireEvent.click(getByTestId('mode-vsHuman'));
-    expect(getByTestId('move-btn').disabled).toBe(true);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(getByTestId('start-hh-game'));
-    expect(getByTestId('move-btn').disabled).toBe(false);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(getByTestId('move-btn')); // endTurn → currentPlayer 1
-    expect(getByTestId('move-btn').disabled).toBe(false);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('disables moves during the computer turn in vsComputer mode', () => {
     const { getByTestId } = renderGame(ctxAwareConfig());
     fireEvent.click(getByTestId('role-btn-0'));
-    expect(getByTestId('move-btn').disabled).toBe(false);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn
-    expect(getByTestId('move-btn').disabled).toBe(true);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(true);
   });
 });
 
@@ -194,7 +194,7 @@ describe('Bot behavior by mode', () => {
 
   it('does not call botStrategy in vsHuman mode', () => {
     const botStrategy = vi.fn();
-    const { getByTestId } = renderGame(ctxAwareConfig({ botStrategy }));
+    const { getByTestId } = renderGame(ctxAwareConfig(botStrategy));
     fireEvent.click(getByTestId('mode-vsHuman'));
     fireEvent.click(getByTestId('start-hh-game'));
     fireEvent.click(getByTestId('move-btn')); // endTurn → currentPlayer 1
@@ -204,7 +204,7 @@ describe('Bot behavior by mode', () => {
 
   it('calls botStrategy when it becomes the computer turn', () => {
     const botStrategy = vi.fn();
-    const { getByTestId } = renderGame(ctxAwareConfig({ botStrategy }));
+    const { getByTestId } = renderGame(ctxAwareConfig(botStrategy));
     fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn
     act(() => { vi.advanceTimersByTime(1500); });
@@ -216,7 +216,7 @@ describe('switchMode', () => {
   it('resets to roleSelection when switching mode during play', () => {
     const { getByTestId } = renderGame(ctxAwareConfig());
     fireEvent.click(getByTestId('role-btn-0'));
-    expect(getByTestId('move-btn').disabled).toBe(false);
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(getByTestId('mode-vsHuman'));
     expect(getByTestId('start-hh-game')).toBeTruthy();
   });
@@ -237,9 +237,12 @@ describe('strategyGameFactory endOfTurnMove', () => {
   afterEach(() => { vi.clearAllTimers(); });
 
   it('calls endOfTurnMove after 750ms when a move returns autoEndOfTurn: true', () => {
-    const autoMove = vi.fn((board) => ({ nextBoard: board }));
-    const moves = {
-      mainMove: (board, { events }) => { events.endTurn(); return { nextBoard: board, autoEndOfTurn: true }; },
+    const autoMove = vi.fn((board: Board) => ({ nextBoard: board }));
+    const moves: GameMoves<Board> = {
+      mainMove: (board, { events }: { events: Events }) => {
+        events.endTurn();
+        return { nextBoard: board, autoEndOfTurn: true };
+      },
       autoMove
     };
 
@@ -254,9 +257,12 @@ describe('strategyGameFactory endOfTurnMove', () => {
   });
 
   it('does not call endOfTurnMove when a move does not return autoEndOfTurn', () => {
-    const autoMove = vi.fn((board) => ({ nextBoard: board }));
-    const moves = {
-      mainMove: (board, { events }) => { events.endTurn(); return { nextBoard: board }; },
+    const autoMove = vi.fn((board: Board) => ({ nextBoard: board }));
+    const moves: GameMoves<Board> = {
+      mainMove: (board, { events }: { events: Events }) => {
+        events.endTurn();
+        return { nextBoard: board };
+      },
       autoMove
     };
 
@@ -275,7 +281,7 @@ describe('win/loss tracking', () => {
     const { getByTestId } = renderGame(gameEndingConfig());
     fireEvent.click(getByTestId('role-btn-0')); // choose first player (index 0 = currentPlayer 0)
     fireEvent.click(getByTestId('end-win-btn')); // currentPlayer wins = player wins
-    const stats = JSON.parse(localStorage.getItem('stats__0'));
+    const stats = JSON.parse(localStorage.getItem('stats__0')!);
     expect(stats).toEqual({ win: 1, loss: 0 });
   });
 
@@ -283,7 +289,7 @@ describe('win/loss tracking', () => {
     const { getByTestId } = renderGame(gameEndingConfig());
     fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('end-lose-btn')); // other player wins = player loses
-    const stats = JSON.parse(localStorage.getItem('stats__0'));
+    const stats = JSON.parse(localStorage.getItem('stats__0')!);
     expect(stats).toEqual({ win: 0, loss: 1 });
   });
 
@@ -305,7 +311,7 @@ describe('win/loss tracking', () => {
     fireEvent.click(g2('role-btn-0'));
     fireEvent.click(g2('end-lose-btn')); // loss
 
-    const stats = JSON.parse(localStorage.getItem('stats__0'));
+    const stats = JSON.parse(localStorage.getItem('stats__0')!);
     expect(stats).toEqual({ win: 1, loss: 1 });
   });
 });
