@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { range } from "lodash";
 import { neighbours } from "./helpers";
 import type { Board } from "./policeman-thief";
+import type { Ctx, GameMoves } from "../../game-factory/types";
 
 const cubeCoords = [
   { cx: "30%", cy: "30%" },
@@ -14,8 +15,8 @@ const cubeCoords = [
   { cx: "90%", cy: "90%" }
 ];
 
-export const BoardClient = ({ board, ctx, moves }: { board: Board; [key: string]: any }) => {
-  const handleCircleClick = (vertex) => {
+export const BoardClient = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board> }) => {
+  const handleCircleClick = (vertex: number) => {
     if (!isClickable(vertex)) return;
     if (ctx.currentPlayer === 1) {
       moves.moveThief(board, vertex);
@@ -28,7 +29,7 @@ export const BoardClient = ({ board, ctx, moves }: { board: Board; [key: string]
     moves.moveFirstPoliceman(board, vertex);
   };
 
-  const isClickable = (vertex) => {
+  const isClickable = (vertex: number) => {
     if (!ctx.isClientMoveAllowed) return false;
     if (ctx.currentPlayer === 1) {
       return neighbours[board.thief].includes(vertex);
@@ -39,7 +40,7 @@ export const BoardClient = ({ board, ctx, moves }: { board: Board; [key: string]
     return neighbours[board.policemen[0]].includes(vertex)
   }
 
-  const getColor = (vertex) => {
+  const getColor = (vertex: number) => {
     if (isClickable(vertex)) {
       if (ctx.currentPlayer === 1) {
         if (board.policemen[0] === vertex) return "url(#thief-and-first-policeman)";

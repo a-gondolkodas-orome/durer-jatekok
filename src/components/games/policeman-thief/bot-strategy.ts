@@ -1,8 +1,9 @@
 import { random } from "lodash";
 import { neighbours } from "./helpers";
 import type { Board } from "./policeman-thief";
+import type { Ctx, GameMoves } from "../../game-factory/types";
 
-export const aiBotStrategy = ({ board, ctx, moves }: { board: Board; [key: string]: any }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: GameMoves<Board> }) => {
   if (ctx.chosenRoleIndex === 0) {
     moveThiefOptimally({ board, moves });
   } else {
@@ -10,7 +11,7 @@ export const aiBotStrategy = ({ board, ctx, moves }: { board: Board; [key: strin
   }
 };
 
-const movePolicemenOptimally = ({ board, moves }: { board: Board; [key: string]: any }) => {
+const movePolicemenOptimally = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
   //policeman0 Step
   let index0 = board.policemen[0];
   let canWeCatch0 = false;
@@ -72,7 +73,7 @@ const movePolicemenOptimally = ({ board, moves }: { board: Board; [key: string]:
 
 };
 
-const moveThiefOptimally = ({ board, moves }: { board: Board; [key: string]: any }) => {
+const moveThiefOptimally = ({ board, moves }: { board: Board; moves: GameMoves<Board> }) => {
   let index = board.thief;
   for (let i = 0; i < 3; i++) {
     if (
