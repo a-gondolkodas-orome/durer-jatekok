@@ -1,5 +1,6 @@
 import { range, random, sample, difference, cloneDeep } from "lodash";
-import { strategyGameFactory, type Ctx, type Events } from "../../game-factory/strategy-game";
+import { strategyGameFactory } from "../../game-factory/strategy-game";
+import type { Ctx, Events } from '../../game-factory/types';
 import { neighbours } from "./helpers";
 import { aiBotStrategy } from "./bot-strategy";
 import { BoardClient } from "./board-client";

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { strategyGameFactory, type Events, type GameMoves } from '../../game-factory/strategy-game';
+import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, GameMoves } from '../../game-factory/types';
 import { random, range } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
