@@ -177,11 +177,11 @@ const gameEndingConfig = () => ({
   gameplay: {
     moves: {
       endWin: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }) => {
-        events.endGame({ winnerIndex: ctx.currentPlayer });
+        events.endGame(ctx.currentPlayer);
         return { nextBoard: board };
       },
       endLose: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }) => {
-        events.endGame({ winnerIndex: ctx.currentPlayer === 0 ? 1 : 0 });
+        events.endGame(ctx.currentPlayer === 0 ? 1 : 0);
         return { nextBoard: board };
       }
     }

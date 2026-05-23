@@ -1,23 +1,21 @@
 import { Dialog, DialogPanel, DialogTitle, Description } from '@headlessui/react';
 import { useTranslation } from '../../language/translate';
 import { ModeSelector, DifficultySelector, getCtaText } from './game-controls';
-import type { DisplayCtx, Variant } from '../types';
-
-interface GameEndDialogProps {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  resetGameState: () => void
-  ctx: DisplayCtx
-  onSwitchMode: (mode: string) => void
-  variants: Variant[]
-  selectedVariantIndex: number
-  onSelectVariant: (index: number) => void
-}
+import type { Ctx, Variant, Mode } from '../types';
 
 export const GameEndDialog = ({
   isOpen, setIsOpen, resetGameState, ctx,
   onSwitchMode, variants, selectedVariantIndex, onSelectVariant
-}: GameEndDialogProps) => {
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  resetGameState: () => void
+  ctx: Ctx
+  onSwitchMode: (mode: Mode) => void
+  variants: Variant[]
+  selectedVariantIndex: number
+  onSelectVariant: (index: number) => void
+}) => {
   const { isHumanVsHumanGame } = ctx;
   const { t } = useTranslation();
   return (

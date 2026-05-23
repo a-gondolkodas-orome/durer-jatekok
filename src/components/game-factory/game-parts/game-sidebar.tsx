@@ -4,25 +4,25 @@ import { useTranslation, I18nString } from '../../language/translate';
 import {
   ModeSelector,
   DifficultySelector,
-  getCtaText,
-  DEFAULT_PLAYER_NAMES
+  getCtaText
 } from './game-controls';
-import type { Ctx, DisplayCtx, Variant } from '../types';
+import type { Ctx, Mode, Variant } from '../types';
+
 import { Stats } from '../use-game-stats';
 
 export interface SidebarMoves {
-  switchMode: (mode: string) => void
+  switchMode: (mode: Mode) => void
   startGame: (roleIndex?: number | null) => void
   setPlayerNames: (names: string[]) => void
   setDifficulty: (index: number) => void
   resetGameState: () => void
 }
 
-export interface GameSidebarProps {
+interface GameSidebarProps {
   roleLabels?: [I18nString, I18nString]
   stepDescription: React.ReactNode
   ctx: Ctx
-  gameEndDisplayCtx?: DisplayCtx | null
+  playerNames: string[]
   moves: SidebarMoves
   variants: Variant[]
   selectedVariantIndex: number
@@ -34,7 +34,7 @@ export const GameSidebar = ({
   roleLabels,
   stepDescription,
   ctx,
-  gameEndDisplayCtx,
+  playerNames,
   moves,
   variants,
   selectedVariantIndex,
@@ -75,14 +75,12 @@ export const GameSidebar = ({
     );
   }
 
-  const displayCtx = gameEndDisplayCtx ?? ctx;
-
   return (
     <div className="p-2 flex flex-col grow shrink-0 basis-64 gap-3">
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 mb-8 flex flex-col gap-3">
-        {displayCtx.isHumanVsHumanGame && ctx.phase !== 'roleSelection'
+        {ctx.isHumanVsHumanGame && ctx.phase !== 'roleSelection'
           ? <PlayerTurnPanel ctx={ctx} />
-          : <p className="text-center font-bold text-lg">{t(getCtaText(displayCtx))}</p>
+          : <p className="text-center font-bold text-lg">{t(getCtaText(ctx))}</p>
         }
 
         {ctx.phase === 'play' && (
@@ -102,7 +100,8 @@ export const GameSidebar = ({
           ctx.isHumanVsHumanGame
             ? <PlayerNameSetup
                 roleLabels={roleLabels}
-                playerNames={ctx.playerNames}
+                playerNames={playerNames}
+                placeholderNames={ctx.resolvedPlayerNames}
                 setPlayerNames={moves.setPlayerNames}
                 onStart={moves.startGame}
               />
@@ -144,7 +143,7 @@ export const GameSidebar = ({
 };
 
 const RoleSelector = ({ roleLabels, onRoleSelection, disabled }: {
-  roleLabels?: GameSidebarProps['roleLabels']
+  roleLabels?: [I18nString, I18nString]
   onRoleSelection: (roleIndex: number) => void
   disabled: boolean
 }) => {
@@ -169,9 +168,10 @@ const RoleSelector = ({ roleLabels, onRoleSelection, disabled }: {
   </span>;
 };
 
-const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }: {
-  roleLabels?: GameSidebarProps['roleLabels']
+const PlayerNameSetup = ({ roleLabels, playerNames, placeholderNames, setPlayerNames, onStart }: {
+  roleLabels?: [I18nString, I18nString]
   playerNames: string[]
+  placeholderNames: [string, string]
   setPlayerNames: (names: string[]) => void
   onStart: () => void
 }) => {
@@ -189,7 +189,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }: {
         name="name_of_first_player"
         className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
           focus:outline-none focus:ring-1 focus:ring-blue-400"
-        placeholder={t(DEFAULT_PLAYER_NAMES[0])}
+        placeholder={placeholderNames[0]}
         value={playerNames[0]}
         onChange={e => setPlayerNames([e.target.value.trim(), playerNames[1]])}
       />
@@ -202,7 +202,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }: {
         name="name_of_second_player"
         className="border border-slate-300 rounded-md text-slate-700 px-2 py-1 text-sm w-full
           focus:outline-none focus:ring-1 focus:ring-blue-400"
-        placeholder={t(DEFAULT_PLAYER_NAMES[1])}
+        placeholder={placeholderNames[1]}
         value={playerNames[1]}
         onChange={e => setPlayerNames([playerNames[0], e.target.value.trim()])}
       />
@@ -227,8 +227,7 @@ const Spinner = () => (
 );
 
 const PlayerTurnPanel = ({ ctx }: { ctx: Ctx }) => {
-  const { t } = useTranslation();
-  const playerName = (i: number) => ctx.playerNames[i] || t(DEFAULT_PLAYER_NAMES[i]);
+  const playerName = (i: number) => ctx.resolvedPlayerNames[i];
   const isEnd = ctx.phase === 'gameEnd';
 
   return (

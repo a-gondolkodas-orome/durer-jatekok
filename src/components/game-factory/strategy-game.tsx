@@ -2,16 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { GameHeader, GameFooter, GameRule } from './game-parts/game-chrome';
 import { GameSidebar } from './game-parts/game-sidebar';
 import { GameEndDialog } from './game-parts/game-end-dialog';
-import { DEFAULT_PLAYER_NAMES } from './game-parts/game-controls';
 import { mapValues } from 'lodash';
 import { useTranslation, TranslatableNode, Translatable, I18nString } from '../language/translate';
 import { useLocation } from 'react-router';
 import { useGameStats } from './use-game-stats';
 import type {
-  Phase, PlayerIndex, Ctx, Events, MoveResult, MoveFunction, GameMoves,
-  DisplayCtx, Variant as DisplayVariant, VariantInput
+  Phase, Mode, PlayerIndex, Ctx, Events, MoveResult, MoveFunction, GameMoves,
+  BoardClientProps, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './resolve-variants';
+
+const DEFAULT_PLAYER_NAMES: I18nString[] = [
+  { hu: '1. játékos', en: '1st player' },
+  { hu: '2. játékos', en: '2nd player' }
+];
 
 interface Presentation<TBoard> {
   rule: TranslatableNode
@@ -24,20 +28,17 @@ interface Gameplay<TBoard> {
   endOfTurnMove?: string
 }
 
-interface StrategyGameFactoryParams<TBoard> {
-  presentation: Presentation<TBoard>
-  BoardClient: React.ComponentType<{ board: TBoard; ctx: Ctx; events: Events; moves: GameMoves<TBoard> }>
-  gameplay: Gameplay<TBoard>
-  variants: VariantInput<TBoard>[]
-}
-
-
 export const strategyGameFactory = <TBoard,>({
   presentation,
   BoardClient,
   gameplay,
   variants
-}: StrategyGameFactoryParams<TBoard>) => {
+}: {
+  presentation: Presentation<TBoard>
+  BoardClient: React.ComponentType<BoardClientProps<TBoard>>
+  gameplay: Gameplay<TBoard>
+  variants: VariantInput<TBoard>[]
+}) => {
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
   const { moves, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
@@ -57,9 +58,8 @@ export const strategyGameFactory = <TBoard,>({
     const [winnerIndex, setWinnerIndex] = useState<PlayerIndex | null>(null);
     const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
     const [turnState, setTurnState] = useState<unknown>(null);
-    const [mode, setMode] = useState('vsComputer');
+    const [mode, setMode] = useState<Mode>('vsComputer');
     const [playerNames, setPlayerNames] = useState(['', '']);
-    const [gameEndDisplayCtx, setGameEndDisplayCtx] = useState<DisplayCtx | null>(null);
 
     const isHumanVsHumanGame = mode === 'vsHuman';
 
@@ -100,7 +100,6 @@ export const strategyGameFactory = <TBoard,>({
       setWinnerIndex(null);
       setGameUuid(crypto.randomUUID());
       setTurnState(null);
-      setGameEndDisplayCtx(null);
     };
 
     const setDifficulty = (index: number) => {
@@ -109,33 +108,26 @@ export const strategyGameFactory = <TBoard,>({
       resetGameState({ generateBoard: newVariant.generateStartBoard ?? defaultGenerateStartBoard });
     };
 
-    const changeMode = (newMode: string) => {
+    const changeMode = (newMode: Mode) => {
       setMode(newMode);
       if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
         setSelectedVariantIndex(defaultVariantIndex);
       }
     };
 
-    const playerNameOf = (index: PlayerIndex | null): string | null => {
-      if (index === null) return null;
-      return playerNames[index] || t(DEFAULT_PLAYER_NAMES[index]);
-    };
+    const resolvedPlayerNames: [string, string] = [
+      playerNames[0] || t(DEFAULT_PLAYER_NAMES[0]),
+      playerNames[1] || t(DEFAULT_PLAYER_NAMES[1])
+    ];
 
-    const endGame = ({ winnerIndex: wIdx = null }: { winnerIndex?: PlayerIndex | null } = {}) => {
-      const resolvedWinner = wIdx === null ? currentPlayer : wIdx;
+    const endGame = (winnerIndex?: PlayerIndex | null) => {
+      const resolvedWinner = winnerIndex ?? currentPlayer;
       setPhase('gameEnd');
       setWinnerIndex(resolvedWinner);
       setIsGameEndDialogOpen(true);
       if (!isHumanVsHumanGame) {
         recordResult(resolvedWinner === chosenRoleIndex ? 'win' : 'loss');
       }
-      setGameEndDisplayCtx({
-        phase: 'gameEnd',
-        isHumanVsHumanGame,
-        isRoleSelectorWinner: resolvedWinner === chosenRoleIndex,
-        winnerName: playerNameOf(resolvedWinner),
-        currentPlayerName: playerNameOf(currentPlayer)
-      });
     };
 
     const endTurn = () => {
@@ -153,16 +145,13 @@ export const strategyGameFactory = <TBoard,>({
 
     const ctx: Ctx = {
       isHumanVsHumanGame,
-      playerNames,
+      resolvedPlayerNames,
       chosenRoleIndex,
       phase,
       turnState,
       currentPlayer,
-      currentPlayerName: playerNameOf(currentPlayer),
       isClientMoveAllowed,
-      isRoleSelectorWinner: (winnerIndex === chosenRoleIndex),
-      winnerIndex,
-      winnerName: playerNameOf(winnerIndex)
+      winnerIndex
     };
 
     const events: Events = {
@@ -207,7 +196,7 @@ export const strategyGameFactory = <TBoard,>({
               roleLabels={roleLabels}
               stepDescription={t(getPlayerStepDescription({ board, ctx }))}
               ctx={ctx}
-              gameEndDisplayCtx={gameEndDisplayCtx}
+              playerNames={playerNames}
               moves={{
                 startGame,
                 resetGameState,
@@ -228,7 +217,7 @@ export const strategyGameFactory = <TBoard,>({
         isOpen={isGameEndDialogOpen}
         setIsOpen={setIsGameEndDialogOpen}
         resetGameState={resetGameState}
-        ctx={gameEndDisplayCtx ?? ctx}
+        ctx={ctx}
         onSwitchMode={changeMode}
         variants={visibleVariants}
         selectedVariantIndex={selectedVariantIndex}

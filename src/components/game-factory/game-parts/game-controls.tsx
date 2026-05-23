@@ -1,15 +1,9 @@
 import { useTranslation, I18nString } from '../../language/translate';
-import type { Variant, DisplayCtx } from '../types';
-
-
-export const DEFAULT_PLAYER_NAMES: I18nString[] = [
-  { hu: '1. játékos', en: '1st player' },
-  { hu: '2. játékos', en: '2nd player' }
-];
+import type { Variant, Ctx, Mode } from '../types';
 
 export const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode, disabled }: {
   isHumanVsHumanGame: boolean
-  onSwitchMode: (mode: string) => void
+  onSwitchMode: (mode: Mode) => void
   disabled: boolean
 }) => {
   const { t } = useTranslation();
@@ -62,7 +56,7 @@ export const DifficultySelector = ({ variants, selectedIndex, onSelect, disabled
   disabled: boolean
 }) => {
   const { t } = useTranslation();
-  const labelClass = (active: boolean, variantDisabled: boolean | undefined) => `min-w-0 grow py-1 px-2 text-center
+  const labelClass = (active: boolean, variantDisabled = false) => `min-w-0 grow py-1 px-2 text-center
     ${active && !variantDisabled
       ? `bg-blue-500 text-white font-semibold ${fieldsetDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
       : variantDisabled || fieldsetDisabled
@@ -101,10 +95,11 @@ export const getCtaText = ({
   phase,
   isHumanVsHumanGame,
   isClientMoveAllowed,
-  isRoleSelectorWinner,
-  currentPlayerName,
-  winnerName
-}: DisplayCtx): I18nString => {
+  currentPlayer,
+  winnerIndex,
+  chosenRoleIndex,
+  resolvedPlayerNames
+}: Ctx): I18nString => {
   if (phase === 'roleSelection') {
     return isHumanVsHumanGame
       ? { hu: 'Döntsétek el, hogy ki kezd.', en: 'Decide who goes first.' }
@@ -112,15 +107,16 @@ export const getCtaText = ({
   }
   if (phase === 'play') {
     return isHumanVsHumanGame
-      ? { hu: `Következik: ${currentPlayerName}`, en: `Next: ${currentPlayerName}` }
+      ? { hu: `Következik: ${resolvedPlayerNames[currentPlayer!]}`, en: `Next: ${resolvedPlayerNames[currentPlayer!]}` }
       : isClientMoveAllowed
         ? { hu: 'Te jössz', en: 'Your turn' }
         : { hu: 'Mi jövünk', en: "Computer's turn" };
   }
   else {
     return isHumanVsHumanGame
-      ? { hu: `A játékot nyerte: ${winnerName}`, en: `Winner: ${winnerName}` }
-      : isRoleSelectorWinner
+      ? { hu: `A játékot nyerte: ${resolvedPlayerNames[winnerIndex!]}`,
+          en: `Winner: ${resolvedPlayerNames[winnerIndex!]}` }
+      : winnerIndex === chosenRoleIndex
         ? { hu: 'Nyertél. Gratulálunk! :)', en: 'You won. Congratulations! :)' }
         : {
           hu: 'Sajnos, most nem nyertél, de ne add fel.',

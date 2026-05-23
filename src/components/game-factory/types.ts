@@ -1,25 +1,23 @@
 import type { I18nString } from '../language/translate';
 
 export type Phase = 'roleSelection' | 'play' | 'gameEnd'
+export type Mode = 'vsComputer' | 'vsHuman'
 export type PlayerIndex = 0 | 1
 
 export interface Ctx {
   isHumanVsHumanGame: boolean
-  playerNames: string[]
+  resolvedPlayerNames: [string, string]
   chosenRoleIndex: PlayerIndex | null
   phase: Phase
   turnState: unknown
   currentPlayer: PlayerIndex | null
-  currentPlayerName: string | null
   isClientMoveAllowed: boolean
-  isRoleSelectorWinner: boolean
   winnerIndex: PlayerIndex | null
-  winnerName: string | null
 }
 
 export interface Events {
   endTurn: () => void
-  endGame: (options?: { winnerIndex?: PlayerIndex | null }) => void
+  endGame: (winnerIndex?: PlayerIndex | null) => void
   setTurnState: (state: unknown) => void
 }
 
@@ -45,13 +43,3 @@ export interface VariantInput<TBoard> {
   botStrategy?: (args: StrategyArgs<TBoard>) => void
 }
 
-// Subset of Ctx used for display (CTA text, game-end dialog). Play-only fields are optional
-// so the frozen game-end snapshot (which omits them) satisfies this type.
-export interface DisplayCtx {
-  phase: Phase
-  isHumanVsHumanGame: boolean
-  isClientMoveAllowed?: boolean
-  isRoleSelectorWinner?: boolean
-  currentPlayerName?: string | null
-  winnerName?: string | null
-}

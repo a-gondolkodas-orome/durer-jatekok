@@ -1,28 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { GameSidebar, SidebarMoves } from './game-sidebar';
-import type { Ctx, Variant } from '../types';
+import type { Ctx } from '../types';
 
 beforeAll(() => {
-  const { unmount } = renderSidebar({ isHumanVsHumanGame: true, phase: 'roleSelection' });
+  const { unmount } = renderSidebar();
   unmount();
 });
 
-const defaultVariants: Variant[] = [
-  { botStrategy: () => {}, originalIndex: 0, disabled: false }
-];
 
 const defaultCtx: Ctx = {
-  isHumanVsHumanGame: false,
+  isHumanVsHumanGame: true,
   phase: 'roleSelection',
   isClientMoveAllowed: false,
-  isRoleSelectorWinner: false,
-  playerNames: ['Player 1', 'Player 2'],
+  resolvedPlayerNames: ['Player 1', 'Player 2'],
   chosenRoleIndex: null,
-  currentPlayerName: 'Player 1',
   currentPlayer: 0,
   winnerIndex: null,
-  winnerName: null,
   turnState: null
 };
 
@@ -39,11 +33,11 @@ const renderSidebar = (ctxOverrides: Partial<Ctx> = {}) => {
   return render(
     <MemoryRouter>
       <GameSidebar
-        roleLabels={undefined}
         stepDescription=""
         ctx={ctx}
+        playerNames={[]}
         moves={defaultMoves}
-        variants={defaultVariants}
+        variants={[{ botStrategy: () => {}, originalIndex: 0, disabled: false }]}
         selectedVariantIndex={0}
       />
     </MemoryRouter>
