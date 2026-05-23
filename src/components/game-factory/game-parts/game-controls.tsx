@@ -1,7 +1,6 @@
-import { useTranslation,I18nString } from '../../language/translate';
-import type { Variant, CtaContext } from '../types';
+import { useTranslation, I18nString } from '../../language/translate';
+import type { Variant, DisplayCtx } from '../types';
 
-export type { Variant, CtaContext } from '../types';
 
 export const DEFAULT_PLAYER_NAMES: I18nString[] = [
   { hu: '1. játékos', en: '1st player' },
@@ -105,7 +104,7 @@ export const getCtaText = ({
   isRoleSelectorWinner,
   currentPlayerName,
   winnerName
-}: CtaContext): I18nString => {
+}: DisplayCtx): I18nString => {
   if (phase === 'roleSelection') {
     return isHumanVsHumanGame
       ? { hu: 'Döntsétek el, hogy ki kezd.', en: 'Decide who goes first.' }

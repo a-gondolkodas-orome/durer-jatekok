@@ -43,7 +43,7 @@ export interface VariantInput<TBoard> {
   botStrategy?: (args: { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }) => void
 }
 
-export interface CtaContext {
+export interface DisplayCtx {
   phase: Phase
   isHumanVsHumanGame: boolean
   isClientMoveAllowed?: boolean

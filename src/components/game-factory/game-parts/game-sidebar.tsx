@@ -7,10 +7,10 @@ import {
   getCtaText,
   DEFAULT_PLAYER_NAMES
 } from './game-controls';
-import type { CtaContext, Variant } from '../types';
+import type { DisplayCtx, Variant } from '../types';
 import { Stats } from '../use-game-stats';
 
-interface SidebarCtx extends CtaContext {
+interface SidebarCtx extends DisplayCtx {
   isClientMoveAllowed: boolean
   playerNames: string[]
   currentPlayer: number | null
@@ -29,7 +29,7 @@ interface GameSidebarProps {
   roleLabels?: [I18nString, I18nString] | null
   stepDescription: React.ReactNode
   ctx: SidebarCtx
-  gameEndDisplayCtx?: CtaContext | null
+  gameEndDisplayCtx?: DisplayCtx | null
   moves: SidebarMoves
   variants: Variant[]
   selectedVariantIndex: number

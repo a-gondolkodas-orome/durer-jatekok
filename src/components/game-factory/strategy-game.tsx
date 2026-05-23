@@ -9,7 +9,7 @@ import { useLocation } from 'react-router';
 import { useGameStats } from './use-game-stats';
 import type {
   Phase, PlayerIndex, Ctx, Events, MoveResult, MoveFunction, GameMoves,
-  CtaContext, Variant as DisplayVariant, VariantInput
+  DisplayCtx, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './resolve-variants';
 
@@ -59,7 +59,7 @@ export const strategyGameFactory = <TBoard,>({
     const [turnState, setTurnState] = useState<unknown>(null);
     const [mode, setMode] = useState('vsComputer');
     const [playerNames, setPlayerNames] = useState(['', '']);
-    const [gameEndDisplayCtx, setGameEndDisplayCtx] = useState<CtaContext | null>(null);
+    const [gameEndDisplayCtx, setGameEndDisplayCtx] = useState<DisplayCtx | null>(null);
 
     const isHumanVsHumanGame = mode === 'vsHuman';
 

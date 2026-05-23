@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { gameList, GameEntry, Category } from '../games/gameList';
 import { every, orderBy } from 'lodash';
 import { Link } from 'react-router';
@@ -7,7 +7,7 @@ import { LanguageSelector } from '../language/language-selector';
 
 export const Overview = () => {
   const { t } = useTranslation();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   const shouldShow = (game: GameEntry) => {
     const noCategoryMatch = selectedCategories.length > 0
@@ -51,8 +51,8 @@ export const Overview = () => {
 };
 
 const CategoryFilter = ({ selected, onChange }: {
-  selected: string[]
-  onChange: (selected: string[]) => void
+  selected: Category[]
+  onChange: (selected: Category[]) => void
 }) => {
   const { t } = useTranslation();
   const categories = [
@@ -62,7 +62,7 @@ const CategoryFilter = ({ selected, onChange }: {
     { k: 'D', v: 'D' },
     { k: 'E', v: 'E' },
     { k: 'E+', v: 'E+' }
-  ];
+  ] as const;
   return (
     <div className="flex flex-wrap items-center gap-1">
       <span className="text-sm">{t({ hu: 'Szűrés kategóriákra:', en: 'Filter by category:' })}</span>
