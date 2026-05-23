@@ -45,6 +45,8 @@ export interface VariantInput<TBoard> {
   botStrategy?: (args: StrategyArgs<TBoard>) => void
 }
 
+// Subset of Ctx used for display (CTA text, game-end dialog). Play-only fields are optional
+// so the frozen game-end snapshot (which omits them) satisfies this type.
 export interface DisplayCtx {
   phase: Phase
   isHumanVsHumanGame: boolean

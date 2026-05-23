@@ -1,41 +1,29 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { GameSidebar } from './game-sidebar';
-
-type SidebarProps = React.ComponentProps<typeof GameSidebar>
-type SidebarCtx = SidebarProps['ctx']
-type SidebarMoves = SidebarProps['moves']
+import { GameSidebar, SidebarMoves } from './game-sidebar';
+import type { Ctx, Variant } from '../types';
 
 beforeAll(() => {
-  const { unmount } = render(
-    <MemoryRouter>
-      <GameSidebar
-        roleLabels={undefined}
-        stepDescription=""
-        ctx={{ ...defaultCtx, isHumanVsHumanGame: true, phase: 'roleSelection' }}
-        moves={defaultMoves}
-        variants={defaultVariants}
-        selectedVariantIndex={0}
-      />
-    </MemoryRouter>
-  );
+  const { unmount } = renderSidebar({ isHumanVsHumanGame: true, phase: 'roleSelection' });
   unmount();
 });
 
-const defaultVariants: SidebarProps['variants'] = [
+const defaultVariants: Variant[] = [
   { botStrategy: () => {}, originalIndex: 0, disabled: false }
 ];
 
-const defaultCtx: SidebarCtx = {
+const defaultCtx: Ctx = {
   isHumanVsHumanGame: false,
   phase: 'roleSelection',
   isClientMoveAllowed: false,
   isRoleSelectorWinner: false,
   playerNames: ['Player 1', 'Player 2'],
+  chosenRoleIndex: null,
   currentPlayerName: 'Player 1',
   currentPlayer: 0,
-  winnerName: null
+  winnerIndex: null,
+  winnerName: null,
+  turnState: null
 };
 
 const defaultMoves: SidebarMoves = {
@@ -46,26 +34,20 @@ const defaultMoves: SidebarMoves = {
   resetGameState: vi.fn()
 };
 
-const renderSidebar = (
-  ctxOverrides: Partial<SidebarCtx> = {},
-  movesOverrides: Partial<SidebarMoves> = {},
-  variants: SidebarProps['variants'] = defaultVariants
-) => {
+const renderSidebar = (ctxOverrides: Partial<Ctx> = {}) => {
   const ctx = { ...defaultCtx, ...ctxOverrides };
-  const moves = { ...defaultMoves, ...movesOverrides };
-  const { container } = render(
+  return render(
     <MemoryRouter>
       <GameSidebar
         roleLabels={undefined}
         stepDescription=""
         ctx={ctx}
-        moves={moves}
-        variants={variants}
+        moves={defaultMoves}
+        variants={defaultVariants}
         selectedVariantIndex={0}
       />
     </MemoryRouter>
   );
-  return { container, moves };
 };
 
 describe('GameSidebar', () => {

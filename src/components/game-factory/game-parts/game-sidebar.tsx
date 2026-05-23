@@ -7,17 +7,10 @@ import {
   getCtaText,
   DEFAULT_PLAYER_NAMES
 } from './game-controls';
-import type { DisplayCtx, Variant } from '../types';
+import type { Ctx, DisplayCtx, Variant } from '../types';
 import { Stats } from '../use-game-stats';
 
-interface SidebarCtx extends DisplayCtx {
-  isClientMoveAllowed: boolean
-  playerNames: string[]
-  currentPlayer: number | null
-  winnerIndex?: number | null
-}
-
-interface SidebarMoves {
+export interface SidebarMoves {
   switchMode: (mode: string) => void
   startGame: (roleIndex?: number | null) => void
   setPlayerNames: (names: string[]) => void
@@ -25,10 +18,10 @@ interface SidebarMoves {
   resetGameState: () => void
 }
 
-interface GameSidebarProps {
-  roleLabels?: [I18nString, I18nString] | null
+export interface GameSidebarProps {
+  roleLabels?: [I18nString, I18nString]
   stepDescription: React.ReactNode
-  ctx: SidebarCtx
+  ctx: Ctx
   gameEndDisplayCtx?: DisplayCtx | null
   moves: SidebarMoves
   variants: Variant[]
@@ -233,7 +226,7 @@ const Spinner = () => (
   ></div>
 );
 
-const PlayerTurnPanel = ({ ctx }: { ctx: SidebarCtx }) => {
+const PlayerTurnPanel = ({ ctx }: { ctx: Ctx }) => {
   const { t } = useTranslation();
   const playerName = (i: number) => ctx.playerNames[i] || t(DEFAULT_PLAYER_NAMES[i]);
   const isEnd = ctx.phase === 'gameEnd';

@@ -229,7 +229,6 @@ export const strategyGameFactory = <TBoard,>({
         setIsOpen={setIsGameEndDialogOpen}
         resetGameState={resetGameState}
         ctx={gameEndDisplayCtx ?? ctx}
-        isHumanVsHumanGame={isHumanVsHumanGame}
         onSwitchMode={changeMode}
         variants={visibleVariants}
         selectedVariantIndex={selectedVariantIndex}

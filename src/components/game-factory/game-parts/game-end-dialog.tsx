@@ -8,7 +8,6 @@ interface GameEndDialogProps {
   setIsOpen: (open: boolean) => void
   resetGameState: () => void
   ctx: DisplayCtx
-  isHumanVsHumanGame: boolean
   onSwitchMode: (mode: string) => void
   variants: Variant[]
   selectedVariantIndex: number
@@ -17,8 +16,9 @@ interface GameEndDialogProps {
 
 export const GameEndDialog = ({
   isOpen, setIsOpen, resetGameState, ctx,
-  isHumanVsHumanGame, onSwitchMode, variants, selectedVariantIndex, onSelectVariant
+  onSwitchMode, variants, selectedVariantIndex, onSelectVariant
 }: GameEndDialogProps) => {
+  const { isHumanVsHumanGame } = ctx;
   const { t } = useTranslation();
   return (
     <Dialog
