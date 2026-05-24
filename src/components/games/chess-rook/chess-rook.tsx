@@ -1,17 +1,17 @@
-import React from 'react';
 import { range, some, isEqual, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { BoardClientProps, Events } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
-import { getAllowedMoves, generateStartBoard, markVisitedFields } from './helpers';
+import { getAllowedMoves, generateStartBoard, markVisitedFields, type Board, type Field } from './helpers';
 import { ChessRookSvg } from './chess-rook-svg';
 
-const BoardClient = ({ board, ctx, moves }) => {
-  const clickField = (field) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
+  const clickField = (field: Field) => {
     if (!isMoveAllowed(field)) return;
 
     moves.moveRook(board, field);
   };
-  const isMoveAllowed = (targetField) => {
+  const isMoveAllowed = (targetField: Field) => {
     if (!ctx.isClientMoveAllowed) return false;
     return some(getAllowedMoves(board), field => isEqual(field, targetField));
   };
@@ -58,7 +58,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  moveRook: (board, { events }, { row, col }) => {
+  moveRook: (board: Board, { events }: { events: Events }, { row, col }: Field) => {
     const nextBoard = cloneDeep(board);
     markVisitedFields(nextBoard, nextBoard.rookPosition, { row, col });
 
@@ -71,7 +71,7 @@ const moves = {
     }
     return { nextBoard };
   }
-}
+};
 
 const rule = {
   hu: <>
