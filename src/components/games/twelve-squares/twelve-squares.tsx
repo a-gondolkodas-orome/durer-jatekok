@@ -1,12 +1,14 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { range, random, sample } from 'lodash';
 import { ChessBishopSvg } from '../chess-bishops/chess-bishop-svg';
 
-const isValidStep = (board, step) =>
+type Board = { left: number, right: number }
+
+const isValidStep = (board: Board, step) =>
   (step === 1 || step === 2) && step !== board.right - board.left;
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isMoveAllowed = (step) => {
 	  if(!ctx.isClientMoveAllowed) return false;
     return isValidStep(board, step);
@@ -66,12 +68,12 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const validSteps = [1, 2].filter(step => isValidStep(board, step));
   moves.step(board, sample(validSteps));
 };
 
-const optimalBotStrategy = ({ board, moves }) => {
+const optimalBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const step = getOptimalAiStep(board);
   moves.step(board, step);
 };
@@ -85,7 +87,7 @@ const getOptimalAiStep = ({ left, right }) => {
 };
 
 const moves = {
-  step: (board, { ctx, events }, step) => {
+  step: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, step) => {
     const nextBoard = ctx.currentPlayer === 0
       ? { left: board.left + step, right: board.right }
       : { left: board.left, right: board.right - step };
