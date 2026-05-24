@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { strategyGameFactory } from "../../game-factory/strategy-game";
+import type { Events, StrategyArgs, BoardClientProps } from "../../game-factory/types";
 import { range, isEqual, random, sample, difference, filter, cloneDeep } from "lodash";
 import { useTranslation } from "../../language/translate";
 
-const generateStartBoard = (maxDiscs) => () => {
+type Board = [number, number]
+
+const generateStartBoard = (maxDiscs) => (): Board => {
   const discCount = random(Math.floor(maxDiscs/2), maxDiscs);
   if (random(0, 1)) {
-    const blueCount = sample(range(0, discCount + 1, 3));
+    const blueCount = sample(range(0, discCount + 1, 3))!;
     return [blueCount, discCount - blueCount];
   } else {
     const nextDivisibleBy3 = 3 * (Math.floor(maxDiscs/3) + 1);
     const blueCount = sample(
       difference(range(0, discCount + 1), range(0, nextDivisibleBy3, 3))
-    );
+    )!;
     return [blueCount, discCount - blueCount];
   }
 };
@@ -33,9 +36,9 @@ const DisabledDisc = ({ bgColor }) => {
 };
 
 const gameBoardFactory = (maxDiscs) => {
-  return ({ board, ctx, moves }) => {
+  return ({ board, ctx, moves }: BoardClientProps<Board>) => {
     const { t } = useTranslation();
-    const [hovered, setHovered] = useState(null);
+    const [hovered, setHovered] = useState<[number, number] | null>(null);
 
     const select = (pile, i) => {
       if (!ctx.isClientMoveAllowed) return;
@@ -148,7 +151,7 @@ const gameBoardFactory = (maxDiscs) => {
 };
 
 const moves = {
-  removeDiscs: (board, { events }, count) => {
+  removeDiscs: (board: Board, { events }: { events: Events }, count) => {
     const nextBoard = cloneDeep(board);
     nextBoard[0] -= count;
     events.endTurn();
@@ -157,7 +160,7 @@ const moves = {
     }
     return { nextBoard };
   },
-  turnDiscs: (board, { events }, count) => {
+  turnDiscs: (board: Board, { events }: { events: Events }, count) => {
     const nextBoard = cloneDeep(board);
     nextBoard[1] -= count;
     nextBoard[0] += count;
@@ -169,11 +172,11 @@ const moves = {
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const rem = board[0] % 3;
   if (rem === 0) {
-    const randomNonEmptyPile = sample(filter([0, 1], (i) => board[i] > 0));
-    const amount = board[randomNonEmptyPile] > 1 ? sample([1, 2]) : 1;
+    const randomNonEmptyPile = sample(filter([0, 1], (i) => board[i] > 0))!;
+    const amount = board[randomNonEmptyPile] > 1 ? sample([1, 2])! : 1;
     if (randomNonEmptyPile === 0) {
       moves.removeDiscs(board, amount);
     } else {
@@ -189,13 +192,13 @@ const aiBotStrategy = ({ board, moves }) => {
   }
 };
 
-const randomBotStrategy = ({ board, moves }) => {
-  const validMoves = [];
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+  const validMoves: Array<() => void> = [];
   if (board[0] >= 1) validMoves.push(() => moves.removeDiscs(board, 1));
   if (board[0] >= 2) validMoves.push(() => moves.removeDiscs(board, 2));
   if (board[1] >= 1) validMoves.push(() => moves.turnDiscs(board, 1));
   if (board[1] >= 2) validMoves.push(() => moves.turnDiscs(board, 2));
-  sample(validMoves)();
+  sample(validMoves)!();
 };
 
 const getPlayerStepDescription = () => ({
