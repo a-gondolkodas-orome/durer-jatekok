@@ -85,13 +85,16 @@ export const strategyGameFactory = <TBoard,>({
       return moveResult;
     };
 
-    const resetGameState = ({ newMode = mode, generateBoard = activeGenerateStartBoard } = {}) => {
-      setMode(newMode);
-      let boardGenerator = generateBoard;
-      if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
-        setSelectedVariantIndex(defaultVariantIndex);
+    const resetGameState = ({ newMode = mode, newVariantIndex = selectedVariantIndex } = {}) => {
+      const newVariant = resolvedVariants[newVariantIndex] ?? defaultVariant;
+      let boardGenerator = newVariant.generateStartBoard ?? defaultGenerateStartBoard;
+      let finalVariantIndex = newVariantIndex;
+      if (newMode === 'vsHuman' && !newVariant.generateStartBoard) {
+        finalVariantIndex = defaultVariantIndex;
         boardGenerator = defaultGenerateStartBoard;
       }
+      setSelectedVariantIndex(finalVariantIndex);
+      setMode(newMode);
       setBoard(boardGenerator());
       setPhase('roleSelection');
       setChosenRoleIndex(null);
@@ -103,16 +106,14 @@ export const strategyGameFactory = <TBoard,>({
     };
 
     const setDifficulty = (index: number) => {
-      setSelectedVariantIndex(index);
-      const newVariant = resolvedVariants[index] ?? defaultVariant;
-      resetGameState({ generateBoard: newVariant.generateStartBoard ?? defaultGenerateStartBoard });
+      resetGameState({ newVariantIndex: index });
     };
 
-    const changeMode = (newMode: Mode) => {
-      setMode(newMode);
-      if (newMode === 'vsHuman' && !activeVariant.generateStartBoard) {
-        setSelectedVariantIndex(defaultVariantIndex);
-      }
+    const getVariantsForMode = (m: Mode): DisplayVariant[] => {
+      const humanVsHuman = m === 'vsHuman';
+      return resolvedVariants
+        .map((v, i) => ({ ...v, originalIndex: i, disabled: !humanVsHuman && !v.botStrategy }))
+        .filter(v => !humanVsHuman || !!v.generateStartBoard);
     };
 
     const resolvedPlayerNames: [string, string] = [
@@ -174,9 +175,7 @@ export const strategyGameFactory = <TBoard,>({
       }, time);
     };
 
-    const visibleVariants: DisplayVariant[] = resolvedVariants
-      .map((v, i) => ({ ...v, originalIndex: i, disabled: !isHumanVsHumanGame && !v.botStrategy }))
-      .filter(v => !isHumanVsHumanGame || !!v.generateStartBoard);
+    const visibleVariants = getVariantsForMode(mode);
 
     return (
     <main className="flex flex-col p-2 min-h-screen">
@@ -216,12 +215,10 @@ export const strategyGameFactory = <TBoard,>({
       <GameEndDialog
         isOpen={isGameEndDialogOpen}
         setIsOpen={setIsGameEndDialogOpen}
-        resetGameState={resetGameState}
         ctx={ctx}
-        onSwitchMode={changeMode}
-        variants={visibleVariants}
         selectedVariantIndex={selectedVariantIndex}
-        onSelectVariant={setSelectedVariantIndex}
+        getVariantsForMode={getVariantsForMode}
+        onNewGame={(newMode, variantIndex) => resetGameState({ newMode, newVariantIndex: variantIndex })}
       />
     </main>
     );
