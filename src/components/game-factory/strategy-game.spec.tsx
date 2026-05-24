@@ -15,21 +15,6 @@ const MinimalBoardClient = ({ board, moves }: BoardClientProps<Board>) => (
   <button data-testid="move-btn" onClick={() => moves.mainMove(board)}>move</button>
 );
 
-const minimalConfig = (gameplay: Gameplay<Board>): StrategyGameConfig<Board> => ({
-  presentation: {
-    rule: <></>,
-    getPlayerStepDescription: () => ''
-  },
-  BoardClient: MinimalBoardClient,
-  gameplay,
-  variants: [{ botStrategy: () => {}, generateStartBoard: (): Board => ['initial'] }]
-});
-
-const renderGame = (config: StrategyGameConfig<Board>) => {
-  const Game = strategyGameFactory(config);
-  return render(<MemoryRouter><Game /></MemoryRouter>);
-};
-
 const CtxAwareBoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => (
   <button
     data-testid="move-btn"
@@ -38,22 +23,38 @@ const CtxAwareBoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => 
   >move</button>
 );
 
-const ctxAwareConfig = (botStrategy: () => void = () => {}) => ({
-  presentation: {
-    rule: <></>,
-    getPlayerStepDescription: () => ''
-  },
-  BoardClient: CtxAwareBoardClient,
-  gameplay: {
-    moves: {
-      mainMove: (board: Board, { events }: { events: Events }) => {
-        events.endTurn();
-        return { nextBoard: board };
-      }
+const defaultGameplay: Gameplay<Board> = {
+  moves: {
+    mainMove: (board: Board, { events }: { events: Events }) => {
+      events.endTurn();
+      return { nextBoard: board };
     }
-  },
+  }
+};
+
+const makeConfig = ({
+  BoardClient = MinimalBoardClient,
+  gameplay = defaultGameplay,
+  botStrategy = () => {}
+}: {
+  BoardClient?: StrategyGameConfig<Board>['BoardClient']
+  gameplay?: Gameplay<Board>
+  botStrategy?: () => void
+} = {}): StrategyGameConfig<Board> => ({
+  presentation: { rule: <></>, getPlayerStepDescription: () => '' },
+  BoardClient,
+  gameplay,
   variants: [{ botStrategy, generateStartBoard: (): Board => ['initial'] }]
 });
+
+const minimalConfig = (gameplay: Gameplay<Board>) => makeConfig({ gameplay });
+const ctxAwareConfig = (botStrategy: () => void = () => {}) =>
+  makeConfig({ BoardClient: CtxAwareBoardClient, botStrategy });
+
+const renderGame = (config: StrategyGameConfig<Board>) => {
+  const Game = strategyGameFactory(config);
+  return render(<MemoryRouter><Game /></MemoryRouter>);
+};
 
 describe('isClientMoveAllowed', () => {
   it('allows both players to move in vsHuman mode', () => {
@@ -162,11 +163,7 @@ describe('strategyGameFactory endOfTurnMove', () => {
   });
 });
 
-const gameEndingConfig = () => ({
-  presentation: {
-    rule: <></>,
-    getPlayerStepDescription: () => ''
-  },
+const gameEndingConfig = () => makeConfig({
   BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
     <>
       <button data-testid="end-win-btn" onClick={() => moves.endWin(board)}>win</button>
@@ -184,8 +181,7 @@ const gameEndingConfig = () => ({
         return { nextBoard: board };
       }
     }
-  },
-  variants: [{ botStrategy: () => {}, generateStartBoard: (): Board => ['initial'] }]
+  }
 });
 
 describe('win/loss tracking', () => {
