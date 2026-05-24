@@ -2,23 +2,13 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { GameSidebar, SidebarMoves } from './game-sidebar';
 import type { Ctx } from '../types';
+import { makeCtx } from '../ctx-factory';
 
 beforeAll(() => {
   const { unmount } = renderSidebar();
   unmount();
 });
 
-
-const defaultCtx: Ctx = {
-  isHumanVsHumanGame: true,
-  phase: 'roleSelection',
-  isClientMoveAllowed: false,
-  resolvedPlayerNames: ['Player 1', 'Player 2'],
-  chosenRoleIndex: null,
-  currentPlayer: 0,
-  winnerIndex: null,
-  turnState: null
-};
 
 const defaultMoves: SidebarMoves = {
   switchMode: vi.fn(),
@@ -29,7 +19,7 @@ const defaultMoves: SidebarMoves = {
 };
 
 const renderSidebar = (ctxOverrides: Partial<Ctx> = {}) => {
-  const ctx = { ...defaultCtx, ...ctxOverrides };
+  const ctx = makeCtx({ currentPlayer: 0, ...ctxOverrides });
   return render(
     <MemoryRouter>
       <GameSidebar

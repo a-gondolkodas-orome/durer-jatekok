@@ -1,17 +1,5 @@
 import { getCtaText } from './game-controls';
-import type { Ctx } from '../types';
-
-const makeCtx = (overrides: Partial<Ctx> = {}): Ctx => ({
-  phase: 'roleSelection',
-  isHumanVsHumanGame: false,
-  resolvedPlayerNames: ['Alice', 'Bob'],
-  currentPlayer: null,
-  isClientMoveAllowed: false,
-  winnerIndex: null,
-  chosenRoleIndex: null,
-  turnState: null,
-  ...overrides
-});
+import { makeCtx } from '../ctx-factory';
 
 describe('getCtaText', () => {
   describe('vsHuman mode', () => {
@@ -21,13 +9,17 @@ describe('getCtaText', () => {
     });
 
     it('play: returns "Next: [player name]"', () => {
-      expect(getCtaText(makeCtx({ phase: 'play', isHumanVsHumanGame: true, currentPlayer: 0 })))
-        .toEqual({ hu: 'Következik: Alice', en: 'Next: Alice' });
+      const ctx = makeCtx({
+        phase: 'play', isHumanVsHumanGame: true, currentPlayer: 0, resolvedPlayerNames: ['Alice', 'Bob']
+      });
+      expect(getCtaText(ctx)).toEqual({ hu: 'Következik: Alice', en: 'Next: Alice' });
     });
 
     it('gameEnd: returns "Winner: [winner name]"', () => {
-      expect(getCtaText(makeCtx({ phase: 'gameEnd', isHumanVsHumanGame: true, winnerIndex: 1 })))
-        .toEqual({ hu: 'A játékot nyerte: Bob', en: 'Winner: Bob' });
+      const ctx = makeCtx({
+        phase: 'gameEnd', isHumanVsHumanGame: true, winnerIndex: 1, resolvedPlayerNames: ['Alice', 'Bob']
+      });
+      expect(getCtaText(ctx)).toEqual({ hu: 'A játékot nyerte: Bob', en: 'Winner: Bob' });
     });
   });
 
