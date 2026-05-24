@@ -17,15 +17,22 @@ const DEFAULT_PLAYER_NAMES: I18nString[] = [
   { hu: '2. játékos', en: '2nd player' }
 ];
 
-interface Presentation<TBoard> {
+export interface Presentation<TBoard> {
   rule: TranslatableNode
   roleLabels?: [I18nString, I18nString]
   getPlayerStepDescription: (args: { board: TBoard; ctx: Ctx }) => Translatable
 }
 
-interface Gameplay<TBoard> {
+export interface Gameplay<TBoard> {
   moves: Record<string, MoveFunction<TBoard>>
   endOfTurnMove?: string
+}
+
+export type StrategyGameConfig<TBoard> = {
+  presentation: Presentation<TBoard>
+  BoardClient: React.ComponentType<BoardClientProps<TBoard>>
+  gameplay: Gameplay<TBoard>
+  variants: VariantInput<TBoard>[]
 }
 
 export const strategyGameFactory = <TBoard,>({
@@ -33,12 +40,7 @@ export const strategyGameFactory = <TBoard,>({
   BoardClient,
   gameplay,
   variants
-}: {
-  presentation: Presentation<TBoard>
-  BoardClient: React.ComponentType<BoardClientProps<TBoard>>
-  gameplay: Gameplay<TBoard>
-  variants: VariantInput<TBoard>[]
-}) => {
+}: StrategyGameConfig<TBoard>) => {
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
   const { moves, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);

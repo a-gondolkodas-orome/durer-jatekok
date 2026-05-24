@@ -1,10 +1,9 @@
 import { render, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { strategyGameFactory } from './strategy-game';
-import type { Ctx, Events, GameMoves } from './types';
+import { strategyGameFactory, type StrategyGameConfig, type Gameplay } from './strategy-game';
+import type { BoardClientProps, Ctx, Events, GameMoves } from './types';
 
 type Board = string[];
-type BoardClientProps = { board: Board; ctx: Ctx; events: Events; moves: GameMoves<Board> };
 
 beforeAll(() => {
   const { getByTestId, unmount } = renderGame(ctxAwareConfig());
@@ -12,26 +11,26 @@ beforeAll(() => {
   unmount();
 });
 
-const MinimalBoardClient = ({ board, moves }: BoardClientProps) => (
+const MinimalBoardClient = ({ board, moves }: BoardClientProps<Board>) => (
   <button data-testid="move-btn" onClick={() => moves.mainMove(board)}>move</button>
 );
 
-const minimalConfig = (moves: GameMoves<Board>, endOfTurnMove?: string) => ({
+const minimalConfig = (gameplay: Gameplay<Board>): StrategyGameConfig<Board> => ({
   presentation: {
     rule: <></>,
     getPlayerStepDescription: () => ''
   },
   BoardClient: MinimalBoardClient,
-  gameplay: { moves, endOfTurnMove },
+  gameplay,
   variants: [{ botStrategy: () => {}, generateStartBoard: (): Board => ['initial'] }]
 });
 
-const renderGame = (config: Parameters<typeof strategyGameFactory<Board>>[0]) => {
+const renderGame = (config: StrategyGameConfig<Board>) => {
   const Game = strategyGameFactory(config);
   return render(<MemoryRouter><Game /></MemoryRouter>);
 };
 
-const CtxAwareBoardClient = ({ board, ctx, moves }: BoardClientProps) => (
+const CtxAwareBoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => (
   <button
     data-testid="move-btn"
     disabled={!ctx.isClientMoveAllowed}
@@ -135,7 +134,7 @@ describe('strategyGameFactory endOfTurnMove', () => {
       autoMove
     };
 
-    const { getByTestId } = renderGame(minimalConfig(moves, 'autoMove'));
+    const { getByTestId } = renderGame(minimalConfig({ moves, endOfTurnMove: 'autoMove' }));
     fireEvent.click(getByTestId('move-btn'));
 
     expect(autoMove).not.toHaveBeenCalled();
@@ -155,7 +154,7 @@ describe('strategyGameFactory endOfTurnMove', () => {
       autoMove
     };
 
-    const { getByTestId } = renderGame(minimalConfig(moves, 'autoMove'));
+    const { getByTestId } = renderGame(minimalConfig({ moves, endOfTurnMove: 'autoMove' }));
     fireEvent.click(getByTestId('move-btn'));
     act(() => { vi.advanceTimersByTime(750); });
 
@@ -168,7 +167,7 @@ const gameEndingConfig = () => ({
     rule: <></>,
     getPlayerStepDescription: () => ''
   },
-  BoardClient: ({ board, moves }: BoardClientProps) => (
+  BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
     <>
       <button data-testid="end-win-btn" onClick={() => moves.endWin(board)}>win</button>
       <button data-testid="end-lose-btn" onClick={() => moves.endLose(board)}>lose</button>
