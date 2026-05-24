@@ -1,7 +1,9 @@
-import React from 'react';
 import { sample } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { useTranslation } from '../../language/translate';
+
+type Board = { digits: number[], sumMod9: number }
 
 const totalDigits = 10;
 const availableDigits = [1, 2, 3, 4, 5, 6];
@@ -27,13 +29,13 @@ const winnerFromState = (() => {
   return (sumMod9, turnsLeft) => memo[`${sumMod9},${turnsLeft}`];
 })();
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const slots = Array.from({ length: totalDigits }, (_, i) =>
     i < board.digits.length ? board.digits[i] : null
   );
 
-  let numberSummary = null;
+  let numberSummary: string | null = null;
   if (board.digits.length === totalDigits) {
     const num = board.digits.reduce((acc, d) => acc * 10 + d, 0);
     const remainder = board.sumMod9;
@@ -83,7 +85,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  chooseDigit: (board, { events }, digit) => {
+  chooseDigit: (board: Board, { events }: { events: Events }, digit) => {
     const newDigits = [...board.digits, digit];
     const newSumMod9 = (board.sumMod9 + digit) % 9;
     const nextBoard = { digits: newDigits, sumMod9: newSumMod9 };
@@ -96,7 +98,7 @@ const moves = {
   }
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
 
@@ -111,7 +113,7 @@ const randomBotStrategy = ({ board, moves }) => {
   moves.chooseDigit(board, sample(availableDigits));
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
 
