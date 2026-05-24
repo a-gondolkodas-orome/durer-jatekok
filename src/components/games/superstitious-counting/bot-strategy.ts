@@ -1,12 +1,12 @@
-'use strict';
-
 import { random } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './superstitious-counting';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.step(board, randomStep(board.restricted));
 };
 
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const step = getOptimalAiStep(board);
   moves.step(board, step);
 };

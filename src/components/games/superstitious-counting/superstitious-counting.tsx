@@ -1,25 +1,26 @@
-import React from 'react';
 import { range, sample, difference } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import { useTranslation } from '../../language/translate';
 
+export type Board = { current: number, target: number, restricted: number | null }
 
-const generateStartBoard = () => {
+const generateStartBoard = (): Board => {
   const losingPositions = range(29, 127, 14);
   const winningPositions = difference(range(26, 115), losingPositions);
-  const target = sample([sample(losingPositions), sample(winningPositions)]);
+  const target = sample([sample(losingPositions), sample(winningPositions)])!;
   return { current: 0, target, restricted: null };
 };
 
-const generateTestStartBoard = () => {
+const generateTestStartBoard = (): Board => {
   const losingPositions = [29];
   const winningPositions = difference(range(26, 33), losingPositions);
-  const target = sample([sample(losingPositions), sample(winningPositions)]);
+  const target = sample([sample(losingPositions), sample(winningPositions)])!;
   return { current: 0, target, restricted: null };
 };
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const fields = range(board.target + 14);
 
@@ -78,12 +79,12 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  step: (board, { ctx, events }, step) => {
+  step: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, step) => {
     const numberAfterStep = board.current + step;
     const nextBoard = { current: numberAfterStep, target: board.target, restricted: 13 - step };
     events.endTurn();
     if (numberAfterStep >= board.target) {
-      events.endGame(1 - ctx.currentPlayer)
+      events.endGame(1 - ctx.currentPlayer!)
     }
     return { nextBoard };
   }

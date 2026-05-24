@@ -134,13 +134,13 @@ export const strategyGameFactory = <TBoard,>({
     };
 
     const endTurn = () => {
-      setCurrentPlayer(p => (1 - p!) as PlayerIndex);
+      setCurrentPlayer(p => 1 - p!);
     };
 
     const startGame = (roleIndex: number | null = null) => {
       setPhase('play');
       setCurrentPlayer(0);
-      setChosenRoleIndex(roleIndex as PlayerIndex | null);
+      setChosenRoleIndex(roleIndex);
     };
 
     const isClientMoveAllowed = phase === 'play'
