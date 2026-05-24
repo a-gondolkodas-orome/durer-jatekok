@@ -1,12 +1,14 @@
-import React from 'react';
 import { range, sum, isEqual, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 
-const generateStartBoard = () => [0, 0, 0, 0];
+export type Board = number[]
+
+const generateStartBoard = (): Board => [0, 0, 0, 0];
 
 const moves = {
-  addPiece: (board, { events }, pileId) => {
+  addPiece: (board: Board, { events }: { events: Events }, pileId) => {
     const nextBoard = cloneDeep(board);
     nextBoard[pileId] += 1;
     events.endTurn();
@@ -18,7 +20,7 @@ const moves = {
   }
 }
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const placePiece = id => {
     if (!ctx.isClientMoveAllowed) return;
     moves.addPiece(board, id);

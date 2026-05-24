@@ -1,17 +1,17 @@
-'use strict';
-
 import { sum, random, sample, range } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './two-times-two';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.addPiece(board, sample(range(0, 4)));
 };
 
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const id = getOptimalTileIndex(board);
   moves.addPiece(board, id);
 }
 
-const getOptimalTileIndex = (board) => {
+const getOptimalTileIndex = (board: Board) => {
   const pieces = sum(board);
 
   if (pieces % 2 === 0) { //following the strategy
