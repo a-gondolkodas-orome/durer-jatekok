@@ -1,10 +1,12 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { range, cloneDeep, sample, random } from 'lodash';
 import { strategyDict } from './bot-strategy';
 import { useTranslation } from '../../language/translate';
+import type { Events, BoardClientProps, StrategyArgs } from '../../game-factory/types';
 
-const isAllowed = (board, n) => {
+type Board = { numbersOnTable: boolean[], previousMove: number | null }
+
+const isAllowed = (board: Board, n) => {
   if (board.previousMove === null) {
     return true;
   }
@@ -17,7 +19,7 @@ const isAllowed = (board, n) => {
   return false;
 }
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const isMoveAllowed = n => isAllowed(board, n);
 
@@ -62,7 +64,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  removeNumber: (board, { events }, n) => {
+  removeNumber: (board: Board, { events }: { events: Events }, n) => {
     const nextBoard = cloneDeep(board);
     nextBoard.numbersOnTable[n - 1] = false;
     nextBoard.previousMove = n;
@@ -74,19 +76,19 @@ const moves = {
   }
 };
 
-const isGameEnd = board => {
+const isGameEnd = (board: Board) => {
   const possibleMoves = range(1, board.numbersOnTable.length + 1)
     .filter(n => isAllowed(board, n));
   return possibleMoves.length === 0;
 }
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const possibleMoves = range(1, board.numbersOnTable.length + 1)
     .filter(n => isAllowed(board, n));
   moves.removeNumber(board, sample(possibleMoves));
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const numCount = board.numbersOnTable.length;
   const stateId = generateStateID(board);
   const optimalMoves = strategyDict[numCount]
@@ -101,7 +103,7 @@ const aiBotStrategy = ({ board, moves }) => {
   }
 };
 
-const generateStateID = (board) => {
+const generateStateID = (board: Board) => {
   let id = 0;
   for (let i = 0; i < board.numbersOnTable.length; i++) {
     if (board.numbersOnTable[i]){
@@ -132,20 +134,20 @@ const getPlayerStepDescription = () => ({
   en: 'Choose one of the numbers that can be removed.'
 });
 
-const generateStartBoard = () => {
+const generateStartBoard = (): Board => {
   const numCount = random(0, 2) === 0
-    ? sample([6, 10])
-    : sample([7, 8, 9, 11, 12, 13, 14, 15]);
+    ? sample([6, 10])!
+    : sample([7, 8, 9, 11, 12, 13, 14, 15])!;
   return ({
     numbersOnTable: Array(numCount).fill(true),
     previousMove: null
   })
 }
 
-const generateTestStartBoard = () => {
+const generateTestStartBoard = (): Board => {
   const numCount = random(0, 2) === 0
-    ? sample([6])
-    : sample([7, 8, 9]);
+    ? sample([6])!
+    : sample([7, 8, 9])!;
   return ({
     numbersOnTable: Array(numCount).fill(true),
     previousMove: null
