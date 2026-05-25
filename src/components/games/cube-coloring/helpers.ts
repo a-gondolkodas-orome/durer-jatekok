@@ -1,10 +1,12 @@
-'use strict';
-
 import { isNull, every } from 'lodash';
+
+export type Board = (string | null)[]
+
+export const generateStartBoard = (): Board => Array(8).fill(null);
 
 export const allColors = ['#dc2626', '#eab308', '#2563eb'];
 
-export const isAllowedStep = (board, vertex, color) => {
+export const isAllowedStep = (board: Board, vertex, color) => {
   if (!isNull(board[vertex])) return false;
   return every(neighbours[vertex], i => isNull(board[i]) || board[i] !== color);
 };

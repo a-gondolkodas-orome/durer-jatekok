@@ -1,10 +1,9 @@
-'use strict';
-
 import { isNull, difference, range, shuffle, sample } from 'lodash';
-import { allColors, isAllowedStep, neighbours } from './helpers';
+import { allColors, isAllowedStep, neighbours, type Board } from './helpers';
+import type { StrategyArgs } from '../../game-factory/types';
 
-export const randomBotStrategy = ({ board, moves }) => {
-  const validMoves = [];
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+  const validMoves: { vertex: number, color: string }[] = [];
   for (const vertex of range(0, 8)) {
     if (!isNull(board[vertex])) continue;
     for (const color of allColors) {
@@ -16,14 +15,14 @@ export const randomBotStrategy = ({ board, moves }) => {
   moves.colorVertex(board, sample(validMoves));
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const { vertex, color } = ctx.chosenRoleIndex === 0
-    ? makeOptimalStepAsSecond(board)
+    ? makeOptimalStepAsSecond(board)!
     : makeOptimalStepAsFirst(board);
   moves.colorVertex(board, { vertex, color });
 };
 
-const makeOptimalStepAsFirst = (board) => {
+const makeOptimalStepAsFirst = (board: Board) => {
   const mainDiagonal = shuffle([2, 4]);
   const otherVertices = shuffle([0, 1, 3, 5, 6, 7]);
   const vertexToColor = [...mainDiagonal, ...otherVertices].find(v => isNull(board[v]));
@@ -31,7 +30,7 @@ const makeOptimalStepAsFirst = (board) => {
   return { vertex: vertexToColor, color: sample(colors) };
 };
 
-const makeOptimalStepAsSecond = (board) => {
+const makeOptimalStepAsSecond = (board: Board) => {
   const emptyVertices = shuffle(range(0, 8)).filter(v => isNull(board[v]));
 
   // try to immediately make a vertex uncolorable
@@ -81,11 +80,11 @@ const makeOptimalStepAsSecond = (board) => {
   console.error("This state should not happen");
 };
 
-const getMissingColors = (board, vertex) => {
+const getMissingColors = (board: Board, vertex) => {
   const nbColors = neighbours[vertex].map(v => board[v]);
   return difference(allColors, nbColors);
 };
 
-const getEmptyNeighbours = (board, vertex) => {
+const getEmptyNeighbours = (board: Board, vertex) => {
   return neighbours[vertex].filter(i => isNull(board[i]));
 };

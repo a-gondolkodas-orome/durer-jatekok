@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { range, cloneDeep, every, some, isNull } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
-import { isAllowedStep, allColors } from './helpers';
+import { isAllowedStep, allColors, generateStartBoard, type Board } from './helpers';
 import { useTranslation } from '../../language/translate';
-
-const generateStartBoard = () => Array(8).fill(null);
 
 const cubeCoords = [
   { cx: '8%',  cy: '25%' },
@@ -18,7 +17,7 @@ const cubeCoords = [
   { cx: '25%', cy: '74%' }
 ];
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const [color, setColor] = useState('');
   const [show, setShow] = useState(false);
@@ -123,13 +122,13 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const isGameEnd = board => {
+const isGameEnd = (board: Board) => {
   const canUseColor = color => some(range(0, 8), v => isAllowedStep(board, v, color));
   return every(allColors, color => !canUseColor(color));
 };
 
 const moves = {
-  colorVertex: (board, { events }, { vertex, color }) => {
+  colorVertex: (board: Board, { events }: { events: Events }, { vertex, color }) => {
     const nextBoard = cloneDeep(board);
     nextBoard[vertex] = color;
     events.endTurn();
