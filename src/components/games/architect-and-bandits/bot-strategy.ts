@@ -1,4 +1,6 @@
-import { sample } from 'lodash';
+import { maxBy } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './architect-and-bandits';
 
 // Vertices A(0)..H(7) clockwise. Each edge = 10 km, max 4 edges/day.
 // Architect wins by visiting all 8 vertices over 4 days despite 3 nightly destructions.
@@ -13,7 +15,7 @@ import { sample } from 'lodash';
 //   Day 3: rebuild remaining missing towers from night 2, position for day 4
 //   Day 4: visit any towers destroyed on night 3 (always reachable ≤ 4 edges)
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.currentPlayer === 0) {
     const path = getOptimalArchitectPath(board);
     executeArchitectPath(path, board, moves);
@@ -32,11 +34,11 @@ const executeArchitectPath = (path, board, moves) => {
   setTimeout(() => executeArchitectPath(rest, nextBoard, moves), 600);
 };
 
-const getOptimalArchitectPath = (board) => {
+const getOptimalArchitectPath = (board: Board) => {
   const pos = board.architectPosition;
   const towers = board.towers;
   const day = board.day;
-  const missing = towers.map((t, i) => (!t ? i : null)).filter((i) => i !== null);
+  const missing = towers.map((t, i) => (!t ? i : null)).filter(i => i !== null);
 
   if (day === 1) {
     return [1, 2, 3, 4]; // A→B→C→D→E
@@ -98,9 +100,9 @@ const getOptimalArchitectPath = (board) => {
     const farMissing = missing.find((v) => v >= 5); // F(5), G(6), or H(7)
     const nearMissing = missing.find((v) => v !== farMissing);
 
-    const pathCW = clockwisePath(pos, farMissing);
+    const pathCW = clockwisePath(pos, farMissing!);
     if (nearMissing === undefined || pathCW.includes(nearMissing)) return pathCW;
-    return counterclockwisePath(pos, farMissing);
+    return counterclockwisePath(pos, farMissing!);
   }
 
   return [];
@@ -109,24 +111,21 @@ const getOptimalArchitectPath = (board) => {
 // Bandit heuristic: pick the tower that maximises the
 // minimum path the architect needs to cover all missing+newly-destroyed vertices.
 // Destroying the architect's current position is excluded: startNextDay rebuilds it for free.
-const executeBanditStrategy = (board, moves) => {
+const executeBanditStrategy = (board: Board, moves) => {
   const pos = board.architectPosition;
   const candidates = board.towers
     .map((t, i) => (t && i !== pos ? i : null))
-    .filter((i) => i !== null);
+    .filter(i => i !== null);
   if (candidates.length === 0) return;
 
   const missing = board.towers
     .map((t, i) => (!t && i !== pos ? i : null))
-    .filter((i) => i !== null);
+    .filter(i => i !== null);
 
-  const best = candidates.reduce(
-    (acc, v) => {
-      const pathLen = minPathToVisitAll(pos, [...missing, v]);
-      return pathLen > acc.len ? { v, len: pathLen } : acc;
-    },
-    { v: null, len: -1 }
-  );
+  const best = maxBy(
+    candidates.map(v => ({ v, len: minPathToVisitAll(pos, [...missing, v]) })),
+    'len'
+  )!;
   moves.destroyTower(board, best.v);
 };
 
@@ -149,7 +148,7 @@ const minPathToVisitAll = (pos, targets) => {
 };
 
 const directedPath = (from, to, step) => {
-  const path = [];
+  const path: number[] = [];
   let cur = from;
   while (cur !== to) {
     cur = (cur + step + 8) % 8;

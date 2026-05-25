@@ -1,5 +1,6 @@
-import React from 'react';
 import { useTranslation } from '../../language/translate';
+import type { BoardClientProps } from '../../game-factory/types';
+import type { Board } from './architect-and-bandits-b';
 
 const VERTEX_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
@@ -21,7 +22,7 @@ const LABEL_COORDS = Array.from({ length: 10 }, (_, i) => {
   };
 });
 
-export const BoardClient = ({ board, ctx, moves }) => {
+export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const gameStarted = ctx.isHumanVsHumanGame || ctx.chosenRoleIndex !== null;
 

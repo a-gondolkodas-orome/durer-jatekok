@@ -1,5 +1,6 @@
-import React from 'react';
 import { useTranslation } from '../../language/translate';
+import type { BoardClientProps } from '../../game-factory/types';
+import type { Board } from './architect-and-bandits';
 
 const VERTEX_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -21,7 +22,7 @@ const LABEL_COORDS = Array.from({ length: 8 }, (_, i) => {
   };
 });
 
-export const BoardClient = ({ board, ctx, moves }) => {
+export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   // Hide towers during role selection (before the game actually begins)
   const gameStarted = ctx.isHumanVsHumanGame || ctx.chosenRoleIndex !== null;

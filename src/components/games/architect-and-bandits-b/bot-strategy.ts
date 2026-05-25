@@ -1,4 +1,6 @@
-import { sample } from 'lodash';
+import { maxBy, sample } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './architect-and-bandits-b';
 
 // Vertices A(0)..J(9) clockwise. Each edge = 10 km, max 5 edges/day.
 // Architect wins by visiting all 10 vertices over 4 days despite 3 nightly destructions.
@@ -13,7 +15,7 @@ import { sample } from 'lodash';
 //   Day 3: cover remaining missing, position for day 4
 //   Day 4: visit any towers destroyed on night 3 (always reachable ≤5 edges)
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.currentPlayer === 0) {
     const path = getOptimalArchitectPath(board);
     executeArchitectPath(path, board, moves);
@@ -32,11 +34,11 @@ const executeArchitectPath = (path, board, moves) => {
   setTimeout(() => executeArchitectPath(rest, nextBoard, moves), 600);
 };
 
-const getOptimalArchitectPath = (board) => {
+const getOptimalArchitectPath = (board: Board) => {
   const pos = board.architectPosition;
   const towers = board.towers;
   const day = board.day;
-  const missing = towers.map((t, i) => (!t ? i : null)).filter(i => i !== null);
+  const missing = towers.map((t, i) => (!t ? i : null)).filter((i) => i !== null);
 
   if (day === 1) return [1, 2, 3, 4, 5]; // A→B→C→D→E→F
 
@@ -111,29 +113,26 @@ const getOptimalArchitectPath = (board) => {
 // Bandit heuristic: day 1 random; later days pick the tower that maximises the
 // minimum path the architect needs to cover all missing+newly-destroyed vertices.
 // Destroying the architect's current position is excluded: startNextDay rebuilds it for free.
-const executeBanditStrategy = (board, moves) => {
+const executeBanditStrategy = (board: Board, moves) => {
   const pos = board.architectPosition;
   const candidates = board.towers
     .map((t, i) => (t && i !== pos ? i : null))
-    .filter(i => i !== null);
+    .filter((i) => i !== null);
   if (candidates.length === 0) return;
 
   if (board.day === 1) {
-    moves.destroyTower(board, sample(candidates));
+    moves.destroyTower(board, sample(candidates)!);
     return;
   }
 
   const missing = board.towers
     .map((t, i) => (!t && i !== pos ? i : null))
-    .filter(i => i !== null);
+    .filter((i) => i !== null);
 
-  const best = candidates.reduce(
-    (acc, v) => {
-      const pathLen = minPathToVisitAll(pos, [...missing, v]);
-      return pathLen > acc.len ? { v, len: pathLen } : acc;
-    },
-    { v: null, len: -1 }
-  );
+  const best = maxBy(
+    candidates.map(v => ({ v, len: minPathToVisitAll(pos, [...missing, v]) })),
+    'len'
+  )!;
   moves.destroyTower(board, best.v);
 };
 
@@ -155,8 +154,10 @@ const minPathToVisitAll = (pos, targets) => {
   return best;
 };
 
+const decDist = (a, b) => Math.min((b - a + 10) % 10, (a - b + 10) % 10);
+
 const directedPath = (from, to, step) => {
-  const path = [];
+  const path: number[] = [];
   let cur = from;
   while (cur !== to) {
     cur = (cur + step + 10) % 10;
