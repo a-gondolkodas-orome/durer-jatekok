@@ -1,9 +1,11 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { random } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
-const BoardClient = ({ board, ctx, moves }) => {
+type Board = number[]
+
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   return(
     <section className="p-2 shrink-0 grow basis-2/3">
@@ -39,11 +41,11 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  add1: (board, { events }) => {
+  add1: (board: Board, { events }: { events: Events }) => {
     events.endTurn();
     return { nextBoard: [board[0], board[1] + 1] }
   },
-  subtract: (board, { events }) => {
+  subtract: (board: Board, { events }: { events: Events }) => {
     events.endTurn();
     if (board[0] - board[1] <= 0) {
       events.endGame();
@@ -52,7 +54,7 @@ const moves = {
   }
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (random(0, 1) === 0) {
     moves.add1(board);
   } else {
@@ -60,7 +62,7 @@ const randomBotStrategy = ({ board, moves }) => {
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const [a, b] = board;
   if (a <= b) {
     moves.subtract(board);
@@ -79,7 +81,7 @@ const aiBotStrategy = ({ board, moves }) => {
     moves.subtract(board);
     return;
   }
-  if (a % 2 === 1 & b % 2 === 0) {
+  if (a % 2 === 1 && b % 2 === 0) {
     moves.subtract(board);
     return;
   }
