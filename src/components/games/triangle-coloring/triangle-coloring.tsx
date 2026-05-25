@@ -1,8 +1,10 @@
-import React from 'react';
 import { strategyGameFactory, dummyEvents } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { range, cloneDeep, sample, shuffle } from 'lodash';
 
-const FORBIDDEN = 2;
+const [ALLOWED, COLORED, FORBIDDEN] = [1, 2, 3];
+type Board = (typeof ALLOWED | typeof COLORED | typeof FORBIDDEN)[]
+
 // triangles
 //          0
 //       1  2  3
@@ -54,7 +56,7 @@ const triangles = [
   { id: 15, v: [9, 13, 14], neighbors: [14] }
 ];
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const getTrianglePoints = i => {
     const v = triangles[i].v;
     const [v0, v1, v2] = [vertices[v[0]], vertices[v[1]], vertices[v[2]]];
@@ -63,15 +65,13 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   const colorTriangle = i => {
     if (!ctx.isClientMoveAllowed) return;
-    if (board[i] !== null) return;
+    if (board[i] !== ALLOWED) return;
     moves.colorTriangle(board, i);
   }
 
-  const isForbidden = i => board[i] === FORBIDDEN;
-
   const getColor = i => {
-    if (board[i] === 'colored') return 'fill-blue-600';
-    if (isForbidden(i)) return 'fill-slate-400';
+    if (board[i] === COLORED) return 'fill-blue-600';
+    if (board[i] === FORBIDDEN) return 'fill-slate-400';
     return 'fill-transparent';
   };
 
@@ -83,7 +83,7 @@ const BoardClient = ({ board, ctx, moves }) => {
             key={i}
             points={getTrianglePoints(i)}
             className={`
-              ${getColor(i)} ${isForbidden(i) ? 'cursor-not-allowed' : ''}
+              ${getColor(i)} ${board[i] === FORBIDDEN ? 'cursor-not-allowed' : ''}
             `}
             stroke="black" strokeWidth="0.5"
             onClick={() => colorTriangle(i)}
@@ -101,9 +101,9 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  colorTriangle: (board, { events }, id) => {
+  colorTriangle: (board: Board, { events }: { events: Events }, id: number) => {
     const nextBoard = cloneDeep(board);
-    nextBoard[id] = 'colored';
+    nextBoard[id] = COLORED;
     triangles[id].neighbors.forEach(n => {
       nextBoard[n] = FORBIDDEN;
     });
@@ -115,18 +115,18 @@ const moves = {
   }
 };
 
-const getAllowedMoves = board => range(16).filter(i => board[i] === null);
+const getAllowedMoves = (board: Board) => range(16).filter(i => board[i] === ALLOWED);
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.colorTriangle(board, sample(getAllowedMoves(board)));
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const optimalMove = getOptimalAiMove(board);
   moves.colorTriangle(board, optimalMove);
 };
 
-const getOptimalAiMove = board => {
+const getOptimalAiMove = (board: Board) => {
   const allowedMoves = getAllowedMoves(board);
   const optimalPlace = shuffle(allowedMoves).find(i => {
     const { nextBoard } = moves.colorTriangle(board, { events: dummyEvents }, i);
@@ -140,7 +140,7 @@ const getOptimalAiMove = board => {
 };
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIPlayer) => {
+const isWinningState = (board: Board, amIPlayer) => {
   const allowedPlacesForOther = getAllowedMoves(board);
   if (allowedPlacesForOther.length === 0) {
     return true;
@@ -180,7 +180,7 @@ export const TriangleColoring = strategyGameFactory({
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
     {
       botStrategy: aiBotStrategy,
-      generateStartBoard: () => Array(16).fill(null),
+      generateStartBoard: () => Array(16).fill(ALLOWED),
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
       isDefault: true
     }
