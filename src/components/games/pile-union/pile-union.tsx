@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { range, random } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, BoardClientProps } from '../../game-factory/types';
 import { useTranslation } from '../../language/translate';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 
-const BoardClient = ({ board, ctx, events, moves }) => {
-  const [moveType, setMoveType] = useState('remove');
+export type Board = number[]
+export type MoveType = 'remove' | 'merge'
+type TurnState = { firstSelectedPile: number } | null
+
+const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
+  const [moveType, setMoveType] = useState<MoveType>('remove');
+  const turnState = ctx.turnState as TurnState;
 
   const handlePileClick = (pileIndex) => {
     if (!ctx.isClientMoveAllowed) return;
     if (moveType === 'remove') {
       moves.removeOne(board, pileIndex);
     } else {
-      if (ctx.turnState === null) {
+      if (turnState === null) {
         events.setTurnState({ firstSelectedPile: pileIndex });
-      } else if (ctx.turnState.firstSelectedPile === pileIndex) {
+      } else if (turnState.firstSelectedPile === pileIndex) {
         events.setTurnState(null);
       } else {
-        moves.mergePiles(board, [ctx.turnState.firstSelectedPile, pileIndex]);
+        moves.mergePiles(board, [turnState.firstSelectedPile, pileIndex]);
         events.setTurnState(null);
         setMoveType('remove');
       }
@@ -41,7 +47,7 @@ const BoardClient = ({ board, ctx, events, moves }) => {
             key={pileIndex}
             size={size}
             disabled={!ctx.isClientMoveAllowed}
-            isSelected={moveType === 'merge' && ctx.turnState?.firstSelectedPile === pileIndex}
+            isSelected={moveType === 'merge' && turnState?.firstSelectedPile === pileIndex}
             moveType={moveType}
             onClick={() => handlePileClick(pileIndex)}
           />
@@ -52,10 +58,15 @@ const BoardClient = ({ board, ctx, events, moves }) => {
   );
 };
 
-const MoveTypeSelector = ({ moveType, isClientMoveAllowed, canMerge, onSelect }) => {
+const MoveTypeSelector = ({ moveType, isClientMoveAllowed, canMerge, onSelect }: {
+  moveType: MoveType
+  isClientMoveAllowed: boolean
+  canMerge: boolean
+  onSelect: (type: MoveType) => void
+}) => {
   const { t } = useTranslation();
 
-  const labelClass = (active, disabled) => `grow py-1 px-2 text-center ${
+  const labelClass = (active: boolean, disabled: boolean) => `grow py-1 px-2 text-center ${
     active ? 'bg-blue-500 text-white font-semibold cursor-pointer'
     : disabled ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-600'
     : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'
@@ -100,7 +111,13 @@ const MoveTypeSelector = ({ moveType, isClientMoveAllowed, canMerge, onSelect })
   );
 };
 
-const Pile = ({ size, disabled, isSelected, moveType, onClick }) => {
+const Pile = ({ size, disabled, isSelected, moveType, onClick }: {
+  size: number
+  disabled: boolean
+  isSelected: boolean
+  moveType: MoveType
+  onClick: () => void
+}) => {
   const [hovered, setHovered] = useState(false);
   const isRemoveHovered = moveType === 'remove' && hovered;
   const isMergeHovered = moveType === 'merge' && hovered;
@@ -145,7 +162,7 @@ const Pile = ({ size, disabled, isSelected, moveType, onClick }) => {
   );
 };
 
-const Matchstick = ({ dimmed }) => (
+const Matchstick = ({ dimmed }: { dimmed: boolean }) => (
   <div
     className={`w-3 h-14 flex flex-col items-center ${dimmed ? 'opacity-40' : ''}`}
     style={{ transform: 'scaleY(-1)' }}
@@ -156,7 +173,7 @@ const Matchstick = ({ dimmed }) => (
 );
 
 const moves = {
-  removeOne: (board, { events }, pileIndex) => {
+  removeOne: (board: Board, { events }: { events: Events }, pileIndex) => {
     const newSize = board[pileIndex] - 1;
     const nextBoard = [
       ...board.slice(0, pileIndex),
@@ -167,7 +184,7 @@ const moves = {
     if (nextBoard.length === 0) events.endGame();
     return { nextBoard };
   },
-  mergePiles: (board, { events }, [pileIndex1, pileIndex2]) => {
+  mergePiles: (board: Board, { events }: { events: Events }, [pileIndex1, pileIndex2]) => {
     const [firstIdx, secondIdx] = [pileIndex1, pileIndex2].sort((a, b) => a - b);
     const merged = board[firstIdx] + board[secondIdx];
     const nextBoard = board.filter((_, i) => i !== firstIdx && i !== secondIdx);

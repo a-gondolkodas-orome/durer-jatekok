@@ -1,8 +1,12 @@
 import { sample, sortBy, sum } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './pile-union';
+
+type MoveAction = { type: 'remove'; i: number } | { type: 'merge'; i: number; j: number }
 
 const memo = new Map();
 
-const isLosing = (board) => {
+const isLosing = (board: Board) => {
   const sorted = sortBy(board);
   const key = sorted.join(',');
   if (memo.has(key)) return memo.get(key);
@@ -28,7 +32,7 @@ const isLosing = (board) => {
 P = Previous player wins (the player who just moved wins)
 N = Next player wins — the current player to move has a winning move available
 */
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const T = sum(board) + board.length;
 
   if (T % 2 === 0) {
@@ -53,8 +57,8 @@ export const aiBotStrategy = ({ board, moves }) => {
     }
   } else {
     // P position: use memo to capitalise on opponent mistakes, otherwise random
-    const winningMoves = [];
-    const allMoves = [];
+    const winningMoves: MoveAction[] = [];
+    const allMoves: MoveAction[] = [];
     board.forEach((_, i) => {
       allMoves.push({ type: 'remove', i });
       const next = board.filter((_, idx) => idx !== i);
@@ -69,7 +73,7 @@ export const aiBotStrategy = ({ board, moves }) => {
         if (isLosing(next)) winningMoves.push({ type: 'merge', i, j });
       }
     }
-    const chosen = sample(winningMoves.length > 0 ? winningMoves : allMoves);
+    const chosen = sample(winningMoves.length > 0 ? winningMoves : allMoves)!;
     if (chosen.type === 'remove') {
       moves.removeOne(board, chosen.i);
     } else {
@@ -78,21 +82,21 @@ export const aiBotStrategy = ({ board, moves }) => {
   }
 };
 
-export const randomBotStrategy = ({ board, moves }) => {
-  const winIn1 = [];
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+  const winIn1: MoveAction[] = [];
   board.forEach((_, i) => {
     const next = board.filter((_, idx) => idx !== i);
     if (board[i] > 1) next.push(board[i] - 1);
     if (next.length === 0) winIn1.push({ type: 'remove', i });
   });
 
-  const allMoves = [];
+  const allMoves: MoveAction[] = [];
   board.forEach((_, i) => allMoves.push({ type: 'remove', i }));
   for (let i = 0; i < board.length; i++) {
     for (let j = i + 1; j < board.length; j++) allMoves.push({ type: 'merge', i, j });
   }
 
-  const chosen = sample(winIn1.length > 0 ? winIn1 : allMoves);
+  const chosen = sample(winIn1.length > 0 ? winIn1 : allMoves)!;
   if (chosen.type === 'remove') {
     moves.removeOne(board, chosen.i);
   } else {
