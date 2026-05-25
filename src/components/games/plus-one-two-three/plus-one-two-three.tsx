@@ -1,11 +1,13 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { range, random } from 'lodash';
+
+type Board = number
 
 const target = 40;
 const maxStep = 3;
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const isMoveAllowed = number => {
     if (!ctx.isClientMoveAllowed) return false;
@@ -47,19 +49,19 @@ const isIncreaseValid = ({ board, number }) => {
 }
 
 const moves = {
-  increaseTo: (board, { ctx, events }, number) => {
+  increaseTo: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, number) => {
     if (!isIncreaseValid({ board, number })) {
       console.error('invalid_move');
     }
     events.endTurn();
     if (number > target) {
-      events.endGame(1 - ctx.currentPlayer)
+      events.endGame(1 - ctx.currentPlayer!)
     }
     return { nextBoard: number }
   }
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const nextBoard = board % (1 + maxStep) !== 0
     ? board + (1 + maxStep) - board % (1 + maxStep)
     : board + random(1, maxStep);
