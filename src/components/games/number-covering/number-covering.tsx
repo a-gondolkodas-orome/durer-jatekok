@@ -1,13 +1,15 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps, PlayerIndex } from '../../game-factory/types';
 import { range, sum, sample, cloneDeep } from 'lodash';
 import { useTranslation } from '../../language/translate';
 
+type Board = number[]
+
 const COVERED = -1;
 
-const getRemaining = (board) => board.filter(i => i !== COVERED);
+const getRemaining = (board: Board) => board.filter(i => i !== COVERED);
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
 
   const clickNumber = (number) => {
@@ -50,16 +52,16 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.coverNumber(board, sample(getRemaining(board)));
 };
 
-const aiBotStrategy = ({ board, ctx, moves }) => {
+const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const aiMove = getOptimalAiMove(board, ctx.chosenRoleIndex);
   moves.coverNumber(board, aiMove);
 };
 
-const getOptimalAiMove = (board, chosenRoleIndex) => {
+const getOptimalAiMove = (board: Board, chosenRoleIndex) => {
   const remaining = getRemaining(board);
   const evens = remaining.filter(i => i%2 === 0);
   const odds = remaining.filter(i => i%2 === 1);
@@ -103,7 +105,7 @@ const rule10 = {
 };
 
 const moves = {
-  coverNumber: (board, { events }, number) => {
+  coverNumber: (board: Board, { events }: { events: Events }, number) => {
     const nextBoard = cloneDeep(board);
     nextBoard[number-1] = COVERED;
     events.endTurn();
