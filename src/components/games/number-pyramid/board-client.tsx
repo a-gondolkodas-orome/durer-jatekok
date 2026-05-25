@@ -1,7 +1,9 @@
-import React from 'react';
 import { isEqual } from 'lodash';
+import type { BoardClientProps } from '../../game-factory/types';
 import { useTranslation } from '../../language/translate';
-import { hasActivePair } from './strategy';
+import { hasActivePair, type Board } from './strategy';
+
+export type TurnState = { levelIdx: number; slotIdx: number } | null;
 
 const chipBase = 'rounded-lg border-2 px-3 py-2 font-bold text-lg min-w-12 text-center';
 
@@ -27,25 +29,26 @@ const ActiveSlot = ({ value, isSelected, isDisabled, onClick }) => (
   </button>
 );
 
-export const BoardClient = ({ board, ctx, events, moves }) => {
+export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
+  const turnState = ctx.turnState as TurnState;
 
   const handleClick = ({ levelIdx, slotIdx }) => {
     if (!ctx.isClientMoveAllowed) return;
     const slot = board.levels[levelIdx][slotIdx];
     if (!slot || slot.state !== 'active') return;
 
-    if (ctx.turnState === null) {
+    if (turnState === null) {
       if (!hasActivePair(board.levels[levelIdx])) return;
       events.setTurnState({ levelIdx, slotIdx });
       return;
     }
-    if (isEqual(ctx.turnState, { levelIdx, slotIdx })) {
+    if (isEqual(turnState, { levelIdx, slotIdx })) {
       events.setTurnState(null);
       return;
     }
 
-    moves.combineTwo(board, { levelIdx, indices: [ctx.turnState.slotIdx, slotIdx] });
+    moves.combineTwo(board, { levelIdx, indices: [turnState.slotIdx, slotIdx] });
   };
 
   return (
@@ -60,8 +63,8 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
         {[3, 2, 1, 0].map((levelIdx) => {
           const level = board.levels[levelIdx];
           const isDisabled = !ctx.isClientMoveAllowed
-            || (ctx.turnState !== null && ctx.turnState.levelIdx !== levelIdx)
-            || (ctx.turnState === null && !hasActivePair(level));
+            || (turnState !== null && turnState.levelIdx !== levelIdx)
+            || (turnState === null && !hasActivePair(level));
           return (
             <div key={levelIdx} className="flex flex-col items-center gap-1">
               <div className="flex flex-wrap justify-center gap-2">
@@ -72,7 +75,7 @@ export const BoardClient = ({ board, ctx, events, moves }) => {
                     <ActiveSlot
                       key={slotIdx}
                       value={slot.value}
-                      isSelected={isEqual(ctx.turnState, { levelIdx, slotIdx })}
+                      isSelected={isEqual(turnState, { levelIdx, slotIdx })}
                       isDisabled={isDisabled}
                       onClick={() => handleClick({ levelIdx, slotIdx })}
                     />

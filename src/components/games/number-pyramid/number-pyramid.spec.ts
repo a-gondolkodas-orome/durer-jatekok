@@ -1,8 +1,10 @@
 import { moves } from './number-pyramid';
+import type { Board, Slot } from './strategy';
+import { makeCtx } from '../../game-factory/ctx-factory';
 
-const active = (value) => ({ value, state: 'active' });
+const active = (value: number): Slot => ({ value, state: 'active' });
 
-const makeBoard = (level0Values, target) => ({
+const makeBoard = (level0Values: number[], target: number): Board => ({
   levels: [
     level0Values.map(active),
     Array(4).fill(null),
@@ -14,11 +16,11 @@ const makeBoard = (level0Values, target) => ({
 });
 
 const mockEvents = () => {
-  const calls = { endTurn: 0, endGame: null };
+  const calls = { endTurn: 0 };
   return {
     events: {
       endTurn: () => { calls.endTurn++; },
-      endGame: (winnerIndex) => { calls.endGame = winnerIndex; },
+      endGame: (winnerIndex?: number | null) => { calls['endGame'] = winnerIndex; },
       setTurnState: () => {}
     },
     calls
@@ -30,42 +32,42 @@ describe('moves.combineTwo', () => {
     const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 50);
     const { events } = mockEvents();
     const { nextBoard } = moves.combineTwo(
-      board, { ctx: { currentPlayer: 0 }, events }, { levelIdx: 0, indices: [0, 1] }
+      board, { ctx: makeCtx({ currentPlayer: 0 }), events }, { levelIdx: 0, indices: [0, 1] }
     );
     const level1Active = nextBoard.levels[1].find((s) => s?.state === 'active');
-    expect(level1Active.value).toBe(9);
+    expect(level1Active!.value).toBe(9);
   });
 
   it('marks both combined slots as consumed', () => {
     const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 50);
     const { events } = mockEvents();
     const { nextBoard } = moves.combineTwo(
-      board, { ctx: { currentPlayer: 0 }, events }, { levelIdx: 0, indices: [0, 1] }
+      board, { ctx: makeCtx({ currentPlayer: 0 }), events }, { levelIdx: 0, indices: [0, 1] }
     );
-    expect(nextBoard.levels[0][0].state).toBe('consumed');
-    expect(nextBoard.levels[0][1].state).toBe('consumed');
+    expect(nextBoard.levels[0][0]!.state).toBe('consumed');
+    expect(nextBoard.levels[0][1]!.state).toBe('consumed');
   });
 
   it('calls endTurn when combined value is below k', () => {
     const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 50);
     const { events, calls } = mockEvents();
-    moves.combineTwo(board, { ctx: { currentPlayer: 0 }, events }, { levelIdx: 0, indices: [0, 1] });
+    moves.combineTwo(board, { ctx: makeCtx({ currentPlayer: 0 }), events }, { levelIdx: 0, indices: [0, 1] });
     expect(calls.endTurn).toBe(1);
-    expect(calls.endGame).toBeNull();
+    expect(calls['endGame']).toBeUndefined();
   });
 
   it('calls endGame with current player when combined value reaches k', () => {
     const board = makeBoard([10, 9, 3, 2, 2, 2, 2, 2], 15);
     const { events, calls } = mockEvents();
-    moves.combineTwo(board, { ctx: { currentPlayer: 1 }, events }, { levelIdx: 0, indices: [0, 1] });
-    expect(calls.endGame).toBe(1);
+    moves.combineTwo(board, { ctx: makeCtx({ currentPlayer: 1 }), events }, { levelIdx: 0, indices: [0, 1] });
+    expect(calls['endGame']).toBe(1);
     expect(calls.endTurn).toBe(0);
   });
 
   it('does not mutate the original board', () => {
     const board = makeBoard([5, 4, 3, 2, 2, 2, 2, 2], 50);
     const { events } = mockEvents();
-    moves.combineTwo(board, { ctx: { currentPlayer: 0 }, events }, { levelIdx: 0, indices: [0, 1] });
-    expect(board.levels[0][0].state).toBe('active');
+    moves.combineTwo(board, { ctx: makeCtx({ currentPlayer: 0 }), events }, { levelIdx: 0, indices: [0, 1] });
+    expect(board.levels[0][0]!.state).toBe('active');
   });
 });

@@ -1,14 +1,20 @@
-import React from 'react';
 import { cloneDeep, sumBy } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import { aiBotStrategy, generateStartBoard, randomBotStrategy } from './strategy';
-import { BoardClient } from './board-client';
+import type { Ctx, Events } from '../../game-factory/types';
+import {
+  aiBotStrategy, generateStartBoard, randomBotStrategy, type Board
+} from './strategy';
+import { BoardClient, type TurnState } from './board-client';
 
 export const moves = {
-  combineTwo: (board, { ctx, events }, { levelIdx, indices }) => {
+  combineTwo: (
+    board: Board,
+    { ctx, events }: { ctx: Ctx; events: Events },
+    { levelIdx, indices }
+  ) => {
     const nextBoard = cloneDeep(board);
 
-    const slots = indices.map((idx) => nextBoard.levels[levelIdx][idx]);
+    const slots = indices.map((idx) => nextBoard.levels[levelIdx][idx]!);
     const combinedValue = sumBy(slots, 'value');
     slots.forEach((slot) => { slot.state = 'consumed'; });
 
@@ -40,9 +46,10 @@ const rule = {
   </>
 };
 
-const getPlayerStepDescription = ({ ctx }) => {
-  if (ctx.turnState) {
-    const level = ctx.turnState.levelIdx + 1;
+const getPlayerStepDescription = ({ ctx }: { ctx: Ctx }) => {
+  const turnState = ctx.turnState as TurnState;
+  if (turnState) {
+    const level = turnState.levelIdx + 1;
     return {
       hu: `Válassz egy másik számot a ${level}. szintről.`,
       en: `Select another number from level ${level}.`

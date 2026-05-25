@@ -1,29 +1,34 @@
 import { orderBy, random, range, sample, sampleSize, shuffle, sum } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
 
-export const randomBotStrategy = ({ board, moves }) => {
-  const { levels, target } = board;
+export type Slot = { value: number; state: 'active' | 'consumed' };
+export type Level = (Slot | null)[];
+export type Board = {
+  levels: Level[];
+  target: number;
+  sortedInitial: number[];
+};
 
-  const win = findImmediateWin(levels, target);
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+  const win = findImmediateWin(board);
   if (win) { moves.combineTwo(board, win); return; }
 
-  const available = range(3).filter((li) => hasActivePair(levels[li]));
-  const li = sample(available);
-  const actives = activeSlotIndices(levels[li]);
+  const available = range(3).filter((li) => hasActivePair(board.levels[li]));
+  const li = sample(available)!;
+  const actives = activeSlotIndices(board.levels[li]);
   moves.combineTwo(board, { levelIdx: li, indices: sampleSize(actives, 2) });
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
-  const { levels, target, sortedInitial } = board;
-
-  const win = findImmediateWin(levels, target);
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
+  const win = findImmediateWin(board);
   if (win) { moves.combineTwo(board, win); return; }
 
-  const botIsWinner = isP2WinningPosition(sortedInitial, target) === (ctx.currentPlayer === 1);
+  const botIsWinner = isP2WinningPosition(board) === (ctx.currentPlayer === 1);
 
-  const tryLevel = (levelIdx, order = 'desc') => {
-    if (!hasActivePair(levels[levelIdx])) return false;
-    const level = levels[levelIdx];
-    const indices = orderBy(activeSlotIndices(level), (i) => level[i].value, order).slice(0, 2);
+  const tryLevel = (levelIdx, order: 'asc' | 'desc' = 'desc') => {
+    if (!hasActivePair(board.levels[levelIdx])) return false;
+    const level = board.levels[levelIdx];
+    const indices = orderBy(activeSlotIndices(level), (i) => level[i]!.value, order).slice(0, 2);
     moves.combineTwo(board, { levelIdx, indices });
     return true;
   };
@@ -43,12 +48,12 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
   }
 };
 
-export const isP2WinningPosition = (sortedInitial, target) => {
+export const isP2WinningPosition = ({ sortedInitial, target }: Board): boolean => {
   const s = sortedInitial;
   return s[0] + s[1] + s[6] + s[7] < target && s[2] + s[3] + s[4] + s[5] >= target;
 };
 
-export const generateStartBoard = (tries = 0) => {
+export const generateStartBoard = (tries = 0): Board => {
   if (tries >= 100) throw new Error('generateStartBoard: too many retries');
   const nums = Array.from({ length: 8 }, () => random(2, 15));
   nums.sort((a, b) => b - a);
@@ -64,11 +69,11 @@ export const generateStartBoard = (tries = 0) => {
 
   const pool = random(0, 1) === 0 ? p2Gens : p1Gens;
   if (pool.length === 0) return generateStartBoard(tries + 1);
-  const target = sample(pool)();
+  const target = sample(pool)!();
 
   return {
     levels: [
-      shuffle(nums).map((n) => ({ value: n, state: 'active' })),
+      shuffle(nums).map((n): Slot => ({ value: n, state: 'active' })),
       Array(4).fill(null),
       Array(2).fill(null),
       Array(1).fill(null)
@@ -78,7 +83,7 @@ export const generateStartBoard = (tries = 0) => {
   };
 };
 
-const findImmediateWin = (levels, target) => {
+const findImmediateWin = ({ levels, target }: Board) => {
   for (const [levelIdx, level] of levels.entries()) {
     const indices = findWinningPair(level, target);
     if (indices) return { levelIdx, indices };
@@ -86,11 +91,11 @@ const findImmediateWin = (levels, target) => {
   return null;
 };
 
-const findWinningPair = (level, target) => {
+const findWinningPair = (level: Level, target: number) => {
   const actives = activeSlotIndices(level);
   for (let i = 0; i < actives.length; i++) {
     for (let j = i + 1; j < actives.length; j++) {
-      if (level[actives[i]].value + level[actives[j]].value >= target) {
+      if (level[actives[i]]!.value + level[actives[j]]!.value >= target) {
         return [actives[i], actives[j]];
       }
     }
@@ -98,8 +103,8 @@ const findWinningPair = (level, target) => {
   return null;
 };
 
-export const hasActivePair = (level) => activeSlotIndices(level).length >= 2;
+export const hasActivePair = (level: Level): boolean => activeSlotIndices(level).length >= 2;
 
 // Slot states: null = empty placeholder, { value, state:'active'|'consumed' }
-const activeSlotIndices = (level) =>
+const activeSlotIndices = (level: Level): number[] =>
   level.flatMap((s, i) => (s?.state === 'active' ? [i] : []));
