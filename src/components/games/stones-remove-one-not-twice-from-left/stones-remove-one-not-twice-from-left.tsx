@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { cloneDeep, isEqual, sample, random, range } from 'lodash';
 import { useTranslation } from '../../language/translate';
+
+type Board = { piles: [number, number], leftRestriction: [boolean, boolean] }
 
 const StonePile = ({ count, onClick, disabled, restricted }) => {
   const [hovered, setHovered] = useState(false);
@@ -29,13 +32,13 @@ const StonePile = ({ count, onClick, disabled, restricted }) => {
   );
 };
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
 
   const isMoveAllowed = pileId => {
     if (!ctx.isClientMoveAllowed) return false;
     if (board.piles[pileId] === 0) return false;
-    if (pileId === 0 && board.leftRestriction[ctx.currentPlayer]) return false;
+    if (pileId === 0 && board.leftRestriction[ctx.currentPlayer!]) return false;
     return true;
   }
 
@@ -62,10 +65,10 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  removeStone: (board, { ctx, events }, pileId) => {
+  removeStone: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, pileId) => {
     const nextBoard = cloneDeep(board);
     nextBoard.piles[pileId] = board.piles[pileId] - 1;
-    nextBoard.leftRestriction[ctx.currentPlayer] = (pileId === 0);
+    nextBoard.leftRestriction[ctx.currentPlayer!] = (pileId === 0);
     events.endTurn();
     if (isGameEnd(nextBoard, ctx)) {
       events.endGame();
@@ -84,12 +87,12 @@ const isGameEnd = (board, ctx) => {
   return false;
 }
 
-const randomBotStrategy = ({ board, ctx, moves }) => {
+const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   moves.removeStone(board, getPileOfRandomAllowedMove(board, ctx));
 };
 
-const aiBotStrategy = ({ board, ctx, moves }) => {
-  if (board.leftRestriction[ctx.currentPlayer]) {
+const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
+  if (board.leftRestriction[ctx.currentPlayer!]) {
     moves.removeStone(board, 1);
     return;
   }
@@ -183,12 +186,12 @@ const getPlayerStepDescription = () => ({
   en: 'Click the pile you want to remove a stone from.'
 });
 
-const generateTestStartBoard = () => ({
-  piles: sample([[3, 4], [4, 3], [3, 3], [4, 4]]),
-  leftRestriction: [false, false]
+const generateTestStartBoard = (): Board => ({
+  piles: sample([[3, 4], [4, 3], [3, 3], [4, 4]]) as [number, number],
+  leftRestriction: [false, false] as [boolean, boolean]
 });
 
-const generateStartBoard = () => {
+const generateStartBoard = (): Board => {
   const piles = sample([
     [11, 8],
     [9, 9],
@@ -197,10 +200,10 @@ const generateStartBoard = () => {
     [5, 8],
     [8, 7],
     [6, 4]
-  ])
+  ]) as [number, number]
   return {
     piles,
-    leftRestriction: [false, false]
+    leftRestriction: [false, false] as [boolean, boolean]
   };
 }
 
