@@ -187,8 +187,8 @@ const getPlayerStepDescription = () => ({
 });
 
 const generateTestStartBoard = (): Board => ({
-  piles: sample([[3, 4], [4, 3], [3, 3], [4, 4]]) as [number, number],
-  leftRestriction: [false, false] as [boolean, boolean]
+  piles: sample([[3, 4], [4, 3], [3, 3], [4, 4]]),
+  leftRestriction: [false, false]
 });
 
 const generateStartBoard = (): Board => {
@@ -203,7 +203,7 @@ const generateStartBoard = (): Board => {
   ]) as [number, number]
   return {
     piles,
-    leftRestriction: [false, false] as [boolean, boolean]
+    leftRestriction: [false, false]
   };
 }
 

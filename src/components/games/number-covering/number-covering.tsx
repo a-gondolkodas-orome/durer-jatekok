@@ -5,7 +5,7 @@ import { useTranslation } from '../../language/translate';
 
 type Board = number[]
 
-const COVERED = -1;
+const COVERED = -1 as const;
 
 const getRemaining = (board: Board) => board.filter(i => i !== COVERED);
 
