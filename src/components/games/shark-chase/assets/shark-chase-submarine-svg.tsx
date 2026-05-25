@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const SubmarineSvg = () => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="612" height="612" viewBox="0 0 612 612" version="1.1"  style={{ display: 'none' }}>
