@@ -1,9 +1,9 @@
-'use strict';
-
 import { cloneDeep, last } from "lodash";
+import type { Events } from '../../game-factory/types';
+import type { Board } from "./bacteria"
 
 export const moves = {
-  defend: (board, { events }, { row, col }) => {
+  defend: (board: Board, { events }: { events: Events }, { row, col }) => {
     const nextBoard = cloneDeep(board);
 
     nextBoard.bacteria[row][col] -= 1;
@@ -15,7 +15,7 @@ export const moves = {
 
     return { nextBoard };
   },
-  shiftRight: (board, { events }, { row, col }) => {
+  shiftRight: (board: Board, { events }: { events: Events }, { row, col }) => {
     const nextBoard = cloneDeep(board);
 
     const reachedFields = [[row, col + 1]];
@@ -29,7 +29,7 @@ export const moves = {
 
     return { nextBoard };
   },
-  shiftLeft: (board, { events }, { row, col }) => {
+  shiftLeft: (board: Board, { events }: { events: Events }, { row, col }) => {
     const nextBoard = cloneDeep(board);
 
     const reachedFields = [[row, col - 1]];
@@ -43,7 +43,7 @@ export const moves = {
 
     return { nextBoard };
   },
-  jump: (board, { events }, { row, col }) => {
+  jump: (board: Board, { events }: { events: Events }, { row, col }) => {
     const nextBoard = cloneDeep(board);
 
     nextBoard.bacteria = makeJump(nextBoard.bacteria, row, col);
@@ -57,7 +57,7 @@ export const moves = {
 
     return { nextBoard };
   },
-  spread: (board, { events }, { row, col }) => {
+  spread: (board: Board, { events }: { events: Events }, { row, col }) => {
     const nextBoard = cloneDeep(board);
 
     const reachedFields = reachedFieldsWithSpread(
@@ -116,7 +116,7 @@ const areAllBacteriaRemoved = (bacteria) => {
   return true;
 };
 
-export const isGoal = (board, row, col) => {
+export const isGoal = (board: Board, row, col) => {
   return row === (board.bacteria.length - 1) && board.goals.includes(col);
 };
 
@@ -139,16 +139,16 @@ const makeShiftOrSpread = (bacteria, attackRow, attackCol, reachedFields) => {
 };
 
 /* Currently only correct for board with adjacent goals */
-export const isDangerous = (board, { row, col }) => {
+export const isDangerous = (board: Board, { row, col }) => {
   return distanceFromDangerousAttackZone(board, { row, col }).dist === 0;
 };
 
-export const distanceFromDangerousAttackZone = (board, { row, col }) => {
+export const distanceFromDangerousAttackZone = (board: Board, { row, col }) => {
   const boardWidth = board.bacteria[0].length;
   const goalRowIdx = board.bacteria.length - 1;
   const finalLeft = board.goals[0] === 0 ? 0 : board.goals[0] - 1;
   const leftEdge = finalLeft + Math.floor((goalRowIdx - row)/2);
-  const finalRight = last(board.goals) === boardWidth - 1 ? boardWidth - 1 : last(board.goals) + 1;
+  const finalRight = last(board.goals) === boardWidth - 1 ? boardWidth - 1 : last(board.goals)! + 1;
   const rightEdge = finalRight - Math.ceil((goalRowIdx - row)/2);
   if (board.goals[0] === 0) {
     if (col === 0 && row === (goalRowIdx - 2)) {

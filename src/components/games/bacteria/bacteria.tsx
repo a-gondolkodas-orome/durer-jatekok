@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { range, random } from "lodash";
 import { strategyGameFactory } from "../../game-factory/strategy-game";
+import type { BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from "./bot-strategy";
 import {
   isJump,
@@ -11,9 +12,11 @@ import {
   moves
 } from "./helpers";
 
+export type Board = { bacteria: number[][], goals: number[] }
+
 const boardWidth = 11;
 
-const generateStartBoard = () => {
+const generateStartBoard = (): Board => {
   const bacteria = Array(9).fill([]);
   range(bacteria.length).forEach((rowIndex) => {
     const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
@@ -56,6 +59,7 @@ const generateStartBoard = () => {
       return { bacteria, goals: [5, 6, 7, 8, 9, 10] };
     }
   }
+  throw new Error('unreachable');
 };
 
 const BacteriaDisplay = ({ count, onGoal, dimmed = false }) => {
@@ -77,9 +81,9 @@ const GoalMarker = () => (
   <span className="text-base leading-none">🚩</span>
 );
 
-const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
-  const [attackRow, setAttackRow] = useState(null);
-  const [attackCol, setAttackCol] = useState(null);
+const BoardClient = ({ board: { bacteria, goals }, ctx, moves }: BoardClientProps<Board>) => {
+  const [attackRow, setAttackRow] = useState<number | null>(null);
+  const [attackCol, setAttackCol] = useState<number | null>(null);
 
   const isPlayerAttacker = ctx.currentPlayer === 0;
 
@@ -177,7 +181,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }) => {
     const goal = isGoal({ row, col });
     if (attackRow !== null && isAllowedAttack({ row, col })) {
       const attack = { attackRow, attackCol, row, col };
-      const previewCount = isJump(attack) ? 1 : bacteria[attackRow][attackCol];
+      const previewCount = isJump(attack) ? 1 : bacteria[attackRow!][attackCol!];
       return <BacteriaDisplay count={previewCount} onGoal={goal} dimmed />;
     }
     if (count > 0) return <BacteriaDisplay count={count} onGoal={goal} />;

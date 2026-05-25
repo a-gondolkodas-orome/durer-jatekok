@@ -1,5 +1,3 @@
-"use strict";
-
 import {
   sample,
   minBy,
@@ -8,6 +6,7 @@ import {
   filter,
   sum
 } from "lodash";
+import type { StrategyArgs } from '../../game-factory/types';
 import {
   lastCol,
   isDangerous,
@@ -15,17 +14,19 @@ import {
   isOddEdge
 } from "./helpers";
 
-export const randomBotStrategy = ({ board, ctx, moves }) => {
+import type { Board } from "./bacteria";
+
+export const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const { bacteria } = board;
   const bacteriaCoords = getBacteriaCoords(bacteria);
 
   if (ctx.currentPlayer === 1) {
-    const [row, col] = sample(bacteriaCoords);
+    const [row, col] = sample(bacteriaCoords)!;
     moves.defend(board, { row, col });
     return;
   }
 
-  const validMoves = [];
+  const validMoves: (() => void)[] = [];
   for (const [row, col] of bacteriaCoords) {
     if (bacteria[row][col + 1] !== undefined) {
       validMoves.push(() => moves.shiftRight(board, { row, col }));
@@ -40,11 +41,11 @@ export const randomBotStrategy = ({ board, ctx, moves }) => {
       validMoves.push(() => moves.spread(board, { row, col }));
     }
   }
-  sample(validMoves)();
+  sample(validMoves)!();
 };
 
 /* Currently only implemented for the case of adjacent goal fields */
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
     const { defenseRow, defenseCol } = aiDefense(board);
     moves.defend(board, { row: defenseRow, col: defenseCol });
@@ -59,7 +60,7 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
   }
 };
 
-export const aiDefense = (board) => {
+export const aiDefense = (board: Board) => {
   let defenseRow, defenseCol;
 
   const bacteriaCoords = getBacteriaCoords(board.bacteria);
@@ -83,23 +84,23 @@ export const aiDefense = (board) => {
     return sum(adjustedBacteriaCount) > 1;
   });
   if (pathsWithMultipleBacteria.length >= 1) {
-    [defenseRow, defenseCol] = sample(sample(pathsWithMultipleBacteria));
+    [defenseRow, defenseCol] = sample(sample(pathsWithMultipleBacteria))!;
   } else if (dangerousBacteria.length >= 1) {
     [defenseRow, defenseCol] = minBy(
       shuffle(dangerousBacteria),
       ([row]) => -row
-    );
+    )!;
   } else {
     [defenseRow, defenseCol] = minBy(
       shuffle(bacteriaCoords),
       ([row, col]) => distanceFromDangerousAttackZone(board, { row, col }).dist
-    );
+    )!;
   }
 
   return { defenseRow, defenseCol };
 };
 
-export const aiAttack = (board) => {
+export const aiAttack = (board: Board) => {
   const { bacteria, goals } = board;
 
   const goalRowIdx = bacteria.length - 1;
@@ -114,7 +115,7 @@ export const aiAttack = (board) => {
     [attackRow, attackCol] = minBy(
       shuffle(dangerousBacteria),
       ([row]) => -row
-    );
+    )!;
     if (attackRow === goalRowIdx) {
       attackChoice = (attackCol === goals[0] - 1) ? "shiftRight" : "shiftLeft";
     } else if (attackRow === (goalRowIdx - 2) && (attackCol === 0 || attackCol === lastCol(bacteria, attackRow))) {
@@ -130,12 +131,12 @@ export const aiAttack = (board) => {
       return true;
     });
     if (coordsWithMultiples.length >= 1) {
-      [attackRow, attackCol] = sample(coordsWithMultiples);
+      [attackRow, attackCol] = sample(coordsWithMultiples)!;
     } else {
       [attackRow, attackCol] = minBy(
         shuffle(bacteriaCoords),
         ([row, col]) => distanceFromDangerousAttackZone(board, { row, col }).dist
-      );
+      )!;
     }
     let attackOptions = ["shiftRight", "shiftLeft", "jump", "spread", "spread", "spread", "spread"];
     if (attackRow === goalRowIdx - 1) {
@@ -157,7 +158,7 @@ export const aiAttack = (board) => {
 };
 
 const getBacteriaCoords = (bacteria) => {
-  let bacteriaCoords = [];
+  let bacteriaCoords: number[][] = [];
   for (let row = 0; row < bacteria.length; row++) {
     for (let col = 0; col < bacteria[row].length; col++) {
       if (bacteria[row][col] > 0) bacteriaCoords.push([row, col]);

@@ -1,4 +1,5 @@
 import { distanceFromDangerousAttackZone, isDangerous, moves } from "./helpers";
+import type { Events } from '../../game-factory/types';
 import { reverse } from 'lodash';
 
 describe('distanceFromDangerousAttackZone', () => {
@@ -55,8 +56,9 @@ describe('moves', () => {
     let callMock = false;
     const events = {
       endTurn: () => {},
-      endGame: () => { callMock = true; }
-    }
+      endGame: () => { callMock = true; },
+      setTurnState: () => {}
+    } satisfies Events
     const { nextBoard } = moves.defend(board, { events }, { row: 2, col: 0 });
     expect(nextBoard.bacteria[2][0]).toEqual(1);
     expect(callMock).toBe(false);
@@ -72,8 +74,9 @@ describe('moves', () => {
     let callMock = false;
     const events = {
       endTurn: () => {},
-      endGame: () => { callMock = true; }
-    }
+      endGame: () => { callMock = true; },
+      setTurnState: () => {}
+    } satisfies Events
     moves.defend(board, { events }, { row: 2, col: 0 });
     expect(callMock).toBe(true);
   });
