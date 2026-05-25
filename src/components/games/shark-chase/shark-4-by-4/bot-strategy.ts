@@ -1,9 +1,9 @@
-'use strict';
-
 import { sample } from 'lodash';
+import type { StrategyArgs } from '../../../game-factory/types';
+import { type Board } from './shark-chase';
 
-const getAdjacentCells = (pos) => {
-  const cells = [];
+const getAdjacentCells = (pos: number): number[] => {
+  const cells: number[] = [];
   if (pos + 4 < 16) cells.push(pos + 4);
   if (pos - 4 >= 0) cells.push(pos - 4);
   if (pos + 1 < 16 && pos % 4 !== 3) cells.push(pos + 1);
@@ -11,16 +11,16 @@ const getAdjacentCells = (pos) => {
   return cells;
 };
 
-export const randomBotStrategy = ({ board, ctx, moves }) => {
+export const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
     const safeMoves = [...getAdjacentCells(board.shark).filter(c => board.submarines[c] === 0), board.shark];
-    const firstPos = sample(safeMoves);
+    const firstPos = sample(safeMoves)!;
     const { nextBoard } = moves.moveShark(board, firstPos);
     if (nextBoard.sharkMovesInTurn === 1) {
       setTimeout(() => {
         const safeCells = getAdjacentCells(nextBoard.shark).filter(c => nextBoard.submarines[c] === 0);
         const secondMoves = [...safeCells, nextBoard.shark];
-        moves.moveShark(nextBoard, sample(secondMoves));
+        moves.moveShark(nextBoard, sample(secondMoves)!);
       }, firstPos === board.shark ? 0 : 750);
     }
   } else {
@@ -29,20 +29,20 @@ export const randomBotStrategy = ({ board, ctx, moves }) => {
       moves.moveSubmarine(board, { from: winningFrom, to: board.shark });
       return;
     }
-    const validMoves = [];
+    const validMoves: { from: number; to: number }[] = [];
     board.submarines.forEach((count, from) => {
       if (count >= 1) getAdjacentCells(from).forEach(to => validMoves.push({ from, to }));
     });
     const approachingMoves = validMoves.filter(
       ({ from, to }) => distanceFromShark(board.shark, to) < distanceFromShark(board.shark, from)
     );
-    moves.moveSubmarine(board, sample(approachingMoves.length > 0 ? approachingMoves : validMoves));
+    moves.moveSubmarine(board, sample(approachingMoves.length > 0 ? approachingMoves : validMoves)!);
   }
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
-    const finalPos = getNextSharkPositionByAI(board.submarines, board.shark);
+    const finalPos = getNextSharkPositionByAI(board.submarines, board.shark)!;
     const firstPos = getIntermediateSharkPosition(board.submarines, board.shark, finalPos);
     const { nextBoard } = moves.moveShark(board, firstPos);
     if (finalPos !== board.shark) {
@@ -51,12 +51,12 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
       }, firstPos === finalPos ? 0 : 750);
     }
   } else {
-    const { from, to } = getOptimalSubmarineMoveByAi(board);
+    const { from, to } = getOptimalSubmarineMoveByAi(board)!;
     moves.moveSubmarine(board, { from, to });
   }
 };
 
-const getOptimalSubmarineMoveByAi = (board) => {
+const getOptimalSubmarineMoveByAi = (board: Board): { from: number; to: number } | undefined => {
   const submarineNextToShark = findSubmarineNextToShark(board);
   if (submarineNextToShark !== undefined) {
     return { from: submarineNextToShark, to: board.shark }
@@ -99,9 +99,10 @@ const getOptimalSubmarineMoveByAi = (board) => {
       break;
     }
   }
+  return undefined;
 };
 
-const findSubmarineNextToShark = (board) => {
+const findSubmarineNextToShark = (board: Board): number | undefined => {
   if (board.shark+4 < 16 && board.submarines[board.shark+4] >= 1) return board.shark+4;
   if (board.shark-4 >= 0 && board.submarines[board.shark-4] >= 1) return board.shark-4;
   if (board.shark+1 < 16 && board.shark%4 !== 3 && board.submarines[board.shark+1] >= 1) return board.shark+1;
@@ -109,14 +110,14 @@ const findSubmarineNextToShark = (board) => {
   return undefined;
 };
 
-const distanceFromShark = (shark, id) => {
+const distanceFromShark = (shark: number, id: number): number => {
   return (
     Math.abs((shark % 4) - (id % 4)) +
     Math.abs(Math.floor(shark / 4) - Math.floor(id / 4))
   );
 }
 
-export const getNextSharkPositionByAI = (submarines, shark) => {
+export const getNextSharkPositionByAI = (submarines: number[], shark: number): number | undefined => {
   const componentSizes = getComponentSizes(submarines)
 
   // 2 lepessel elerheto mezo aminek legnagyobb az osszefuggosegi komponense
@@ -129,7 +130,7 @@ export const getNextSharkPositionByAI = (submarines, shark) => {
     }
   }
 
-  const possibleMoves = [];
+  const possibleMoves: number[] = [];
 
   // 4 kozepso mezo
   for (let ind = 0; ind < 4; ind++) {
@@ -171,7 +172,7 @@ export const getNextSharkPositionByAI = (submarines, shark) => {
   return sample(possibleMoves);
 }
 
-const isReachableWithoutDeath = (submarines, shark, id) => {
+const isReachableWithoutDeath = (submarines: number[], shark: number, id: number): boolean => {
   if (distanceFromShark(shark, id) > 2) return false;
   if (submarines[id] >= 1) return false;
   if (distanceFromShark(shark, id) === 2) {
@@ -187,7 +188,7 @@ const isReachableWithoutDeath = (submarines, shark, id) => {
   return true;
 }
 
-const getIntermediateSharkPosition = (submarines, shark, id) => {
+const getIntermediateSharkPosition = (submarines: number[], shark: number, id: number): number => {
   if (id === shark - 2) return shark - 1;
   if (id === shark + 2) return shark + 1;
   if (id === shark + 8) return shark + 4;
@@ -208,8 +209,8 @@ const getIntermediateSharkPosition = (submarines, shark, id) => {
 }
 
 // osszefuggosegi komponensek a tengeralattjarokkal nem kozvetlen szomszedos mezokbol
-const getComponentSizes = (submarines) => {
-  const isNextToSubmarine = (id) => {
+const getComponentSizes = (submarines: number[]): number[] => {
+  const isNextToSubmarine = (id: number): boolean => {
     if (id+4 < 16 && submarines[id+4] >= 1) return true;
     if (id-4 >= 0 && submarines[id-4] >= 1) return true;
     if (id+1 < 16 && id%4 !== 3 && submarines[id+1] >= 1) return true;
@@ -221,8 +222,8 @@ const getComponentSizes = (submarines) => {
   const visited = Array(16).fill(false);
   const visited2 = Array(16).fill(false);
   const componentSizes = Array(16).fill(0);
-  const queue = [];
-  let first;
+  const queue: number[] = [];
+  let first: number;
 
   for (let i = 0; i<16; i++)
   {
@@ -234,7 +235,7 @@ const getComponentSizes = (submarines) => {
       while(queue.length > 0)
       {
         counter++;
-        first = queue.shift();
+        first = queue.shift()!;
         if (first+4 < 16 && !isNextToSubmarine(first+4) && visited[first+4] == false) {
           queue.push(first+4); visited[first+4]=true
         }
@@ -252,7 +253,7 @@ const getComponentSizes = (submarines) => {
       visited2[i] = true;
       while(queue.length > 0)
       {
-        first = queue.shift();
+        first = queue.shift()!;
         componentSizes[first] = counter;
         if (first+4 < 16 && !isNextToSubmarine(first+4) && visited2[first+4] == false) {
           queue.push(first+4); visited2[first+4] = true;

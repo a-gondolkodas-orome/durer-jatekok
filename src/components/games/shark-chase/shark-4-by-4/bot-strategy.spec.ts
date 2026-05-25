@@ -1,4 +1,4 @@
-import { getNextSharkPositionByAI } from "./bot-strategy";
+import { getNextSharkPositionByAI } from './bot-strategy';
 
 describe('getNextSharkPositionByAI', () => {
   it('avoid losing in next step if possible', () => {
@@ -7,7 +7,7 @@ describe('getNextSharkPositionByAI', () => {
       0, 1, 0, 0,
       1, 0, 0, 0,
       0, 0, 0, 0
-    ]
+    ];
     const shark = 4;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(0);
@@ -19,7 +19,7 @@ describe('getNextSharkPositionByAI', () => {
       0, 1, 0, 0,
       1, 0, 0, 0,
       0, 0, 0, 0
-    ]
+    ];
     const shark = 0;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(0);
@@ -31,7 +31,7 @@ describe('getNextSharkPositionByAI', () => {
       0, 0, 0, 0,
       1, 0, 0, 1,
       0, 0, 1, 0
-    ]
+    ];
     const shark = 15;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(15);
@@ -43,7 +43,7 @@ describe('getNextSharkPositionByAI', () => {
       0, 0, 0, 1,
       1, 0, 0, 0,
       0, 0, 0, 0
-    ]
+    ];
     const shark = 3;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(3);
@@ -55,7 +55,7 @@ describe('getNextSharkPositionByAI', () => {
       1, 0, 0, 0,
       0, 0, 0, 0,
       0, 1, 0, 0
-    ]
+    ];
     const shark = 0;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(0);
@@ -67,7 +67,7 @@ describe('getNextSharkPositionByAI', () => {
       0, 0, 0, 0,
       1, 0, 0, 0,
       0, 1, 0, 0
-    ]
+    ];
     const shark = 12;
     const position = getNextSharkPositionByAI(submarines, shark);
     expect(position).toEqual(12);

@@ -1,37 +1,41 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { range } from 'lodash';
+import type { BoardClientProps } from '../../../game-factory/types';
 import { SharkSvg } from '../assets/shark-chase-shark-svg';
 import { SubmarineSvg } from '../assets/shark-chase-submarine-svg';
 import { useTranslation } from '../../../language/translate';
+import { type Board } from './shark-chase';
 
-export const BoardClient = ({ board, ctx, moves }) => {
+export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const [chosenPiece, setChosenPiece] = useState(null);
+  const [chosenPiece, setChosenPiece] = useState<number | null>(null);
   const isCurrentPlayerResearcher = ctx.currentPlayer === 0;
   const isCurrentPlayerShark = ctx.currentPlayer === 1;
 
-  let possibleMoves=[]
+  let possibleMoves: number[] = [];
   if (ctx.isClientMoveAllowed) {
     if (isCurrentPlayerShark) {
-      possibleMoves = range(16).filter(i => distance(board.shark, i) <= 1)
+      possibleMoves = range(25).filter(i => distance(board.shark, i) <= 1);
     } else if (chosenPiece !== null) {
-      possibleMoves = range(16).filter(i => distance(chosenPiece, i) === 1)
+      possibleMoves = range(25).filter(i => distance(chosenPiece, i) === 1);
     }
   }
 
-  const isAllowed_choosePiece = (id) => {
+  const isAllowed_choosePiece = (id: number): boolean => {
     if (!ctx.isClientMoveAllowed) return false;
     if (isCurrentPlayerResearcher) return board.submarines[id] >= 1;
     if (isCurrentPlayerShark) return board.shark === id;
-  }
+    return false;
+  };
 
-  const isAllowed_movePiece = (id) => {
+  const isAllowed_movePiece = (id: number): boolean => {
     if (!ctx.isClientMoveAllowed) return false;
-    if (isCurrentPlayerResearcher) return distance(chosenPiece, id) === 1;
+    if (isCurrentPlayerResearcher) return chosenPiece !== null && distance(chosenPiece, id) === 1;
     if (isCurrentPlayerShark) return distance(board.shark, id) <= 1;
-  }
+    return false;
+  };
 
-  const clickField = (id) => {
+  const clickField = (id: number) => {
     if (!ctx.isClientMoveAllowed) return;
     if (isCurrentPlayerResearcher) {
       if (chosenPiece === null) {
@@ -56,18 +60,18 @@ export const BoardClient = ({ board, ctx, moves }) => {
 
   return (
   <section className="p-2 shrink-0 grow basis-2/3">
-    <p className='font-bold text-lg'>{t({ hu: 'Hátralévő lépések száma', en: 'Remaining moves' })}: {12-board.turn}</p>
+    <p className='font-bold text-lg'>{t({ hu: 'Hátralévő lépések száma', en: 'Remaining moves' })}: {16-board.turn}</p>
     <SubmarineSvg/>
     <SharkSvg/>
-    <div className="grid grid-cols-4 gap-0 border-2">
-      {range(16).map(id => (
+    <div className="grid grid-cols-5 gap-0 border-2">
+      {range(25).map(id => (
         <button
           key={id}
           onClick={() => clickField(id)}
           disabled={!isAllowed_choosePiece(id) && !isAllowed_movePiece(id)}
           className={`
             aspect-square p-[0%] border-2 relative flex justify-center items-center
-            ${possibleMoves.includes(id) && isCurrentPlayerShark && board.submarines[id] && 'border-red-600'}
+            ${possibleMoves.includes(id) && isCurrentPlayerShark && board.submarines[id] ? 'border-red-600' : ''}
           `}
         >
           {possibleMoves.includes(id) && isCurrentPlayerResearcher && (
@@ -96,11 +100,10 @@ export const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const distance = (fieldA, fieldB) => {
-  if (fieldA === null || fieldB === null) return null;
+const distance = (fieldA: number, fieldB: number): number => {
   return (
-    Math.abs((fieldA % 4) - (fieldB % 4)) +
-    Math.abs(Math.floor(fieldA / 4) - Math.floor(fieldB / 4))
+    Math.abs((fieldA % 5) - (fieldB % 5)) +
+    Math.abs(Math.floor(fieldA / 5) - Math.floor(fieldB / 5))
   );
 };
 
@@ -151,6 +154,22 @@ const SubmarinesInCell = ({ count }) => {
           <use xlinkHref="#submarine" />
         </svg>
         <svg className="aspect-square top-[10%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+      </>
+    )}
+    {count === 4 && (
+      <>
+        <svg className="aspect-square top-[-15%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-[-5%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-[5%] absolute z-20 opacity-80">
+          <use xlinkHref="#submarine" />
+        </svg>
+        <svg className="aspect-square top-[15%] absolute z-20 opacity-80">
           <use xlinkHref="#submarine" />
         </svg>
       </>
