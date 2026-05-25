@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { range, cloneDeep, isEqual, flatMap, sample, last, shuffle } from 'lodash';
 import { strategyGameFactory, dummyEvents } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
+
+type Board = [number, number][]
+type Field = { row: number, col: number }
 
 const BOARDSIZE = 6;
-const getId = ({ row, col }) => row * BOARDSIZE + col;
-const isCovered = (field, board) => flatMap(board).includes(getId(field));
+const getId = ({ row, col }: Field) => row * BOARDSIZE + col;
+const isCovered = (field: Field, board: Board) => flatMap(board).includes(getId(field));
 
-const getDominoDirection = (field, board) => {
-  const domino = board.find(d => d.includes(getId(field)));
+const getDominoDirection = (field: Field, board: Board) => {
+  const domino = board.find(d => d.includes(getId(field)))!;
   const neighbor = domino[0] === getId(field) ? domino[1] : domino[0];
   const nCol = neighbor % BOARDSIZE;
   const nRow = (neighbor - nCol) / BOARDSIZE;
@@ -23,9 +27,9 @@ const DOMINO_BORDER_CLASSES = {
   bottom: 'rounded-b-md border-b-4 border-l-4 border-r-4'
 };
 
-const BoardClient = ({ board, ctx, moves }) => {
-  const [selectedField, setSelectedField] = useState(null);
-  const [hoveredField, setHoveredField] = useState(null);
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
+  const [selectedField, setSelectedField] = useState<Field | null>(null);
+  const [hoveredField, setHoveredField] = useState<Field | null>(null);
 
   const hasEmptyNeighbor = ({ row, col }) => {
     if (col < (BOARDSIZE - 1) && !isCovered({ row, col: col + 1 }, board)) return true;
@@ -35,7 +39,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     return false;
   }
 
-  const clickField = (field) => {
+  const clickField = (field: Field) => {
     if (selectedField === null) { setSelectedField(field); return; }
     if (isEqual(field, selectedField)) { setSelectedField(null); return; }
     moves.placeDomino(board, [getId(selectedField), getId(field)]);
@@ -49,13 +53,13 @@ const BoardClient = ({ board, ctx, moves }) => {
     return false;
   }
 
-  const isPartOfPreview = (field) => {
+  const isPartOfPreview = (field: Field) => {
     if (selectedField === null || hoveredField === null) return false;
     if (!isNeighborOfSelected(hoveredField) || isCovered(hoveredField, board)) return false;
     return isEqual(field, selectedField) || isEqual(field, hoveredField);
   };
 
-  const getCellBgClass = (field) => {
+  const getCellBgClass = (field: Field) => {
     if (isCovered(field, board)) return 'bg-slate-600 border-black';
     if (!ctx.isClientMoveAllowed) return '';
     if (isPartOfPreview(field)) return 'bg-blue-500';
@@ -64,7 +68,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     return '';
   };
 
-  const isClickAllowed = (field) => {
+  const isClickAllowed = (field: Field) => {
     if (!ctx.isClientMoveAllowed) return false;
     if (isCovered(field, board)) return false;
     if (!hasEmptyNeighbor(field)) return false;
@@ -73,7 +77,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     return true;
   }
 
-  const getDominoBorders = (field) => {
+  const getDominoBorders = (field: Field) => {
     if (!isCovered(field, board)) return '';
     return DOMINO_BORDER_CLASSES[getDominoDirection(field, board)];
   }
@@ -130,8 +134,8 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const getPossibleMoves = board => {
-  const possibleMoves = [];
+const getPossibleMoves = (board: Board) => {
+  const possibleMoves: [number, number][] = [];
   const boardIndices = flatMap(
     range(0, BOARDSIZE), row => range(0, BOARDSIZE).map(col => ({ row, col }))
   );
@@ -149,7 +153,7 @@ const getPossibleMoves = board => {
 }
 
 const moves = {
-  placeDomino: (board, { events }, domino) => {
+  placeDomino: (board: Board, { events }: { events: Events }, domino) => {
     const nextBoard = cloneDeep(board);
     nextBoard.push(domino);
     events.endTurn();
@@ -160,22 +164,23 @@ const moves = {
   }
 }
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.placeDomino(board, sample(getPossibleMoves(board)));
 };
 
 // Note: Currently the AI may not win even from a winning position if the player
 // selected winning role but then did not follow winning strategy due to intractability.
 // We may improve AI with some heuristic and leveraging equivalent positions.
-const aiBotStrategy = ({ board, moves, ctx }) => {
+const aiBotStrategy = ({ board, moves, ctx }: StrategyArgs<Board>) => {
   const possibleMoves = getPossibleMoves(board);
   if (possibleMoves.length >= 20) {
     if (ctx.chosenRoleIndex === 1) {
       const randomDomino = sample(getPossibleMoves(board));
       moves.placeDomino(board, randomDomino);
     } else {
-      const lastDomino = last(board);
-      const mirrorImage = [BOARDSIZE * BOARDSIZE - 1 - lastDomino[0], BOARDSIZE * BOARDSIZE - 1 - lastDomino[1]];
+      const lastDomino = last(board)!;
+      const N = BOARDSIZE * BOARDSIZE - 1;
+      const mirrorImage = [N - lastDomino[0], N - lastDomino[1]];
       moves.placeDomino(board, mirrorImage);
     }
   } else {
@@ -184,7 +189,7 @@ const aiBotStrategy = ({ board, moves, ctx }) => {
   }
 }
 
-const getOptimalAiMove = board => {
+const getOptimalAiMove = (board: Board) => {
   const allowedMoves = getPossibleMoves(board);
   const optimalPlace = shuffle(allowedMoves).find(i => {
     const { nextBoard } = moves.placeDomino(board, { events: dummyEvents }, i);
@@ -198,7 +203,7 @@ const getOptimalAiMove = board => {
 };
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIPlayer) => {
+const isWinningState = (board: Board, amIPlayer) => {
   const allowedPlacesForOther = getPossibleMoves(board);
   if (allowedPlacesForOther.length === 0) {
     return true;
