@@ -1,16 +1,17 @@
 import { sample, cloneDeep } from 'lodash';
-import { Thief, hasWinningTriple, getUntakenCards } from '../helpers';
+import { Thief, hasWinningTriple, getUntakenCards, type Board } from '../helpers';
+import type { StrategyArgs } from '../../../game-factory/types';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.takeCard(board, sample(getUntakenCards(board, 9)));
 };
 
-export const aiBotStrategy = ({ board, moves, ctx }) => {
+export const aiBotStrategy = ({ board, moves, ctx }: StrategyArgs<Board>) => {
     const move = getMove(board, ctx.chosenRoleIndex);
     moves.takeCard(board, move);
 }
 
-const getMove = (board, chosenRoleIndex) => {
+const getMove = (board: Board, chosenRoleIndex) => {
   const allowedMoves = getUntakenCards(board, 9);
   if (chosenRoleIndex === 1 && getUntakenCards.length === 9) return 5;
   const optimalMoves = allowedMoves.filter(i => {
@@ -24,7 +25,7 @@ const getMove = (board, chosenRoleIndex) => {
 }
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIFirst) => {
+const isWinningState = (board: Board, amIFirst) => {
   if (isGameEnd(board)) {
     return amIFirst !== hasWinningTriple(board.cards[Thief]);
   }
@@ -39,6 +40,6 @@ const isWinningState = (board, amIFirst) => {
   return optimalPlaceForOther === undefined;
 };
 
-const isGameEnd = board => {
+const isGameEnd = (board: Board) => {
   return board.numTurns === 8 || hasWinningTriple(board.cards[Thief]);
 }

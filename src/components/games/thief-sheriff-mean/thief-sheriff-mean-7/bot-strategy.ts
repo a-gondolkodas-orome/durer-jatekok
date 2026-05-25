@@ -1,19 +1,20 @@
-import { sample, _ } from 'lodash';
-import { Sheriff, Thief, getUntakenCards } from '../helpers';
+import { sample } from 'lodash';
+import { Sheriff, Thief, getUntakenCards, type Board } from '../helpers';
+import type { StrategyArgs } from '../../../game-factory/types';
 
 const CARD_COUNT = 7;
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.takeCard(board, [sample(getUntakenCards(board, CARD_COUNT))]);
 };
 
-export const aiBotStrategy = ({ board, moves, ctx }) => {
-    const move = getMove(board, ctx.chosenRoleIndex);
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+    const move = getMove(board);
     moves.takeCard(board, [move]);
 }
 
-const getMove = (board) => {
-  const cards = Array(CARD_COUNT).fill(null);
+const getMove = (board: Board) => {
+  const cards: (number | null)[] = Array(CARD_COUNT).fill(null);
   board.cards[Sheriff].forEach(card => {
     cards[card - 1] = Sheriff;
   });
@@ -29,12 +30,12 @@ const getMove = (board) => {
   // take only ones with max value
   const maxIndices = meanCounts.filter(([count]) => count === maxCount)
     .map(([_, idx]) => idx);
-  return sample(maxIndices) + 1;
+  return sample(maxIndices)! + 1;
 }
 
 const findPossibleMeans = (cards) => {
   // get all good sets of three cards
-  let means = [];
+  const means: number[][] = [];
   for (let i = 0; i < (CARD_COUNT - 2); i++) {
     for (let j = i + 1; j < (CARD_COUNT - 1); j++) {
       for (let k = j + 1; k < CARD_COUNT; k++) {
@@ -51,7 +52,7 @@ const findPossibleMeans = (cards) => {
 }
 
 const getMeanCounts = (cards) => {
-  let counts = Array(CARD_COUNT).fill(0);
+  const counts = Array(CARD_COUNT).fill(0);
   findPossibleMeans(cards).forEach(mean => {
     counts[mean[0]]++;
     counts[mean[1]]++;

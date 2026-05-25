@@ -1,18 +1,19 @@
-import React from 'react';
 import { strategyGameFactory } from '../../../game-factory/strategy-game';
 import { range, cloneDeep } from 'lodash';
+import type { Events, BoardClientProps } from '../../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import {
   hasWinningTriple,
   Sheriff,
   Thief,
   getUntakenCards,
-  generateStartBoard
+  generateStartBoard,
+  type Board
 } from "../helpers";
 
-const CARD_COUNT = 7;
+const CARD_COUNT = 9;
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isAllowedMove = index => {
     if (!ctx.isClientMoveAllowed) return false;
     return getUntakenCards(board, CARD_COUNT).includes(index);
@@ -20,7 +21,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 
   const clickCard = (index) => {
     if (!isAllowedMove(index)) return;
-    moves.takeCard(board, [index]);
+    moves.takeCard(board, index);
   }
 
   const getCardColor = num => {
@@ -56,17 +57,19 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  takeCard: (board, { ctx, events }, indices) => {
+  takeCard: (board: Board, { ctx, events }: { ctx: any, events: Events }, idx) => {
     const nextBoard = cloneDeep(board);
 
-    indices.forEach(idx => {
-      nextBoard.cards[ctx.currentPlayer].push(idx)
-    });
+    nextBoard.cards[ctx.currentPlayer].push(idx);
     nextBoard.numTurns += 1;
-    if (nextBoard.numTurns >= 5) {
-      nextBoard.cards[Thief].push(...getUntakenCards(nextBoard, CARD_COUNT));
+
+    if (nextBoard.numTurns === 8) {
+      nextBoard.cards[Sheriff].push(getUntakenCards(nextBoard, CARD_COUNT)[0]);
       const winner = hasWinningTriple(nextBoard.cards[Thief]) ? Thief : Sheriff;
       events.endGame(winner);
+    } else if (hasWinningTriple(nextBoard.cards[Thief])) {
+      // Thief can win early
+      events.endGame(Thief);
     }
     events.endTurn();
     return { nextBoard };
@@ -75,33 +78,22 @@ const moves = {
 
 const rule = {
   hu: <>
-    <b>Nyomozó és Tolvaj</b> az alábbi játékot játssza. Hét kártya van az asztalon lévő készletben,
-    az 1, 2, ..., {CARD_COUNT} számokkal jelölve. A játék {CARD_COUNT} lépésből áll, minden lépésben az egyik
-    játékos kezébe vesz egyet az asztalon lévő kártyák
-    közül. Az alábbi sorrend szerint lépnek a játékosok:
-    <br />
-    <b>
-    1. Nyomozó, 2. Tolvaj, 3. Nyomozó, 4. Tolvaj, 5. Nyomozó, 6. Tolvaj, 7. Tolvaj.
-    </b>
-    <br />
-    Tolvaj akkor nyer, ha a játék végéig összegyűjt három olyan kártyát, melyek közül az egyiken lévő szám a másik
-    kettőnek az átlaga. Nyomozó pedig akkor nyer, ha Tolvaj nem gyűjt össze három ilyen kártyát.
+    <b>Nyomozó és Tolvaj</b> az alábbi játékot játssza. Kilenc kártya van az asztalon lévő készletben,
+    az 1, 2, ..., {CARD_COUNT} számokkal jelölve. Nyomozó és Tolvaj felváltva vesz a kezébe egyet-egyet
+    az asztalon lévő kártyák közül úgy, hogy az első kártyát Nyomozó veszi el.
+    Tolvaj akkor nyer, ha a játék végéig összegyűjt három olyan kártyát, melyek közül az egyiken
+    lévő szám a másik kettőnek az átlaga. Nyomozó pedig akkor nyer, ha Tolvaj nem gyűjt össze
+    három ilyen kártyát.
   </>,
   en: <>
-    <b>Sheriff and Thief</b> play the following game. Seven cards numbered 1, 2, …, {CARD_COUNT} are on
-    the table. The game lasts {CARD_COUNT} turns; on each turn one player picks up a card.
-    The turn order is:
-    <br />
-    <b>
-    1. Sheriff, 2. Thief, 3. Sheriff, 4. Thief, 5. Sheriff, 6. Thief, 7. Thief.
-    </b>
-    <br />
+    <b>Sheriff and Thief</b> play the following game. Nine cards numbered 1, 2, …, {CARD_COUNT} are on
+    the table. Sheriff and Thief alternate picking up cards, with the Sheriff going first.
     The Thief wins if they collect three cards where one number is the average of the other two.
     The Sheriff wins if the Thief fails to collect such a triple.
   </>
 };
 
-export const ThiefSheriffMean7 = strategyGameFactory({
+export const ThiefSheriffMean9 = strategyGameFactory({
   presentation: {
     rule,
     roleLabels: [
