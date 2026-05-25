@@ -1,10 +1,13 @@
-import React from 'react';
 import { range, sum, isEqual, random, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import { useTranslation } from '../../language/translate';
 
-const generateStartBoard = () => {
+export type Board = number[]
+type TurnState = { firstPlacedSquareIndex: number } | null
+
+const generateStartBoard = (): Board => {
   const board = Array(5).fill(0);
   const x = random(4);
   board[x] += 1;
@@ -12,7 +15,7 @@ const generateStartBoard = () => {
 };
 
 const moves = {
-  addPiece: (board, { ctx, events }, pileId) => {
+  addPiece: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, pileId: number) => {
     const nextBoard = cloneDeep(board);
     nextBoard[pileId] += 1;
     if (ctx.currentPlayer === 1 && [3, 6, 9].includes(sum(nextBoard))) {
@@ -27,23 +30,24 @@ const moves = {
     }
     return { nextBoard };
   },
-  undoFirstDisc: (board, { ctx, events }) => {
+  undoFirstDisc: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }) => {
     const nextBoard = cloneDeep(board);
-    nextBoard[ctx.turnState.firstPlacedSquareIndex] -= 1;
+    nextBoard[(ctx.turnState as TurnState)!.firstPlacedSquareIndex] -= 1;
     events.setTurnState(null);
     return { nextBoard };
   }
 }
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
 
-  const placePiece = id => {
+  const placePiece = (id: number) => {
     if (!ctx.isClientMoveAllowed) return;
     moves.addPiece(board, id);
   };
 
-  const firstPlacedSquareIndex = ctx.turnState?.firstPlacedSquareIndex ?? null;
+  const turnState = ctx.turnState as TurnState;
+  const firstPlacedSquareIndex = turnState?.firstPlacedSquareIndex ?? null;
   const showDimmedDisc = ctx.isClientMoveAllowed && firstPlacedSquareIndex !== null;
 
   return (

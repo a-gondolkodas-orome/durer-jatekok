@@ -1,8 +1,8 @@
-'use strict';
-
 import { sum, random, cloneDeep } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './five-squares';
 
-export const randomBotStrategy = ({ board, ctx, moves }) => {
+export const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
     const { nextBoard } = moves.addPiece(board, random(4));
     setTimeout(() => {
@@ -13,9 +13,9 @@ export const randomBotStrategy = ({ board, ctx, moves }) => {
   }
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (ctx.chosenRoleIndex === 0) {
-    const tileIndices = getOptimalTileIndices(board);
+    const tileIndices = getOptimalTileIndices(board)!;
     const { nextBoard } = moves.addPiece(board, tileIndices[0]);
     setTimeout(() => {
       moves.addPiece(nextBoard, tileIndices[1]);
@@ -27,7 +27,7 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
 };
 
 //following the strategy
-const getOptimalTileIndices = (board) => {
+const getOptimalTileIndices = (board: Board) => {
   const pieces = sum(board);
   let board2 = cloneDeep(board);
   board2.sort();
@@ -87,7 +87,7 @@ const getOptimalTileIndices = (board) => {
 };
 
 //trying to win if the player makes a mistake
-const getOptimalTileIndex = (board) => {
+const getOptimalTileIndex = (board: Board) => {
   const pieces = sum(board);
   let board2 = cloneDeep(board);
   board2.sort();
@@ -126,7 +126,7 @@ const getOptimalTileIndex = (board) => {
 };
 
 // finds a square with n pieces randomly
-const findSquare = (board,n) => {
+const findSquare = (board: Board, n) => {
   let ret = random(4);
   while (board[ret] !== n) ret = random(4);
   return ret;
@@ -134,7 +134,7 @@ const findSquare = (board,n) => {
 
 // finds the squares with values n and k
 // n and k does not need to be different but there must be exactly 2 such squares
-const findSquares = (board,n,k) => {
+const findSquares = (board: Board, n, k) => {
   let i1 = 0;
   while (board[i1] !== n || board[i1] !== k) i1++;
   let i2 = i1+1;
