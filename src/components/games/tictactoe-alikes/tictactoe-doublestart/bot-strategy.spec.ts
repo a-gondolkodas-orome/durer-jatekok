@@ -1,6 +1,7 @@
 import { aiBotStrategy } from './bot-strategy';
 import type { Board } from './helpers';
-import type { Ctx, GameMoves } from '../../../game-factory/types';
+import type { GameMoves } from '../../../game-factory/types';
+import { makeCtx } from '../../../game-factory/ctx-factory';
 
 const mockPlacePiece = (color: string): GameMoves<Board> => ({
   placePiece: (board: Board, id: number) => { board[id] = color; return { nextBoard: board }; }
@@ -15,7 +16,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null
       ];
       const moves = mockPlacePiece('red');
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
+      aiBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }), moves });
       expect(board[4]).toEqual('red');
     });
 
@@ -26,7 +27,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, 'blue'
       ];
       const moves = mockPlacePiece('red');
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
+      aiBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }), moves });
       expect(board[6]).toEqual('red');
     });
 
@@ -37,7 +38,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'blue', 'blue'
       ];
       const moves = mockPlacePiece('red');
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
+      aiBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }), moves });
       expect(board[6]).toEqual('red');
     });
   });
@@ -50,7 +51,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'blue', 'blue'
       ];
       const moves = mockPlacePiece('blue');
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 } as Ctx, moves });
+      aiBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }), moves });
       expect(board[6]).toEqual('blue');
     });
 
@@ -61,7 +62,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null
       ];
       const moves = mockPlacePiece('blue');
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 } as Ctx, moves });
+      aiBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }), moves });
       expect(board[8]).toEqual('blue');
     });
   });

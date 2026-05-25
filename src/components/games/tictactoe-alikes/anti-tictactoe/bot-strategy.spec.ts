@@ -1,6 +1,7 @@
 import { aiBotStrategy } from "./bot-strategy";
 import type { Board } from './helpers';
-import type { Ctx, GameMoves } from '../../../game-factory/types';
+import type { GameMoves } from '../../../game-factory/types';
+import { makeCtx } from '../../../game-factory/ctx-factory';
 
 const mockPlacePiece = (): GameMoves<Board> => ({
   placePiece: (board: Board, id: number) => { board[id] = 'new_piece'; return { nextBoard: board }; }
@@ -11,7 +12,7 @@ describe('aiBotStrategy', () => {
     const board = Array(9).fill(null);
     const moves = mockPlacePiece();
 
-    aiBotStrategy({ board, moves, ctx: { chosenRoleIndex: 1 } as Ctx });
+    aiBotStrategy({ board, moves, ctx: makeCtx({ chosenRoleIndex: 1 }) });
 
     expect(board[4]).toEqual('new_piece');
   });
@@ -23,7 +24,7 @@ describe('aiBotStrategy', () => {
       null, 'red', null,
       null, null, null
     ]
-    aiBotStrategy({ board: board1, moves, ctx: { chosenRoleIndex: 1 } as Ctx })
+    aiBotStrategy({ board: board1, moves, ctx: makeCtx({ chosenRoleIndex: 1 }) })
     expect(board1[8]).toEqual('new_piece');
 
     const board2 = [
@@ -31,7 +32,7 @@ describe('aiBotStrategy', () => {
       null, 'red', 'blue',
       null, null, 'red'
     ]
-    aiBotStrategy({ board: board2, moves, ctx: { chosenRoleIndex: 1 } as Ctx })
+    aiBotStrategy({ board: board2, moves, ctx: makeCtx({ chosenRoleIndex: 1 }) })
 
     expect(board2[3]).toEqual('new_piece');
   });
@@ -43,7 +44,7 @@ describe('aiBotStrategy', () => {
       'red', null, 'red'
     ];
     const moves = mockPlacePiece();
-    aiBotStrategy({ board, moves, ctx: { chosenRoleIndex: 0 } as Ctx })
+    aiBotStrategy({ board, moves, ctx: makeCtx({ chosenRoleIndex: 0 }) })
     expect(board[1]).not.toEqual('new_piece');
   });
 });

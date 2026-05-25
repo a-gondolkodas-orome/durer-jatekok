@@ -1,8 +1,7 @@
 import { aiBotStrategy } from './bot-strategy';
 import type { Board } from './helpers';
-import type { Ctx, GameMoves } from '../../../game-factory/types';
-
-const mockCtx = {} as Ctx;
+import type { GameMoves } from '../../../game-factory/types';
+import { makeCtx } from '../../../game-factory/ctx-factory';
 
 const mockPlacePiece = (): GameMoves<Board> => ({
   placePiece: (board: Board, id: number) => { board[id] = 'new_piece'; return { nextBoard: board }; }
@@ -22,7 +21,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[2]).toEqual('new_piece');
     });
@@ -35,7 +34,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[0]).toEqual('new_piece');
     });
@@ -48,7 +47,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[6]).toEqual('new_piece');
     });
@@ -61,7 +60,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[6]).toEqual('new_piece');
     });
@@ -74,7 +73,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[4]).toEqual('new_piece');
     });
@@ -87,7 +86,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(
         board[0] === 'new_piece' || board[2] === 'new_piece' ||
@@ -103,7 +102,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockPlacePiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(
         board[2] === 'new_piece' || board[6] === 'new_piece'
@@ -120,7 +119,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockWhitenPiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[4]).toEqual('white');
     });
@@ -133,7 +132,7 @@ describe('aiBotStrategy', () => {
       ];
       const moves = mockWhitenPiece();
 
-      aiBotStrategy({ board, ctx: mockCtx, moves });
+      aiBotStrategy({ board, ctx: makeCtx(), moves });
 
       expect(board[5]).toEqual('white');
     });
@@ -147,7 +146,7 @@ describe('aiBotStrategy', () => {
         ]
         const moves = mockWhitenPiece();
 
-        aiBotStrategy({ board: board1, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board1, ctx: makeCtx(), moves });
 
         expect(board1[3] === 'white' || board1[5] === 'white').toBe(true);
 
@@ -156,7 +155,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'red',
           'red', 'blue', 'blue'
         ]
-        aiBotStrategy({ board: board2, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board2, ctx: makeCtx(), moves });
         expect(board2[7] === 'white' || board2[1] === 'white').toBe(true);
       });
 
@@ -167,7 +166,7 @@ describe('aiBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'red', 'blue'
         ]
-        aiBotStrategy({ board: board1, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board1, ctx: makeCtx(), moves });
         expect(board1[8]).toEqual('white');
 
         const board2 = [
@@ -175,7 +174,7 @@ describe('aiBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'white', 'blue'
         ]
-        aiBotStrategy({ board: board2, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board2, ctx: makeCtx(), moves });
         expect(board2[8]).toEqual('white');
 
         const board3 = [
@@ -183,7 +182,7 @@ describe('aiBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'blue', 'red'
         ]
-        aiBotStrategy({ board: board3, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board3, ctx: makeCtx(), moves })
         expect(board3[6]).toEqual('white');
 
         const board4 = [
@@ -191,7 +190,7 @@ describe('aiBotStrategy', () => {
           'red', 'red', 'blue',
           'blue', 'blue', 'white'
         ]
-        aiBotStrategy({ board: board4, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board4, ctx: makeCtx(), moves })
         expect(board4[6]).toEqual('white');
 
         const board5 = [
@@ -199,7 +198,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'blue', 'red'
         ]
-        aiBotStrategy({ board: board5, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board5, ctx: makeCtx(), moves })
         expect(board5[0]).toEqual('white');
 
         const board6 = [
@@ -207,7 +206,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'white',
           'white', 'blue', 'red'
         ]
-        aiBotStrategy({ board: board6, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board6, ctx: makeCtx(), moves })
         expect(board6[0]).toEqual('white');
 
         const board7 = [
@@ -215,7 +214,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'white', 'blue'
         ]
-        aiBotStrategy({ board: board7, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board7, ctx: makeCtx(), moves })
         expect(board7[2]).toEqual('white');
 
         const board8 = [
@@ -223,7 +222,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'red',
           'red', 'white', 'blue'
         ]
-        aiBotStrategy({ board: board8, ctx: mockCtx, moves })
+        aiBotStrategy({ board: board8, ctx: makeCtx(), moves })
         expect(board8[2]).toEqual('white');
       });
     });
@@ -236,7 +235,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'blue'
         ]
         const moves = mockWhitenPiece();
-        aiBotStrategy({ board, ctx: mockCtx, moves })
+        aiBotStrategy({ board, ctx: makeCtx(), moves })
         expect(board[2] === 'white' || board[6] === 'white').toBe(true);
       });
 
@@ -247,7 +246,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'red',
           'blue', 'white', 'blue'
         ]
-        aiBotStrategy({ board: board1, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board1, ctx: makeCtx(), moves });
         expect(board1[3]).toEqual('white');
 
         const board2 = [
@@ -255,7 +254,7 @@ describe('aiBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'red', 'white'
         ]
-        aiBotStrategy({ board: board2, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board2, ctx: makeCtx(), moves });
         expect(board2[1]).toEqual('white');
 
         const board3 = [
@@ -263,7 +262,7 @@ describe('aiBotStrategy', () => {
           'red', 'red', 'blue',
           'white', 'blue', 'red'
         ]
-        aiBotStrategy({ board: board3, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board3, ctx: makeCtx(), moves });
         expect(board3[5]).toEqual('white');
 
         const board4 = [
@@ -271,7 +270,7 @@ describe('aiBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'blue', 'blue'
         ]
-        aiBotStrategy({ board: board4, ctx: mockCtx, moves });
+        aiBotStrategy({ board: board4, ctx: makeCtx(), moves });
         expect(board4[7]).toEqual('white');
       });
     });
