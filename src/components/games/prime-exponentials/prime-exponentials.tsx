@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { sample, random } from 'lodash';
 import { useTranslation } from '../../language/translate';
+
+type Board = number
 
 /* eslint-disable array-element-newline */
 const primeList = [
@@ -93,7 +96,7 @@ const HoverPreview = ({ hovered, board }) => {
   );
 };
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const [hovered, setHovered] = useState(null);
   const [visiblePowers] = useState(() => allPrimePowers.filter(e => e.value <= board));
 
@@ -116,13 +119,13 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const randomBotStrategy = ({ board, moves }) => {
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const validMoves = allPrimePowers.filter(e => e.value <= board);
-  const { prime, exponent } = sample(validMoves);
+  const { prime, exponent } = sample(validMoves)!;
   moves.subtractPrimeExponent(board, { prime, exponent });
 };
 
-const aiBotStrategy = ({ board, moves }) => {
+const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (board === 1) {
     moves.subtractPrimeExponent(board, { prime: 2, exponent: 0 });
     return;
@@ -134,10 +137,10 @@ const aiBotStrategy = ({ board, moves }) => {
   let chosenExponent;
 
   if (board % 6 === 0) {
-    ({ prime: chosenPrime, exponent: chosenExponent } = sample(validMoves));
+    ({ prime: chosenPrime, exponent: chosenExponent } = sample(validMoves)!);
   } else {
     const possibleMoves = validMoves.filter(({ value }) => (board - value) % 6 === 0);
-    ({ prime: chosenPrime, exponent: chosenExponent } = sample(possibleMoves));
+    ({ prime: chosenPrime, exponent: chosenExponent } = sample(possibleMoves)!);
   }
   moves.subtractPrimeExponent(board, { prime: chosenPrime, exponent: chosenExponent });
   return;
@@ -149,7 +152,7 @@ const getPlayerStepDescription = () => ({
 });
 
 const moves = {
-  subtractPrimeExponent: (board, { events }, { prime, exponent }) => {
+  subtractPrimeExponent: (board: Board, { events }: { events: Events }, { prime, exponent }) => {
     const nextBoard = board - prime ** exponent;
     events.endTurn();
     if (nextBoard === 0) {
