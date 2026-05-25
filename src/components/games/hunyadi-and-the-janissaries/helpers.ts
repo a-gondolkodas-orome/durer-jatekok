@@ -1,17 +1,20 @@
-'use strict';
+import { random, flatten, cloneDeep, sum, remove, tail } from 'lodash';
+import type { Events } from '../../game-factory/types';
 
-import { random, flatten, cloneDeep, sum, _, remove, tail } from 'lodash';
+export type SoldierColor = 'blue' | 'red';
+export type Board = SoldierColor[][];
+export type Soldier = { rowIndex: number; pieceIndex: number; group: SoldierColor };
 
-export const generateStartBoard = () => {
+export const generateStartBoard = (): Board => {
   // this code is not 50% Hunyadi - 50% Szultan winnin position generator,
   // but relatively balanced and biased toward situations with more soldiers
   // and not single-step game
   const rowCount = 5;
-  let board = [];
+  let board: SoldierColor[][] = [];
   // for debugging purposes
   let totalScore = 0;
   for (let i = 0; i < (rowCount - 1); i++) {
-    const row = [];
+    const row: SoldierColor[] = [];
     if (i === 0) {
       row.push('blue');
       totalScore += 1;
@@ -25,7 +28,7 @@ export const generateStartBoard = () => {
   board.push([]);
 
   for (let i = 0; i < (rowCount - 1); i++) {
-    for (let j of board[i]) {
+    for (let j = 0; j < board[i].length; j++) {
       if (random(0, 4) >= 2) {
         board[i].splice(j, 1);
         board[i + 1].push('blue', 'blue');
@@ -44,8 +47,8 @@ export const generateStartBoard = () => {
 };
 
 export const moves = {
-  killGroup: (board, { events }, group) => {
-    const nextBoard = board.map(row => remove(row, soldier => soldier !== group))
+  killGroup: (board: Board, { events }: { events: Events }, group: SoldierColor) => {
+    const nextBoard = board.map(row => remove(row, soldier => soldier !== group));
 
     const isGameEnd = flatten(nextBoard).length === 0;
     if (isGameEnd) {
@@ -55,11 +58,11 @@ export const moves = {
     }
     return { nextBoard, isGameEnd, autoEndOfTurn: true };
   },
-  finalizeSeparation: (board, { events }) => {
+  finalizeSeparation: (board: Board, { events }: { events: Events }) => {
     events.endTurn();
     return { nextBoard: board };
   },
-  setGroupOfSoldiers: (board, _, soldiers) => {
+  setGroupOfSoldiers: (board: Board, _, soldiers: Soldier[]) => {
     const nextBoard = cloneDeep(board);
     for (const soldier of soldiers) {
       nextBoard[soldier.rowIndex][soldier.pieceIndex] = soldier.group;
@@ -67,7 +70,7 @@ export const moves = {
     return { nextBoard };
   },
   // endOfTurn move automatically initiated by game engine
-  stepUp: (board, { events }) => {
+  stepUp: (board: Board, { events }: { events: Events }) => {
     const nextBoard = [...tail(board), []];
     events.endTurn();
     if (nextBoard[0].length > 0) {
@@ -75,4 +78,4 @@ export const moves = {
     }
     return { nextBoard };
   }
-}
+};

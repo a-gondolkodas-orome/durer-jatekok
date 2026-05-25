@@ -1,27 +1,30 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { BoardClientProps, Ctx } from '../../game-factory/types';
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import { aiBotStrategy } from './bot-strategy';
-import { generateStartBoard, moves } from './helpers';
+import { generateStartBoard, moves, type Board, type SoldierColor } from './helpers';
 import { useTranslation } from '../../language/translate';
 
-const BoardClient = ({ board, ctx, moves }) => {
+type Piece = { rowIndex: number, pieceIndex: number }
+
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const [hoveredPiece, setHoveredPiece] = useState(null);
+  const [hoveredPiece, setHoveredPiece] = useState<Piece | null>(null);
 
   const isPlayerSultan = ctx.currentPlayer === 0;
   const groupOfHoveredPiece = hoveredPiece
     ? board[hoveredPiece.rowIndex][hoveredPiece.pieceIndex]
     : null;
 
-  const showToBeKilled = (group) => {
+  const showToBeKilled = (group: SoldierColor) => {
     if (!ctx.isClientMoveAllowed || isPlayerSultan) return false;
     if (!hoveredPiece) return false;
     return group === groupOfHoveredPiece;
   };
 
-  const clickOnSoldier = (rowIndex, pieceIndex) => {
+  const clickOnSoldier = ({ rowIndex, pieceIndex }: Piece) => {
     if (!ctx.isClientMoveAllowed) return;
 
     if (isPlayerSultan) {
@@ -70,7 +73,7 @@ const BoardClient = ({ board, ctx, moves }) => {
               key={pieceIndex}
               disabled={!ctx.isClientMoveAllowed}
               className="aspect-square w-[10%] inline-block mx-1"
-              onClick={() => clickOnSoldier(rowIndex, pieceIndex)}
+              onClick={() => clickOnSoldier({ rowIndex, pieceIndex })}
               onFocus={() => setHoveredPiece({ rowIndex, pieceIndex })}
               onBlur={() => setHoveredPiece(null)}
               onMouseOver={() => setHoveredPiece({ rowIndex, pieceIndex })}
@@ -102,7 +105,7 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const getPlayerStepDescription = ({ ctx }) => {
+const getPlayerStepDescription = ({ ctx }: { ctx: Ctx }) => {
   return ctx.currentPlayer === 0
     ? {
       hu: 'Kattints a katonákra és válaszd két részre a seregedet.',
@@ -136,8 +139,8 @@ export const HunyadiAndTheJanissaries = strategyGameFactory({
   presentation: {
     rule,
     roleLabels: [
-      { hu: 'Szultán', en: "Sultan" },
-      { hu: 'Hunyadi', en: "Hunyadi" }
+      { hu: 'Szultán', en: 'Sultan' },
+      { hu: 'Hunyadi', en: 'Hunyadi' }
     ],
     getPlayerStepDescription
   },

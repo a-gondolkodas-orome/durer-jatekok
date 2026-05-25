@@ -1,25 +1,23 @@
-'use strict';
-
 import { getOptimalGroupToKill, getOptimalSoldierGroups } from './bot-strategy';
 import { isEqual } from 'lodash';
-import { moves } from './helpers';
+import { moves, type Board } from './helpers';
 
 describe('HunyadiAndTheJanissaries strategy', () => {
   describe('getOptimalGroupToKill', () => {
     it('should kill the group of the first soldier if there is any in the first row', () => {
-      const board = [[], ['blue', 'red', 'red'], ['red']];
+      const board = [[], ['blue', 'red', 'red'], ['red']] as Board;
       expect(getOptimalGroupToKill(board)).toEqual('blue');
     });
 
     it('should kill the group with the bigger combined weight', () => {
-      const board = [[], [], ['red'], ['blue', 'blue'], ['blue']];
+      const board = [[], [], ['red'], ['blue', 'blue'], ['blue']] as Board;
       expect(getOptimalGroupToKill(board)).toEqual('blue');
     });
   });
 
   describe('getOptimalSoldierGroups', () => {
     it('should split first row evenly if there are more soldiers', () => {
-      const board = [[], ['blue', 'blue']];
+      const board = [[], ['blue', 'blue']] as Board;
       const soldiers = getOptimalSoldierGroups(board);
       const { nextBoard } = moves.setGroupOfSoldiers(board, {}, soldiers);
       expect(isEqual(nextBoard, [[], ['red', 'blue']]) || isEqual(nextBoard, [[], ['blue', 'red']]));
@@ -32,7 +30,7 @@ describe('HunyadiAndTheJanissaries strategy', () => {
         ['blue'],
         [],
         ['blue', 'blue', 'blue', 'blue']
-      ];
+      ] as Board;
       const soldiers = getOptimalSoldierGroups(board);
       const { nextBoard } = moves.setGroupOfSoldiers(board, {}, soldiers);
       expect(
@@ -48,7 +46,7 @@ describe('HunyadiAndTheJanissaries strategy', () => {
         ['blue', 'blue', 'blue'],
         ['blue'],
         ['blue', 'blue']
-      ];
+      ] as Board;
       const soldiers = getOptimalSoldierGroups(board);
       const { nextBoard } = moves.setGroupOfSoldiers(board, {}, soldiers);
       expect(
