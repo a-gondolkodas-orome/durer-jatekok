@@ -1,13 +1,13 @@
-'use strict';
-
 import { random } from 'lodash';
+import type { PlayerIndex, StrategyArgs } from '../../game-factory/types';
+import type { Board } from './rock-paper-scissor';
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const idx = getOptimalAiMove(board, ctx.chosenRoleIndex);
   moves.removeSymbol(board, idx);
 };
 
-export const getOptimalAiMove = (board, chosenRoleIndex) => {
+export const getOptimalAiMove = (board: Board, chosenRoleIndex: PlayerIndex | null): number | undefined => {
   // start with a random place as a first step
   if (chosenRoleIndex === 1) {
     const allowedPlaces = [0, 1, 2].filter(i => board[1][i] !== null);

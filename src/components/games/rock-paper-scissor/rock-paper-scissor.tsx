@@ -1,20 +1,22 @@
-import React from 'react';
 import { compact, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy } from './bot-strategy';
 import { RockSvg } from './symbols/rock-svg';
 import { PaperSvg } from './symbols/paper-svg';
 import { ScissorSvg } from './symbols/scissor-svg';
 import { useTranslation } from '../../language/translate';
 
-const BoardClient = ({ board, ctx, moves }) => {
+export type Board = ('rock' | 'paper' | 'scissor' | null)[][]
+
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const isMoveAllowed = (symbolIdx) => {
+  const isMoveAllowed = (symbolIdx: number) => {
     if (!ctx.isClientMoveAllowed) return false;
-    return board[1 - ctx.currentPlayer][symbolIdx] !== null;
+    return board[1 - ctx.currentPlayer!][symbolIdx] !== null;
   };
 
-  const clickField = (symbolIdx) => {
+  const clickField = (symbolIdx: number) => {
     if (!isMoveAllowed(symbolIdx)) return;
 
     moves.removeSymbol(board, symbolIdx)
@@ -54,11 +56,11 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const isGameEnd = (board) => {
+const isGameEnd = (board: Board) => {
   return compact(board[0]).length === 1 && compact(board[1]).length === 1;
 };
 
-const getWinnerIndex = (board) => {
+const getWinnerIndex = (board: Board) => {
   if (!isGameEnd(board)) return undefined;
   const pairs = [[0, 2], [1, 0], [2, 1]];
   for (const p of pairs) {
@@ -70,9 +72,9 @@ const getWinnerIndex = (board) => {
 };
 
 const moves = {
-  removeSymbol: (board, { ctx, events }, idx) => {
+  removeSymbol: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, idx: number) => {
     const nextBoard = cloneDeep(board);
-    nextBoard[1 - ctx.currentPlayer][idx] = null;
+    nextBoard[1 - ctx.currentPlayer!][idx] = null;
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame(getWinnerIndex(nextBoard));
@@ -86,7 +88,7 @@ const rule = {
     A játék kezdetekor mindkét játékos elé leteszünk három kártyát: az egyik követ, a
     másik papírt, a harmadik ollót ábrázol. Ezután a játékosok felváltva elvesznek egy-egy kártyát az
     ellenfelük elől, egészen addig, amíg már csak egy-egy kártya marad. Ekkor a megmaradt kártyákat
-    ütköztetik a „kő-papír-olló” játék szabályai szerint, így eldöntve, hogy ki a győztes; ha mindkét
+    ütköztetik a „kő-papír-olló" játék szabályai szerint, így eldöntve, hogy ki a győztes; ha mindkét
     kártyán ugyanaz van, akkor a Kezdő nyert.
   </>,
   en: <>
@@ -110,7 +112,7 @@ export const RockPaperScissor = strategyGameFactory({
   variants: [
     {
       botStrategy: aiBotStrategy,
-      generateStartBoard: () => [['rock', 'paper', 'scissor'], ['rock', 'paper', 'scissor']]
+      generateStartBoard: (): Board => [['rock', 'paper', 'scissor'], ['rock', 'paper', 'scissor']]
     }
   ]
 });
