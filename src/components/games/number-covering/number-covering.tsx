@@ -1,5 +1,5 @@
 import { strategyGameFactory } from '../../game-factory/strategy-game';
-import type { Events, StrategyArgs, BoardClientProps, PlayerIndex } from '../../game-factory/types';
+import type { Events, StrategyArgs, BoardClientProps } from '../../game-factory/types';
 import { range, sum, sample, cloneDeep } from 'lodash';
 import { useTranslation } from '../../language/translate';
 

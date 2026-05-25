@@ -1,6 +1,6 @@
 import { strategyGameFactory } from '../../../game-factory/strategy-game';
 import { range, cloneDeep } from 'lodash';
-import type { Events, BoardClientProps, PlayerIndex } from '../../../game-factory/types';
+import type { Events, BoardClientProps } from '../../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import {
   hasWinningTriple,
