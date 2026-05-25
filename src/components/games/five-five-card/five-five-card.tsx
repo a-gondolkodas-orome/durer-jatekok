@@ -1,16 +1,18 @@
-import React from 'react';
 import { range, cloneDeep, compact } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Ctx, Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import { useTranslation } from '../../language/translate';
 
-const BoardClient = ({ board, ctx, moves }) => {
+export type Board = (number | null)[][]
+
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const isMoveAllowed = (id) => {
+  const isMoveAllowed = (id: number) => {
     if (!ctx.isClientMoveAllowed) return false;
-    return board[1 - ctx.currentPlayer][id] !== null;
+    return board[1 - ctx.currentPlayer!][id] !== null;
   };
-  const clickField = (id) => {
+  const clickField = (id: number) => {
     if (!isMoveAllowed(id)) return;
 
     moves.removeCard(board, id + 1);
@@ -52,14 +54,14 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const isGameEnd = (board) => {
+const isGameEnd = (board: Board) => {
   return compact(board[0]).length === 1 && compact(board[1]).length === 1;
 };
 
-const getWinnerIndex = board => {
+const getWinnerIndex = (board: Board) => {
   if (!isGameEnd(board)) return undefined;
-  const firstPlayerNumber = compact(board[0])[0];
-  const secondPlayerNumber = compact(board[1])[0]
+  const firstPlayerNumber = compact(board[0])[0]!;
+  const secondPlayerNumber = compact(board[1])[0]!
 
   if (firstPlayerNumber === secondPlayerNumber) return 0;
   if ((firstPlayerNumber + secondPlayerNumber) % 2 === 0){
@@ -70,9 +72,9 @@ const getWinnerIndex = board => {
 }
 
 const moves = {
-  removeCard: (board, { ctx, events }, id) => {
+  removeCard: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, id: number) => {
     const nextBoard = cloneDeep(board);
-    nextBoard[1 - ctx.currentPlayer][id - 1] = null;
+    nextBoard[1 - ctx.currentPlayer!][id - 1] = null;
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame(getWinnerIndex(nextBoard));
