@@ -1,8 +1,10 @@
 import { findIndex, sample, range } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './helpers';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const nonEmptyPiles = [1, 2, 3].filter(i => board[i - 1] > 0);
-  const remove = sample(nonEmptyPiles);
+  const remove = sample(nonEmptyPiles)!;
   const { nextBoard } = moves.removeCoin(board, remove);
   if (remove === 1) return;
   const addOptions = [null, ...range(1, remove)];
@@ -11,7 +13,7 @@ export const randomBotStrategy = ({ board, moves }) => {
   }, 750);
 };
 
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const { remove, add } = botMoveParams({ board });
   const { nextBoard } = moves.removeCoin(board, remove);
   if (add === undefined) return;
@@ -26,7 +28,7 @@ export const aiBotStrategy = ({ board, moves }) => {
   }
 };
 
-export const botMoveParams = ({ board }) => {
+export const botMoveParams = ({ board }: { board: Board }) => {
   const oddPiles = [1, 2, 3].filter(i => board[i - 1] % 2 === 1);
 
   if (oddPiles.length === 2) {

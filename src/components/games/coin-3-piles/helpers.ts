@@ -1,6 +1,7 @@
-'use strict';
-
 import { cloneDeep, isEqual } from "lodash";
+import type { Events } from '../../game-factory/types';
+
+export type Board = number[]
 
 export const getPlayerStepDescription = ({ ctx: { turnState } }) => {
   if (turnState === 'placeBack') {
@@ -15,14 +16,14 @@ export const getPlayerStepDescription = ({ ctx: { turnState } }) => {
   };
 };
 
-export const isWinningState = ({ board }) => {
+export const isWinningState = ({ board }: { board: Board }) => {
   const oddPiles = [0, 1, 2].filter(i => board[i] % 2 === 1);
 
   return (oddPiles.length === 3 || oddPiles.length === 0);
 }
 
 export const moves = {
-  removeCoin: (board, { events }, value) => {
+  removeCoin: (board: Board, { events }: { events: Events }, value) => {
     const nextBoard = cloneDeep(board);
     nextBoard[value - 1] -= 1;
     if (value === 1) {
@@ -35,13 +36,13 @@ export const moves = {
     }
     return { nextBoard };
   },
-  undoRemoveCoin: (board, { events }, value) => {
+  undoRemoveCoin: (board: Board, { events }: { events: Events }, value) => {
     const nextBoard = cloneDeep(board);
     nextBoard[value - 1] += 1;
     events.setTurnState(null);
     return { nextBoard };
   },
-  addCoin: (board, { events }, value) => {
+  addCoin: (board: Board, { events }: { events: Events }, value) => {
     const nextBoard = cloneDeep(board);
     if (value !== null) {
       nextBoard[value - 1] += 1;

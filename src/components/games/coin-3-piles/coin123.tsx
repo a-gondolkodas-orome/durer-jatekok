@@ -1,13 +1,12 @@
-import React from 'react';
 import { random, sum } from 'lodash';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import { BoardClient } from './board-client';
-import { getPlayerStepDescription, isWinningState, moves } from './helpers';
+import { getPlayerStepDescription, isWinningState, moves, type Board } from './helpers';
 
-const generateTestStartBoard = () => [random(0, 2), random(0, 2), random(1, 3)];
+const generateTestStartBoard = (): Board => [random(0, 2), random(0, 2), random(1, 3)];
 
-const generateStartBoard = () => {
+const generateStartBoard = (): Board => {
   if (random(0, 1)) {
     return generateWinningStartBoard();
   } else {
@@ -15,13 +14,13 @@ const generateStartBoard = () => {
   }
 };
 
-const generateWinningStartBoard = () => {
+const generateWinningStartBoard = (): Board => {
   const board = [random(0, 5), random(0, 7), random(1, 8)];
   if (!isWinningState({ board }) && sum(board) >= 4) return board;
   return generateWinningStartBoard();
 }
 
-const generateLosingStartBoard = () => {
+const generateLosingStartBoard = (): Board => {
   const board = [random(0, 5), random(0, 7), random(1, 8)];
   if (isWinningState({ board }) && sum(board) >= 4) return board;
   return generateLosingStartBoard();

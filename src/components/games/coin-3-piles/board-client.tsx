@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { range } from 'lodash';
 import { useTranslation } from '../../language/translate';
+import type { BoardClientProps } from '../../game-factory/types';
+import type { Board } from './helpers';
 
 const getCoinBgColor = (coinValue) => {
   if (coinValue === 1) return 'bg-yellow-700';
@@ -13,10 +15,10 @@ const getCoinShadowColor = (coinValue) => {
   return 'shadow-yellow-400';
 };
 
-export const BoardClient = ({ board, ctx, moves }) => {
+export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState(null);
-  const [hoveredPile, setHoveredPile] = useState(null);
+  const [valueOfRemovedCoin, setValueOfRemovedCoin] = useState<number | null>(null);
+  const [hoveredPile, setHoveredPile] = useState<number | null>(null);
 
   const wasCoinAlreadyRemovedInTurn = valueOfRemovedCoin !== null;
 
@@ -29,7 +31,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
   const isAddAllowed = coinValue => {
     if (!ctx.isClientMoveAllowed) return false;
     if (!wasCoinAlreadyRemovedInTurn) return false;
-    return coinValue < valueOfRemovedCoin;
+    return coinValue < valueOfRemovedCoin!;
   };
 
   const undoCoinRemoval = () => {
@@ -68,7 +70,7 @@ export const BoardClient = ({ board, ctx, moves }) => {
 
   const shouldShowCoinToBeAdded = (coinValue) => {
     if (!wasCoinAlreadyRemovedInTurn) return false;
-    return valueOfRemovedCoin > coinValue && coinValue === hoveredPile;
+    return valueOfRemovedCoin! > coinValue && coinValue === hoveredPile;
   };
 
   return (

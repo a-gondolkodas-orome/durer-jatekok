@@ -1,5 +1,4 @@
 import { botMoveParams } from './bot-strategy';
-import { _ } from 'lodash';
 
 describe('coin123 strategy', () => {
   describe('aiBotStrategy (tested via botMoveParams)', () => {
