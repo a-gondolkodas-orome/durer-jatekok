@@ -1,9 +1,8 @@
-'use strict';
-
 import { isNull, range, sample } from 'lodash';
-import { pColor, aiColor, inPlacingPhase, isGameEnd } from './helpers';
+import { pColor, aiColor, inPlacingPhase, isGameEnd, type Board } from './helpers';
+import type { StrategyArgs } from '../../../game-factory/types';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const allowedPlaces = getAllowedPlaces(board, false);
   if (inPlacingPhase(board)) {
     const safePlaces = allowedPlaces.filter(i => !opponentCanWinNext(board, i));
@@ -13,17 +12,17 @@ export const randomBotStrategy = ({ board, moves }) => {
   }
 };
 
-const opponentCanWinNext = (board, position) => {
+const opponentCanWinNext = (board: Board, position) => {
   const boardCopy = [...board];
   boardCopy[position] = aiColor;
   return range(0, 9).filter(i => isNull(boardCopy[i])).some(i => {
-    const boardCopy2 = cloneDeep(boardCopy);
+    const boardCopy2 = [...boardCopy];
     boardCopy2[i] = pColor;
     return isGameEnd(boardCopy2);
   });
 };
 
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   if (inPlacingPhase(board)) {
     const id = getOptimalAiPlacingPosition(board);
     moves.placePiece(board, id);
@@ -33,7 +32,7 @@ export const aiBotStrategy = ({ board, moves }) => {
   }
 };
 
-const getOptimalAiPlacingPosition = (board) => {
+const getOptimalAiPlacingPosition = (board: Board) => {
   const allowedPlaces = getAllowedPlaces(board, false);
 
   if (allowedPlaces.length === 9) return(sample([0, 2, 4, 6, 8]));
@@ -63,7 +62,7 @@ const getOptimalAiPlacingPosition = (board) => {
   return sample(allowedPlaces);
 };
 
-const getOptimalAiFlippingPosition = (board) => {
+const getOptimalAiFlippingPosition = (board: Board) => {
   const allowedPlaces = getAllowedPlaces(board, false);
 
   const optimalPlaces = allowedPlaces.filter(i => {
@@ -82,7 +81,7 @@ const getOptimalAiFlippingPosition = (board) => {
 const isWinningStateCache = new Map();
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIPlayer) => {
+const isWinningState = (board: Board, amIPlayer) => {
   const key = board.join(',') + '|' + amIPlayer;
   if (isWinningStateCache.has(key)) return isWinningStateCache.get(key);
 
@@ -104,7 +103,7 @@ const isWinningState = (board, amIPlayer) => {
   return result;
 };
 
-const getAllowedPlaces = (board, amIPlayer) => {
+const getAllowedPlaces = (board: Board, amIPlayer) => {
   if (inPlacingPhase(board)) {
     return range(0, 9).filter(i => isNull(board[i]));
   }
@@ -112,7 +111,7 @@ const getAllowedPlaces = (board, amIPlayer) => {
   return range(0, 9).filter(i => board[i] === enemyColor);
 };
 
-const getNextColor = (board, amIPlayer) => {
+const getNextColor = (board: Board, amIPlayer) => {
   if (inPlacingPhase(board)) {
     return amIPlayer ? pColor : aiColor;
   }

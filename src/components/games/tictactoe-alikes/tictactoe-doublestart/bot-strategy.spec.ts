@@ -1,4 +1,10 @@
 import { aiBotStrategy } from './bot-strategy';
+import type { Board } from './helpers';
+import type { Ctx, GameMoves } from '../../../game-factory/types';
+
+const mockPlacePiece = (color: string): GameMoves<Board> => ({
+  placePiece: (board: Board, id: number) => { board[id] = color; return { nextBoard: board }; }
+});
 
 describe('Double starter TicTacToe strategy', () => {
   describe('AI is the first to move', () => {
@@ -8,10 +14,8 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null,
         null, null, null
       ];
-
-      const moves = { placePiece: (board, id) => board[id] = 'red' }
-
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
+      const moves = mockPlacePiece('red');
+      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
       expect(board[4]).toEqual('red');
     });
 
@@ -21,10 +25,8 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'red', null,
         null, null, 'blue'
       ];
-
-      const moves = { placePiece: (board, id) => board[id] = 'red' }
-
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
+      const moves = mockPlacePiece('red');
+      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
       expect(board[6]).toEqual('red');
     });
 
@@ -34,10 +36,8 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null,
         null, 'blue', 'blue'
       ];
-
-      const moves = { placePiece: (board, id) => board[id] = 'red' }
-
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 }, moves });
+      const moves = mockPlacePiece('red');
+      aiBotStrategy({ board, ctx: { chosenRoleIndex: 1 } as Ctx, moves });
       expect(board[6]).toEqual('red');
     });
   });
@@ -49,9 +49,8 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, 'red',
         null, 'blue', 'blue'
       ];
-
-      const moves = { placePiece: (board, id) => board[id] = 'blue' }
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 }, moves });
+      const moves = mockPlacePiece('blue');
+      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 } as Ctx, moves });
       expect(board[6]).toEqual('blue');
     });
 
@@ -61,9 +60,8 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'red', null,
         null, null, null
       ];
-
-      const moves = { placePiece: (board, id) => board[id] = 'blue' }
-      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 }, moves });
+      const moves = mockPlacePiece('blue');
+      aiBotStrategy({ board, ctx: { chosenRoleIndex: 0 } as Ctx, moves });
       expect(board[8]).toEqual('blue');
     });
   });

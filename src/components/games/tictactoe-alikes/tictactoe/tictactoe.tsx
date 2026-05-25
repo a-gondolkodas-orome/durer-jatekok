@@ -1,11 +1,11 @@
-import React from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../../game-factory/strategy-game';
+import type { Events, BoardClientProps, Ctx } from '../../../game-factory/types';
 import { generateEmptyTicTacToeBoard } from '../helpers';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
-import { inPlacingPhase, isGameEnd, currentPlayerColor, otherPlayerColor } from './helpers';
+import { inPlacingPhase, isGameEnd, currentPlayerColor, otherPlayerColor, type Board } from './helpers';
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const gameIsInPlacingPhase = inPlacingPhase(board);
   const clickField = (id) => {
     if (!isMoveAllowed(id)) return;
@@ -66,7 +66,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  placePiece: (board, { ctx, events }, id) => {
+  placePiece: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, id) => {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = currentPlayerColor(ctx);
     events.endTurn();
@@ -75,7 +75,7 @@ const moves = {
     }
     return { nextBoard };
   },
-  whitenPiece: (board, { events }, id) => {
+  whitenPiece: (board: Board, { events }: { events: Events }, id) => {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = 'white';
     events.endTurn();

@@ -1,18 +1,18 @@
-'use strict';
-
 import { some, range, groupBy } from 'lodash';
-import { hasWinningSubset } from '../helpers';
+import { hasWinningSubset, type Board } from '../helpers';
+
+export type { Board };
 
 export const roleColors = ['red', 'blue'];
 
-export const isGameEnd = (board) => {
+export const isGameEnd = (board: Board) => {
   if (board.filter(c => c).length === 9) return true;
   const occupiedPlaces = range(0, 9).filter((i) => board[i]);
   const boardIndicesByPieceColor = groupBy(occupiedPlaces, (i) => board[i]);
   return some(boardIndicesByPieceColor, hasWinningSubset);
 };
 
-export const hasFirstPlayerWon = (board) => {
+export const hasFirstPlayerWon = (board: Board) => {
   if (!isGameEnd(board)) return undefined;
   if (board.filter(c => c).length === 9) {
     return !hasWinningSubset(range(0, 9).filter(i => board[i] === roleColors[0]));

@@ -1,11 +1,11 @@
-import React from 'react';
 import { range, cloneDeep } from 'lodash';
 import { strategyGameFactory } from '../../../game-factory/strategy-game';
+import type { Events, BoardClientProps, Ctx } from '../../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
 import { generateEmptyTicTacToeBoard } from '../helpers';
-import { isGameEnd, hasFirstPlayerWon } from './helpers';
+import { isGameEnd, hasFirstPlayerWon, type Board } from './helpers';
 
-const BoardClient = ({ board, ctx, moves }) => {
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isMoveAllowed = (id) => {
     if (!ctx.isClientMoveAllowed) return false;
     return board[id] === null;
@@ -46,10 +46,10 @@ const BoardClient = ({ board, ctx, moves }) => {
   );
 };
 
-const isDuringFirstMove = board => board.filter(c => c).length <= 1;
+const isDuringFirstMove = (board: Board) => board.filter(c => c).length <= 1;
 
 const moves = {
-  placePiece: (board, { ctx, events }, id) => {
+  placePiece: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, id) => {
     const nextBoard = cloneDeep(board);
     nextBoard[id] = ctx.currentPlayer === 0 ? 'red' : 'blue';
 

@@ -1,12 +1,11 @@
-'use strict';
-
 import { range, isNull, sample, sampleSize, cloneDeep } from 'lodash';
 import { hasWinningSubset } from '../helpers';
-import { isGameEnd, hasFirstPlayerWon, roleColors } from './helpers';
+import { isGameEnd, hasFirstPlayerWon, roleColors, type Board } from './helpers';
+import type { StrategyArgs } from '../../../game-factory/types';
 
-const emptyCells = board => range(0, 9).filter(i => isNull(board[i]));
+const emptyCells = (board: Board) => range(0, 9).filter(i => isNull(board[i]));
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const allowedPlaces = emptyCells(board);
   if (allowedPlaces.length === 9) {
     const [first, second] = sampleSize(allowedPlaces, 2);
@@ -19,10 +18,10 @@ export const randomBotStrategy = ({ board, moves }) => {
   }
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   if (emptyCells(board).length === 9) {
     // choose two neighboring corners randomly
-    const firstStep = sample([[0, 2], [2, 8], [6, 8], [0, 6]]);
+    const firstStep = sample([[0, 2], [2, 8], [6, 8], [0, 6]])!;
     const { nextBoard } = moves.placePiece(board, firstStep[0]);
     setTimeout(() => {
       moves.placePiece(nextBoard, firstStep[1]);
@@ -33,7 +32,7 @@ export const aiBotStrategy = ({ board, ctx, moves }) => {
   }
 };
 
-const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
+const getOptimalAiPlacingPosition = (board: Board, chosenRoleIndex) => {
   const aiColor = roleColors[1 - chosenRoleIndex];
   const opponentColor = roleColors[chosenRoleIndex];
 
@@ -56,7 +55,7 @@ const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
 };
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIFirst) => {
+const isWinningState = (board: Board, amIFirst) => {
   if (isGameEnd(board)) {
     return amIFirst === hasFirstPlayerWon(board);
   }

@@ -1,9 +1,9 @@
-'use strict';
-
 import { isNull, some, groupBy, range } from 'lodash';
-import { hasWinningSubset } from '../helpers';
+import { hasWinningSubset, type Board } from '../helpers';
 
-export const isGameEnd = (board) => {
+export type { Board };
+
+export const isGameEnd = (board: Board) => {
   const occupiedPlaces = range(0, 9).filter((i) => board[i]);
   const boardIndicesByPieceColor = groupBy(occupiedPlaces, (i) => board[i]);
   return some(boardIndicesByPieceColor, hasWinningSubset);
@@ -12,7 +12,7 @@ export const isGameEnd = (board) => {
 export const pColor = 'blue';
 export const aiColor = 'red';
 
-export const inPlacingPhase = (board) => board.find(isNull) !== undefined;
+export const inPlacingPhase = (board: Board) => board.find(isNull) !== undefined;
 
 export const currentPlayerColor = (ctx) =>
   ctx.isHumanVsHumanGame

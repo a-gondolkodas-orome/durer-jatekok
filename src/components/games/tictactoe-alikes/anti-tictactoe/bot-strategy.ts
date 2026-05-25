@@ -1,21 +1,20 @@
-'use strict';
-
 import { range, isNull, sample, cloneDeep } from 'lodash';
 import { hasWinningSubset } from '../helpers';
-import { roleColors, hasFirstPlayerWon, isGameEnd } from './helpers';
+import { roleColors, hasFirstPlayerWon, isGameEnd, type Board } from './helpers';
+import type { StrategyArgs } from '../../../game-factory/types';
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.placePiece(board, sample(emptyCells(board)));
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const id = getOptimalAiPlacingPosition(board, ctx.chosenRoleIndex);
   moves.placePiece(board, id);
 };
 
-const emptyCells = board => range(0, 9).filter(i => isNull(board[i]));
+const emptyCells = (board: Board) => range(0, 9).filter(i => isNull(board[i]));
 
-const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
+const getOptimalAiPlacingPosition = (board: Board, chosenRoleIndex) => {
   const allowedPlaces = emptyCells(board);
 
   // start with middle place as a first step
@@ -24,7 +23,7 @@ const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
   // as a first player, proceed with placing at an empty place symmetrical to player's piece
   if (chosenRoleIndex === 1) {
     // pairs symmetric to middle place
-    const pairs = [[0, 8], [1, 7], [2, 6], [3, 5], [5, 3], [6, 2],  [7, 1] [8, 0]];
+    const pairs = [[0, 8], [1, 7], [2, 6], [3, 5], [5, 3], [6, 2], [7, 1], [8, 0]];
     for (const p of pairs) {
       // first is occupied, second is not from given pair
       if (!isNull(board[p[0]]) && isNull(board[p[1]])) {
@@ -53,7 +52,7 @@ const getOptimalAiPlacingPosition = (board, chosenRoleIndex) => {
 };
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIFirst) => {
+const isWinningState = (board: Board, amIFirst) => {
   if (isGameEnd(board)) {
     return amIFirst === hasFirstPlayerWon(board);
   }

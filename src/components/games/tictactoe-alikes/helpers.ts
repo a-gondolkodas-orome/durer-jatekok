@@ -1,5 +1,7 @@
 import { some, difference } from 'lodash';
 
+export type Board = (string | null)[]
+
 /*
 board indices topography
 [0, 1, 2,
