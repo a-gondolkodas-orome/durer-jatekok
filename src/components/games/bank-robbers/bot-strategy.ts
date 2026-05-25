@@ -1,12 +1,14 @@
 import { random, sample } from 'lodash';
+import type { StrategyArgs } from '../../game-factory/types';
+import type { Board } from './bank-robbers';
 
-export const aiBotStrategy = ({ board, moves }) => {
+export const aiBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   let bankIndex = 0;
   if (board.lastMove === null) {
     bankIndex = random(board.circle.length - 1);
   } else {
     const pMoves = optimalStrategy[board.circle.length - 7][convertToBinary(board.circle)];
-    bankIndex = sample(pMoves) + 1;
+    bankIndex = sample(pMoves)! + 1;
   }
   moves.rob(board, bankIndex)
 }

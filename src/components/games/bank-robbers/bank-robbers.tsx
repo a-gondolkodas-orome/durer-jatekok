@@ -1,9 +1,11 @@
-import React from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
 import { range, cloneDeep, random, sample } from 'lodash';
+import type { Events, BoardClientProps, StrategyArgs } from '../../game-factory/types';
 import { aiBotStrategy } from './bot-strategy';
 
-const BoardClient = ({ board, ctx, moves }) => {
+export type Board = { circle: boolean[], lastMove: number | null, firstMove: number | null }
+
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const getAngle = (index) => {
     const step = Math.PI*2/board.circle.length;
     return index*step + (board.firstMove === null ? 0 : board.firstMove*step);
@@ -65,7 +67,7 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  rob: (board, { events }, index) => {
+  rob: (board: Board, { events }: { events: Events }, index) => {
     const nextBoard = cloneDeep(board);
     // so that ai strategy can be simpler: first move is always the same
     const transformedMove = board.firstMove === null ? 0 : index;
@@ -82,14 +84,14 @@ const moves = {
   }
 }
 
-const getAllowedBanks = board => {
+const getAllowedBanks = (board: Board) => {
   return range(board.circle.length).filter(i => {
     return board.circle[i] && (board.circle.at(i-1) || board.circle[(i+1)%board.circle.length]);
   })
 }
 
-const randomBotStrategy = ({ board, moves }) => {
-  moves.rob(board, sample(getAllowedBanks(board)));
+const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+  moves.rob(board, sample(getAllowedBanks(board))!);
 };
 
 const rule = {
@@ -110,8 +112,8 @@ const rule = {
   </>
 };
 
-const generateStartBoard = () => {
-  const n = random(0, 2) === 0 ? sample([8, 10]) : sample([7, 9]);
+const generateStartBoard = (): Board => {
+  const n = random(0, 2) === 0 ? sample([8, 10])! : sample([7, 9])!;
   return {
     circle: Array(n).fill(true),
     lastMove: null,
