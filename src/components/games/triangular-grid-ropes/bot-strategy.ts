@@ -5,35 +5,41 @@ import {
   edgeDirection,
   isAllowed,
   mirrorNodes,
-  isGameEnd
+  isGameEnd,
+  type Board,
+  type Edge
 } from './helpers';
+import type { PlayerIndex, StrategyArgs } from '../../game-factory/types';
 
 //    0
 //   1 2
 //  3 4 5
 // 6 7 8 9
 
-export const randomBotStrategy = ({ board, moves }) => {
+export const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.stretchRope(board, sample(getAllowedMoves(board)));
 };
 
-export const aiBotStrategy = ({ board, ctx, moves }) => {
+export const aiBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const move = getOptimalAiMove({ board, chosenRoleIndex: ctx.chosenRoleIndex });
   moves.stretchRope(board, move);
 };
 
-const getOptimalAiMove = ({ board, chosenRoleIndex }) => {
+const getOptimalAiMove = ({ board, chosenRoleIndex }: { board: Board, chosenRoleIndex: PlayerIndex | null }) => {
   const allowedMoves = getAllowedMoves(board);
   if (chosenRoleIndex === 1) {
     if (board.length === 0) {
       return sample([{ from: 3, to: 5 }, { from: 1, to: 8 }, { from: 2, to: 7 }]);
     } else {
-      const symDir = edgeDirection(board[0]);
-      const lastMove = last(board);
+      const symDir = edgeDirection(board[0]!)!;
+      const lastMove = last(board)!;
       if (edgeDirection(lastMove) === symDir) {
         return allowedMoves.find(e => edgeDirection(e) === symDir);
       } else {
-        const mirrorOfLastMove = { from: mirrorNodes[symDir][lastMove.from], to: mirrorNodes[symDir][lastMove.to] };
+        const mirrorOfLastMove: Edge = {
+          from: mirrorNodes[symDir][lastMove.from],
+          to: mirrorNodes[symDir][lastMove.to]
+        };
         if (!isAllowed(board, mirrorOfLastMove)) {
           console.error('Unexpected state, falling back');
           return sample(allowedMoves);
@@ -80,7 +86,7 @@ const getOptimalAiMove = ({ board, chosenRoleIndex }) => {
 };
 
 // given board *after* your step, are you set up to win the game for sure?
-const isWinningState = (board, amIFirst) => {
+const isWinningState = (board: Board, amIFirst) => {
   if (isGameEnd(board)) {
     return true;
   }

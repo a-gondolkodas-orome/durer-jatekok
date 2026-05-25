@@ -19,7 +19,10 @@ export const vertices = [
   { id: 9, x: 3, y: 3, z: 0, cx: "75%", cy: "57.5%" }
 ];
 
-export const isAllowed = (board, { from, to }) => {
+export type Edge = { from: number, to: number }
+export type Board = Edge[]
+
+export const isAllowed = (board: Board, { from, to }: Edge) => {
   if (!isParallel({ from, to })) return false;
   if (isPartOfExistingRope(board, { from, to })) return false;
   const middlePoints = getMiddlePoints({ from, to });
@@ -27,18 +30,18 @@ export const isAllowed = (board, { from, to }) => {
   return every(middlePoints, p => !nodesWithRope.includes(p));
 };
 
-export const isGameEnd = board => {
+export const isGameEnd = (board: Board) => {
   const allowedMoves = getAllowedMoves(board);
   return allowedMoves.length === 0;
 };
 
-export const getAllowedSuperset = (board, { from, to }) => {
-  if (from === null || to === null || from === to) return null;
+export const getAllowedSuperset = (board: Board, { from, to }) => {
+  if (from == null || to == null || from === to) return null;
   if (!isAllowed(board, { from, to })) return { from, to };
   const edgeSupsersets = superSets[`${from}-${to}`] || superSets[`${to}-${from}`] || [];
   const allowedSupersets = edgeSupsersets.filter(e => isAllowed(board, { from: e[0], to: e[1] }));
   if (allowedSupersets.length > 0) {
-    const e = last(allowedSupersets);
+    const e = last(allowedSupersets)!;
     return { from: e[0], to: e[1] };
   }
   return { from, to };
@@ -53,7 +56,9 @@ const oneLengthEdges = [
 ];
 /* eslint-enable array-element-newline */
 
-export const mirrorNodes = {
+export type Direction = 'x' | 'y' | 'z';
+
+export const mirrorNodes: Record<Direction, number[]> = {
   'x': [0, 2, 1, 5, 4, 3, 9, 8, 7, 6],
   'y': [9, 8, 5, 7, 4, 2, 6, 3, 1, 0],
   'z': [6, 3, 7, 1, 4, 8, 0, 2, 5, 9]
@@ -83,7 +88,7 @@ const superSets = {
   '4-7': [[2, 7]]
 };
 
-export const edgeDirection = ({ from, to }) => {
+export const edgeDirection = ({ from, to }: Edge) => {
   const vertexA = vertices[from];
   const vertexB = vertices[to];
   if (vertexA.x === vertexB.x) return 'x';
@@ -92,11 +97,11 @@ export const edgeDirection = ({ from, to }) => {
   return null;
 };
 
-const isParallel = (edge) => {
+const isParallel = (edge: Edge) => {
   return edgeDirection(edge) !== null;
 };
 
-const isPartOfExistingRope = (board, { from, to }) => {
+const isPartOfExistingRope = (board: Board, { from, to }: Edge) => {
   return board.some(e => {
     const middlePoints = getMiddlePoints(e);
     const edgePoints = [...middlePoints, e.from, e.to];
@@ -104,7 +109,7 @@ const isPartOfExistingRope = (board, { from, to }) => {
   });
 };
 
-const getMiddlePoints = ({ from, to }) => {
+const getMiddlePoints = ({ from, to }: Edge) => {
   const dir = edgeDirection({ from, to });
   if (dir === null) return [];
   return range(10).filter(id => {
@@ -115,7 +120,7 @@ const getMiddlePoints = ({ from, to }) => {
   });
 };
 
-const getNodesWithRope = board => {
+const getNodesWithRope = (board: Board) => {
   return range(10).filter(id => {
     return board.some(e => {
       const isEndpoint = e.from === id || e.to === id;
@@ -125,19 +130,19 @@ const getNodesWithRope = board => {
   });
 };
 
-export const getAllowedMoves = board => {
-  const moves = [];
+export const getAllowedMoves = (board: Board) => {
+  const moves: Edge[] = [];
   range(10).map(from => {
     range(from).map(to => {
       if (isAllowed(board, { from, to }) && from !== to) {
-        moves.push(getAllowedSuperset(board, { from, to }));
+        moves.push(getAllowedSuperset(board, { from, to })!);
       }
     });
   });
   return uniqWith(moves, (a, b) => isEqual(a, b) || isEqual(a, { from: b.to, to: b.from }));
 };
 
-export const getTrivialMoves = (board) => {
+export const getTrivialMoves = (board: Board) => {
   const allowedMoves = getAllowedMoves(board);
   const trivialMoves = allowedMoves.filter(e =>
     oneLengthEdges.includes(`${e.from}-${e.to}`) || oneLengthEdges.includes(`${e.to}-${e.from}`)

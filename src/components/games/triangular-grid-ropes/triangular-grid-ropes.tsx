@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { strategyGameFactory } from '../../game-factory/strategy-game';
+import type { Events, BoardClientProps } from '../../game-factory/types';
 import { aiBotStrategy, randomBotStrategy } from './bot-strategy';
-import { isAllowed, getAllowedSuperset, isGameEnd, vertices } from './helpers';
+import { isAllowed, getAllowedSuperset, isGameEnd, vertices, type Board } from './helpers';
 import { cloneDeep } from 'lodash';
 
-const BoardClient = ({ board, ctx, moves }) => {
-  const [firstNode, setFirstNode] = useState(null);
-  const [hoveredNode, setHoveredNode] = useState(null);
+const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
+  const [firstNode, setFirstNode] = useState<number | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<number | null>(null);
 
   const connectNode = node => {
     if (!ctx.isClientMoveAllowed) return;
@@ -46,7 +47,7 @@ const BoardClient = ({ board, ctx, moves }) => {
     ))}
 
     {/* candidate next edge */}
-    {firstNode !== null && hoveredNode !== null && firstNode !== hoveredNode && (
+    {firstNode !== null && hoveredNode !== null && firstNode !== hoveredNode && candidateFromV && candidateToV && (
       <line
       x1={candidateFromV.cx} y1={candidateFromV.cy}
       x2={candidateToV.cx} y2={candidateToV.cy}
@@ -95,9 +96,9 @@ const BoardClient = ({ board, ctx, moves }) => {
 };
 
 const moves = {
-  stretchRope: (board, { events }, { from, to }) => {
+  stretchRope: (board: Board, { events }: { events: Events }, { from, to }) => {
     const nextBoard = cloneDeep(board);
-    nextBoard.push(getAllowedSuperset(board, { from, to }));
+    nextBoard.push(getAllowedSuperset(board, { from, to })!);
     events.endTurn();
     if (isGameEnd(nextBoard)) {
       events.endGame();
@@ -142,7 +143,7 @@ export const TriangularGridRopes = strategyGameFactory({
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
     {
       botStrategy: aiBotStrategy,
-      generateStartBoard: () => [],
+      generateStartBoard: (): Board => [],
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
       isDefault: true
     }
