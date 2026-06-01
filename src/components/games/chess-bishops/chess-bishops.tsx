@@ -123,12 +123,7 @@ export const ChessBishops = strategyGameFactory({
   gameplay: { moves },
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
-    {
-      botStrategy: smartBotStrategy,
-      generateStartBoard,
-      label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
-      isDefault: true,
-      notAlwaysOptimal: true
-    }
+    // smart bot: verified as optimal
+    { botStrategy: smartBotStrategy, generateStartBoard, label: { hu: 'Okos 🤖', en: 'Smart 🤖' }, isDefault: true }
   ]
 });
