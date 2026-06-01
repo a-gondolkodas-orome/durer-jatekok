@@ -76,7 +76,8 @@ export const NumberPyramid = strategyGameFactory({
       botStrategy: smartBotStrategy,
       generateStartBoard,
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
-      isDefault: true
+      isDefault: true,
+      notAlwaysOptimal: true
     }
   ]
 });

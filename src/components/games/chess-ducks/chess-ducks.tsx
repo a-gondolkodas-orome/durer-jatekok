@@ -103,7 +103,13 @@ const chessDucksGameFactory = ({ ROWS, COLS }: { ROWS: number; COLS: number }) =
     gameplay: { moves },
     variants: [
       { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
-      { botStrategy: smartBotStrategy, generateStartBoard, label: { hu: 'Okos 🤖', en: 'Smart 🤖' }, isDefault: true }
+      {
+        botStrategy: smartBotStrategy,
+        generateStartBoard,
+        label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
+        isDefault: true,
+        notAlwaysOptimal: true
+      }
     ]
   });
 };
