@@ -73,6 +73,7 @@ export const NumberPyramid = strategyGameFactory({
       label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
     },
     {
+      // smart bot: TODO: check if always optimal
       botStrategy: smartBotStrategy,
       generateStartBoard,
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },

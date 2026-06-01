@@ -244,6 +244,7 @@ export const TenDiscs = strategyGameFactory({
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
     {
+      // smart bot: verified as optimal
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(10),
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
