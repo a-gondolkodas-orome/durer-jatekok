@@ -104,6 +104,8 @@ const chessDucksGameFactory = ({ ROWS, COLS }: { ROWS: number; COLS: number }) =
     variants: [
       { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
       {
+        // smart bot: TODO: check if optimal
+        // Note: might be optimal in 4x6 case but not in 4x7 case
         botStrategy: smartBotStrategy,
         generateStartBoard,
         label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
