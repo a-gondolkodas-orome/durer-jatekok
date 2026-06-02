@@ -238,6 +238,7 @@ export const PileUnion = strategyGameFactory({
       label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
     },
     {
+      // smart bot: TODO: check if optimal
       botStrategy: smartBotStrategy,
       generateStartBoard: () => {
         const numPiles = random(2, 4);

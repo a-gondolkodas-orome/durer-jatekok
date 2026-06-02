@@ -143,6 +143,7 @@ export const TriangularGridRopes = strategyGameFactory({
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt 🤖', en: 'Test 🤖' } },
     {
+      // smart bot: TODO: check if optimal
       botStrategy: smartBotStrategy,
       generateStartBoard: (): Board => [],
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
