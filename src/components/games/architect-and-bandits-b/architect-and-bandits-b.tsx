@@ -112,7 +112,6 @@ export const ArchitectAndBanditsB = strategyGameFactory({
   gameplay: { moves, endOfTurnMove: 'startNextDay' },
   variants: [{
     botStrategy: smartBotStrategy,
-    generateStartBoard,
-    notAlwaysOptimal: true
+    generateStartBoard
   }]
 });

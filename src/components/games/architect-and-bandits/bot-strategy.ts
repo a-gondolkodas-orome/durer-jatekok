@@ -111,35 +111,6 @@ const getOptimalArchitectPath = (board: Board) => {
 // Bandit heuristic: pick the tower that maximises the
 // minimum path the architect needs to cover all missing+newly-destroyed vertices.
 // Destroying the architect's current position is excluded: startNextDay rebuilds it for free.
-
-
-// Night 2 is where it can fail. Let me try to construct a counterexample.
-
-// State after day 2: architect at H(7), missing = {B(1)} — arises naturally if
-// day 1 was optimal (A→B→C→D→E), night 1 destroyed B, and the human architect
-// played day 2 as E→F→G→H instead of going back toward B.
-
-// Heuristic evaluates minPathToVisitAll(H=7, {B=1, v}) for each candidate v:
-
-// Destroy E(4): path = 5 (CW: H→A→B→C→D→E)
-// Destroy F(5): path = 6 (need to span both B and F from H)
-// Heuristic picks F. But E is the correct move. Here is why:
-
-// After destroying F: missing = {B, F}. Architect can go H→A→B (covers B, 2 steps) ending at B(1).
-// From B(1) with only F missing, checking all night-3 options: none can push path above 4.
-// The architect can always go B→A→H→G→F or similar. Bandits cannot win.
-
-// After destroying E: missing = {B, E}. Architect cannot cover both on day 3 (path = 5 > 4). Whatever they do:
-
-// Cover B, end at B(1), E still missing → night 3 destroys A(0): minPathToVisitAll(1, {4,0}) = 5 > 4. Bandits win.
-// Cover B, end at C(2), E still missing → night 3 destroys H(7): path = 6 > 4. Bandits win.
-// Cover B, end at D(3), E still missing → night 3 destroys A(0): path = 5 > 4. Bandits win.
-// Cover E, end at E(4), B still missing → night 3 destroys H(7): path = 5 > 4. Bandits win.
-// Cover E, end at D(3), B still missing → night 3 destroys G(6): path = 5 > 4. Bandits win.
-// Cover E, end at F(5), B still missing → night 3 destroys H(7): path = 6 > 4. Bandits win.
-// So the heuristic is provably suboptimal: it picked F(5) (path 6) over E(4) (path 5),
-// but E is the game-winning move and F is not.
-
 const executeBanditStrategy = (board: Board, moves) => {
   const pos = board.architectPosition;
   const candidates = board.towers
