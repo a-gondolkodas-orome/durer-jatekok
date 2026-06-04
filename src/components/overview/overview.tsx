@@ -29,7 +29,7 @@ export const Overview = () => {
 
   return <main className="p-2">
     <OverviewHeader />
-    <div className="border-t border-slate-300 mt-2 pt-3 flex flex-wrap items-center gap-1 mb-2">
+    <div className="border-t border-slate-300 dark:border-slate-700 mt-2 pt-3 flex flex-wrap items-center gap-1 mb-2">
       <CategoryFilter selected={selectedCategories} onChange={setSelectedCategories} />
     </div>
     <h2 className="font-bold my-4 text-center">
@@ -71,10 +71,15 @@ const CategoryFilter = ({ selected, onChange }: {
           <button
             key={v}
             onClick={() => onChange(isSelected ? selected.filter(s => s !== v) : [...selected, v])}
-            className={`px-2 py-0.5 border text-sm
+            className={`
+              px-2 py-0.5 border text-sm rounded-sm
               ${isSelected
-                ? 'bg-blue-200 border-blue-400 hocus:bg-blue-300'
-                : 'bg-white border-slate-300 hocus:bg-slate-100'}`}
+                ? `bg-blue-200 dark:bg-blue-900 border-blue-400 dark:border-blue-600
+                  hocus:bg-blue-300 dark:hocus:bg-blue-800`
+                : `bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600
+                hocus:bg-slate-100 dark:hocus:bg-slate-700`
+              }
+              `}
           >{k}</button>
         );
       })}
@@ -83,8 +88,8 @@ const CategoryFilter = ({ selected, onChange }: {
         disabled={selected.length === 0}
         aria-label={t({ hu: 'Szűrés törlése', en: 'Clear filters' })}
         className={`
-          px-2 py-0.5 border border-slate-300 bg-white text-sm
-          text-slate-500 enabled:hocus:bg-slate-100
+          px-2 py-0.5 border rounded-sm border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm
+          text-slate-500 dark:text-slate-400 enabled:hocus:bg-slate-100 dark:enabled:hocus:bg-slate-700
           disabled:opacity-0 disabled:cursor-default
         `}
       >×</button>
@@ -100,13 +105,13 @@ const OverviewHeader = () => {
         href="https://forms.gle/7DwugmXNrvKgkiiu8"
         target="_blank"
         rel="noreferrer"
-        className="text-sm text-slate-500 hocus:text-slate-600"
+        className="text-sm text-slate-500 dark:text-slate-400 hocus:text-slate-600 dark:hocus:text-slate-300"
       >
         {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
       </a>
       <LanguageSelector />
     </div>
-    <h1 className="text-blue-600 font-bold text-center text-2xl pb-2">
+    <h1 className="text-blue-600 dark:text-blue-400 font-bold text-center text-2xl pb-2">
       {t({ hu: 'Dürer stratégiás játékok', en: 'Dürer Strategy Games' })}
     </h1>
     <div className="max-w-[100ch] mx-auto">
@@ -130,16 +135,16 @@ const OverviewHeader = () => {
 };
 
 const categoryColorClass: Record<Category, string> = {
-  'A':  'bg-green-200 border-green-400 text-green-950',
-  'B':  'bg-teal-300 border-teal-500 text-teal-950',
-  'C':  'bg-blue-300 border-blue-400 text-blue-950',
-  'D':  'bg-blue-400 border-blue-500 text-blue-950',
+  'A':  'bg-green-200 border-green-400 text-green-950 dark:bg-green-900 dark:border-green-700 dark:text-green-100',
+  'B':  'bg-teal-300 border-teal-500 text-teal-950 dark:bg-teal-900 dark:border-teal-700 dark:text-teal-100',
+  'C':  'bg-blue-300 border-blue-400 text-blue-950 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-100',
+  'D':  'bg-blue-400 border-blue-500 text-blue-950 dark:bg-blue-900 dark:border-blue-600 dark:text-blue-100',
   'E':  'bg-blue-600 border-blue-700 text-white',
   'E+': 'bg-blue-800 border-blue-900 text-white'
 };
 
 const chipBase = 'rounded-full border px-2 py-0.5 text-xs whitespace-nowrap';
-const neutralChip = `${chipBase} border-slate-300`;
+const neutralChip = `${chipBase} border-slate-300 dark:border-slate-600 dark:text-slate-300`;
 
 const Game = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) => {
   const { t } = useTranslation();
@@ -154,9 +159,9 @@ const Game = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) =
     to={`/game/${gameId}`}
     data-testid="game-card"
     className={`
-      rounded-lg shadow-sm border p-2 m-2 max-w-[32ch] w-full flex flex-col
-      cursor-pointer hocus:shadow-md hocus:border-blue-400
-      focus-visible:shadow-md focus-visible:border-blue-400 transition-shadow
+      rounded-lg shadow-sm border dark:border-slate-700 p-2 m-2 max-w-[32ch] w-full flex flex-col
+      cursor-pointer hocus:shadow-md hocus:border-blue-400 dark:hocus:border-blue-500
+      focus-visible:shadow-md focus-visible:border-blue-400 dark:focus-visible:border-blue-500 transition-shadow
       no-underline text-inherit
     `}
   >
@@ -169,7 +174,7 @@ const Game = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) =
       <span className={`${chipBase} ${categoryColor}`}>{gameProps.category.join(', ')}</span>
       <span className={neutralChip}>{round}</span>
       <span className="grow"></span>
-      <span className="text-slate-500 text-sm" aria-hidden="true">→</span>
+      <span className="text-slate-500 dark:text-slate-400 text-sm" aria-hidden="true">→</span>
     </div>
   </Link>;
 };

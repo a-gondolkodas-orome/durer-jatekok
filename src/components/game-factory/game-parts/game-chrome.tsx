@@ -14,9 +14,9 @@ export const GameHeader = () => {
     <header className="flex flex-wrap items-baseline">
       <Link
         to='/'
-        className="md:basis-44 text-sm text-blue-600 whitespace-nowrap"
+        className="md:basis-44 text-sm text-blue-600 dark:text-blue-400 whitespace-nowrap"
       >← <span className="hidden md:inline">{t({ hu: 'Vissza a listához', en: 'Back to list' })}</span></Link>
-      <h1 className="grow text-blue-600 font-bold pb-4 text-center">
+      <h1 className="grow text-blue-600 dark:text-blue-400 font-bold pb-4 text-center">
         {title}
       </h1>
       <span className="md:hidden ml-auto">
@@ -82,8 +82,10 @@ export const GameRule = ({ ruleDescription }: { ruleDescription: React.ReactNode
   return <section className="flex justify-center mb-4 mt-1 max-w-[100ch]">
     <Disclosure defaultOpen>
       {({ open }) => (
-        <div className="border-2 rounded-sm grow">
-          <DisclosureButton className="w-full bg-slate-200 text-xl flex justify-center">
+        <div className="border-2 rounded-sm grow dark:border-slate-600">
+          <DisclosureButton
+            className="w-full bg-slate-200 dark:bg-slate-700 dark:text-slate-200 text-xl flex justify-center"
+          >
             <span className="grow">{t({ hu: 'Játékszabályok', en: 'Game rules' })}</span>
             <span
               className="text-right pr-4"

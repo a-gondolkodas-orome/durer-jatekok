@@ -8,17 +8,19 @@ export const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode, disabled }: {
 }) => {
   const { t } = useTranslation();
   const labelClass = (active: boolean) => `grow py-1 px-2 text-center
+    ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
     ${active
-      ? `bg-blue-500 text-white font-semibold ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
+      ? `bg-blue-500 text-white font-semibold`
       : disabled
-        ? 'opacity-40 cursor-not-allowed bg-slate-100'
-        : 'bg-slate-100 text-slate-600 hocus:bg-slate-200 cursor-pointer'}`;
+        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-700'
+        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hocus:bg-slate-200 dark:hocus:bg-slate-600'
+    }`;
   return (
     <fieldset>
-      <legend className="text-xs text-slate-600 mb-1.5">
+      <legend className="text-xs text-slate-600 dark:text-slate-400 mb-1.5">
         {t({ hu: 'Játékmód', en: 'Game mode' })}
       </legend>
-      <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
+      <div className={`flex rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 text-sm
         has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
         <label className={labelClass(!isHumanVsHumanGame)}>
           <input
@@ -57,17 +59,19 @@ export const DifficultySelector = ({ variants, selectedIndex, onSelect, disabled
 }) => {
   const { t } = useTranslation();
   const labelClass = (active: boolean, variantDisabled = false) => `min-w-0 grow py-1 px-2 text-center
+    ${fieldsetDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}
     ${active && !variantDisabled
-      ? `bg-blue-500 text-white font-semibold ${fieldsetDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`
+      ? `bg-blue-500 text-white font-semibold`
       : variantDisabled || fieldsetDisabled
-        ? 'opacity-40 cursor-not-allowed bg-slate-100'
-        : 'bg-slate-100 text-slate-600 hocus:bg-slate-200 cursor-pointer'}`;
+        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-700'
+        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hocus:bg-slate-200 dark:hocus:bg-slate-600'
+    }`;
   return (
     <fieldset>
-      <legend className="text-xs text-slate-600 mb-1.5">
+      <legend className="text-xs text-slate-600 dark:text-slate-400 mb-1.5">
         {t({ hu: 'Nehézség', en: 'Difficulty' })}
       </legend>
-      <div className={`flex rounded-lg overflow-hidden border border-slate-300 text-sm
+      <div className={`flex rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 text-sm
         has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
         {variants.map(v => (
           <label
