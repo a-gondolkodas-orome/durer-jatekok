@@ -89,7 +89,7 @@ const CategoryFilter = ({ selected, onChange }: {
         aria-label={t({ hu: 'Szűrés törlése', en: 'Clear filters' })}
         className={`
           px-2 py-0.5 border rounded-sm border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm
-          text-slate-500 dark:text-slate-400 enabled:hocus:bg-slate-100 dark:enabled:hocus:bg-slate-700
+          text-slate-500 enabled:hocus:bg-slate-100 dark:enabled:hocus:bg-slate-700
           disabled:opacity-0 disabled:cursor-default
         `}
       >×</button>
@@ -105,7 +105,7 @@ const OverviewHeader = () => {
         href="https://forms.gle/7DwugmXNrvKgkiiu8"
         target="_blank"
         rel="noreferrer"
-        className="text-sm text-slate-500 dark:text-slate-400 hocus:text-slate-600 dark:hocus:text-slate-300"
+        className="text-sm text-slate-500"
       >
         {t({ hu: 'Hibabejelentő', en: 'Bug report' })}
       </a>
@@ -160,9 +160,8 @@ const Game = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) =
     data-testid="game-card"
     className={`
       rounded-lg shadow-sm border dark:border-slate-700 p-2 m-2 max-w-[32ch] w-full flex flex-col
-      cursor-pointer hocus:shadow-md hocus:border-blue-400 dark:hocus:border-blue-500
-      focus-visible:shadow-md focus-visible:border-blue-400 dark:focus-visible:border-blue-500 transition-shadow
-      no-underline text-inherit
+      cursor-pointer hocus:shadow-md dark:hocus:border-blue-500
+      transition-shadow no-underline text-inherit
     `}
   >
     <h2 className="font-bold mb-4 text-center">
@@ -174,7 +173,7 @@ const Game = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) =
       <span className={`${chipBase} ${categoryColor}`}>{gameProps.category.join(', ')}</span>
       <span className={neutralChip}>{round}</span>
       <span className="grow"></span>
-      <span className="text-slate-500 dark:text-slate-400 text-sm" aria-hidden="true">→</span>
+      <span className="text-slate-500 text-sm" aria-hidden="true">→</span>
     </div>
   </Link>;
 };
