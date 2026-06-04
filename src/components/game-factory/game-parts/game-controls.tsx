@@ -20,8 +20,12 @@ export const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode, disabled }: {
       <legend className="text-xs text-slate-600 dark:text-slate-400 mb-1.5">
         {t({ hu: 'Játékmód', en: 'Game mode' })}
       </legend>
-      <div className={`flex rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 text-sm
-        has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1`}>
+      <div
+        className={`
+          flex rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 text-sm
+          has-focus-visible:ring-2 has-focus-visible:ring-red-400 has-focus-visible:ring-offset-1
+        `}
+      >
         <label className={labelClass(!isHumanVsHumanGame)}>
           <input
             type="radio"
