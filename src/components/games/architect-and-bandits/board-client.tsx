@@ -90,7 +90,8 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               {/* Vertex base square — + thick border when tower present */}
               <rect
                 x={x - 4.5} y={y - 4.5} width={9} height={9}
-                fill={hasTower ? '#c2b280' : '#f3f4f6'}
+                fill={hasTower ? '#c2b280' : undefined}
+                className={hasTower ? undefined : 'fill-slate-100 dark:fill-slate-600'}
                 stroke={hasTower ? '#374151' : '#6b7280'}
                 strokeWidth={hasTower ? 1.2 : 0.5}
               />
@@ -113,7 +114,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                 textAnchor="middle"
                 fontSize="4"
                 fontWeight="bold"
-                fill="#111"
+                fill="currentColor"
                 className="select-none pointer-events-none"
               >
                 {VERTEX_LABELS[i]}
