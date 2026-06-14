@@ -31,7 +31,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         key={id}
         disabled={!isMoveAllowed(id)}
         onClick={() => clickField(id)}
-        className="aspect-square p-[25%] bg-slate-50 dark:bg-slate-800"
+        className="aspect-square p-[25%] bg-surface-elevated"
         >
           {board[id] && (
             <span

@@ -65,10 +65,10 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const getCellBgClass = (field: Field) => {
     if (isCovered(field, board)) return 'bg-slate-600 border-slate-900 dark:border-slate-400';
-    if (!ctx.isClientMoveAllowed) return 'bg-white dark:bg-slate-800';
+    if (!ctx.isClientMoveAllowed) return 'bg-surface-elevated';
     if (isPartOfPreview(field) || isEqual(selectedField, field)) return 'bg-blue-400';
     if (isNeighborOfSelected(field)) return 'bg-blue-100 dark:bg-blue-900';
-    return 'bg-white dark:bg-slate-800';
+    return 'bg-surface-elevated';
   };
 
   const isClickAllowed = (field: Field) => {

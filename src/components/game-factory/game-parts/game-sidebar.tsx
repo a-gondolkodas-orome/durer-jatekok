@@ -198,7 +198,7 @@ const PlayerNameSetup = ({ roleLabels, playerNames, setPlayerNames, onStart }: {
         <Input
           name={i === 0 ? 'name_of_first_player' : 'name_of_second_player'}
           className="border rounded-md text-slate-600 dark:text-slate-200
-           bg-surface-elevated dark:border-slate-600
+           bg-surface-elevated
             px-2 py-1 text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
           placeholder={t([
             { hu: 'Neved (Nyuszika)', en: 'Your name (Pip)' },

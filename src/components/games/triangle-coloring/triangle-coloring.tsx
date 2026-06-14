@@ -92,7 +92,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
             <polygon
               key={i}
               points={getTrianglePoints(i)}
-              className={`${getColor(i)} stroke-black dark:stroke-slate-400`}
+              className={`${getColor(i)} stroke-slate-900 dark:stroke-slate-400`}
               strokeWidth="0.5"
               onClick={() => colorTriangle(i)}
               onKeyUp={(event) => {
@@ -106,7 +106,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         </g>
         <polygon
           points="50,12.5 16.5,73 83.5,73"
-          fill="none" className="stroke-black dark:stroke-slate-400" strokeWidth="0.5"
+          fill="none" className="stroke-slate-900 dark:stroke-slate-400" strokeWidth="0.5"
         />
       </svg>
     </GameBoard>

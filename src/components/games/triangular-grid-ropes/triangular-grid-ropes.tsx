@@ -79,7 +79,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         className={`
           ${vertex.id === firstNode
             ? (ctx.currentPlayer === 0 ? "fill-blue-500" : "fill-green-500")
-            : isInvalidHover ? 'fill-red-500' : 'fill-black dark:fill-slate-300'
+            : isInvalidHover ? 'fill-red-500' : 'fill-slate-900 dark:fill-slate-300'
           }
         `}
         onClick={() => connectNode(vertex.id)}

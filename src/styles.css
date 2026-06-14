@@ -42,10 +42,13 @@
     }
 }
 
-@layer components {
+@layer utilities {
     .bg-surface-elevated {
         @apply bg-slate-50 dark:bg-slate-800;
     }
+}
+
+@layer components {
     .primary-button {
         @apply block w-full py-1 sm:py-1.5 px-1.5 sm:px-2;
         @apply text-base sm:text-lg font-semibold rounded-lg disabled:opacity-50;
@@ -54,7 +57,7 @@
     .secondary-button {
         @apply block w-full py-1.5 px-2;
         @apply text-base sm:text-lg rounded-lg disabled:opacity-50;
-        @apply border enabled:hocus:border-slate-300 bg-slate-50 enabled:hocus:bg-slate-100;
-        @apply dark:bg-slate-800 dark:enabled:hocus:bg-slate-700 dark:enabled:hocus:border-slate-600;
+        @apply border enabled:hocus:border-slate-300 bg-slate-50 dark:bg-slate-800 enabled:hocus:bg-slate-100;
+        @apply dark:enabled:hocus:bg-slate-700 dark:enabled:hocus:border-slate-600;
     }
 }
