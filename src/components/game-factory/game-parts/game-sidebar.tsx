@@ -66,15 +66,25 @@ export const GameSidebar = ({
         }
 
         {ctx.phase === 'play' && (
-          <div className="relative flex justify-center">
-            {!ctx.isHumanVsHumanGame && !ctx.isClientMoveAllowed && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Spinner />
-              </div>
-            )}
-            <p className={`italic text-justify ${!ctx.isClientMoveAllowed ? 'invisible' : ''}`}>
-              {stepDescription}
-            </p>
+          <div className="flex flex-col gap-2">
+            <div className="relative flex justify-center">
+              {!ctx.isHumanVsHumanGame && !ctx.isClientMoveAllowed && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Spinner />
+                </div>
+              )}
+              <p className={`italic text-justify ${!ctx.isClientMoveAllowed ? 'invisible' : ''}`}>
+                {stepDescription}
+              </p>
+            </div>
+            <button
+              data-testid="undo-btn"
+              className="secondary-button text-sm"
+              disabled={!moves.canUndo}
+              onClick={() => moves.undo()}
+            >
+              ↶ {t({ hu: 'Visszavonás', en: 'Undo' })}
+            </button>
           </div>
         )}
 
@@ -119,17 +129,6 @@ export const GameSidebar = ({
               />
             </div>
           </details>
-        )}
-
-        {ctx.phase === 'play' && (
-          <button
-            data-testid="undo-btn"
-            className="secondary-button"
-            disabled={!moves.canUndo}
-            onClick={() => moves.undo()}
-          >
-            {t({ hu: '↶ Visszavonás', en: '↶ Undo' })}
-          </button>
         )}
 
         <button
