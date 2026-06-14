@@ -16,6 +16,8 @@ export interface SidebarMoves {
   setPlayerNames: (names: [string, string]) => void
   setDifficulty: (index: number) => void
   resetGameState: () => void
+  undo: () => void
+  canUndo: boolean
 }
 
 interface GameSidebarProps {
@@ -119,7 +121,19 @@ export const GameSidebar = ({
           </details>
         )}
 
+        {ctx.phase === 'play' && (
+          <button
+            data-testid="undo-btn"
+            className="secondary-button"
+            disabled={!moves.canUndo}
+            onClick={() => moves.undo()}
+          >
+            {t({ hu: '↶ Visszavonás', en: '↶ Undo' })}
+          </button>
+        )}
+
         <button
+          data-testid="new-game-btn"
           className="secondary-button"
           disabled={!isNewGameAllowed}
           onClick={() => moves.resetGameState()}
