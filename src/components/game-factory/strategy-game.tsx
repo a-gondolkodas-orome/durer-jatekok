@@ -52,18 +52,50 @@ export const strategyGameFactory = <TBoard,>({
     const defaultGenerateStartBoard = defaultVariant.generateStartBoard!;
     const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
 
-    const [board, setBoard] = useState<TBoard>(activeGenerateStartBoard());
-    const [phase, setPhase] = useState<Phase>('roleSelection');
-    const [chosenRoleIndex, setChosenRoleIndex] = useState<number | null>(null);
-    const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
-    const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(false);
-    const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
-    const [gameUuid, setGameUuid] = useState(crypto.randomUUID());
-    const [moveCount, setMoveCount] = useState(0);
-    const [turnState, setTurnState] = useState<unknown>(null);
-    const [mode, setMode] = useState<Mode>('vsComputer');
     type UndoSnapshot = { board: TBoard; currentPlayer: number };
-    const [undoSnapshot, setUndoSnapshot] = useState<UndoSnapshot | null>(null);
+
+    // Single source of truth for the per-session state, used both to seed the
+    // initial state and to reset it (see resetGameState). The three persistent
+    // values — selectedVariantIndex, mode, playerNames — are deliberately not
+    // part of a session and survive resets.
+    const createInitialSession = (boardGenerator: () => TBoard) => ({
+      board: boardGenerator(),
+      phase: 'roleSelection' as Phase,
+      chosenRoleIndex: null as number | null,
+      currentPlayer: null as number | null,
+      isGameEndDialogOpen: false,
+      winnerIndex: null as number | null,
+      gameUuid: crypto.randomUUID(),
+      moveCount: 0,
+      turnState: null as unknown,
+      undoSnapshot: null as UndoSnapshot | null
+    });
+
+    // Resolve which board generator (and variant index) to use for a fresh game.
+    // In vsHuman mode, a variant without its own generateStartBoard falls back to
+    // the default variant. Only used when starting a new game — the render path
+    // above intentionally keeps no such index-correction.
+    const resolveBoardGenerator = (variantIndex: number, m: Mode) => {
+      const variant = resolvedVariants[variantIndex] ?? defaultVariant;
+      const generator = variant.generateStartBoard ?? defaultGenerateStartBoard;
+      if (m === 'vsHuman' && !variant.generateStartBoard) {
+        return { index: defaultVariantIndex, generator: defaultGenerateStartBoard };
+      }
+      return { index: variantIndex, generator };
+    };
+
+    const [initialSession] = useState(() => createInitialSession(activeGenerateStartBoard));
+    const [board, setBoard] = useState<TBoard>(initialSession.board);
+    const [phase, setPhase] = useState<Phase>(initialSession.phase);
+    const [chosenRoleIndex, setChosenRoleIndex] = useState<number | null>(initialSession.chosenRoleIndex);
+    const [currentPlayer, setCurrentPlayer] = useState<number | null>(initialSession.currentPlayer);
+    const [isGameEndDialogOpen, setIsGameEndDialogOpen] = useState(initialSession.isGameEndDialogOpen);
+    const [winnerIndex, setWinnerIndex] = useState<number | null>(initialSession.winnerIndex);
+    const [gameUuid, setGameUuid] = useState(initialSession.gameUuid);
+    const [moveCount, setMoveCount] = useState(initialSession.moveCount);
+    const [turnState, setTurnState] = useState<unknown>(initialSession.turnState);
+    const [mode, setMode] = useState<Mode>('vsComputer');
+    const [undoSnapshot, setUndoSnapshot] = useState<UndoSnapshot | null>(initialSession.undoSnapshot);
     const currentTurnHasMovesRef = useRef(false);
     const botTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [playerNames, setPlayerNames] = useState<[string, string]>(() => {
@@ -109,25 +141,21 @@ export const strategyGameFactory = <TBoard,>({
     };
 
     const resetGameState = ({ newMode = mode, newVariantIndex = selectedVariantIndex } = {}) => {
-      const newVariant = resolvedVariants[newVariantIndex] ?? defaultVariant;
-      let boardGenerator = newVariant.generateStartBoard ?? defaultGenerateStartBoard;
-      let finalVariantIndex = newVariantIndex;
-      if (newMode === 'vsHuman' && !newVariant.generateStartBoard) {
-        finalVariantIndex = defaultVariantIndex;
-        boardGenerator = defaultGenerateStartBoard;
-      }
+      const { index: finalVariantIndex, generator: boardGenerator } =
+        resolveBoardGenerator(newVariantIndex, newMode);
+      const s = createInitialSession(boardGenerator);
       setSelectedVariantIndex(finalVariantIndex);
       setMode(newMode);
-      setBoard(boardGenerator());
-      setPhase('roleSelection');
-      setChosenRoleIndex(null);
-      setCurrentPlayer(null);
-      setIsGameEndDialogOpen(false);
-      setWinnerIndex(null);
-      setGameUuid(crypto.randomUUID());
-      setMoveCount(0);
-      setTurnState(null);
-      setUndoSnapshot(null);
+      setBoard(s.board);
+      setPhase(s.phase);
+      setChosenRoleIndex(s.chosenRoleIndex);
+      setCurrentPlayer(s.currentPlayer);
+      setIsGameEndDialogOpen(s.isGameEndDialogOpen);
+      setWinnerIndex(s.winnerIndex);
+      setGameUuid(s.gameUuid);
+      setMoveCount(s.moveCount);
+      setTurnState(s.turnState);
+      setUndoSnapshot(s.undoSnapshot);
       currentTurnHasMovesRef.current = false;
     };
 

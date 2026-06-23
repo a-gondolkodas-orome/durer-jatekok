@@ -353,3 +353,43 @@ describe('win/loss tracking', () => {
     expect(stats).toEqual({ win: 1, loss: 1 });
   });
 });
+
+describe('variant board-generator resolution', () => {
+  // Index 1 has a botStrategy but no generateStartBoard, so it is selectable in
+  // vsComputer mode but cannot host a vsHuman game.
+  const multiVariantConfig = (): StrategyGameConfig<Board> => ({
+    presentation: { rule: <></>, getPlayerStepDescription: () => '' },
+    BoardClient: ({ board }: BoardClientProps<Board>) => (
+      <div data-testid="board">{board.join(',')}</div>
+    ),
+    gameplay: defaultGameplay,
+    variants: [
+      {
+        isDefault: true,
+        generateStartBoard: (): Board => ['default'],
+        botStrategy: () => {},
+        label: { hu: 'A', en: 'A' }
+      },
+      { botStrategy: () => {}, label: { hu: 'B', en: 'B' } }
+    ]
+  });
+
+  it('resets a bot-only variant to the default variant when switching into vsHuman mode', () => {
+    const { container, getByTestId } = renderGame(multiVariantConfig());
+    const radios = () =>
+      Array.from(container.querySelectorAll('input[name="difficulty"]')) as HTMLInputElement[];
+
+    expect(radios()[0].checked).toBe(true); // default (index 0) selected initially
+    fireEvent.click(radios()[1]);           // select the bot-only variant (index 1)
+    expect(radios()[1].checked).toBe(true);
+
+    // Variant 1 has no generateStartBoard → switching to vsHuman must fall back
+    // to the default variant. Switch back to vsComputer to inspect the radios.
+    fireEvent.click(getByTestId('mode-vsHuman'));
+    fireEvent.click(getByTestId('mode-vsComputer'));
+
+    expect(radios()[0].checked).toBe(true);
+    expect(radios()[1].checked).toBe(false);
+    expect(getByTestId('board').textContent).toBe('default');
+  });
+});
