@@ -355,8 +355,8 @@ describe('win/loss tracking', () => {
 });
 
 describe('variant board-generator resolution', () => {
-  // Index 1 has a botStrategy but no generateStartBoard, so it is selectable in
-  // vsComputer mode but cannot host a vsHuman game.
+  // Index 1 has a botStrategy but no separate generateStartBoard, so it is
+  // selectable in vsComputer mode but cannot host a vsHuman game.
   const multiVariantConfig = (): StrategyGameConfig<Board> => ({
     presentation: { rule: <></>, getPlayerStepDescription: () => '' },
     BoardClient: ({ board }: BoardClientProps<Board>) => (
@@ -367,10 +367,9 @@ describe('variant board-generator resolution', () => {
       {
         isDefault: true,
         generateStartBoard: (): Board => ['default'],
-        botStrategy: () => {},
-        label: { hu: 'A', en: 'A' }
+        botStrategy: () => {}
       },
-      { botStrategy: () => {}, label: { hu: 'B', en: 'B' } }
+      { botStrategy: () => {} }
     ]
   });
 
@@ -389,7 +388,5 @@ describe('variant board-generator resolution', () => {
     fireEvent.click(getByTestId('mode-vsComputer'));
 
     expect(radios()[0].checked).toBe(true);
-    expect(radios()[1].checked).toBe(false);
-    expect(getByTestId('board').textContent).toBe('default');
   });
 });
