@@ -1,5 +1,6 @@
 import type { FC, SVGProps } from 'react';
 import type { IconKey } from '../games/gameList';
+import { ScissorSvg } from '../games/rock-paper-scissor/symbols/scissor-svg';
 
 // Small, self-contained, monochrome icons for the overview cards. Everything is
 // drawn with `currentColor` so each icon tints with the category-accent badge it
@@ -31,8 +32,9 @@ const ChessIcon: FC<IconProps> = (p) => (
 
 const BoardIcon: FC<IconProps> = (p) => (
   <svg {...svgProps(p)}>
-    <rect x="4" y="4" width="16" height="16" rx="1" />
-    <path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16" />
+    <rect x="3" y="6" width="18" height="12" rx="1" />
+    <path d="M9 6v12M15 6v12M3 12h18" />
+    <circle cx="6" cy="9" r="2" fill="currentColor" stroke="none" />
   </svg>
 );
 
@@ -53,27 +55,22 @@ const CoinsIcon: FC<IconProps> = (p) => (
 
 const NumberIcon: FC<IconProps> = (p) => (
   <svg {...svgProps(p)}>
-    <path d="M7 4v16M17 4v16" />
-    <path d="M4 8.5h16M4 15.5h16" />
+    <rect x="5" y="3" width="14" height="18" rx="2" />
+    <text
+      x="12" y="12.5" textAnchor="middle" dominantBaseline="central"
+      fontSize="12" fontWeight="700" fill="currentColor" stroke="none"
+    >3</text>
   </svg>
 );
 
-const GeometryIcon: FC<IconProps> = (p) => (
+const SmallGraphIcon: FC<IconProps> = (p) => (
   <svg {...svgProps(p)}>
-    <path d="M12 3 21 20H3L12 3Z" />
-    <circle cx="12" cy="3" r="1.4" fill="currentColor" stroke="none" />
-    <circle cx="3" cy="20" r="1.4" fill="currentColor" stroke="none" />
-    <circle cx="21" cy="20" r="1.4" fill="currentColor" stroke="none" />
-  </svg>
-);
-
-const GraphIcon: FC<IconProps> = (p) => (
-  <svg {...svgProps(p)}>
-    <path d="M6 6 12 12M12 12 18 6M12 12 12 19" />
-    <circle cx="6" cy="6" r="2" fill="currentColor" stroke="none" />
-    <circle cx="18" cy="6" r="2" fill="currentColor" stroke="none" />
-    <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
-    <circle cx="12" cy="19" r="2" fill="currentColor" stroke="none" />
+    <rect x="5" y="5" width="14" height="14" />
+    <path d="M5 5 19 19" />
+    <circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="5" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none" />
   </svg>
 );
 
@@ -87,15 +84,12 @@ const PilesIcon: FC<IconProps> = (p) => (
 
 const CardsIcon: FC<IconProps> = (p) => (
   <svg {...svgProps(p)}>
-    <rect x="8" y="5" width="10" height="14" rx="1.5" transform="rotate(8 13 12)" />
-    <rect x="6" y="5" width="10" height="14" rx="1.5" transform="rotate(-8 11 12)" />
-  </svg>
-);
-
-const DiscsIcon: FC<IconProps> = (p) => (
-  <svg {...svgProps(p)}>
-    <circle cx="8" cy="9" r="4.5" />
-    <circle cx="15" cy="15" r="4.5" fill="currentColor" stroke="none" />
+    <rect x="5" y="5" width="10" height="14" rx="1.5" transform="rotate(-15 10 12)" />
+    <rect x="8" y="6" width="11" height="14" rx="1.5" className="fill-surface-elevated" />
+    <text
+      x="13.5" y="13.5" textAnchor="middle" dominantBaseline="central"
+      fontSize="10" fontWeight="700" fill="currentColor" stroke="none"
+    >5</text>
   </svg>
 );
 
@@ -124,6 +118,20 @@ const DominoesIcon: FC<IconProps> = (p) => (
   </svg>
 );
 
+const HouseIcon: FC<IconProps> = (p) => (
+  <svg {...svgProps(p)}>
+    <path d="M3.5 11 12 4 20.5 11" />
+    <rect x="6" y="11" width="12" height="9" />
+    <rect x="10.4" y="14.5" width="3.2" height="5.5" />
+  </svg>
+);
+
+// Reuses the in-game scissor artwork; it already draws with `currentColor` and
+// has no global ids, so it composes safely on the overview cards.
+const ScissorIcon: FC<IconProps> = (p) => (
+  <ScissorSvg className="w-full h-full" aria-hidden focusable="false" {...p} />
+);
+
 // Neutral placeholder for games without a dedicated icon.
 export const FallbackIcon: FC<IconProps> = (p) => (
   <svg {...svgProps(p)}>
@@ -138,14 +146,14 @@ export const gameIcons: Record<IconKey, FC<IconProps>> = {
   coloring: ColoringIcon,
   coins: CoinsIcon,
   number: NumberIcon,
-  geometry: GeometryIcon,
-  graph: GraphIcon,
+  'small-graph': SmallGraphIcon,
   piles: PilesIcon,
   cards: CardsIcon,
-  discs: DiscsIcon,
   pursuit: PursuitIcon,
   pyramid: PyramidIcon,
-  dominoes: DominoesIcon
+  dominoes: DominoesIcon,
+  house: HouseIcon,
+  scissor: ScissorIcon
 };
 
 export const GameIcon = ({ iconKey, ...rest }: { iconKey?: IconKey } & IconProps) => {

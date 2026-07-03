@@ -7,8 +7,8 @@ export type GameList = Record<string, GameEntry>;
 // Keys into the overview icon registry (game-icons.tsx). A game without an
 // `icon` falls back to a neutral placeholder.
 export type IconKey =
-  | 'chess' | 'board' | 'coloring' | 'coins' | 'number' | 'geometry'
-  | 'graph' | 'piles' | 'cards' | 'discs' | 'pursuit' | 'pyramid' | 'dominoes'
+  | 'chess' | 'board' | 'coloring' | 'coins' | 'number' | 'small-graph'
+  | 'piles' | 'cards' | 'pursuit' | 'pyramid' | 'dominoes' | 'house' | 'scissor'
 
 export interface GameEntry {
   year: { k: string; v: string }
@@ -28,7 +28,6 @@ export const gameList: GameList = {
     year: { k: "I. (07/08)", v: "07/08" },
     round: "döntő",
     category: ["B"],
-    featured: true,
     icon: "chess",
     name: { hu: "Futók lerakása", en: "Placing bishops" },
     credit: { developedBy: ["Czeller Ildikó"] }
@@ -53,13 +52,13 @@ export const gameList: GameList = {
     year: { k: "II. (08/09)", v: "08/09" },
     round: "döntő",
     category: ["B"],
+    icon: "small-graph",
     name: { hu: "Ámor és Kupidó", en: "Cupid and Amor" }
   },
   DominoesOnChessboard: {
     year: { k: "III. (09/10)", v: "09/10" },
     round: "döntő",
     category: ["C"],
-    featured: true,
     icon: "dominoes",
     name: { hu: "Sakktáblára dominók", en: "Cram (Dominoes)" },
     title: { hu: "Sakktáblára dominók", en: "Cram (Dominoes on a chessboard)" },
@@ -91,7 +90,7 @@ export const gameList: GameList = {
     year: { k: "VI. (12/13)", v: "12/13" },
     round: "döntő",
     category: ["A"],
-    icon: "board",
+    icon: "chess",
     name: { hu: "Tizenkét mező", en: "Twelve squares" },
     credit: { developedBy: ["Melján Dávid"] }
   },
@@ -106,6 +105,7 @@ export const gameList: GameList = {
     year: { k: "VI. (12/13)", v: "12/13" },
     round: "döntő",
     category: ["D"],
+    icon: "pyramid",
     name: { hu: "Hunyadi és a janicsárok", en: "Hunyadi and the janissaries" },
     credit: { developedBy: ["Czeller Ildikó", "Schweitzer Ádám"] }
   },
@@ -113,18 +113,21 @@ export const gameList: GameList = {
     year: { k: "VII. (13/14)", v: "13/14" },
     round: "döntő",
     category: ["A"],
+    icon: "scissor",
     name: { hu: "Kő-papír-olló", en: "Rock-paper-scissors" },
     credit: { developedBy: ["Máté Lőrinc"] }
   },
   FiveConnectedFields: {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "döntő",
+    icon: 'small-graph',
     category: ["A"],
     name: { hu: "Öt összekötött mező", en: "Five connected fields" }
   },
   FourConnectedFields: {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "döntő",
+    icon: "small-graph",
     category: ["B"],
     name: { hu: "Négy összekötött mező", en: "Four connected fields" }
   },
@@ -140,7 +143,6 @@ export const gameList: GameList = {
     year: { k: "VII. (13/14)", v: "13/14" },
     round: "döntő",
     category: ["C"],
-    featured: true,
     icon: "coloring",
     name: { hu: "Háromszög színezés", en: "Triangle colouring" },
     credit: { developedBy: ["Czeller Ildikó"] }
@@ -190,7 +192,7 @@ export const gameList: GameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["A"],
-    icon: "discs",
+    icon: "piles",
     name: { hu: "Átfordítás, elvétel (6)", en: "Flip or remove (6)" },
     title: { hu: "Átfordítás, elvétel (6 korong)", en: "Flip or remove (6 discs)" },
     credit: { developedBy: ["Hajós Balázs"] }
@@ -199,7 +201,7 @@ export const gameList: GameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["B"],
-    icon: "discs",
+    icon: "piles",
     name: { hu: "Átfordítás, elvétel (10)", en: "Flip or remove (10)" },
     title: { hu: "Átfordítás, elvétel (10 korong)", en: "Flip or remove (10 discs)" },
     credit: { developedBy: ["Hajós Balázs"] }
@@ -208,7 +210,7 @@ export const gameList: GameList = {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["C", "D"],
-    icon: "board",
+    icon: "pursuit",
     name: { hu: "Baktériumok terjedése", en: "Spreading of bacteria" },
     credit: { developedBy: ["Tárkányi Damján"] }
   },
@@ -241,6 +243,7 @@ export const gameList: GameList = {
     round: "döntő",
     category: ["B"],
     icon: "board",
+    featured: true,
     name: { hu: "3x3-as antiamőba", en: "3×3 anti-tic-tac-toe" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
@@ -257,6 +260,7 @@ export const gameList: GameList = {
     round: "döntő",
     category: ["B"],
     icon: "board",
+    featured: true,
     name: { hu: "5 mezőbe különbözőt", en: "5 distinct squares" },
     credit: { developedBy: ["Soós Máté"] }
   },
@@ -288,7 +292,7 @@ export const gameList: GameList = {
     year: { k: "XIV. (20/21)", v: "20/21" },
     round: "döntő",
     category: ["C", "D"],
-    icon: "geometry",
+    icon: "small-graph",
     name: { hu: "10 totemoszlop", en: "10 totem poles" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
@@ -296,7 +300,6 @@ export const gameList: GameList = {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
     category: ["A"],
-    featured: true,
     icon: "coins",
     name: { hu: "15 érme beváltása", en: "Change 15 coins" },
     credit: { developedBy: ["Czeller Ildikó"] }
@@ -323,6 +326,7 @@ export const gameList: GameList = {
     round: "döntő",
     category: ["C", "D"],
     icon: "coloring",
+    featured: true,
     name: { hu: "Kockaszínezés", en: "Cube colouring" },
     credit: { suggestedBy: ["Nagy Kartal"], developedBy: ["Szűcs Gábor"] }
   },
@@ -339,6 +343,7 @@ export const gameList: GameList = {
     round: "online",
     category: ["E"],
     icon: "chess",
+    featured: true,
     name: { hu: "Békés kacsák (4 × 7)", en: "Peaceful ducks (4 × 7)" },
     title: { hu: "Békés kacsák a 4 × 7-es sakktáblán", en: "Peaceful ducks on the 4 × 7 board" },
     credit: { developedBy: ["Jánosik Áron"] }
@@ -347,7 +352,7 @@ export const gameList: GameList = {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "döntő",
     category: ["D"],
-    icon: "number",
+    icon: "piles",
     name: { hu: "Kettőt vesz, egyet kap", en: "Add N, take 2N" },
     credit: { suggestedBy: ["Imolay András"], developedBy: ["Matolcsi Dávid"] }
   },
@@ -363,6 +368,7 @@ export const gameList: GameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["A"],
+    icon: "house",
     name: { hu: "Építész és banditák (A)", en: "Architect and Bandits (A)" },
     title: { hu: "Építész és banditák (8 torony)", en: "Architect and Bandits (8 towers)" }
   },
@@ -370,6 +376,7 @@ export const gameList: GameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "döntő",
     category: ["B"],
+    icon: "house",
     name: { hu: "Építész és banditák (B)", en: "Architect and Bandits (B)" },
     title: { hu: "Építész és banditák (10 torony)", en: "Architect and Bandits (10 towers)" }
   },
@@ -389,7 +396,7 @@ export const gameList: GameList = {
     year: { k: "XVII. (23/24)", v: "23/24" },
     round: "online",
     category: ["C", "D", "E"],
-    icon: "number",
+    icon: "piles",
     name: { hu: "Egyet vegyél vagy felezz", en: "Take one or halve" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
@@ -408,7 +415,7 @@ export const gameList: GameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["A"],
-    icon: "number",
+    icon: "cards",
     name: { hu: "Tolvajnál átlag (1-7)", en: "Thief's mean (1–7)" },
     credit: { developedBy: ["Turu Tamás"] }
   },
@@ -416,7 +423,7 @@ export const gameList: GameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "döntő",
     category: ["B"],
-    icon: "number",
+    icon: "cards",
     name: { hu: "Tolvajnál átlag (1-9)", en: "Thief's mean (1–9)" },
     credit: { developedBy: ["Czeller Ildikó", "Turu Tamás"] }
   },
@@ -435,7 +442,7 @@ export const gameList: GameList = {
     year: { k: "XVIII. (24/25)", v: "24/25" },
     round: "online",
     category: ["C", "D", "E"],
-    icon: "coins",
+    icon: "house",
     name: { hu: "Bankrablók: 7-10 bank", en: "Bank robbers: 7–10 banks" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
@@ -450,12 +457,15 @@ export const gameList: GameList = {
     year: { k: "XIX. (25/26)", v: "25/26" },
     round: "döntő",
     category: ["A"],
+    icon: "board",
+    featured: true,
     name: { hu: "Mágikus láda (A)", en: "Magic Box (A)" },
     title: { hu: "Mágikus láda", en: "Magic Box" }
   },
   MagicBoxB: {
     year: { k: "XIX. (25/26)", v: "25/26" },
     round: "döntő",
+    icon: "board",
     category: ["B"],
     name: { hu: "Mágikus láda (B)", en: "Magic Box (B)" },
     title: { hu: "Mágikus láda (kijelöléssel)", en: "Magic Box (with designation)" }
@@ -464,7 +474,7 @@ export const gameList: GameList = {
     year: { k: "XIX. (25/26)", v: "25/26" },
     round: "online",
     category: ["C", "D"],
-    icon: "number",
+    icon: "cards",
     name: { hu: "Osztó/többszörös törlés", en: "Remove a divisor/multiple" },
     credit: { developedBy: ["Hajós Balázs"] }
   },

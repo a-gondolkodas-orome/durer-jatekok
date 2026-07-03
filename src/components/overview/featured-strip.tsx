@@ -13,6 +13,7 @@ export const FeaturedStrip = ({ gameIds }: { gameIds: string[] }) => {
     <CollapsibleSection
       title={{ hu: 'Kiemelt játékok', en: 'Featured games' }}
       defaultOpen={true}
+      storageKey="featured"
       dataTestid="featured-strip"
     >
       <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">

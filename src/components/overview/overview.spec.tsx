@@ -24,6 +24,8 @@ vi.mock('../games/gameList', (): { gameList: GameList } => ({
 const renderOverview = () => render(<HashRouter><Overview /></HashRouter>);
 
 describe('Overview', () => {
+  beforeEach(() => sessionStorage.clear());
+
   it('shows the featured strip with only featured games', () => {
     renderOverview();
     const strip = screen.getByTestId('featured-strip');
@@ -64,6 +66,27 @@ describe('Overview', () => {
     expect(screen.queryByText('B egy')).toBeNull();
     // no featured game matches C → strip hidden
     expect(screen.queryByTestId('featured-strip')).toBeNull();
+  });
+
+  it('remembers a section open state across a remount (navigating to a game and back)', () => {
+    const { unmount } = renderOverview();
+    // expand the C–E+ section, then leave the overview (unmount)
+    fireEvent.click(screen.getByRole('button', { name: /C-D-E kategória/ }));
+    expect(screen.getByText('C egy')).toBeTruthy();
+    unmount();
+    // returning to the overview re-mounts it: the section stays open
+    renderOverview();
+    expect(screen.getByText('C egy')).toBeTruthy();
+  });
+
+  it('remembers a collapsed featured strip across a remount', () => {
+    const { unmount } = renderOverview();
+    expect(screen.getByText('A egy')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Kiemelt játékok/ }));
+    expect(screen.queryByText('A egy')).toBeNull();
+    unmount();
+    renderOverview();
+    expect(screen.queryByText('A egy')).toBeNull();
   });
 
   it('renders a fallback icon for a game without an icon', () => {

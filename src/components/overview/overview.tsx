@@ -47,6 +47,7 @@ export const Overview = () => {
         gameIds={orderByCategoryThenYear(groups[section], gameList)}
         defaultOpen={defaultOpenSections.includes(section)}
         forceOpen={isFiltering}
+        storageKey={section}
       />
     ))}
 

@@ -1,8 +1,21 @@
 import { Link } from 'react-router';
-import type { GameEntry } from '../games/gameList';
+import type { GameEntry, Category } from '../games/gameList';
 import { useTranslation } from '../language';
 import { GameIcon } from './game-icons';
-import { categoryColorClass, chipBase } from './tokens';
+
+const chipBase = 'rounded-full drop-shadow-sm px-2 py-0.5 whitespace-nowrap bg-surface-elevated';
+// Category accent colours, increasing in difficulty A → E+. Used for the card
+// chip and the icon badge; both adapt to dark mode. E/E+ carry `text-white`, so
+// a `currentColor` icon placed on them turns white automatically.
+const categoryColorClass: Record<Category, string> = {
+  'A':  'bg-green-200 dark:bg-green-700',
+  'B':  'bg-teal-300 dark:bg-teal-700',
+  'C':  'bg-blue-300 dark:bg-blue-700',
+  'D':  'bg-blue-400 dark:bg-blue-600',
+  'E':  'bg-blue-600 text-white',
+  'E+': 'bg-blue-800 text-white'
+};
+
 
 export const GameCard = ({ gameId, gameProps }: { gameId: string; gameProps: GameEntry }) => {
   const { t } = useTranslation();
@@ -37,9 +50,9 @@ export const GameCard = ({ gameId, gameProps }: { gameId: string; gameProps: Gam
     </h2>
     <div className="grow"></div>
     <div className="flex flex-wrap items-baseline gap-1 text-xs w-full">
-      <span className={`${chipBase} bg-surface-elevated`} title={gameProps.year.k}>{gameProps.year.v}</span>
-      <span className={`${chipBase} bg-surface-elevated`}>{round}</span>
-      <span className={`${chipBase} ${categoryColor}`}>{gameProps.category.join(', ')}</span>
+      <span className={chipBase} title={gameProps.year.k}>{gameProps.year.v}</span>
+      <span className={chipBase}>{round}</span>
+      <span className={chipBase}>{gameProps.category.join(', ')}</span>
       <span className="ml-auto" aria-hidden="true">→</span>
     </div>
   </Link>;
