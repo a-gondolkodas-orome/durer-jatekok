@@ -46,6 +46,41 @@ describe("five connected fields strategy", () => {
     expect(isNodePlayable(board, move)).toBe(true);
   });
 
+  it("from a losing position, the bot minimises the opponent's winning replies", () => {
+    // The bot cannot win here, so it plays the move that leaves the opponent the
+    // fewest winning replies (hardest to answer). Checked over every reachable
+    // losing position.
+    const opponentWinningReplies = (board: Board, node: number) => {
+      const next = addCoin(board, node);
+      return legalNodes(next).filter((n) => !isWinningForMover(addCoin(next, n))).length;
+    };
+
+    const seen = new Set<string>();
+    const losing: Board[] = [];
+    const walk = (board: Board) => {
+      const key = board.join(",");
+      if (seen.has(key)) return;
+      seen.add(key);
+      if (!hasAnyMove(board)) return;
+      if (!isWinningForMover(board)) losing.push(board);
+      for (const n of legalNodes(board)) walk(addCoin(board, n));
+    };
+    walk([0, 0, 0, 0, 0]);
+
+    let sawRealChoice = false; // a position where min != max, so min vs max matters
+    for (const board of losing) {
+      const counts = legalNodes(board).map((n) => opponentWinningReplies(board, n));
+      const min = Math.min(...counts);
+      if (min !== Math.max(...counts)) sawRealChoice = true;
+      // sample a few times since ties are broken randomly
+      for (let i = 0; i < 8; i++) {
+        expect(opponentWinningReplies(board, getBotMove(board))).toBe(min);
+      }
+    }
+    expect(losing.length).toBeGreaterThan(0);
+    expect(sawRealChoice).toBe(true);
+  });
+
   it("optimal first player wins against every possible second-player line", () => {
     // Exhaustive proof of optimality: player 0 plays getBotMove, player 1 tries
     // every legal reply. The first player must place the last coin on every line.
