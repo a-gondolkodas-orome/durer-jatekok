@@ -32,18 +32,18 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
   };
 
   const discClass = (r: number, c: number) => {
-    if (!rect || !selected) return 'bg-sky-500';
+    if (!rect || !selected) return 'bg-blue-500';
     const inRect = r >= rect.minR && r <= rect.maxR && c >= rect.minC && c <= rect.maxC;
-    if (!inRect) return 'bg-sky-500';
+    if (!inRect) return 'bg-blue-500';
     const sameRow = r === selected.r;
     const sameCol = c === selected.c;
     // Only the removable lines through the selected disc: its row and its column
     // within the same rectangle.
     if ((hoverOrientation === 'row' && sameRow) || (hoverOrientation === 'col' && sameCol)) {
-      return 'bg-rose-500';
+      return 'bg-slate-500';
     }
-    if (sameRow || sameCol) return 'bg-sky-500 ring-2 ring-amber-400';
-    return 'bg-sky-500';
+    if (sameRow || sameCol) return 'bg-blue-500 ring-2 ring-amber-400';
+    return 'bg-blue-500';
   };
 
   const isSelected = (r: number, c: number) => !!selected && selected.r === r && selected.c === c;
