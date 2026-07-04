@@ -50,7 +50,9 @@ describe('moves.placeCop', () => {
 
   it('ends the turn and moves to thief placement once all police are placed', () => {
     const { events } = meta();
-    const board = { ...generateStartBoard(), policemen: [7] };
+    // pin copCount so placing the second cop reliably completes placement
+    // (generateStartBoard randomises it to 2 or 3)
+    const board = { ...generateStartBoard(), copCount: 2, policemen: [7] };
     const { nextBoard } = moves.placeCop(board, { events }, 3);
     expect(nextBoard.policemen).toEqual([7, 3]);
     expect(nextBoard.phase).toBe('placingThief');
