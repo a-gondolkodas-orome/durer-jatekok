@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import {
   type Grid, getRectangleAt, getRectangles, applyMove, isEmpty, getAllMoves, generateStartBoard
 } from './helpers';

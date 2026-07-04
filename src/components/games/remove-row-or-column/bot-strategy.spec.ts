@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { makeCtx, type GameMoves } from '../../game-factory';
 import { type Board, type Grid, type Move, applyMove, isEmpty } from './helpers';
 import { grundy, boardGrundy, smartBotStrategy, randomBotStrategy } from './bot-strategy';
