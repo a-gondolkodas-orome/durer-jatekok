@@ -1,4 +1,4 @@
-import { sample } from 'lodash';
+import { sample, random } from 'lodash';
 import type { StrategyArgs } from '../../game-factory';
 import {
   type Board, type Grid, getRectangles, getAllMoves, applyMove, isEmpty
@@ -31,30 +31,43 @@ export const boardGrundy = (grid: Grid): number =>
     0
   );
 
-const countWinningReplies = (grid: Grid): number =>
-  getAllMoves(grid).filter(m => boardGrundy(applyMove(grid, m)) === 0).length;
+// From a lost position the game is decided, so occasionally concede fast (hand
+// the opponent an instant win) instead of dragging it out. 1 in 4 ≈ 25%.
+const CONCEDE_ODDS = 4;
 
 // Optimal play: from a winning position (non-zero Grundy) move to a 0 position;
 // such a move always exists. From a losing position every move hands the
-// opponent a win, so pick the one leaving them the fewest winning replies —
-// maximising the chance a human misses it.
+// opponent a win, so — unless we concede — play for a mistake: keep the game
+// going (no instant win for the opponent, e.g. never collapse to a lone 1×n
+// line) and leave them as few winning replies as possible.
 export const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const { grid } = board;
   const allMoves = getAllMoves(grid);
   const winning = allMoves.filter(m => boardGrundy(applyMove(grid, m)) === 0);
 
-  let choice;
+  let choice: typeof allMoves[number];
   if (winning.length) {
     choice = sample(winning)!;
   } else {
-    let fewest = Infinity;
-    let candidates: typeof allMoves = [];
-    for (const m of allMoves) {
-      const replies = countWinningReplies(applyMove(grid, m));
-      if (replies < fewest) { fewest = replies; candidates = [m]; }
-      else if (replies === fewest) candidates.push(m);
+    const scored = allMoves.map(m => {
+      const next = applyMove(grid, m);
+      const replies = getAllMoves(next);
+      return {
+        m,
+        // whether the opponent could take the last disc right away
+        givesInstantWin: replies.some(r => isEmpty(applyMove(next, r))),
+        winningReplies: replies.filter(r => boardGrundy(applyMove(next, r)) === 0).length
+      };
+    });
+    const concede = scored.filter(s => s.givesInstantWin);
+    const keepAlive = scored.filter(s => !s.givesInstantWin);
+
+    if (concede.length && (!keepAlive.length || random(1, CONCEDE_ODDS) === 1)) {
+      choice = sample(concede)!.m;
+    } else {
+      const fewest = Math.min(...keepAlive.map(s => s.winningReplies));
+      choice = sample(keepAlive.filter(s => s.winningReplies === fewest))!.m;
     }
-    choice = sample(candidates)!;
   }
   moves.removeLine(board, choice);
 };
