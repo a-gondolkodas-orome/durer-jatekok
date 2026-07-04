@@ -146,7 +146,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                 enabled:hocus:bg-blue-100 dark:enabled:hocus:bg-blue-900
                 enabled:hocus:border-blue-300 disabled:opacity-50"
             >
-              {t({ hu: 'Feloszt', en: 'Split' })}
+              {t({ hu: 'Újraosztom', en: 'Split' })}
             </button>
           </div>
           {p1 !== null && p2 !== null && p3 !== null && p3 < 1 && (
