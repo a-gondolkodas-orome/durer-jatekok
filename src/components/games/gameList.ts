@@ -228,8 +228,8 @@ export const gameList: GameList = {
     round: "döntő",
     category: ["C", "D"],
     icon: "pursuit",
-    name: { hu: "Rendőrök, tolvaj (C)", en: "Policemen and thief (C, D)" },
-    title: { hu: "Rendőrök, tolvaj (C kategória)", en: "Policemen and thief (category C, D)" }
+    name: { hu: "Rendőrök, tolvaj (C, D)", en: "Policemen and thief (C, D)" },
+    title: { hu: "Rendőrök, tolvaj (C, D kategória)", en: "Policemen and thief (category C, D)" }
   },
   SixDiscs: {
     year: { k: "X. (16/17)", v: "16/17" },

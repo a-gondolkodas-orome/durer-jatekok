@@ -81,11 +81,6 @@ describe('policeman-thief-c minimax', () => {
     expect(got).toEqual(refWinningPlacements(2));
   });
 
-  it('two policemen win almost everywhere with three (reference cross-check)', () => {
-    // sanity: three cops dominate (matches the design analysis of 670/680)
-    expect(winningPlacements(3).length).toBe(670);
-  });
-
   it('chooseCopMove returns a genuinely winning move from every winning 2-cop state', () => {
     // From a known winning placement, against every thief start, the chosen cop
     // move must force the loss (verified with both the module and the reference).

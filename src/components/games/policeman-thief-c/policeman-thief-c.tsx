@@ -79,7 +79,6 @@ export const moves = {
       events.endGame(1);
       return { nextBoard };
     }
-    nextBoard.copCursor = 0;
     events.endTurn();
     return { nextBoard };
   }
@@ -130,7 +129,7 @@ const getPlayerStepDescription = ({ board, ctx }: { board: Board; ctx: Ctx }) =>
       en: `Move the ${copColorName.en[board.copCursor]} policeman to a neighbouring vertex.`
     };
   }
-  const remaining = board.copCount === 0 ? 0 : 3 - board.thiefMoveCount;
+  const remaining = 3 - board.thiefMoveCount;
   return {
     hu: `Lépj a tolvajjal egy szomszédos csúcsra. Még ${remaining} lépés a győzelemig.`,
     en: `Move the thief to a neighbouring vertex. ${remaining} more move(s) to win.`
