@@ -10,9 +10,7 @@ const isValidValue = (raw: string): boolean => /^-?\d{1,12}$/.test(raw.trim());
 const factor = (r: number): string =>
   r === 0 ? 'x' : r > 0 ? `(x - ${r})` : `(x + ${-r})`;
 
-// A coefficient is "open" when it is empty and this client may fill it. All open
-// coefficients are equally choosable, so they share one style — no slot is
-// singled out as "next".
+// A coefficient is "open" when it is empty and this client may fill it.
 const CoefChip = (
   { label, value, isOpen }: { label: Coef; value: number | null; isOpen: boolean }
 ) => (
@@ -25,7 +23,7 @@ const CoefChip = (
           : 'border-slate-400 opacity-60'}`}
     aria-label={`${label} = ${value ?? '?'}`}
   >
-    {value ?? '?'}
+    {value ?? label}
   </span>
 );
 
@@ -76,7 +74,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                 disabled={!ctx.isClientMoveAllowed}
                 onChange={e => setInputs(prev => ({ ...prev, [coef]: e.target.value }))}
                 onKeyDown={e => { if (e.key === 'Enter') submit(coef); }}
-                className="w-28 px-2 py-1.5 rounded-md border-2 border-slate-400
+                className="w-36 px-2 py-1.5 rounded-md border-2 border-slate-400
                   disabled:opacity-50 bg-transparent"
                 placeholder={t({ hu: 'egész szám', en: 'integer' })}
               />
@@ -98,8 +96,8 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         <p className="mt-4 text-sm">
           {roots
             ? t({
-              hu: `P(x) = ${factor(roots[0])}${factor(roots[1])}${factor(roots[2])} — gyökök: ${roots.join(', ')}`,
-              en: `P(x) = ${factor(roots[0])}${factor(roots[1])}${factor(roots[2])} — roots: ${roots.join(', ')}`
+              hu: `P(x) = ${factor(roots[0])}·${factor(roots[1])}·${factor(roots[2])} — gyökök: ${roots.join(', ')}`,
+              en: `P(x) = ${factor(roots[0])}·${factor(roots[1])}·${factor(roots[2])} — roots: ${roots.join(', ')}`
             })
             : t({
               hu: 'A polinomnak nincs három egész gyöke.',

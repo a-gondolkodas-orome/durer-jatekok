@@ -62,9 +62,11 @@ const blockingMove = (board: Board): [Coef, number] | null => {
 export const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const empties = COEFS.filter(k => board[k] === null);
 
-  // First player, move 1: c = 0 is a winning first move (forces root 0).
+  // First player, move 1: pick randomly between the two winning first moves —
+  // c = 0 (forces root 0) and b = -1 (forces the pair {1, -1}).
   if (empties.length === 3) {
-    moves.setCoefficient(board, 'c', 0);
+    const [coef, value] = sample([['c', 0], ['b', -1]] as [Coef, number][])!;
+    moves.setCoefficient(board, coef, value);
     return;
   }
 

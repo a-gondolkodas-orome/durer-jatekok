@@ -24,23 +24,37 @@ const range = (lo: number, hi: number) =>
   Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
 
 describe('smartBotStrategy — first player (integer roots)', () => {
-  it('plays c = 0 as the first move', () => {
-    expect(runBot({ a: null, b: null, c: null })).toEqual({ coef: 'c', value: 0 });
+  it('opens with a winning first move, using both c = 0 and b = -1 over time', () => {
+    const seen = new Set<string>();
+    for (let i = 0; i < 60; i++) {
+      const { coef, value } = runBot({ a: null, b: null, c: null });
+      expect([['c', 0], ['b', -1]].some(([k, v]) => k === coef && v === value)).toBe(true);
+      seen.add(`${coef}=${value}`);
+    }
+    expect(seen).toEqual(new Set(['c=0', 'b=-1']));
   });
 
-  it('completes to three integer roots after the opponent sets a (c = 0)', () => {
-    for (const a of range(-30, 30)) {
-      const { coef, value } = runBot({ a, b: null, c: 0 });
-      expect(coef).toBe('b');
-      expect(hasThreeIntegerRoots(a, value, 0)).toBe(true);
+  it('completes to three integer roots after a c = 0 opening', () => {
+    for (const v of range(-30, 30)) {
+      const afterA = runBot({ a: v, b: null, c: 0 });      // opponent set a
+      expect(afterA.coef).toBe('b');
+      expect(hasThreeIntegerRoots(v, afterA.value, 0)).toBe(true);
+
+      const afterB = runBot({ a: null, b: v, c: 0 });      // opponent set b
+      expect(afterB.coef).toBe('a');
+      expect(hasThreeIntegerRoots(afterB.value, v, 0)).toBe(true);
     }
   });
 
-  it('completes to three integer roots after the opponent sets b (c = 0)', () => {
-    for (const b of range(-30, 30)) {
-      const { coef, value } = runBot({ a: null, b, c: 0 });
-      expect(coef).toBe('a');
-      expect(hasThreeIntegerRoots(value, b, 0)).toBe(true);
+  it('completes to three integer roots after a b = -1 opening', () => {
+    for (const v of range(-30, 30)) {
+      const afterA = runBot({ a: v, b: -1, c: null });      // opponent set a
+      expect(afterA.coef).toBe('c');
+      expect(hasThreeIntegerRoots(v, -1, afterA.value)).toBe(true);
+
+      const afterC = runBot({ a: null, b: -1, c: v });      // opponent set c
+      expect(afterC.coef).toBe('a');
+      expect(hasThreeIntegerRoots(afterC.value, -1, v)).toBe(true);
     }
   });
 });

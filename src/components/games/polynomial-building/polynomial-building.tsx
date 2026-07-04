@@ -19,18 +19,18 @@ const moves = {
 
 const rule = {
   hu: <>
-    Legyen P(x) = x³ + ax² + bx + c egy polinom. Két játékos felváltva határozza
+    Legyen <code className="whitespace-nowrap">P(x) = x³ + ax² + bx + c</code> egy polinom.
+    Két játékos felváltva határozza
     meg a, b, c értékeit. Tetszőleges sorrendben választanak a, b, c értékeinek
     egész számokat. Az első játékos célja, hogy a polinomnak mindhárom gyöke
-    egész legyen. A második játékos célja, hogy ezt megakadályozza. (Az első
-    játékos kezd.)
+    egész legyen. A második játékos célja, hogy ezt megakadályozza.
   </>,
   en: <>
-    Let P(x) = x³ + ax² + bx + c be a polynomial. Two players alternately
+    Let <code className="whitespace-nowrap">P(x) = x³ + ax² + bx + c</code> be a polynomial.
+    Two players alternately
     determine the values of a, b, c. In any order, they choose integer values
     for a, b, c. The first player's goal is for all three roots of the
     polynomial to be integers. The second player's goal is to prevent this.
-    (The first player moves first.)
   </>
 };
 
@@ -65,8 +65,7 @@ export const PolynomialBuilding = strategyGameFactory({
       label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
     },
     {
-      // smart bot: verified as optimal (A always wins; winning first moves are
-      // c = 0 or b = -1)
+      // smart bot: verified as optimal
       botStrategy: smartBotStrategy,
       generateStartBoard: (): Board => ({ a: null, b: null, c: null }),
       label: { hu: 'Okos 🤖', en: 'Smart 🤖' },
