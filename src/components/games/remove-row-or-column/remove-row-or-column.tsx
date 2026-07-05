@@ -12,7 +12,7 @@ import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
 type Selected = { r: number; c: number } | null
 
-const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
+export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const { grid } = board;
   const selected = ctx.turnState as Selected;
@@ -113,7 +113,7 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
   );
 };
 
-const moves = {
+export const moves = {
   removeLine: (board: Board, { events }: { events: Events }, move: Move) => {
     const nextBoard = { grid: applyMove(board.grid, move) };
     events.setTurnState(null);
@@ -145,7 +145,7 @@ const rule = {
   </>
 };
 
-const getPlayerStepDescription = ({ ctx }: { board: Board; ctx: Ctx }) => {
+export const getPlayerStepDescription = ({ ctx }: { board: Board; ctx: Ctx }) => {
   return ctx.turnState
     ? {
       hu: 'Vedd le a kijelölt korong sorát vagy oszlopát a gombokkal, vagy válassz másik korongot.',
