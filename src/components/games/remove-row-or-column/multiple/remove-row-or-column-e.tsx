@@ -1,14 +1,12 @@
-import { strategyGameFactory } from '../../game-factory';
-import {
-  BoardClient, moves, getPlayerStepDescription
-} from '../remove-row-or-column/remove-row-or-column';
-import { smartBotStrategy, randomBotStrategy } from '../remove-row-or-column/bot-strategy';
+import { strategyGameFactory } from '../../../game-factory';
+import { BoardClient, moves, getPlayerStepDescription } from '../board-client';
+import { smartBotStrategy, randomBotStrategy } from '../bot-strategy';
 import { generateStartBoard } from './helpers';
 
 // Sibling of "Remove a row or column" (category C): identical mechanics, but the
 // start position is several isolated rectangles instead of a single one. The
-// flood-fill engine and Sprague–Grundy bot in ../remove-row-or-column already
-// handle a board of many rectangles, so only the start board and rule differ.
+// flood-fill engine and Sprague–Grundy bot in ../ already handle a board of many
+// rectangles, so only the start board and rule differ.
 const rule = {
   hu: <>
     A játék kezdetén a korongok néhány (nem feltétlenül egyforma méretű) téglalapban vannak

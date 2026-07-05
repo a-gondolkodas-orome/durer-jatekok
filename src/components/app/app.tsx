@@ -56,8 +56,8 @@ import { PolynomialBuilding } from '../games/polynomial-building/polynomial-buil
 import { PrimeExponentials } from '../games/prime-exponentials/prime-exponentials';
 import { PrimelyToZero } from '../games/primely-to-zero/primely-to-zero';
 import { RemoveDivisorMultiple } from '../games/remove-divisor-multiple/remove-divisor-multiple';
-import { RemoveRowOrColumn } from '../games/remove-row-or-column/remove-row-or-column';
-import { RemoveRowOrColumnE } from '../games/remove-row-or-column-e/remove-row-or-column-e';
+import { RemoveRowOrColumn } from '../games/remove-row-or-column/single/remove-row-or-column';
+import { RemoveRowOrColumnE } from '../games/remove-row-or-column/multiple/remove-row-or-column-e';
 import { RockPaperScissor } from '../games/rock-paper-scissor/rock-paper-scissor';
 import { RookToCorner } from '../games/rook-to-corner/rook-to-corner';
 import { SharkChase4 } from '../games/shark-chase/shark-4-by-4/shark-chase';

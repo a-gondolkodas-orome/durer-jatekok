@@ -1,5 +1,5 @@
-import { getRectangles } from '../remove-row-or-column/helpers';
-import { boardGrundy } from '../remove-row-or-column/bot-strategy';
+import { getRectangles } from '../helpers';
+import { boardGrundy } from '../bot-strategy';
 import { generateStartBoard } from './helpers';
 
 describe('generateStartBoard', () => {
