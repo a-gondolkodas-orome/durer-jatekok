@@ -75,7 +75,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           (flex-1 + aspect-square) so up to 12 fields fit without wrapping, which
           keeps the row's linear order obvious. The max-width stops them from
           growing oversized on wide screens. */}
-      <div className="flex gap-1 sm:gap-1.5 justify-center items-center py-6 w-full max-w-xl mx-auto">
+      <div className="flex gap-1 sm:gap-1.5 justify-center items-center py-2 w-full max-w-xl mx-auto">
         {cells.map((cell, i) => {
           const state = cellState(i);
           const actionable = canInteract
@@ -89,17 +89,17 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               aria-label={label(i)}
               className={`relative flex-1 min-w-0 aspect-square rounded-md sm:rounded-lg border-2
                 flex items-center justify-center bg-surface-elevated transition-colors ${ring[state]}
-                ${actionable ? 'cursor-pointer' : 'cursor-default'}`}
+              `}
             >
               {cell !== null && (
                 <span
-                  className={`w-3/5 aspect-square rounded-full shadow-sm ${discClass(cell)}
+                  className={`w-4/5 aspect-square rounded-full shadow-sm ${discClass(cell)}
                     ${state === 'selected' ? 'ring-2 ring-offset-1 ring-blue-600' : ''}`}
                 />
               )}
               {state === 'placeable' && (
                 <span
-                  className={`absolute w-3/5 aspect-square rounded-full border-2 border-dashed
+                  className={`absolute w-4/5 aspect-square rounded-full border-2 border-dashed
                     ${myColor === 'red' ? 'border-red-400' : 'border-blue-400'}`}
                 />
               )}
@@ -109,7 +109,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       </div>
 
       {canInteract && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4">
           <button onClick={() => moves.pass(board)} className="primary-button w-auto">
             {t({ hu: 'Passzolok', en: 'Pass' })}
           </button>

@@ -76,10 +76,6 @@ const rule = {
 export const RecolouringDiscs = strategyGameFactory({
   presentation: {
     rule,
-    roleLabels: [
-      { hu: 'Piros vagyok (kezdő)', en: 'I am Red (first)' },
-      { hu: 'Kék vagyok (második)', en: 'I am Blue (second)' }
-    ],
     getPlayerStepDescription: ({ board, ctx }) => {
       const goal = targetCounts(board.cells.length);
       const red = countColor(board.cells, 'red');
