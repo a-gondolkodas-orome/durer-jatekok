@@ -93,8 +93,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
             >
               {cell !== null && (
                 <span
-                  className={`w-4/5 aspect-square rounded-full shadow-sm ${discClass(cell)}
-                    ${state === 'selected' ? 'ring-2 ring-offset-1 ring-blue-600' : ''}`}
+                  className={`w-4/5 aspect-square rounded-full shadow-sm ${discClass(cell)}`}
                 />
               )}
               {state === 'placeable' && (
