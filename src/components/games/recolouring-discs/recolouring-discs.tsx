@@ -84,11 +84,12 @@ export const RecolouringDiscs = strategyGameFactory({
       const who = ctx.isHumanVsHumanGame
         ? { hu: isRed ? 'A piros van soron.' : 'A kék van soron.', en: isRed ? 'Red to move.' : 'Blue to move.' }
         : { hu: isRed ? 'Te vagy a piros.' : 'Te vagy a kék.', en: isRed ? 'You are red.' : 'You are blue.' };
+      const move = ctx.moveCount + 1; // the move about to be made
       return {
         hu: `${who.hu} Mozgass egy saját korongot 1–2 mezővel, tegyél le egy újat egy saját korong mellé, `
-          + `vagy passzolj. Piros: ${red}/${goal.red}, kék: ${blue}/${goal.blue}.`,
+          + `vagy passzolj. Piros: ${red}/${goal.red}, kék: ${blue}/${goal.blue}. Lépés: ${move}/${PLY_CAP}.`,
         en: `${who.en} Move one of your discs by 1–2 fields, place a new one next to one of your discs, `
-          + `or pass. Red: ${red}/${goal.red}, blue: ${blue}/${goal.blue}.`
+          + `or pass. Red: ${red}/${goal.red}, blue: ${blue}/${goal.blue}. Move ${move}/${PLY_CAP}.`
       };
     }
   },
