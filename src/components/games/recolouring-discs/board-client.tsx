@@ -95,12 +95,19 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     return 'plain';
   };
 
+  // Movable discs are ringed in the player's own colour ("these are your pieces,
+  // pick one up"), keeping them distinct from the blue selected/target
+  // highlighting that marks the move currently in progress.
+  const selectedRing = myColor === 'red'
+    ? 'border-red-400 ring-2 ring-red-300 dark:ring-red-600 hocus:ring-red-500'
+    : 'border-blue-400 ring-2 ring-blue-300 dark:ring-blue-600 hocus:ring-blue-500';
+
   const ring: Record<ReturnType<typeof cellState>, string> = {
-    selected: 'border-blue-500 ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900',
-    target: 'border-blue-400 border-dashed bg-blue-100 dark:bg-blue-900',
-    placeable: 'border-green-500 border-dashed bg-green-100 dark:bg-green-900',
-    movable: 'border-slate-400 hocus:border-blue-400',
-    plain: 'border-slate-300 dark:border-slate-600'
+    selected: `${selectedRing} opacity-75`,
+    target: 'border-blue-400 border-dashed bg-blue-200 dark:bg-blue-700',
+    placeable: '',
+    movable: 'border-blue-500 bg-blue-200 dark:bg-blue-700',
+    plain: ''
   };
 
   const label = (i: number): string => {
@@ -144,7 +151,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                     ${discClass(cell)}`}
                 />
               )}
-              {state === 'placeable' && (
+              {(state === 'placeable' || state === 'target') && (
                 <span
                   className={`absolute w-4/5 aspect-square rounded-full border-2 border-dashed
                     ${myColor === 'red' ? 'border-red-400' : 'border-blue-400'}`}
