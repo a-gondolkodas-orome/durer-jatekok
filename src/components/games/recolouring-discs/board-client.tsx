@@ -1,7 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../language';
 import { GameBoard, type BoardClientProps } from '../../game-factory';
-import { type Board, colorOf, moveTargets, placeTargets } from './helpers';
+import { type Board, type Cell, colorOf, moveTargets, placeTargets } from './helpers';
+
+// Translucent version of each disc colour, used for the recolour pulse ring.
+const pulseColor: Record<'red' | 'blue', string> = {
+  red: 'rgba(239, 68, 68, 0.75)', // red-500
+  blue: 'rgba(59, 130, 246, 0.75)' // blue-500
+};
+
+// Attention pulse played on a disc that was just recoloured: it grows briefly
+// and emits a fading ring in its new colour. Kept here (Web Animations API)
+// rather than as a global @keyframes so this game-specific effect stays inside
+// the game. Does nothing if the browser lacks element.animate (e.g. jsdom).
+const playRecolourPulse = (el: HTMLElement, color: 'red' | 'blue'): void => {
+  el.animate?.(
+    [
+      { transform: 'scale(1)', boxShadow: `0 0 0 0 ${pulseColor[color]}` },
+      { transform: 'scale(1.3)', boxShadow: `0 0 0 6px ${pulseColor[color]}`, offset: 0.35 },
+      { transform: 'scale(1)', boxShadow: '0 0 0 12px transparent' }
+    ],
+    { duration: 900, easing: 'ease-out' }
+  );
+};
 
 const discClass = (cell: 'red' | 'blue' | null): string => {
   if (cell === 'red') return 'bg-red-500';
@@ -19,6 +40,28 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   // Drop any in-progress selection whenever the board advances.
   useEffect(() => setSelectedFrom(null), [ctx.moveCount]);
+
+  // Pulse discs that were just recoloured (a cell that held a disc and now holds
+  // the opposite colour) so the flip is easy to spot. We diff against the
+  // previous board; only genuine plies (moveCount + 1) count, so restarting or
+  // choosing a role never pulses.
+  const discRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+  const prevCellsRef = useRef<Cell[]>(cells);
+  const prevMoveCountRef = useRef<number>(ctx.moveCount);
+
+  useEffect(() => {
+    const prev = prevCellsRef.current;
+    const wasSequentialPly = ctx.moveCount === prevMoveCountRef.current + 1;
+    prevCellsRef.current = cells;
+    prevMoveCountRef.current = ctx.moveCount;
+    if (!wasSequentialPly) return;
+
+    cells.forEach((c, i) => {
+      if (c === null || prev[i] === null || prev[i] === c) return;
+      const el = discRefs.current.get(i);
+      if (el) playRecolourPulse(el, c);
+    });
+  }, [ctx.moveCount, cells]);
 
   const targets = selectedFrom !== null ? moveTargets(cells, selectedFrom) : [];
   const placeable = canInteract && myColor !== null ? placeTargets(cells, myColor) : [];
@@ -93,7 +136,12 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
             >
               {cell !== null && (
                 <span
-                  className={`w-4/5 aspect-square rounded-full shadow-sm ${discClass(cell)}`}
+                  ref={el => {
+                    if (el) discRefs.current.set(i, el);
+                    else discRefs.current.delete(i);
+                  }}
+                  className={`w-4/5 aspect-square rounded-full shadow-sm transition-colors duration-500
+                    ${discClass(cell)}`}
                 />
               )}
               {state === 'placeable' && (
