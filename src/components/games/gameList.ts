@@ -278,75 +278,36 @@ export const gameList: GameList = {
     name: { hu: "Rendőrök, tolvaj (C, D)", en: "Policemen and thief (C, D)" },
     title: { hu: "Rendőrök, tolvaj (C, D kategória)", en: "Policemen and thief (category C, D)" }
   },
-  SixDiscs: {
+  FlipOrRemove: {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
-    category: ["A"],
+    category: ["A", "B"],
     icon: "piles",
-    name: { hu: "Átfordítás, elvétel (6)", en: "Flip or remove (6)" },
-    title: { hu: "Átfordítás, elvétel (6 korong)", en: "Flip or remove (6 discs)" },
-    credit: { developedBy: ["Hajós Balázs"] }
-  },
-  TenDiscs: {
-    year: { k: "X. (16/17)", v: "16/17" },
-    round: "döntő",
-    category: ["B"],
-    icon: "piles",
-    name: { hu: "Átfordítás, elvétel (10)", en: "Flip or remove (10)" },
-    title: { hu: "Átfordítás, elvétel (10 korong)", en: "Flip or remove (10 discs)" },
+    name: { hu: "Átfordítás, elvétel", en: "Flip or remove" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   Bacteria: {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
-    category: ["C", "D"],
+    category: ["C", "D", "E", "E+"],
     icon: "pursuit",
     name: { hu: "Baktériumok terjedése", en: "Spreading of bacteria" },
     credit: { developedBy: ["Tárkányi Damján"] }
   },
-  BacteriaScatteredGoals: {
-    year: { k: "X. (16/17)", v: "16/17" },
-    round: "döntő",
-    category: ["E", "E+"],
-    icon: "pursuit",
-    name: { hu: "Baktériumok terjedése (E)", en: "Spreading of bacteria (E)" }
-  },
-  NumberCovering8: {
+  NumberCovering: {
     year: { k: "XI. (17/18)", v: "17/18" },
     round: "döntő",
-    category: ["A"],
+    category: ["A", "B"],
     icon: "number",
-    name: { hu: "Számok lefedése 1-től 8-ig", en: "Covering numbers 1 to 8" },
-    credit: { developedBy: ["Hajós Balázs"] }
-  },
-  NumberCovering10: {
-    year: { k: "XI. (17/18)", v: "17/18" },
-    round: "döntő",
-    category: ["B"],
-    icon: "number",
-    name: { hu: "Számok lefedése 1-től 10-ig", en: "Covering numbers 1 to 10" },
+    name: { hu: "Számok lefedése", en: "Covering numbers" },
     credit: { developedBy: ["Hajós Balázs"] }
   },
   RemoveRowOrColumn: {
     year: { k: "XI. (17/18)", v: "17/18" },
     round: "döntő",
-    category: ["C"],
+    category: ["C", "E"],
     icon: "board",
-    name: { hu: "Sor vagy oszlop levétele (C)", en: "Remove a row or column (C)" }
-  },
-  RemoveRowOrColumnE: {
-    year: { k: "XI. (17/18)", v: "17/18" },
-    round: "döntő",
-    category: ["E"],
-    icon: "board",
-    name: {
-      hu: "Sor vagy oszlop levétele (E)",
-      en: "Remove a row or column (E)"
-    },
-    title: {
-      hu: "Sor vagy oszlop levétele – több téglalap",
-      en: "Remove a row or column – multiple rectangles"
-    }
+    name: { hu: "Sor vagy oszlop levétele", en: "Remove a row or column" }
   },
   TicTacToeDoubleStart: {
     year: { k: "XII. (18/19)", v: "18/19" },
@@ -456,29 +417,21 @@ export const gameList: GameList = {
     icon: "number",
     name: { hu: "Összeg 15", en: "Sum 15" }
   },
-  Coin357: {
+  CoinChange: {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
-    category: ["A"],
-    icon: "coins",
-    name: { hu: "15 érme beváltása", en: "Change 15 coins" },
-    credit: { developedBy: ["Czeller Ildikó"] }
-  },
-  Coin123: {
-    year: { k: "XV. (21/22)", v: "21/22" },
-    round: "döntő",
-    category: ["B"],
+    category: ["A", "B"],
     icon: "coins",
     name: { hu: "Érmék beváltása", en: "Coin change" },
     credit: { developedBy: ["Czeller Ildikó"] }
   },
-  ChessDucksC: {
+  ChessDucks: {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "online",
-    category: ["C"],
+    category: ["C", "E"],
     icon: "chess",
-    name: { hu: "Békés kacsák (4 × 6)", en: "Peaceful ducks (4 × 6)" },
-    title: { hu: "Békés kacsák a 4 × 6-os sakktáblán", en: "Peaceful ducks on the 4 × 6 board" },
+    featured: true,
+    name: { hu: "Békés kacsák", en: "Peaceful ducks" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   CubeColoring: {
@@ -496,16 +449,6 @@ export const gameList: GameList = {
     category: ["D"],
     icon: "number",
     name: { hu: "Kettőhatványok kivonása", en: "Subtract 2^n" },
-    credit: { developedBy: ["Jánosik Áron"] }
-  },
-  ChessDucksE: {
-    year: { k: "XV. (21/22)", v: "21/22" },
-    round: "online",
-    category: ["E"],
-    icon: "chess",
-    featured: true,
-    name: { hu: "Békés kacsák (4 × 7)", en: "Peaceful ducks (4 × 7)" },
-    title: { hu: "Békés kacsák a 4 × 7-es sakktáblán", en: "Peaceful ducks on the 4 × 7 board" },
     credit: { developedBy: ["Jánosik Áron"] }
   },
   RecolouringDiscs: {

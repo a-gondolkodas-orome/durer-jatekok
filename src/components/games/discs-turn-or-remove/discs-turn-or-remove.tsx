@@ -192,40 +192,58 @@ const rule = (maxDiscs) => ({
   </>
 });
 
-export const SixDiscs = strategyGameFactory({
+const genericRule = {
+  hu: <>
+    A játék kezdetén néhány piros vagy kék korong van az asztalon.
+    A soron következő játékos összesen négyfélét léphet:
+    <br />
+    • 1 vagy 2 kék korongot elvehet az asztalról.
+    <br />
+    • 1 vagy 2 piros korongot átfordíthat kékké.
+    <br />
+    Az veszít, aki nem tud lépni.
+  </>,
+  en: <>
+    At the start there are some red or blue discs on the table.
+    The current player has four possible moves:
+    <br />
+    • Remove 1 or 2 blue discs from the table.
+    <br />
+    • Flip 1 or 2 red discs to blue.
+    <br />
+    The player who cannot move loses.
+  </>
+};
+
+// Test variant covers both sub-games: a 6-disc or a 10-disc start position.
+const generateTestStartBoard = (): Board => sample([generateStartBoard(6), generateStartBoard(10)])!();
+
+export const FlipOrRemove = strategyGameFactory({
   presentation: {
-    rule: rule(6),
+    rule: genericRule,
     getPlayerStepDescription
   },
   BoardClient,
   gameplay: { moves },
   variants: [
-    { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
     {
-      // smart bot: verified as optimal
+      botStrategy: randomBotStrategy,
+      generateStartBoard: generateTestStartBoard,
+      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+    },
+    // smart bot: verified as optimal
+    {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(6),
-      label: { hu: 'Teljes', en: 'Full' },
+      rule: rule(6),
+      label: { hu: '6 korong · Okos 🤖', en: '6 discs · Smart 🤖' },
       isDefault: true
-    }
-  ]
-});
-
-export const TenDiscs = strategyGameFactory({
-  presentation: {
-    rule: rule(10),
-    getPlayerStepDescription
-  },
-  BoardClient,
-  gameplay: { moves },
-  variants: [
-    { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
+    },
     {
-      // smart bot: verified as optimal
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(10),
-      label: { hu: 'Teljes', en: 'Full' },
-      isDefault: true
+      rule: rule(10),
+      label: { hu: '10 korong · Okos 🤖', en: '10 discs · Smart 🤖' }
     }
   ]
 });

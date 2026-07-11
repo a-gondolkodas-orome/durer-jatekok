@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range, random } from "lodash";
+import { range, random, sample } from "lodash";
 import { strategyGameFactory, type BoardClientProps, GameBoard } from "../../game-factory";
 import { smartBotStrategy, randomBotStrategy } from "./bot-strategy";
 import {
@@ -10,19 +10,17 @@ import {
   isAllowedAttackClick,
   moves
 } from "./helpers";
+import type { Board } from "./danger";
 
-export type Board = { bacteria: number[][], goals: number[] }
+const rowCount = 9;
 
-const boardWidth = 11;
+const emptyBacteria = (boardWidth: number): number[][] =>
+  range(rowCount).map(rowIndex => Array(rowIndex % 2 === 0 ? boardWidth : boardWidth - 1).fill(0));
 
-const generateStartBoard = (): Board => {
-  const bacteria = Array(9).fill([]);
-  range(bacteria.length).forEach((rowIndex) => {
-    const rowSize = rowIndex % 2 === 0 ? boardWidth : boardWidth - 1;
-    bacteria[rowIndex] = Array(rowSize).fill(0);
-  });
+// "Adjacent goals" sub-game: goals form a contiguous block in the top row.
+const generateAdjacentStartBoard = (): Board => {
+  const bacteria = emptyBacteria(11);
 
-  // using isDangerous we could generate random but interesting boards instead of hardcoding a few
   const boardVariantId = random(1, 8);
   switch (boardVariantId) {
     case 1: {
@@ -61,6 +59,35 @@ const generateStartBoard = (): Board => {
   throw new Error('unreachable');
 };
 
+// "Scattered goals" sub-game: goals (top row) are not necessarily adjacent.
+// Curated positions keep each side winning roughly half the time; verified in
+// bot-strategy.spec.ts.
+const scatteredStartConfigs: { starts: number[], goals: number[] }[] = [
+  // attacker-winning
+  { starts: [0, 1, 5, 8, 15], goals: [2, 5, 7, 8] },
+  { starts: [1, 3, 4, 8, 11, 14], goals: [0, 5, 8, 12, 14] },
+  { starts: [3, 7, 9, 12], goals: [4, 5, 9, 10, 11, 13] },
+  { starts: [2, 5, 6, 14, 16], goals: [1, 5, 7, 8, 11] },
+  { starts: [2, 5, 6, 8, 12, 16], goals: [3, 8, 9, 10, 13, 16] },
+  // defender-winning
+  { starts: [2, 5, 12, 16], goals: [4, 6, 7, 11, 12] },
+  { starts: [3, 5, 9, 12], goals: [2, 3, 5, 13, 16] },
+  { starts: [1, 8, 9, 10], goals: [3, 9, 13, 16] },
+  { starts: [0, 4, 5, 11, 12, 13], goals: [4, 7, 10, 12] },
+  { starts: [1, 3, 4, 11, 12, 15], goals: [1, 4, 5, 10, 12, 16] }
+];
+
+const generateScatteredStartBoard = (): Board => {
+  const bacteria = emptyBacteria(17);
+  const { starts, goals } = sample(scatteredStartConfigs)!;
+  starts.forEach(col => { bacteria[0][col] = 1; });
+  return { bacteria, goals };
+};
+
+// Test variant covers both sub-games.
+const generateTestStartBoard = (): Board =>
+  sample([generateAdjacentStartBoard, generateScatteredStartBoard])!();
+
 const BacteriaDisplay = ({ count, onGoal, dimmed = false }) => {
   if (count === 0) return null;
   const dotColor = dimmed
@@ -80,9 +107,12 @@ const GoalMarker = () => (
   <span className="text-base leading-none">🚩</span>
 );
 
+// Board-driven: reads its width from the board, so it renders any goal layout.
 const BoardClient = ({ board: { bacteria, goals }, ctx, moves }: BoardClientProps<Board>) => {
   const [attackRow, setAttackRow] = useState<number | null>(null);
   const [attackCol, setAttackCol] = useState<number | null>(null);
+
+  const boardWidth = bacteria[0].length;
 
   const isPlayerAttacker = ctx.currentPlayer === 0;
 
@@ -235,12 +265,12 @@ const getPlayerStepDescription = ({ ctx }) => {
   }
 };
 
-const rule = {
+const ruleBody = (goalsClause: { hu: string; en: string }) => ({
   hu: <>
-    A zöld körökkel jelölt mezőkön baktériumok találhatók, a tábla
-    felső sorában a megjelölt (szomszédos) mezők a CÉL mezők. A játékban egy Támadó és Védekező
-    játékos felváltva lép. A Védekező játékos minden körében levesz pontosan 1
-    baktériumot bármely általa választott mezőről.
+    A zöld körökkel jelölt mezőkön (a tábla alsó sorában) baktériumok találhatók,
+    a tábla felső sorában {goalsClause.hu} mezők a CÉL mezők.
+    A játékban egy Támadó és Védekező játékos felváltva lép. A Védekező játékos
+    minden körében levesz pontosan 1 baktériumot bármely általa választott mezőről.
     A Támadó játékos a következő háromféle lépés egyikét választhatja:
     <br />
     1. Egy mezőn lévő összes baktériummal egyszerre balra vagy jobbra lép egyet.
@@ -254,7 +284,8 @@ const rule = {
     mezőbe; a Védekező pedig akkor, ha az összes baktérium eltűnt a pályáról.
   </>,
   en: <>
-    Squares with green dots contain bacteria; the marked squares in the top row are GOAL squares.
+    Squares with green dots (in the bottom row) contain bacteria; the marked squares
+    in the top row {goalsClause.en} are GOAL squares.
     An Attacker and a Defender take turns. On each turn the
     Defender removes exactly 1 bacterium from any square of their choice.
     The Attacker chooses one of the following three moves:
@@ -268,27 +299,44 @@ const rule = {
     <br />The Attacker wins if at least one bacterium reaches a GOAL square; the Defender wins
     if all bacteria are removed from the board.
   </>
-};
+});
+
+const rule = ruleBody({ hu: 'megjelölt', en: '' });
+const adjacentRule = ruleBody({ hu: 'megjelölt (szomszédos)', en: '— which are adjacent —' });
+const scatteredRule = ruleBody({ hu: 'megjelölt (nem feltétlenül szomszédos)', en: '— not necessarily adjacent —' });
+
+const roleLabels: [{ hu: string; en: string }, { hu: string; en: string }] = [
+  { hu: "Támadó", en: "Attacker" },
+  { hu: "Védekező", en: "Defender" }
+];
 
 export const Bacteria = strategyGameFactory({
   presentation: {
     rule,
-    roleLabels: [
-      { hu: "Támadó", en: "Attacker" },
-      { hu: "Védekező", en: "Defender" }
-    ],
+    roleLabels,
     getPlayerStepDescription
   },
   BoardClient,
   gameplay: { moves },
   variants: [
-    { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
-    // verified as optimal
+    {
+      botStrategy: randomBotStrategy,
+      generateStartBoard: generateTestStartBoard,
+      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+    },
+    // smart bot: verified as optimal (danger.ts solver; handles any goal layout)
     {
       botStrategy: smartBotStrategy,
-      generateStartBoard,
-      label: { hu: 'Teljes', en: 'Full' },
+      generateStartBoard: generateAdjacentStartBoard,
+      rule: adjacentRule,
+      label: { hu: 'Szomszédos célok · Okos 🤖', en: 'Adjacent goals · Smart 🤖' },
       isDefault: true
+    },
+    {
+      botStrategy: smartBotStrategy,
+      generateStartBoard: generateScatteredStartBoard,
+      rule: scatteredRule,
+      label: { hu: 'Szórt célok · Okos 🤖', en: 'Scattered goals · Smart 🤖' }
     }
   ]
 });

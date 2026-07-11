@@ -412,6 +412,65 @@ describe('win/loss tracking', () => {
   });
 });
 
+describe('per-variant rule', () => {
+  const twoRuleConfig = (): StrategyGameConfig<Board> => ({
+    presentation: { rule: { hu: 'TOP_RULE', en: 'TOP_RULE' }, getPlayerStepDescription: () => '' },
+    BoardClient: MinimalBoardClient,
+    gameplay: defaultGameplay,
+    variants: [
+      {
+        botStrategy: () => {},
+        generateStartBoard: (): Board => ['a'],
+        label: { hu: 'V1', en: 'V1' },
+        rule: { hu: 'RULE_ONE', en: 'RULE_ONE' },
+        isDefault: true
+      },
+      {
+        botStrategy: () => {},
+        generateStartBoard: (): Board => ['b'],
+        label: { hu: 'V2', en: 'V2' },
+        rule: { hu: 'RULE_TWO', en: 'RULE_TWO' }
+      }
+    ]
+  });
+
+  it('shows the default variant rule and switches when another variant is selected', () => {
+    const { getByText, queryByText, container } = renderGame(twoRuleConfig());
+    expect(getByText('RULE_ONE')).toBeTruthy();
+    expect(queryByText('RULE_TWO')).toBeNull();
+
+    const radios = container.querySelectorAll('input[name="difficulty"]');
+    fireEvent.click(radios[1]);
+
+    expect(getByText('RULE_TWO')).toBeTruthy();
+    expect(queryByText('RULE_ONE')).toBeNull();
+  });
+
+  it('falls back to presentation.rule when the active variant has no rule', () => {
+    const config: StrategyGameConfig<Board> = {
+      presentation: { rule: { hu: 'TOP_RULE', en: 'TOP_RULE' }, getPlayerStepDescription: () => '' },
+      BoardClient: MinimalBoardClient,
+      gameplay: defaultGameplay,
+      variants: [
+        {
+          botStrategy: () => {},
+          generateStartBoard: (): Board => ['a'],
+          label: { hu: 'V1', en: 'V1' },
+          isDefault: true
+        },
+        {
+          botStrategy: () => {},
+          generateStartBoard: (): Board => ['b'],
+          label: { hu: 'V2', en: 'V2' },
+          rule: { hu: 'RULE_TWO', en: 'RULE_TWO' }
+        }
+      ]
+    };
+    const { getByText } = renderGame(config);
+    expect(getByText('TOP_RULE')).toBeTruthy();
+  });
+});
+
 describe('umami game-finished event', () => {
   let track: ReturnType<typeof vi.fn>;
 
