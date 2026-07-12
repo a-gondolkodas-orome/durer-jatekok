@@ -74,15 +74,15 @@ export const CoinChange = strategyGameFactory({
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
-      generateStartBoard: generateArbitraryStartBoard,
-      label: { hu: 'Véletlen (B)', en: 'Random (B)' },
-      isDefault: true
-    },
-    {
-      botStrategy: smartBotStrategy,
       generateStartBoard: generateFixedStartBoard,
       rule: fixedRule,
       label: { hu: '3-5-7 (A)', en: '3-5-7 (A)' }
+    },
+    {
+      botStrategy: smartBotStrategy,
+      generateStartBoard: generateArbitraryStartBoard,
+      label: { hu: 'Véletlen (B)', en: 'Random (B)' },
+      isDefault: true
     }
   ]
 });
