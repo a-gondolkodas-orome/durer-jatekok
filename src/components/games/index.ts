@@ -51,9 +51,7 @@ export { PileSplitter3 } from './pile-splitting-games/pile-splitter-3/pile-split
 export { PileSplitter4 } from './pile-splitting-games/pile-splitter-4/pile-splitter-4';
 export { PileUnion } from './pile-union/pile-union';
 export { PlusOneTwoThree } from './single-number-increase/plus-one-two-three/plus-one-two-three';
-export {
-  PolicemanthiefA as Policemanthief, PolicemanthiefB
-} from './policeman-thief/policeman-thief-ab/policeman-thief-ab';
+export { Policemanthief } from './policeman-thief/policeman-thief-ab/policeman-thief-ab';
 export { PolicemanthiefC } from './policeman-thief/policeman-thief-c/policeman-thief-c';
 export { PolynomialBuilding } from './polynomial-building/polynomial-building';
 export { PrimeExponentials } from './single-pile-removal/prime-exponentials/prime-exponentials';

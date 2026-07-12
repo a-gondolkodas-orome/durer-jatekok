@@ -256,26 +256,18 @@ export const gameList: GameList = {
   Policemanthief: {
     year: { k: "IX. (15/16)", v: "15/16" },
     round: "döntő",
-    category: ["A"],
+    category: ["A", "B"],
     icon: "pursuit",
-    name: { hu: "Rendőrök, tolvaj (A)", en: "Policemen and thief (A)" },
-    title: { hu: "Rendőrök, tolvaj (A kategória)", en: "Policemen and thief (category A)" },
+    name: { hu: "Rendőrök, tolvaj", en: "Policemen and thief" },
+    title: { hu: "Rendőrök, tolvaj (A, B kategória)", en: "Policemen and thief (category A, B)" },
     credit: { developedBy: ["Halasi Gergő"] }
-  },
-  PolicemanthiefB: {
-    year: { k: "IX. (15/16)", v: "15/16" },
-    round: "döntő",
-    category: ["B"],
-    icon: "pursuit",
-    name: { hu: "Rendőrök, tolvaj (B)", en: "Policemen and thief (B)" },
-    title: { hu: "Rendőrök, tolvaj (B kategória)", en: "Policemen and thief (category B)" }
   },
   PolicemanthiefC: {
     year: { k: "IX. (15/16)", v: "15/16" },
     round: "döntő",
     category: ["C", "D"],
     icon: "pursuit",
-    name: { hu: "Rendőrök, tolvaj (C, D)", en: "Policemen and thief (C, D)" },
+    name: { hu: "Rendőrök, tolvaj", en: "Policemen and thief" },
     title: { hu: "Rendőrök, tolvaj (C, D kategória)", en: "Policemen and thief (category C, D)" }
   },
   FlipOrRemove: {
