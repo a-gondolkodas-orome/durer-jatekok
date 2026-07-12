@@ -73,8 +73,7 @@ export { SuperstitiousCounting } from './single-number-increase/superstitious-co
 export { Take1OrHalve } from './single-pile-removal/take-1-or-halve/take-1-or-halve';
 export { TakeAndPoint } from './take-and-point/take-and-point';
 export { TakePowerOfTwo } from './single-pile-removal/take-power-of-two/take-power-of-two';
-export { TenCoins } from './ten-coins/ten-coins-c/ten-coins-c';
-export { TenCoinsD } from './ten-coins/ten-coins-d/ten-coins-d';
+export { TenCoins } from './ten-coins/ten-coins';
 export { TenDigitNumber } from './ten-digit-number/ten-digit-number';
 export { ThiefSheriffMean7 as ThiefSheriffMean } from './thief-sheriff-mean/thief-sheriff-mean-7/thief-sheriff-mean-7';
 export { ThiefSheriffMean9 } from './thief-sheriff-mean/thief-sheriff-mean-9/thief-sheriff-mean-9';

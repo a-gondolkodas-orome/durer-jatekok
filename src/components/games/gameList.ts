@@ -462,18 +462,9 @@ export const gameList: GameList = {
   TenCoins: {
     year: { k: "XVI. (22/23)", v: "22/23" },
     round: "online",
-    category: ["C"],
+    category: ["C", "D"],
     icon: "coins",
-    name: { hu: "10 érme (C)", en: "10 coins (C)" },
-    title: { hu: "10 érme (értékek 1–4)", en: "10 coins (values 1–4)" }
-  },
-  TenCoinsD: {
-    year: { k: "XVI. (22/23)", v: "22/23" },
-    round: "online",
-    category: ["D"],
-    icon: "coins",
-    name: { hu: "10 érme (D)", en: "10 coins (D)" },
-    title: { hu: "10 érme (értékek 1–5)", en: "10 coins (values 1–5)" }
+    name: { hu: "10 érme", en: "10 coins" }
   },
   AddReduceDouble: {
     year: { k: "XVI. (22/23)", v: "22/23" },
