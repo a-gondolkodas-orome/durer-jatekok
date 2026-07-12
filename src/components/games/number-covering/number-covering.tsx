@@ -138,21 +138,21 @@ export const NumberCovering = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: () => range(1, 9),
       rule: rule8,
-      label: { hu: '1–8 · Okos 🤖', en: '1–8 · Smart 🤖' },
+      label: { hu: '8 szám', en: '8 numbers' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: () => range(1, 11),
       rule: rule10,
-      label: { hu: '1–10 · Okos 🤖', en: '1–10 · Smart 🤖' }
+      label: { hu: '10 szám', en: '10 numbers' }
     }
   ]
 });

@@ -305,21 +305,21 @@ export const TenCoins = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoardC,
       rule: ruleFor(4),
-      label: { hu: '1–4 · Okos 🤖', en: '1–4 · Smart 🤖' },
+      label: { hu: '4 érték', en: '4 values' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoardD,
       rule: ruleFor(5),
-      label: { hu: '1–5 · Okos 🤖', en: '1–5 · Smart 🤖' }
+      label: { hu: '5 érték', en: '5 values' }
     }
   ]
 });

@@ -322,21 +322,21 @@ export const Bacteria = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal (danger.ts solver; handles any goal layout)
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateAdjacentStartBoard,
       rule: adjacentRule,
-      label: { hu: 'Szomszédos célok · Okos 🤖', en: 'Adjacent goals · Smart 🤖' },
+      label: { hu: 'Szomszédos', en: 'Adjacent' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateScatteredStartBoard,
       rule: scatteredRule,
-      label: { hu: 'Szórt célok · Okos 🤖', en: 'Scattered goals · Smart 🤖' }
+      label: { hu: 'Szórt', en: 'Scattered' }
     }
   ]
 });

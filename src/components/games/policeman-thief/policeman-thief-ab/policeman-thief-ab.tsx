@@ -165,14 +165,14 @@ export const Policemanthief = strategyGameFactory({
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoardA,
-      label: { hu: 'Rendőrök együtt', en: 'Policemen together' },
+      label: { hu: 'Együtt (A)', en: 'Together (A)' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoardB,
       rule: ruleB,
-      label: { hu: 'Rendőrök külön', en: 'Policemen apart' }
+      label: { hu: 'Külön (B)', en: 'Apart (B)' }
     }
   ]
 });

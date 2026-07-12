@@ -126,21 +126,21 @@ export const ChessDucks = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(4, 6),
       rule: rule(4, 6),
-      label: { hu: '4 × 6 · Okos 🤖', en: '4 × 6 · Smart 🤖' },
+      label: { hu: '4×6', en: '4×6' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(4, 7),
       rule: rule(4, 7),
-      label: { hu: '4 × 7 · Okos 🤖', en: '4 × 7 · Smart 🤖' }
+      label: { hu: '4×7', en: '4×7' }
     }
   ]
 });

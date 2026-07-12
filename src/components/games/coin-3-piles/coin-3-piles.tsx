@@ -69,20 +69,20 @@ export const CoinChange = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateArbitraryStartBoard,
-      label: { hu: 'Tetszőleges · Okos 🤖', en: 'Arbitrary · Smart 🤖' },
+      label: { hu: 'Véletlen (B)', en: 'Random (B)' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateFixedStartBoard,
       rule: fixedRule,
-      label: { hu: '3, 5, 7 · Okos 🤖', en: '3, 5, 7 · Smart 🤖' }
+      label: { hu: '3-5-7 (A)', en: '3-5-7 (A)' }
     }
   ]
 });

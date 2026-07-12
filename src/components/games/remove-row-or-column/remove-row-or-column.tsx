@@ -71,21 +71,21 @@ export const RemoveRowOrColumn = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: optimal (Sprague–Grundy; moves to a zero position when winning)
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateSingleBoard,
       rule: singleRule,
-      label: { hu: 'Egy téglalap · Okos 🤖', en: 'One rectangle · Smart 🤖' },
+      label: { hu: '1 blokk (C)', en: '1 block (C)' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateMultipleBoard,
       rule: multipleRule,
-      label: { hu: 'Több téglalap · Okos 🤖', en: 'Several rectangles · Smart 🤖' }
+      label: { hu: 'Több blokk (E)', en: 'Blocks (E)' }
     }
   ]
 });

@@ -229,21 +229,21 @@ export const FlipOrRemove = strategyGameFactory({
     {
       botStrategy: randomBotStrategy,
       generateStartBoard: generateTestStartBoard,
-      label: { hu: 'Teszt 🤖', en: 'Test 🤖' }
+      label: { hu: 'Teszt', en: 'Test' }
     },
     // smart bot: verified as optimal
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(6),
       rule: rule(6),
-      label: { hu: '6 korong · Okos 🤖', en: '6 discs · Smart 🤖' },
+      label: { hu: '6 korong', en: '6 discs' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateStartBoard(10),
       rule: rule(10),
-      label: { hu: '10 korong · Okos 🤖', en: '10 discs · Smart 🤖' }
+      label: { hu: '10 korong', en: '10 discs' }
     }
   ]
 });
