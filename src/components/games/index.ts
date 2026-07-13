@@ -63,7 +63,7 @@ export { RockPaperScissor } from './rock-paper-scissor/rock-paper-scissor';
 export { RookToCorner } from './rook-to-corner/rook-to-corner';
 export { SharkChase4 } from './shark-chase/shark-4-by-4/shark-chase';
 export { SharkChase5 } from './shark-chase/shark-5-by-5/shark-chase';
-export { FlipOrRemove } from './discs-turn-or-remove/discs-turn-or-remove';
+export { DiscsFlipOrRemove } from './discs-flip-or-remove/discs-flip-or-remove';
 export { SixFieldsCircle } from './six-fields-circle/six-fields-circle';
 export {
   StonesRemoveOneNotTwiceFromLeft

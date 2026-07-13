@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mapValues } from 'lodash';
 import { dummyEvents, makeCtx, type GameMoves } from '../../game-factory';
-import { moves as gameMoves, smartBotStrategy } from './discs-turn-or-remove';
+import { moves as gameMoves, smartBotStrategy } from './discs-flip-or-remove';
 
 // Exhaustive optimality check for both variants (max 6 and max 10 discs).
 // Board = [blue, red]. Moves: remove 1-2 blue, or flip 1-2 red into blue.
@@ -54,7 +54,7 @@ const botCandidates = (board: Board): Board[] => {
   return [...seen.values()];
 };
 
-describe('discs-turn-or-remove smart bot is optimal for both variants', () => {
+describe('discs-flip-or-remove smart bot is optimal for both variants', () => {
   for (const max of [6, 10]) {
     it(`plays optimally across every position with up to ${max} discs`, () => {
       for (let blue = 0; blue <= max; blue++) {

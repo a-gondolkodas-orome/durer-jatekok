@@ -218,7 +218,7 @@ const genericRule = {
 // Test variant covers both sub-games: a 6-disc or a 10-disc start position.
 const generateTestStartBoard = (): Board => sample([generateStartBoard(6), generateStartBoard(10)])!();
 
-export const FlipOrRemove = strategyGameFactory({
+export const DiscsFlipOrRemove = strategyGameFactory({
   presentation: {
     rule: genericRule,
     getPlayerStepDescription

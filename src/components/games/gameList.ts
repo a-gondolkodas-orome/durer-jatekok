@@ -270,7 +270,7 @@ export const gameList: GameList = {
     name: { hu: "Rendőrök, tolvaj", en: "Policemen and thief" },
     title: { hu: "Rendőrök, tolvaj (C, D kategória)", en: "Policemen and thief (category C, D)" }
   },
-  FlipOrRemove: {
+  DiscsFlipOrRemove: {
     year: { k: "X. (16/17)", v: "16/17" },
     round: "döntő",
     category: ["A", "B"],
