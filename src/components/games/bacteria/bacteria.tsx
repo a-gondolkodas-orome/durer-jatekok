@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range, random, sample } from "lodash";
+import { range, sample } from "lodash";
 import { strategyGameFactory, type BoardClientProps, GameBoard } from "../../game-factory";
 import { smartBotStrategy, randomBotStrategy } from "./bot-strategy";
 import {
@@ -18,45 +18,22 @@ const emptyBacteria = (boardWidth: number): number[][] =>
   range(rowCount).map(rowIndex => Array(rowIndex % 2 === 0 ? boardWidth : boardWidth - 1).fill(0));
 
 // "Adjacent goals" sub-game: goals form a contiguous block in the top row.
+const adjacentStartConfigs: { row: number, starts: number[], goals: number[] }[] = [
+  { row: 2, starts: [2, 4, 6, 8], goals: [3, 4, 5, 6, 7] },
+  { row: 2, starts: [3, 5, 7], goals: [3, 4, 5, 6, 7] },
+  { row: 1, starts: [1, 2, 3, 4], goals: [0, 1, 2, 3, 4, 5] },
+  { row: 2, starts: [0, 1, 3], goals: [0, 1, 2, 3, 4, 5] },
+  { row: 0, starts: [2, 3, 7, 9], goals: range(0, 11) },
+  { row: 0, starts: [1, 2, 4, 8], goals: range(0, 11) },
+  { row: 1, starts: [5, 6, 7, 8], goals: [5, 6, 7, 8, 9, 10] },
+  { row: 2, starts: [7, 9, 10], goals: [5, 6, 7, 8, 9, 10] }
+];
+
 const generateAdjacentStartBoard = (): Board => {
   const bacteria = emptyBacteria(11);
-
-  const boardVariantId = random(1, 8);
-  switch (boardVariantId) {
-    case 1: {
-      [2, 4, 6, 8].forEach(b => bacteria[2][b] = 1);
-      return { bacteria, goals: [3, 4, 5, 6, 7] };
-    }
-    case 2: {
-      [3, 5, 7].forEach(b => bacteria[2][b] = 1);
-      return { bacteria, goals: [3, 4, 5, 6, 7] };
-    }
-    case 3: {
-      [1, 2, 3, 4].forEach(b => bacteria[1][b] = 1);
-      return { bacteria, goals: [0, 1, 2, 3, 4, 5] };
-    }
-    case 4: {
-      [0, 1, 3].forEach(b => bacteria[2][b] = 1);
-      return { bacteria, goals: [0, 1, 2, 3, 4, 5] };
-    }
-    case 5: {
-      [2, 3, 7, 9].forEach(b => bacteria[0][b] = 1);
-      return { bacteria, goals: range(0, 11) };
-    }
-    case 6: {
-      [1, 2, 4, 8].forEach(b => bacteria[0][b] = 1);
-      return { bacteria, goals: range(0, 11) };
-    }
-    case 7: {
-      [5, 6, 7, 8].forEach(b => bacteria[1][b] = 1);
-      return { bacteria, goals: [5, 6, 7, 8, 9, 10] };
-    }
-    case 8: {
-      [7, 9, 10].forEach(b => bacteria[2][b] = 1);
-      return { bacteria, goals: [5, 6, 7, 8, 9, 10] };
-    }
-  }
-  throw new Error('unreachable');
+  const { row, starts, goals } = sample(adjacentStartConfigs)!;
+  starts.forEach(col => { bacteria[row][col] = 1; });
+  return { bacteria, goals };
 };
 
 // "Scattered goals" sub-game: goals (top row) are not necessarily adjacent.
