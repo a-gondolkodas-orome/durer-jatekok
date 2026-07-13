@@ -413,29 +413,24 @@ describe('win/loss tracking', () => {
 });
 
 describe('per-variant rule', () => {
-  const twoRuleConfig = (): StrategyGameConfig<Board> => ({
-    presentation: { rule: { hu: 'TOP_RULE', en: 'TOP_RULE' }, getPlayerStepDescription: () => '' },
-    BoardClient: MinimalBoardClient,
-    gameplay: defaultGameplay,
-    variants: [
-      {
-        botStrategy: () => {},
-        generateStartBoard: (): Board => ['a'],
-        label: { hu: 'V1', en: 'V1' },
-        rule: { hu: 'RULE_ONE', en: 'RULE_ONE' },
-        isDefault: true
-      },
-      {
-        botStrategy: () => {},
-        generateStartBoard: (): Board => ['b'],
-        label: { hu: 'V2', en: 'V2' },
-        rule: { hu: 'RULE_TWO', en: 'RULE_TWO' }
-      }
-    ]
-  });
-
   it('shows the default variant rule and switches when another variant is selected', () => {
-    const { getByText, queryByText, container } = renderGame(twoRuleConfig());
+    const config: StrategyGameConfig<Board> = {
+      presentation: { rule: { hu: 'TOP_RULE', en: 'TOP_RULE' }, getPlayerStepDescription: () => '' },
+      BoardClient: MinimalBoardClient,
+      gameplay: defaultGameplay,
+      variants: [
+        {
+          botStrategy: () => {},
+          generateStartBoard: (): Board => ['a'],
+          rule: { hu: 'RULE_ONE', en: 'RULE_ONE' },
+          isDefault: true
+        },
+        {
+          rule: { hu: 'RULE_TWO', en: 'RULE_TWO' }
+        }
+      ]
+    };
+    const { getByText, queryByText, container } = renderGame(config);
     expect(getByText('RULE_ONE')).toBeTruthy();
     expect(queryByText('RULE_TWO')).toBeNull();
 
@@ -455,13 +450,11 @@ describe('per-variant rule', () => {
         {
           botStrategy: () => {},
           generateStartBoard: (): Board => ['a'],
-          label: { hu: 'V1', en: 'V1' },
           isDefault: true
         },
         {
           botStrategy: () => {},
           generateStartBoard: (): Board => ['b'],
-          label: { hu: 'V2', en: 'V2' },
           rule: { hu: 'RULE_TWO', en: 'RULE_TWO' }
         }
       ]
