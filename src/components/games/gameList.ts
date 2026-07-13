@@ -409,7 +409,7 @@ export const gameList: GameList = {
     icon: "number",
     name: { hu: "Összeg 15", en: "Sum 15" }
   },
-  CoinChange: {
+  CoinsIn3Piles: {
     year: { k: "XV. (21/22)", v: "21/22" },
     round: "döntő",
     category: ["A", "B"],

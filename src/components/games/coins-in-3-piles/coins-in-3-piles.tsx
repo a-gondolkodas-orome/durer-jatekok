@@ -58,7 +58,7 @@ const fixedRule = {
   </>
 };
 
-export const CoinChange = strategyGameFactory({
+export const CoinsIn3Piles = strategyGameFactory({
   presentation: {
     rule,
     getPlayerStepDescription

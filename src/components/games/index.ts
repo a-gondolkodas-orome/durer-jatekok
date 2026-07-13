@@ -23,7 +23,7 @@ export { ChessDucks } from './chess-ducks/chess-ducks';
 export { ChessKnight } from './chess-knight/chess-knight';
 export { ChessRook } from './chess-rook/chess-rook';
 export { ChocolateBreaking } from './chocolate-breaking/chocolate-breaking';
-export { CoinChange } from './coin-3-piles/coin-3-piles';
+export { CoinsIn3Piles } from './coins-in-3-piles/coins-in-3-piles';
 export { CubeColoring } from './cube-coloring/cube-coloring';
 export { DigitSubtraction } from './digit-subtraction/digit-subtraction';
 export { Dominoes4x4 } from './dominoes-4x4/dominoes-4x4';
