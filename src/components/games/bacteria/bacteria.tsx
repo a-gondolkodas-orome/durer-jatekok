@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range, sample } from "lodash";
+import { range } from "lodash";
 import { strategyGameFactory, type BoardClientProps, GameBoard } from "../../game-factory";
 import { smartBotStrategy, randomBotStrategy } from "./bot-strategy";
 import {
@@ -11,59 +11,11 @@ import {
   moves
 } from "./helpers";
 import type { Board } from "./danger";
-
-const rowCount = 9;
-
-const emptyBacteria = (boardWidth: number): number[][] =>
-  range(rowCount).map(rowIndex => Array(rowIndex % 2 === 0 ? boardWidth : boardWidth - 1).fill(0));
-
-// "Adjacent goals" sub-game: goals form a contiguous block in the top row.
-const adjacentStartConfigs: { row: number, starts: number[], goals: number[] }[] = [
-  { row: 2, starts: [2, 4, 6, 8], goals: [3, 4, 5, 6, 7] },
-  { row: 2, starts: [3, 5, 7], goals: [3, 4, 5, 6, 7] },
-  { row: 1, starts: [1, 2, 3, 4], goals: [0, 1, 2, 3, 4, 5] },
-  { row: 2, starts: [0, 1, 3], goals: [0, 1, 2, 3, 4, 5] },
-  { row: 0, starts: [2, 3, 7, 9], goals: range(0, 11) },
-  { row: 0, starts: [1, 2, 4, 8], goals: range(0, 11) },
-  { row: 1, starts: [5, 6, 7, 8], goals: [5, 6, 7, 8, 9, 10] },
-  { row: 2, starts: [7, 9, 10], goals: [5, 6, 7, 8, 9, 10] }
-];
-
-const generateAdjacentStartBoard = (): Board => {
-  const bacteria = emptyBacteria(11);
-  const { row, starts, goals } = sample(adjacentStartConfigs)!;
-  starts.forEach(col => { bacteria[row][col] = 1; });
-  return { bacteria, goals };
-};
-
-// "Scattered goals" sub-game: goals (top row) are not necessarily adjacent.
-// Curated positions keep each side winning roughly half the time; verified in
-// bot-strategy.spec.ts.
-const scatteredStartConfigs: { starts: number[], goals: number[] }[] = [
-  // attacker-winning
-  { starts: [0, 1, 5, 8, 15], goals: [2, 5, 7, 8] },
-  { starts: [1, 3, 4, 8, 11, 14], goals: [0, 5, 8, 12, 14] },
-  { starts: [3, 7, 9, 12], goals: [4, 5, 9, 10, 11, 13] },
-  { starts: [2, 5, 6, 14, 16], goals: [1, 5, 7, 8, 11] },
-  { starts: [2, 5, 6, 8, 12, 16], goals: [3, 8, 9, 10, 13, 16] },
-  // defender-winning
-  { starts: [2, 5, 12, 16], goals: [4, 6, 7, 11, 12] },
-  { starts: [3, 5, 9, 12], goals: [2, 3, 5, 13, 16] },
-  { starts: [1, 8, 9, 10], goals: [3, 9, 13, 16] },
-  { starts: [0, 4, 5, 11, 12, 13], goals: [4, 7, 10, 12] },
-  { starts: [1, 3, 4, 11, 12, 15], goals: [1, 4, 5, 10, 12, 16] }
-];
-
-const generateScatteredStartBoard = (): Board => {
-  const bacteria = emptyBacteria(17);
-  const { starts, goals } = sample(scatteredStartConfigs)!;
-  starts.forEach(col => { bacteria[0][col] = 1; });
-  return { bacteria, goals };
-};
-
-// Test variant covers both sub-games.
-const generateTestStartBoard = (): Board =>
-  sample([generateAdjacentStartBoard, generateScatteredStartBoard])!();
+import {
+  generateAdjacentStartBoard,
+  generateScatteredStartBoard,
+  generateTestStartBoard
+} from "./start-boards";
 
 const BacteriaDisplay = ({ count, onGoal, dimmed = false }) => {
   if (count === 0) return null;
