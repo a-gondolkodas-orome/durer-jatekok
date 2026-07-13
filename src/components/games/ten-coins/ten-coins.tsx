@@ -156,7 +156,7 @@ const Coin = ({ value }: { value: number }) => (
   </div>
 );
 
-const moves = {
+export const moves = {
   convert: (board: Board, { events }: { events: Events }, k, l) => {
     const nextBoard = board.map(v => (v === k ? l : v)).sort((a, b) => a - b);
     if (uniq(nextBoard).length === 1) {
@@ -171,7 +171,7 @@ const moves = {
 // Smart bot: play the winning move when one exists (drive towards a losing
 // position, or merge to a single value). In a losing position, make the reply
 // that leaves the opponent with the most ways to blunder.
-const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+export const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const candidateMoves = movesFromSet(distinctValues(board));
 
   const winningMoves = candidateMoves.filter(isWinningMove);

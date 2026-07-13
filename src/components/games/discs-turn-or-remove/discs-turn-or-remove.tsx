@@ -111,7 +111,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   );
 };
 
-const moves = {
+export const moves = {
   removeDiscs: (board: Board, { events }: { events: Events }, count) => {
     const nextBoard = cloneDeep(board);
     nextBoard[0] -= count;
@@ -133,7 +133,7 @@ const moves = {
   }
 };
 
-const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+export const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   const rem = board[0] % 3;
   if (rem === 0) {
     const randomNonEmptyPile = sample(filter([0, 1], (i) => board[i] > 0))!;

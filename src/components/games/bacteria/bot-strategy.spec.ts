@@ -203,3 +203,69 @@ describe("smart bot plays the 9x17 game optimally", () => {
     }
   });
 });
+
+// --- Full-game simulations on the real 9x11 adjacent-goals board -----------
+// The width-17 block above only exercises the scattered variant. These are the
+// eight real start boards of the adjacent variant (generateAdjacentStartBoard),
+// which seed bacteria on rows 0-2, to confirm the shared board-driven bot is
+// also optimal at width 11.
+const adjacentConfigs: { row: number; cols: number[]; goals: number[] }[] = [
+  { row: 2, cols: [2, 4, 6, 8], goals: [3, 4, 5, 6, 7] },
+  { row: 2, cols: [3, 5, 7], goals: [3, 4, 5, 6, 7] },
+  { row: 1, cols: [1, 2, 3, 4], goals: [0, 1, 2, 3, 4, 5] },
+  { row: 2, cols: [0, 1, 3], goals: [0, 1, 2, 3, 4, 5] },
+  { row: 0, cols: [2, 3, 7, 9], goals: range(0, 11) },
+  { row: 0, cols: [1, 2, 4, 8], goals: range(0, 11) },
+  { row: 1, cols: [5, 6, 7, 8], goals: [5, 6, 7, 8, 9, 10] },
+  { row: 2, cols: [7, 9, 10], goals: [5, 6, 7, 8, 9, 10] }
+];
+
+const makeAdjacentBoard = ({ row, cols, goals }: { row: number; cols: number[]; goals: number[] }): Board => {
+  const bacteria = emptyBoard(rowCount, 11);
+  cols.forEach(c => { bacteria[row][c] = 1; });
+  return { bacteria, goals };
+};
+
+describe("smart bot plays the 9x11 adjacent-goals game optimally", () => {
+  it("has a mix of attacker- and defender-winning start boards", () => {
+    const values = adjacentConfigs.map(cfg => deficiency(makeAdjacentBoard(cfg)) >= 1);
+    expect(values.some(Boolean)).toBe(true);
+    expect(values.some(v => !v)).toBe(true);
+  });
+
+  it("attacker bot wins from every attacker-winning start against an optimal defender", () => {
+    for (const cfg of adjacentConfigs) {
+      const board = makeAdjacentBoard(cfg);
+      if (deficiency(board) >= 1) {
+        expect(playAttackerBotVsDefender(board), `starts ${cfg.cols} goals ${cfg.goals}`).toBe("attacker");
+      }
+    }
+  });
+
+  it("defender bot never loses from a defender-winning start against a spreading attacker", () => {
+    for (const cfg of adjacentConfigs) {
+      const start = makeAdjacentBoard(cfg);
+      if (deficiency(start) !== 0) continue;
+      let board = cloneDeep(start);
+      for (let ply = 0; ply < 400; ply++) {
+        const moves = legalAttackMoves(board);
+        let chosen = moves[0];
+        let bestRow = -1;
+        for (const m of moves) {
+          const { board: after, reachedGoal } = simulate(board, m);
+          expect(reachedGoal).toBe(false);
+          const maxRow = Math.max(0, ...bacteriaCoords(after).map(([r]) => r));
+          if (maxRow > bestRow) { bestRow = maxRow; chosen = m; }
+        }
+        const { board: after, reachedGoal } = simulate(board, chosen);
+        expect(reachedGoal).toBe(false);
+        board = after;
+        if (totalBacteria(board) === 0) break;
+        const { row, col } = defenderMove(board);
+        board.bacteria[row][col] -= 1;
+        if (totalBacteria(board) === 0) break;
+      }
+      expect(totalBacteria(board)).toBe(0);
+    }
+  });
+});

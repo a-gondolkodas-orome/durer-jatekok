@@ -6,7 +6,7 @@ import { useTranslation } from '../../language';
 
 type Board = number[]
 
-const COVERED = -1 as const;
+export const COVERED = -1 as const;
 
 const getRemaining = (board: Board) => board.filter(i => i !== COVERED);
 
@@ -44,7 +44,7 @@ const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
   moves.coverNumber(board, sample(getRemaining(board)));
 };
 
-const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
+export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const botMove = getOptimalSmartBotMove(board, ctx.chosenRoleIndex);
   moves.coverNumber(board, botMove);
 };
@@ -92,7 +92,7 @@ const rule10 = {
   </>
 };
 
-const moves = {
+export const moves = {
   coverNumber: (board: Board, { events }: { events: Events }, number) => {
     const nextBoard = cloneDeep(board);
     nextBoard[number-1] = COVERED;
