@@ -258,14 +258,14 @@ export const Bacteria = strategyGameFactory({
       botStrategy: smartBotStrategy,
       generateStartBoard: generateAdjacentStartBoard,
       rule: adjacentRule,
-      label: { hu: 'Szomszédos', en: 'Adjacent' },
+      label: { hu: 'Szomszédos CÉLok', en: 'Adjacent GOALs' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: generateScatteredStartBoard,
       rule: scatteredRule,
-      label: { hu: 'Szórt', en: 'Scattered' }
+      label: { hu: 'Szórt CÉLok', en: 'Scattered GOALs' }
     }
   ]
 });
