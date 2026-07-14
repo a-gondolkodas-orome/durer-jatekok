@@ -1,6 +1,14 @@
 import { cloneDeep, last } from "lodash";
 import type { Events } from '../../game-factory';
-import type { Board } from "./danger"
+import { type Board, type MoveType, applyAttackMove } from "./danger"
+
+const attackerMove = (type: MoveType) =>
+  (board: Board, { events }: { events: Events }, { row, col }) => {
+    const { nextBoard, reachedGoal } = applyAttackMove(board, { type, row, col });
+    events.endTurn();
+    if (reachedGoal) events.endGame();
+    return { nextBoard };
+  };
 
 export const moves = {
   defend: (board: Board, { events }: { events: Events }, { row, col }) => {
@@ -15,71 +23,10 @@ export const moves = {
 
     return { nextBoard };
   },
-  shiftRight: (board: Board, { events }: { events: Events }, { row, col }) => {
-    const nextBoard = cloneDeep(board);
-
-    const reachedFields = [[row, col + 1]];
-    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
-    events.endTurn();
-
-    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
-    if (goalsReached.length >= 1) {
-      events.endGame();
-    }
-
-    return { nextBoard };
-  },
-  shiftLeft: (board: Board, { events }: { events: Events }, { row, col }) => {
-    const nextBoard = cloneDeep(board);
-
-    const reachedFields = [[row, col - 1]];
-    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
-    events.endTurn();
-
-    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
-    if (goalsReached.length >= 1) {
-      events.endGame();
-    }
-
-    return { nextBoard };
-  },
-  jump: (board: Board, { events }: { events: Events }, { row, col }) => {
-    const nextBoard = cloneDeep(board);
-
-    nextBoard.bacteria = makeJump(nextBoard.bacteria, row, col);
-    events.endTurn();
-
-    const reachedFields = [[row + 2, col]];
-    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
-    if (goalsReached.length >= 1) {
-      events.endGame();
-    }
-
-    return { nextBoard };
-  },
-  spread: (board: Board, { events }: { events: Events }, { row, col }) => {
-    const nextBoard = cloneDeep(board);
-
-    const reachedFields = reachedFieldsWithSpread(
-      { bacteria: nextBoard.bacteria, attackRow: row, attackCol: col }
-    );
-    nextBoard.bacteria = makeShiftOrSpread(nextBoard.bacteria, row, col, reachedFields);
-    events.endTurn();
-
-    const goalsReached = reachedFields.filter(([row, col]) => isGoal(board, row, col));
-    if (goalsReached.length >= 1) {
-      events.endGame();
-    }
-
-    return { nextBoard };
-  }
-};
-
-const reachedFieldsWithSpread = ({ bacteria, attackRow, attackCol }) => {
-  return [
-    [attackRow + 1, attackCol],
-    [attackRow + 1, attackCol + (-1) ** (1 + attackRow)]
-  ].filter(([row, col]) => bacteria[row][col] !== undefined);
+  shiftRight: attackerMove('shiftRight'),
+  shiftLeft: attackerMove('shiftLeft'),
+  jump: attackerMove('jump'),
+  spread: attackerMove('spread')
 };
 
 export const isShiftRight = ({ attackRow, attackCol, row, col }) => {
@@ -116,27 +63,7 @@ const areAllBacteriaRemoved = (bacteria) => {
   return true;
 };
 
-export const isGoal = (board: Board, row, col) => {
-  return row === (board.bacteria.length - 1) && board.goals.includes(col);
-};
-
 export const lastCol = (bacteria, row) => bacteria[0].length - 0.5 - 0.5 * (-1) ** row;
-
-const makeJump = (bacteria, attackRow, attackCol) => {
-  const nextBacteria = cloneDeep(bacteria);
-  nextBacteria[attackRow][attackCol] -= 1;
-  nextBacteria[attackRow + 2][attackCol] += 1;
-  return nextBacteria;
-};
-
-const makeShiftOrSpread = (bacteria, attackRow, attackCol, reachedFields) => {
-  const nextBacteria = cloneDeep(bacteria);
-  nextBacteria[attackRow][attackCol] = 0;
-  reachedFields.forEach(([row, col]) => {
-    nextBacteria[row][col] += bacteria[attackRow][attackCol];
-  });
-  return nextBacteria;
-};
 
 /* Currently only correct for board with adjacent goals */
 export const isDangerous = (board: Board, { row, col }) => {

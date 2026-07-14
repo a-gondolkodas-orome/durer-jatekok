@@ -182,3 +182,33 @@ export const removeOne = (board: Board, row: number, col: number): Board => {
   next.bacteria[row][col] -= 1;
   return next;
 };
+
+// Attacker moves ------------------------------------------------------------
+export type MoveType = 'shiftRight' | 'shiftLeft' | 'jump' | 'spread';
+export type AttackMove = { type: MoveType; row: number; col: number };
+
+// Pure attacker move: returns the next board, the cells reached, and whether a
+// goal was reached. Single source of truth for both real play (helpers.ts
+// `moves`) and bot look-ahead (bot-strategy.ts `simulate`).
+export const applyAttackMove = (board: Board, { type, row, col }: AttackMove) => {
+  const nextBoard = cloneDeep(board);
+  let reached: [number, number][];
+  if (type === 'jump') {
+    nextBoard.bacteria[row][col] -= 1;
+    nextBoard.bacteria[row + 2][col] += 1;
+    reached = [[row + 2, col]];
+  } else {
+    if (type === 'shiftRight') {
+      reached = [[row, col + 1]];
+    } else if (type === 'shiftLeft') {
+      reached = [[row, col - 1]];
+    } else { // spread
+      reached = spreadChildren(board, row, col);
+    }
+    const count = board.bacteria[row][col];
+    nextBoard.bacteria[row][col] = 0;
+    for (const [r, c] of reached) nextBoard.bacteria[r][c] += count;
+  }
+  const reachedGoal = reached.some(([r, c]) => isGoalCell(board, r, c));
+  return { nextBoard, reached, reachedGoal };
+};
