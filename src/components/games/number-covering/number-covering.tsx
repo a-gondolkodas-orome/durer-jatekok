@@ -66,27 +66,27 @@ const getOptimalSmartBotMove = (board: Board, chosenRoleIndex) => {
   }
 };
 
-const rule8 = {
+const makeRule = (maxNumber: number) => ({
   hu: <>
-    Egy táblázatban 1-től 8-ig szerepelnek a számok. Két játékos felváltva takar le egy-egy
+    Egy táblázatban 1-től {maxNumber}-ig szerepelnek a számok. Két játékos felváltva takar le egy-egy
     számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
     nyer, ha pedig páratlan, akkor a második.
   </>,
   en: <>
-    A table contains the numbers 1 to 8. Two players take turns covering one number at a time
+    A table contains the numbers 1 to {maxNumber}. Two players take turns covering one number at a time
     until only two numbers remain. If the sum of the two remaining numbers is even, the first
     player wins; if it is odd, the second player wins.
   </>
-};
+});
 
-const rule10 = {
+const genericRule = {
   hu: <>
-    Egy táblázatban 1-től 10-ig szerepelnek a számok. Két játékos felváltva takar le egy-egy
+    Egy táblázatban 1-től kezdődően néhány szám szerepel. Két játékos felváltva takar le egy-egy
     számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
     nyer, ha pedig páratlan, akkor a második.
   </>,
   en: <>
-    A table contains the numbers 1 to 10. Two players take turns covering one number at a time
+    A table contains the numbers starting from 1. Two players take turns covering one number at a time
     until only two numbers remain. If the sum of the two remaining numbers is even, the first
     player wins; if it is odd, the second player wins.
   </>
@@ -111,21 +111,8 @@ const getPlayerStepDescription = () => ({
   en: 'Click a number to cover it.'
 });
 
-const genericRule = {
-  hu: <>
-    Egy táblázatban 1-től kezdődően néhány szám szerepel. Két játékos felváltva takar le egy-egy
-    számot addig, amíg csak két szám marad. Ha a megmaradt két szám összege páros, akkor a kezdő
-    nyer, ha pedig páratlan, akkor a második.
-  </>,
-  en: <>
-    A table contains the numbers starting from 1. Two players take turns covering one number at a time
-    until only two numbers remain. If the sum of the two remaining numbers is even, the first
-    player wins; if it is odd, the second player wins.
-  </>
-};
-
 // Test variant covers both sub-games: numbers 1–8 or 1–10.
-const generateTestStartBoard = (): Board => sample([() => range(1, 9), () => range(1, 11)])!();
+const generateTestStartBoard = (): Board => range(1, sample([9, 11])!);
 
 export const NumberCovering = strategyGameFactory({
   presentation: {
@@ -144,14 +131,14 @@ export const NumberCovering = strategyGameFactory({
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: () => range(1, 9),
-      rule: rule8,
+      rule: makeRule(8),
       label: { hu: '8 szám', en: '8 numbers' },
       isDefault: true
     },
     {
       botStrategy: smartBotStrategy,
       generateStartBoard: () => range(1, 11),
-      rule: rule10,
+      rule: makeRule(10),
       label: { hu: '10 szám', en: '10 numbers' }
     }
   ]
