@@ -1,5 +1,4 @@
-import { distanceFromDangerousAttackZone, isDangerous, moves } from "./helpers";
-import { applyAttackMove, type MoveType } from "./danger";
+import { distanceFromDangerousAttackZone, isDangerous, moves, applyAttackMove, type MoveType } from "./helpers";
 import { reverse } from 'lodash';
 import { makeEvents } from '../../../test-utils';
 

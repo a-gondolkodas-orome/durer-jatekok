@@ -1,31 +1,4 @@
-import { cloneDeep } from "lodash";
-
-export type Board = { bacteria: number[][], goals: number[] };
-
-// Board geometry ------------------------------------------------------------
-// Rows are indexed from the bottom (row 0 = start row, last row = goal row).
-// Wide rows (even index) have one more cell than narrow rows (odd index).
-// A single bacterium climbs one row at a time, either straight or diagonally,
-// exactly matching the two targets of a cell division (spread):
-//   even row -> (r+1, c) and (r+1, c-1)
-//   odd  row -> (r+1, c) and (r+1, c+1)
-
-export const rowWidth = (board: Board, row: number) => board.bacteria[row]?.length ?? 0;
-export const wideWidth = (board: Board) => board.bacteria[0].length;
-export const topRowIdx = (board: Board) => board.bacteria.length - 1;
-
-export const inBoard = (board: Board, row: number, col: number) =>
-  row >= 0 && row < board.bacteria.length && col >= 0 && col < rowWidth(board, row);
-
-export const isGoalCell = (board: Board, row: number, col: number) =>
-  row === topRowIdx(board) && board.goals.includes(col);
-
-// The two cells a bacterium on (row, col) reaches when climbing one row.
-export const spreadChildren = (board: Board, row: number, col: number) => {
-  const diag = col + (row % 2 === 0 ? -1 : 1);
-  return ([[row + 1, col], [row + 1, diag]] as [number, number][])
-    .filter(([r, c]) => inBoard(board, r, c));
-};
+import { type Board, topRowIdx, wideWidth, rowWidth, spreadChildren, inBoard } from "./helpers";
 
 // "Lettered" (dangerous) cells ---------------------------------------------
 // A cell is lettered if a single bacterium placed there (after the defender's
@@ -162,53 +135,4 @@ export const deficiency = (
   }
 
   return totalBacteria - flow;
-};
-
-export const bacteriaCoords = (board: Board): [number, number][] => {
-  const coords: [number, number][] = [];
-  for (let r = 0; r < board.bacteria.length; r++) {
-    for (let c = 0; c < board.bacteria[r].length; c++) {
-      if (board.bacteria[r][c] > 0) coords.push([r, c]);
-    }
-  }
-  return coords;
-};
-
-export const totalBacteria = (board: Board) =>
-  board.bacteria.reduce((sum, row) => sum + row.reduce((a, b) => a + b, 0), 0);
-
-export const removeOne = (board: Board, row: number, col: number): Board => {
-  const next = cloneDeep(board);
-  next.bacteria[row][col] -= 1;
-  return next;
-};
-
-// Attacker moves ------------------------------------------------------------
-export type MoveType = 'shiftRight' | 'shiftLeft' | 'jump' | 'spread';
-export type AttackMove = { type: MoveType; row: number; col: number };
-
-// Pure attacker move: returns the next board, the cells reached, and whether a
-// goal was reached. Single source of truth for both real play (helpers.ts
-// `moves`) and bot look-ahead (bot-strategy.ts `simulate`).
-export const applyAttackMove = (board: Board, { type, row, col }: AttackMove) => {
-  const nextBoard = cloneDeep(board);
-  let reached: [number, number][];
-  if (type === 'jump') {
-    nextBoard.bacteria[row][col] -= 1;
-    nextBoard.bacteria[row + 2][col] += 1;
-    reached = [[row + 2, col]];
-  } else {
-    if (type === 'shiftRight') {
-      reached = [[row, col + 1]];
-    } else if (type === 'shiftLeft') {
-      reached = [[row, col - 1]];
-    } else { // spread
-      reached = spreadChildren(board, row, col);
-    }
-    const count = board.bacteria[row][col];
-    nextBoard.bacteria[row][col] = 0;
-    for (const [r, c] of reached) nextBoard.bacteria[r][c] += count;
-  }
-  const reachedGoal = reached.some(([r, c]) => isGoalCell(board, r, c));
-  return { nextBoard, reached, reachedGoal };
 };

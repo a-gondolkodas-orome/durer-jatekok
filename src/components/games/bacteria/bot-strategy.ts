@@ -1,19 +1,17 @@
 import { cloneDeep, sample, maxBy } from "lodash";
 import type { StrategyArgs } from '../../game-factory';
+import { computeLettered, computeSinks, deficiency } from "./danger";
 import {
   type Board,
   type AttackMove,
   applyAttackMove,
-  computeLettered,
-  computeSinks,
-  deficiency,
   bacteriaCoords,
   totalBacteria,
   inBoard,
   spreadChildren,
   isGoalCell,
   topRowIdx
-} from "./danger";
+} from "./helpers";
 
 export type { AttackMove };
 
