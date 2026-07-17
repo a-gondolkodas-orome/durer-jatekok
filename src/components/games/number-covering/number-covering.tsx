@@ -45,24 +45,26 @@ const randomBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
 };
 
 export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
-  const botMove = getOptimalSmartBotMove(board, ctx.chosenRoleIndex);
+  const botMove = getOptimalSmartBotMove({ board, currentPlayer: ctx.currentPlayer });
   moves.coverNumber(board, botMove);
 };
 
-const getOptimalSmartBotMove = (board: Board, chosenRoleIndex) => {
+export const getOptimalSmartBotMove = (
+  { board, currentPlayer }: { board: Board, currentPlayer: number | null }
+) => {
   const remaining = getRemaining(board);
   const evens = remaining.filter(i => i%2 === 0);
   const odds = remaining.filter(i => i%2 === 1);
   if (evens.length === odds.length || evens.length === 0 || odds.length === 0) {
     return sample(remaining);
+  } else if (currentPlayer === 0) {
+    // first player wants same-parity survivors -> remove from the smaller class
+    const candidates = evens.length < odds.length ? evens : odds;
+    return sample(candidates);
   } else {
-    if (chosenRoleIndex === 0){
-      const candidates = evens.length > odds.length ? evens : odds;
-      return sample(candidates);
-    } else {
-      const candidates = evens.length > odds.length ? odds : evens;
-      return sample(candidates);
-    }
+    // second player wants a mixed pair -> remove from the larger class
+    const candidates = evens.length > odds.length ? evens : odds;
+    return sample(candidates);
   }
 };
 
