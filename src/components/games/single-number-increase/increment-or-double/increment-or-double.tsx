@@ -1,7 +1,7 @@
 import {
   strategyGameFactory, type Ctx, type Events, type StrategyArgs, type BoardClientProps, GameBoard
 } from '../../../game-factory';
-import { random } from 'lodash';
+import { sample } from 'lodash';
 
 // `board` is the last number said. 0 means nothing has been said yet, so the
 // starting player must open with 1 (their only legal move from 0).
@@ -56,7 +56,7 @@ const moves = {
 // even, winning number, so play randomly to maximise the chance the human errs.
 export const getBotNextNumber = (board: Board): number => {
   if (board % 2 === 0) return board + 1;
-  return random(0, 1) === 0 ? board + 1 : board * 2;
+  return sample([board + 1, board * 2])!;
 };
 
 const smartBotStrategy = ({ board, moves }: StrategyArgs<Board>) => {
