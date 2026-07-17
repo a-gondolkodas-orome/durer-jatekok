@@ -37,7 +37,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   );
 };
 
-const say = (board: Board, next: number, { ctx, events }: { ctx: Ctx, events: Events }) => {
+const say = (next: number, { ctx, events }: { ctx: Ctx, events: Events }) => {
   events.endTurn();
   if (isLosing(next)) {
     events.endGame(1 - ctx.currentPlayer!);
@@ -46,8 +46,8 @@ const say = (board: Board, next: number, { ctx, events }: { ctx: Ctx, events: Ev
 };
 
 const moves = {
-  increment: (board: Board, meta: { ctx: Ctx, events: Events }) => say(board, board + 1, meta),
-  double: (board: Board, meta: { ctx: Ctx, events: Events }) => say(board, board * 2, meta)
+  increment: (board: Board, meta: { ctx: Ctx, events: Events }) => say(board + 1, meta),
+  double: (board: Board, meta: { ctx: Ctx, events: Events }) => say(board * 2, meta)
 };
 
 // The mover wins exactly when the last number said is even, so the only winning
