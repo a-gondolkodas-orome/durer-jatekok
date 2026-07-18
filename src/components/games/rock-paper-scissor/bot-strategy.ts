@@ -3,11 +3,11 @@ import type { StrategyArgs } from '../../game-factory';
 import type { Board } from './rock-paper-scissor';
 
 export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
-  const idx = getOptimalSmartBotMove(board, ctx.currentPlayer);
+  const idx = getOptimalSmartBotMove(board, ctx.currentPlayer!);
   moves.removeSymbol(board, idx);
 };
 
-export const getOptimalSmartBotMove = (board: Board, currentPlayer): number | undefined => {
+export const getOptimalSmartBotMove = (board: Board, currentPlayer: number): number => {
   // start with a random place as a first step
   if (currentPlayer === 0) {
     const allowedPlaces = [0, 1, 2].filter(i => board[1][i] !== null);
@@ -42,4 +42,9 @@ export const getOptimalSmartBotMove = (board: Board, currentPlayer): number | un
       }
     }
   }
+
+  // Unreachable: player 0 always moves first, so by any player-1 turn at least one
+  // of player 1's cards is already gone and a pair above matches. A player-0 turn
+  // likewise always returns (full board -> random, otherwise a pair matches).
+  throw new Error('no removable card found: the bot should always have a move here');
 };
