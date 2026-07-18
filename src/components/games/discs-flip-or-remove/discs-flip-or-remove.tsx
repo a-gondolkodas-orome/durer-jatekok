@@ -7,7 +7,7 @@ import { useTranslation } from "../../language";
 
 type Board = [number, number]
 
-const generateStartBoard = (maxDiscs) => (): Board => {
+const generateStartBoard = (maxDiscs: number) => (): Board => {
   const discCount = random(Math.floor(maxDiscs/2), maxDiscs);
   if (random(0, 1)) {
     const blueCount = sample(range(0, discCount + 1, 3))!;
@@ -37,7 +37,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     } else {
       moves.turnDiscs(board, board[1] - i);
     }
-    setHovered(null);
   };
 
   const isSelected = (pile, i) => isEqual(validHovered, [pile, i]) || isEqual(validHovered, [pile, i - 1]);
