@@ -81,6 +81,7 @@ strategyGameFactory({
   BoardClient,                 // React component receiving { board, ctx, events, moves }
   gameplay: {
     moves,                     // object of move functions: (board, { ctx, events }, ...args) => { nextBoard }
+    moveValidators?,           // optional: { [moveName]: (board, { ctx }, ...args) => boolean } — see below
     endOfTurnMove?,            // optional move name auto-executed after moves with autoEndOfTurn: true
   },
   variants,                    // see below
@@ -96,6 +97,23 @@ single-entry array needs no `isDefault` flag.
 
 **`moves`** — each move is `(board, { ctx, events }, ...args) => { nextBoard }`.
 Always pass the current `board` as first arg when chaining moves within a turn.
+Moves trust their arguments and apply them blindly; legality is enforced by
+`moveValidators` (below) and/or the `BoardClient`'s `disabled` gating.
+
+**`moveValidators`** (optional) — a map keyed by move name of pure, side-effect-free
+legality predicates `(board, { ctx }, ...args) => boolean`. When present for a
+move, the engine rejects any dispatch whose args fail the predicate (in dev it
+throws loudly to surface the bug; in prod it warns, fires an `illegal-move`
+analytics event, and no-ops so a stray call cannot corrupt the board). A missing
+key means "always legal", so this is fully opt-in and games that predate it keep
+working unchanged. Prefer defining the validator once and reusing it as the
+**single source of truth**: the same function should drive the `BoardClient`'s
+button `disabled` state (combined with `ctx.isClientMoveAllowed` for turn
+ownership), the bot's legal-move enumeration, and — being React-free — a possible
+future server-side authoritative check. Do **not** put the "whose turn is it"
+check (`ctx.isClientMoveAllowed`) inside a validator; that is the engine's
+concern, not per-move legality. See `coins-in-3-piles` (two-phase turn) and
+`cube-coloring` (reuses the existing `isAllowedStep` helper) for examples.
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes

@@ -25,6 +25,14 @@ export type MoveResult<TBoard> = { nextBoard: TBoard; autoEndOfTurn?: boolean }
 export type MoveFunction<TBoard> = (
   board: TBoard, meta: { ctx: Ctx; events: Events }, ...args: any[]
 ) => MoveResult<TBoard>
+// Pure, side-effect-free legality predicate for a single move. Keyed by move
+// name in `gameplay.moveValidators`. Because it depends only on `board` + `ctx`
+// (no React, no `events`), the same function drives the UI (button `disabled`),
+// the engine (illegal-move enforcement) and, in the future, an authoritative
+// server-side check.
+export type MoveValidator<TBoard> = (
+  board: TBoard, meta: { ctx: Ctx }, ...args: any[]
+) => boolean
 export type GameMoves<TBoard> = Record<string, (board: TBoard, ...args: any[]) => MoveResult<TBoard>>
 export type StrategyArgs<TBoard> = { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }
 export type BoardClientProps<TBoard> = StrategyArgs<TBoard> & { events: Events }

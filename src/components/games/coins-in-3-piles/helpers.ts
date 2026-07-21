@@ -1,5 +1,5 @@
 import { cloneDeep, isEqual } from "lodash";
-import type { Events } from '../../strategy-game-factory';
+import type { Ctx, Events } from '../../strategy-game-factory';
 
 export type Board = number[]
 
@@ -22,6 +22,20 @@ export const canWin = (board: Board) => {
 
   return (oddPiles.length === 3 || oddPiles.length === 0);
 }
+
+// Single source of legality for both the UI (button `disabled` in board-client)
+// and the engine's illegal-move enforcement. Deliberately excludes the "whose
+// turn is it" check (`ctx.isClientMoveAllowed`) — that is the engine's concern,
+// not per-move legality.
+export const moveValidators = {
+  removeCoin: (board: Board, { ctx }: { ctx: Ctx }, value: number) =>
+    ctx.turnState === null && value >= 1 && value <= 3 && board[value - 1] > 0,
+  addCoin: (board: Board, { ctx }: { ctx: Ctx }, value: number | null) => {
+    const removed = (ctx.turnState as { removedCoinValue: number } | null)?.removedCoinValue;
+    if (removed == null) return false;
+    return value === null || (value >= 1 && value < removed);
+  }
+};
 
 export const moves = {
   removeCoin: (board: Board, { events }: { events: Events }, value) => {

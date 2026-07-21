@@ -156,6 +156,14 @@ const moves = {
   }
 }
 
+// Reuses the same `isAllowedStep` legality helper the BoardClient and bot already
+// rely on, so the engine now enforces the colouring rule (no colouring an already
+// coloured vertex, no two adjacent equal colours) from a single source.
+const moveValidators = {
+  colorVertex: (board: Board, _, { vertex, color }: { vertex: number; color: string }) =>
+    isAllowedStep(board, vertex, color)
+}
+
 const rule = {
   hu: <>
     Adott egy téglatest rácsa, aminek be van húzva az egyik testátlója.
@@ -187,7 +195,7 @@ export const CubeColoring = strategyGameFactory({
     })
   },
   BoardClient,
-  gameplay: { moves },
+  gameplay: { moves, moveValidators },
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
     // smart bot: verified as optimal

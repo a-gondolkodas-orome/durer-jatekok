@@ -10,7 +10,7 @@ import { useLocation } from 'react-router';
 import { useGameStats } from './hooks/use-game-stats';
 import { trackEvent } from '../../tracking';
 import type {
-  Phase, Mode, Ctx, Events, MoveResult, MoveFunction, GameMoves,
+  Phase, Mode, Ctx, Events, MoveResult, MoveFunction, MoveValidator, GameMoves,
   BoardClientProps, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './helpers/resolve-variants';
@@ -28,6 +28,10 @@ export interface Presentation<TBoard> {
 
 export interface Gameplay<TBoard> {
   moves: Record<string, MoveFunction<TBoard>>
+  // Optional, keyed by move name. When present for a move, the engine rejects
+  // any dispatch whose args fail the predicate (see `moveWrapper`). Missing key
+  // = always legal, so games that predate this field keep working unchanged.
+  moveValidators?: Record<string, MoveValidator<TBoard>>
   endOfTurnMove?: string
 }
 
@@ -45,7 +49,7 @@ export const strategyGameFactory = <TBoard,>({
   variants
 }: StrategyGameConfig<TBoard>) => {
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
-  const { moves, endOfTurnMove } = gameplay;
+  const { moves, moveValidators, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
 
   return () => {
@@ -94,7 +98,31 @@ export const strategyGameFactory = <TBoard,>({
 
     let wrappedGameMoves: GameMoves<TBoard> = {} as GameMoves<TBoard>;
 
-    const moveWrapper = (doMove: () => MoveResult<TBoard>): MoveResult<TBoard> => {
+    // An illegal move should never happen through the UI (buttons are disabled)
+    // or a correct bot, so reaching here means a bug or tampering. In dev we
+    // throw loudly to surface the bug; in prod we fail safe: warn, record it,
+    // and no-op so a stray call can't corrupt the board or white-screen a player.
+    const reportIllegalMove = (name: string, moveBoard: TBoard, args: unknown[]) => {
+      const message = `strategyGameFactory: illegal move ${name}(${JSON.stringify(args)}) `
+        + `rejected on board ${JSON.stringify(moveBoard)}`;
+      if (import.meta.env.DEV) {
+        throw new Error(message);
+      }
+      console.warn(message);
+      trackEvent('illegal-move', { game: gameId, move: name });
+    };
+
+    const moveWrapper = (
+      name: string,
+      moveBoard: TBoard,
+      args: unknown[],
+      doMove: () => MoveResult<TBoard>
+    ): MoveResult<TBoard> => {
+      const validator = moveValidators?.[name];
+      if (validator && !validator(moveBoard, { ctx }, ...args)) {
+        reportIllegalMove(name, moveBoard, args);
+        return { nextBoard: moveBoard };
+      }
       if (!currentTurnHasMovesRef.current) {
         setUndoSnapshot({ board: cloneDeep(board), currentPlayer: currentPlayer!, moveCount });
         currentTurnHasMovesRef.current = true;
@@ -218,7 +246,8 @@ export const strategyGameFactory = <TBoard,>({
 
     wrappedGameMoves = mapValues(
       moves,
-      (f) => (board: TBoard, ...args: unknown[]) => moveWrapper(() => f(board, { ctx, events }, ...args))
+      (f, name) => (board: TBoard, ...args: unknown[]) =>
+        moveWrapper(name, board, args, () => f(board, { ctx, events }, ...args))
     ) as GameMoves<TBoard>;
 
     const doBotTurn = () => {

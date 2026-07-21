@@ -502,3 +502,86 @@ describe('umami game-finished event', () => {
     expect(lastEvent()[1]).not.toHaveProperty('result');
   });
 });
+
+describe('moveValidators enforcement', () => {
+  const guardedConfig = () => makeConfig({
+    BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
+      <>
+        <button data-testid="legal-btn" onClick={() => moves.guarded(board, 'ok')}>legal</button>
+        <button data-testid="illegal-btn" onClick={() => moves.guarded(board, 'bad')}>illegal</button>
+        <span data-testid="board">{board.join(',')}</span>
+      </>
+    ),
+    gameplay: {
+      moves: {
+        guarded: (board: Board, _meta: { events: Events }, arg: string) => ({ nextBoard: [...board, arg] })
+      },
+      moveValidators: {
+        guarded: (_board: Board, _meta: { ctx: Ctx }, arg: string) => arg === 'ok'
+      }
+    }
+  });
+
+  it('applies a move whose args pass its validator', () => {
+    const { getByTestId } = renderGame(guardedConfig());
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('legal-btn'));
+    expect(getByTestId('board').textContent).toBe('initial,ok');
+  });
+
+  it('throws a loud error in dev when a move fails its validator', () => {
+    // React 19 does not propagate an event-handler throw back to fireEvent; it
+    // reports it on the global `error` event. Capture that (and preventDefault so
+    // vitest does not flag it as an unhandled error).
+    const caught: string[] = [];
+    const onError = (event: ErrorEvent) => {
+      caught.push(event.error?.message ?? event.message);
+      event.preventDefault();
+    };
+    window.addEventListener('error', onError);
+    try {
+      const { getByTestId } = renderGame(guardedConfig());
+      fireEvent.click(getByTestId('role-btn-0'));
+      fireEvent.click(getByTestId('illegal-btn'));
+      expect(caught.some(message => /illegal move/.test(message))).toBe(true);
+      expect(getByTestId('board').textContent).toBe('initial'); // threw before touching the board
+    } finally {
+      window.removeEventListener('error', onError);
+    }
+  });
+
+  it('runs a move unchanged when no validator is registered for it', () => {
+    // defaultGameplay registers no validators, so mainMove applies + endTurn as before
+    const { getByTestId } = renderGame(ctxAwareConfig());
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('move-btn'));
+    expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(true); // bot's turn now
+  });
+
+  describe('in production (import.meta.env.DEV = false)', () => {
+    beforeEach(() => { vi.stubEnv('DEV', false); });
+    afterEach(() => { vi.unstubAllEnvs(); });
+
+    it('does not throw and leaves the board unchanged on an illegal move', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { getByTestId } = renderGame(guardedConfig());
+      fireEvent.click(getByTestId('role-btn-0'));
+      fireEvent.click(getByTestId('illegal-btn'));
+      expect(getByTestId('board').textContent).toBe('initial'); // no-op, not corrupted
+      expect(warn).toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
+    it('reports an illegal-move umami event', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const track = vi.fn();
+      window.umami = { track: track as NonNullable<Window['umami']>['track'] };
+      const { getByTestId } = renderGame(guardedConfig());
+      fireEvent.click(getByTestId('role-btn-0'));
+      fireEvent.click(getByTestId('illegal-btn'));
+      expect(track).toHaveBeenCalledWith('illegal-move', expect.objectContaining({ move: 'guarded' }));
+      delete window.umami;
+      vi.restoreAllMocks();
+    });
+  });
+});

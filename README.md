@@ -218,6 +218,29 @@ You must always pass `board` as a first param to all moves (meaning you must
 pass the updated board to subsequent moves in case of multiple moves within a
 turn).
 
+Moves themselves do **not** validate their arguments — they apply them blindly.
+Legality is enforced separately (see below), so a move called with out-of-contract
+arguments would otherwise silently corrupt the board.
+
+### move validators (optional)
+
+`gameplay.moveValidators` is an optional map keyed by move name of pure,
+side-effect-free predicates `(board, { ctx }, ...args) => boolean`. When a move
+has a validator, the framework checks it before applying the move: in development
+it throws (surfacing bot/UI bugs loudly), and in production it warns, records an
+`illegal-move` analytics event, and no-ops (so a stray or tampered call cannot
+corrupt the board). A move with no validator is always accepted, so this is fully
+opt-in.
+
+Define the validator once and treat it as the **single source of truth** for
+legality: the `BoardClient` uses it to compute button `disabled` state (AND-ed
+with `ctx.isClientMoveAllowed` for turn ownership), the bot uses it to enumerate
+legal moves, and because it is React-free the exact same function could run
+server-side in a future authoritative/competition mode. Keep the "whose turn is
+it" check out of the validator — that belongs to the framework, not to per-move
+legality. See `coins-in-3-piles` (two-phase turn) and `cube-coloring` (reuses its
+existing `isAllowedStep` helper) for worked examples.
+
 ### BoardClient React component
 
 `BoardClient`: a React component which renders the board and calls appropriate
