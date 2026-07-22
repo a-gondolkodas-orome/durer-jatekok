@@ -77,12 +77,15 @@ export const TriangleCircleGame = strategyGameFactory({
       generateStartBoard,
       label: { hu: 'Teszt', en: 'Test' }
     },
-    // Heuristic bot — takes forced wins, parries forced losses, otherwise plays
-    // the strongest threat move. Strong but not proven optimal (see bot-strategy.ts).
+    // Strong bot — a bounded-depth minimax over the threat-reduced game that is
+    // tactically exact (never misses a forced win/loss within its horizon), with
+    // a heuristic fallback in the wide-open opening. Not proven globally optimal
+    // (see bot-strategy.ts), hence the notAlwaysOptimal marker.
     {
       botStrategy: heuristicBotStrategy,
       generateStartBoard,
       label: { hu: 'Okos', en: 'Smart' },
+      notAlwaysOptimal: true,
       isDefault: true
     }
   ]

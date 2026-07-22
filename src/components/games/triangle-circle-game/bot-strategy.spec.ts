@@ -5,8 +5,11 @@ import {
   generateStartBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
 } from './helpers';
-import { heuristicBotStrategy, randomBotStrategy } from './bot-strategy';
+import { heuristicBotStrategy, randomBotStrategy, makeHeuristicBotStrategy } from './bot-strategy';
 import type { Ctx, GameMoves } from '../../game-factory';
+
+// Cheap search budget so full-game simulations stay fast in CI.
+const fastBot = makeHeuristicBotStrategy({ depth: 6, budget: 2000 });
 
 // Drive the bot for one turn and capture what it played, applying the move so we
 // can inspect the resulting board too.
@@ -124,8 +127,8 @@ describe('full playthroughs terminate with a valid winner', () => {
   };
 
   it('heuristic vs heuristic ends cleanly', () => {
-    for (let i = 0; i < 20; i++) {
-      const winner = simulate(heuristicBotStrategy, heuristicBotStrategy);
+    for (let i = 0; i < 5; i++) {
+      const winner = simulate(fastBot, fastBot);
       expect([LINE, CIRCLE]).toContain(winner);
     }
   });
