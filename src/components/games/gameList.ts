@@ -623,6 +623,14 @@ export const gameList: GameList = {
     icon: "small-graph",
     name: { hu: "6 mező körben", en: "Six fields on a circle" }
   },
+  // TODO: provisional metadata — confirm year / round / category / name / credit.
+  TriangleCircleGame: {
+    year: { k: "XIX. (25/26)", v: "25/26" },
+    round: "döntő",
+    category: ["D"],
+    icon: "coloring",
+    name: { hu: "Vonal és kör", en: "Line and circle" }
+  },
   RemoveDivisorMultiple: {
     year: { k: "XIX. (25/26)", v: "25/26" },
     round: "online",
