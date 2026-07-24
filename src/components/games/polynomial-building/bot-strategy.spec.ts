@@ -1,5 +1,5 @@
 import { type GameMoves, type StrategyArgs } from '../../strategy-game-factory';
-import { makeCtx } from '../../strategy-game-factory/test-helpers';
+import { makeCtx } from '../../../test-utils';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import { type Board, type Coef, hasThreeIntegerRoots, canComplete } from './helpers';
 

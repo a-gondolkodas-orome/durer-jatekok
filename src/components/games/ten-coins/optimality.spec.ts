@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mapValues, uniq, range } from 'lodash';
 import { dummyEvents, type GameMoves } from '../../strategy-game-factory';
-import { makeCtx } from '../../strategy-game-factory/test-helpers';
+import { makeCtx } from '../../../test-utils';
 import { moves as gameMoves, smartBotStrategy } from './ten-coins';
 
 // Exhaustive optimality check for both variants (coin values 1..4 and 1..5).

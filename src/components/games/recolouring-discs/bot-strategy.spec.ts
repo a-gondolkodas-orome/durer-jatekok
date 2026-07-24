@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { type GameMoves, type StrategyArgs } from '../../strategy-game-factory';
-import { makeCtx } from '../../strategy-game-factory/test-helpers';
+import { makeCtx } from '../../../test-utils';
 import {
   type Board,
   type Cell,

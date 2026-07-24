@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash';
 import { type GameMoves } from '../../strategy-game-factory';
-import { makeCtx } from '../../strategy-game-factory/test-helpers';
+import { makeCtx } from '../../../test-utils';
 import { getExactWinningMove, smartBotStrategy } from './bot-strategy';
 import { ALL_FIELDS, BOARDSIZE, type Board, type Domino, type Field } from './dominoes-on-chessboard';
 
