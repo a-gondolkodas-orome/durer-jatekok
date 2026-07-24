@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { every } from 'lodash';
-import { gameList, iconKeys, type Category, type GameList, type IconKey } from '../../games/gameList';
+import { gameList, categories, iconKeys, type Category, type GameList, type IconKey } from '../../games/gameList';
 import { useTranslation, type I18nString } from '../../../language';
 import { GameIcon, iconLabels } from '../game-icons';
 
@@ -128,8 +128,6 @@ const FilterRow = <T,>({ label, options, selected, onChange }: {
     </div>
   );
 };
-
-const categories: Category[] = ['A', 'B', 'C', 'D', 'E', 'E+'];
 
 export const CategoryFilter = ({ selected, onChange }: {
   selected: Category[]
