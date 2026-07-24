@@ -22,6 +22,9 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const canRemovePile = (pileId: number) =>
     board.some((size, i) => i !== pileId && size >= 2);
 
+  const canSelectPile = (pileId: number) =>
+    ctx.isClientMoveAllowed && removedPileId === null && canRemovePile(pileId);
+
   const isDisabled = ({ pileId, pieceId }: Piece) => {
     if (!ctx.isClientMoveAllowed) return true;
     if (removedPileId === null) return !canRemovePile(pileId);
@@ -60,20 +63,13 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     return true;
   };
 
-  const isHoverPreviewedForRemoval = (pileId: number) => {
-    if (!ctx.isClientMoveAllowed) return false;
-    if (removedPileId !== null) return false;
-    if (!canRemovePile(pileId)) return false;
-    return validHoveredPileId === pileId;
-  };
+  const isHoverPreviewedForRemoval = (pileId: number) =>
+    canSelectPile(pileId) && validHoveredPileId === pileId;
 
-  const clickPile = (pileId) => {
+  const clickPile = (pileId: number) => {
     if (!ctx.isClientMoveAllowed) return;
     if (removedPileId === pileId) { setRemovedPileId(null); return; }
-    if (removedPileId === null) {
-      if (!canRemovePile(pileId)) return;
-      setRemovedPileId(pileId);
-    }
+    if (canSelectPile(pileId)) setRemovedPileId(pileId);
   };
 
   const pieceColor = ({ pileId, pieceId }: Piece) => {
@@ -93,8 +89,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       return pieceCountInPile ? `${pieceCountInPile} → 🗑️` : '🗑️';
     }
     if (removedPileId === null) {
-      const showRemovePreview = validHoveredPileId === pileId && canRemovePile(pileId);
-      return showRemovePreview ? `${pieceCountInPile} → 🗑️` : pieceCountInPile || '🗑️';
+      return isHoverPreviewedForRemoval(pileId) ? `${pieceCountInPile} → 🗑️` : pieceCountInPile || '🗑️';
     }
     if (!validHoveredPiece || validHoveredPiece.pileId !== pileId) return pieceCountInPile || '🗑️';
     return `
@@ -115,7 +110,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         `}
         style={{ transform: 'scaleY(-1)' }}
         onClick={() => clickPile(pileId)}
-        {...pileHoverProps(pileId)}
+        {...(canSelectPile(pileId) ? pileHoverProps(pileId) : {})}
       >
         <p className="text-xl" style={{ transform: 'scaleY(-1)' }}>
           {currentChoiceDescription(pileId)}
