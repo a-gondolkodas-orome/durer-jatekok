@@ -1,5 +1,5 @@
 import { getCtaText } from './cta-text';
-import { makeCtx } from '../make-ctx';
+import { makeCtx } from '../../helpers/make-ctx';
 
 describe('getCtaText', () => {
   describe('vsHuman mode', () => {

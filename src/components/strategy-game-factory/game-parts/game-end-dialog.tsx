@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Description } from '@headlessui/react';
-import { useTranslation } from '../../language';
-import { ModeSelector, DifficultySelector } from './game-controls';
-import { getCtaText } from './cta-text';
+import { useTranslation } from '../../../language';
+import { ModeSelector, DifficultySelector } from './common/game-controls';
+import { getCtaText } from './common/cta-text';
 import type { Ctx, Variant, Mode } from '../types';
 
 export const GameEndDialog = ({

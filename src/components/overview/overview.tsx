@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { gameList, type Category, type IconKey } from '../games/gameList';
-import { useTranslation, LanguageSelector, type I18nNode } from '../language';
-import { ThemeSwitcher } from '../theme';
-import { FeaturedStrip } from './featured-strip';
-import { CategorySection } from './category-section';
-import { FilterToggle, CategoryFilter, IconFilter } from './filters';
+import { useTranslation, LanguageSelector, type I18nNode } from '../../language';
+import { ThemeSwitcher } from '../../theme';
 import {
+  FilterToggle, CategoryFilter, IconFilter, filterByCategories, filterByIcons
+} from './filters/filters';
+import {
+  FeaturedStrip,
+  CategorySection,
   sectionOrder,
   defaultOpenSections,
   getFeaturedGames,
   groupBySection,
-  filterByCategories,
-  filterByIcons,
   orderByCategoryThenYear,
   type SectionKey
-} from './selection';
+} from './game-list/sections';
 
 const sectionTitles: Record<SectionKey, I18nNode> = {
   AB:  { hu: '5-8. osztályosoknak (A-B kategória)', en: 'For grades 5–8 (A–B category)' },

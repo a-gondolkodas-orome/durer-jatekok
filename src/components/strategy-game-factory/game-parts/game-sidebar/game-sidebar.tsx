@@ -1,11 +1,11 @@
 import React from 'react';
 import { Input } from '@headlessui/react';
-import { useTranslation, type I18nString } from '../../language';
-import { ModeSelector, DifficultySelector } from './game-controls';
-import { getCtaText } from './cta-text';
-import type { Ctx, Mode, Variant } from '../types';
+import { useTranslation, type I18nString } from '../../../../language';
+import { ModeSelector, DifficultySelector } from '../common/game-controls';
+import { getCtaText } from '../common/cta-text';
+import type { Ctx, Mode, Variant } from '../../types';
 
-import type { Stats } from '../use-game-stats';
+import type { Stats } from '../../hooks/use-game-stats';
 
 export interface SidebarMoves {
   switchMode: (mode: Mode) => void

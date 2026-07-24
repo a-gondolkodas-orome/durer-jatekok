@@ -1,5 +1,5 @@
-import { useTranslation } from '../../language';
-import type { Variant, Mode } from '../types';
+import { useTranslation } from '../../../../language';
+import type { Variant, Mode } from '../../types';
 
 export const ModeSelector = ({ isHumanVsHumanGame, onSwitchMode, disabled }: {
   isHumanVsHumanGame: boolean

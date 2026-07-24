@@ -1,8 +1,40 @@
 import { type ReactNode } from 'react';
-import { gameList, type Category, type IconKey } from '../games/gameList';
-import { useTranslation, type I18nString } from '../language';
-import { GameIcon, iconLabels } from './game-icons';
-import { getUsedIcons } from './selection';
+import { every } from 'lodash';
+import { gameList, iconKeys, type Category, type GameList, type IconKey } from '../../games/gameList';
+import { useTranslation, type I18nString } from '../../../language';
+import { GameIcon, iconLabels } from '../game-icons';
+
+// Keep only games matching at least one of the selected categories. An empty
+// selection matches everything. Mirrors the previous `shouldShow` semantics.
+export const filterByCategories = (
+  ids: string[],
+  selected: Category[],
+  list: GameList
+): string[] => {
+  if (selected.length === 0) return ids;
+  return ids.filter(id =>
+    !every(list[id].category, c => !selected.includes(c))
+  );
+};
+
+// The distinct icons actually used by the catalog, in canonical `iconKeys`
+// order. Only these are offered as "filter by type" options, so the filter row
+// never shows a type with no games behind it.
+export const getUsedIcons = (list: GameList): IconKey[] => {
+  const used = new Set(Object.values(list).map(entry => entry.icon));
+  return iconKeys.filter(key => used.has(key));
+};
+
+// Keep only games whose icon is one of the selected types. An empty selection
+// matches everything (mirrors `filterByCategories`).
+export const filterByIcons = (
+  ids: string[],
+  selected: IconKey[],
+  list: GameList
+): string[] => {
+  if (selected.length === 0) return ids;
+  return ids.filter(id => selected.includes(list[id].icon));
+};
 
 // Funnel/filter glyph for the header toggle that shows or hides the filter panel.
 const FunnelIcon = () => (
