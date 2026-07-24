@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GameHeader, GameFooter, GameRule } from './game-parts/game-chrome';
+import { GameHeader } from './game-parts/game-header';
+import { GameFooter } from './game-parts/game-footer';
+import { GameRule } from './game-parts/game-rule';
 import { GameSidebar } from './game-parts/game-sidebar';
 import { GameEndDialog } from './game-parts/game-end-dialog';
 import { mapValues, cloneDeep } from 'lodash';

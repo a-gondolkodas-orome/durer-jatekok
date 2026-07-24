@@ -1,11 +1,8 @@
 import React from 'react';
 import { Input } from '@headlessui/react';
 import { useTranslation, type I18nString } from '../../language';
-import {
-  ModeSelector,
-  DifficultySelector,
-  getCtaText
-} from './game-controls';
+import { ModeSelector, DifficultySelector } from './game-controls';
+import { getCtaText } from './cta-text';
 import type { Ctx, Mode, Variant } from '../types';
 
 import type { Stats } from '../use-game-stats';
