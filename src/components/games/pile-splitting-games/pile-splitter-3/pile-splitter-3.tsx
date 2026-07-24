@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { range, isEqual, random, cloneDeep } from 'lodash';
-import { strategyGameFactory, type BoardClientProps, type Events, GameBoard } from '../../../game-factory';
+import {
+  strategyGameFactory, type BoardClientProps, type Events, GameBoard, useHoverPreview
+} from '../../../game-factory';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
 export type Board = number[];
 type Piece = { pileId: number; pieceId: number };
-type HoveredPiece = (Piece & { moveCount: number }) | null;
 
 const generateStartBoard = (): Board => {
   const x = random(2, 8) * 2 + 1;
@@ -15,13 +16,8 @@ const generateStartBoard = (): Board => {
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const [removedPileId, setRemovedPileId] = useState<number | null>(null);
-  const [hoveredPiece, setHoveredPiece] = useState<HoveredPiece>(null);
-  const validHoveredPiece = (
-    hoveredPiece?.moveCount === ctx.moveCount
-    && hoveredPiece?.pieceId < board[hoveredPiece?.pileId] - 1
-  ) ? hoveredPiece : null;
-  const [hoveredPileId, setHoveredPileId] = useState<{ pileId: number; moveCount: number } | null>(null);
-  const validHoveredPileId = hoveredPileId?.moveCount === ctx.moveCount ? hoveredPileId.pileId : null;
+  const { value: validHoveredPiece, hoverProps } = useHoverPreview<Piece>(ctx.moveCount);
+  const { value: validHoveredPileId, hoverProps: pileHoverProps } = useHoverPreview<number>(ctx.moveCount);
 
   const canRemovePile = (pileId: number) =>
     board.some((size, i) => i !== pileId && size >= 2);
@@ -51,7 +47,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       moves.splitPile(nextBoard, { pileId, pieceCount: pieceId + 1 });
 
       setRemovedPileId(null);
-      setHoveredPiece(null);
     }, 750);
   };
 
@@ -120,9 +115,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         `}
         style={{ transform: 'scaleY(-1)' }}
         onClick={() => clickPile(pileId)}
-        onPointerEnter={() => setHoveredPileId({ pileId, moveCount: ctx.moveCount })}
-        onPointerMove={() => setHoveredPileId({ pileId, moveCount: ctx.moveCount })}
-        onPointerLeave={() => setHoveredPileId(null)}
+        {...pileHoverProps(pileId)}
       >
         <p className="text-xl" style={{ transform: 'scaleY(-1)' }}>
           {currentChoiceDescription(pileId)}
@@ -136,11 +129,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                 ${pieceColor({ pileId, pieceId })}
               `}
               onClick={(e) => { e.stopPropagation(); clickPiece({ pileId, pieceId }); }}
-              onFocus={() => setHoveredPiece({ pileId, pieceId, moveCount: ctx.moveCount })}
-              onBlur={() => setHoveredPiece(null)}
-              onPointerEnter={() => setHoveredPiece({ pileId, pieceId, moveCount: ctx.moveCount })}
-              onPointerMove={() => setHoveredPiece({ pileId, pieceId, moveCount: ctx.moveCount })}
-              onPointerLeave={() => setHoveredPiece(null)}
+              {...(isDisabled({ pileId, pieceId }) ? {} : hoverProps({ pileId, pieceId }))}
             >
               {!isDisabled({ pileId, pieceId }) && removedPileId !== null && removedPileId !== pileId &&
               <p className="text-sm" style={{ transform: 'scaleY(-1)' }}>
