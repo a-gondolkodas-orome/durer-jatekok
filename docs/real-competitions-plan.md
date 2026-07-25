@@ -153,10 +153,53 @@ and add an **organizer-facing results / standings** view.
 - Extend the `new-game` workflow: competition games must ship a **server engine
   + smart bot** and **curated, verified-winnable start boards**.
 
+## Alternative: reuse the existing `durer-aion` competition platform
+
+Instead of turning this repo into a full-blown competition engine (backend,
+match loop, auth, results storage — all built from scratch), we could take the
+opposite direction: **keep this repo as the static practice site, and move the
+game logic into the `a-gondolkodas-orome/durer-aion` monorepo**, which already
+runs real competitions.
+
+That monorepo already has the hard parts this plan would otherwise rebuild:
+server-authoritative match state, team identity, timers, results persistence,
+and an organizer surface. It currently uses **`boardgame.io`** as its game
+engine. The proposal is to **replace the `boardgame.io` package with our
+`strategyGameFactory`** as the engine there.
+
+Why this is attractive:
+
+- **No new backend to design or operate.** The four server-authoritative signals
+  (start board, move validation, smart bot, clock) already have a home.
+- **`strategyGameFactory` is a natural fit.** Its moves are near-pure and its bot
+  strategies are `(board) => nextBoard`; that maps onto a `boardgame.io`-style
+  engine slot more directly than onto a bespoke service.
+- **Division of labour matches reality.** This repo stays a lightweight,
+  no-backend practice site (its original purpose); competition concerns live
+  where competition infrastructure already exists.
+
+Open questions before choosing this path:
+
+- How cleanly `strategyGameFactory`'s API maps onto `boardgame.io`'s engine
+  contract (moves, turn order, game-over detection, bot/AI hook) — and how much
+  of `boardgame.io` the monorepo depends on beyond the engine core.
+- Where the **shared engine module** lives so both repos consume it (published
+  package vs. copied vs. monorepo-owned with this repo importing it).
+- Keeping the **smart bot server-only** still applies, but the monorepo may
+  already have a pattern for it.
+
+This is a genuine fork in the road: **build the engine here** (Phases 1–5 above)
+vs. **contribute the engine to `durer-aion`** and let it own the competition
+runtime. Deciding this early changes almost everything downstream.
+
 ## Biggest risks / decisions to make early
 
+- **Build vs. reuse `durer-aion`.** The single biggest decision (see section
+  above): stand up a new backend in this repo, or move the engine into the
+  existing competition monorepo and replace its `boardgame.io` package.
 - **Hosting.** GitHub Pages cannot run a backend. Either keep Pages for the
   static site plus a separate backend host, or migrate to a platform that serves
-  both.
+  both. (Largely moot if we reuse `durer-aion`.)
 - **Engine-extraction cost.** How cleanly each game's logic separates from React
-  — the pilot game will tell us how heavy this is per game.
+  — the pilot game will tell us how heavy this is per game. (Relevant either way,
+  and doubly so if the engine must satisfy `boardgame.io`'s contract.)
