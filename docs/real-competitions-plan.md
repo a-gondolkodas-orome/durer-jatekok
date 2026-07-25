@@ -160,8 +160,3 @@ and add an **organizer-facing results / standings** view.
   both.
 - **Engine-extraction cost.** How cleanly each game's logic separates from React
   — the pilot game will tell us how heavy this is per game.
-- **"Not sniffable" is best-effort.** Server-side hides the *code*, but for a
-  math competition a team can still *derive* the optimal strategy by reasoning
-  and playing. That is arguably fine (deriving it is the point of the
-  competition); the goal is "not readable from source," not "unbeatable by
-  reasoning."
