@@ -5,15 +5,15 @@ import {
   generateStartBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
 } from './helpers';
-import { heuristicBotStrategy, randomBotStrategy, makeHeuristicBotStrategy } from './bot-strategy';
+import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
 import type { Ctx, GameMoves } from '../../game-factory';
 
 // Cheap search budget so full-game simulations stay fast in CI.
-const fastBot = makeHeuristicBotStrategy({ depth: 6, budget: 2000 });
+const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });
 
 // Drive the bot for one turn and capture what it played, applying the move so we
 // can inspect the resulting board too.
-const playBotTurn = (board: Board, currentPlayer: number, strategy = heuristicBotStrategy) => {
+const playBotTurn = (board: Board, currentPlayer: number, strategy = smartBotStrategy) => {
   const captured: { move: 'shadeEdge' | 'placeCircle'; arg: number; nextBoard: Board } = {
     move: 'shadeEdge',
     arg: -1,
@@ -113,7 +113,7 @@ describe('circle-player bot', () => {
 });
 
 describe('full playthroughs terminate with a valid winner', () => {
-  const simulate = (lineStrategy: typeof heuristicBotStrategy, circleStrategy: typeof heuristicBotStrategy) => {
+  const simulate = (lineStrategy: typeof smartBotStrategy, circleStrategy: typeof smartBotStrategy) => {
     let board = generateStartBoard();
     let player = LINE;
     for (let turn = 0; turn < 200; turn++) {

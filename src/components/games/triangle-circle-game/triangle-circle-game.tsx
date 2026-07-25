@@ -4,7 +4,7 @@ import {
   type Board, LINE, CIRCLE,
   applyShade, applyCircle, generateStartBoard, isLineWin, isCircleWin
 } from './helpers';
-import { heuristicBotStrategy, randomBotStrategy } from './bot-strategy';
+import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
 const moves = {
   // Line player shades one edge; they win at once if it completes an un-circled
@@ -77,12 +77,13 @@ export const TriangleCircleGame = strategyGameFactory({
       generateStartBoard,
       label: { hu: 'Teszt', en: 'Test' }
     },
-    // Strong bot — a bounded-depth minimax over the threat-reduced game that is
-    // tactically exact (never misses a forced win/loss within its horizon), with
-    // a heuristic fallback in the wide-open opening. Not proven globally optimal
-    // (see bot-strategy.ts), hence the notAlwaysOptimal marker.
+    // Smart bot. As the line player it executes a proven forced win (see
+    // forced-win.ts and the certificate in forced-win.spec.ts) — the line
+    // player wins this board with perfect play. As the circle player no
+    // winning strategy exists; it defends as well as possible (two-hot safety
+    // filter + bounded search), hence the notAlwaysOptimal marker.
     {
-      botStrategy: heuristicBotStrategy,
+      botStrategy: smartBotStrategy,
       generateStartBoard,
       label: { hu: 'Okos', en: 'Smart' },
       notAlwaysOptimal: true,

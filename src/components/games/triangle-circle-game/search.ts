@@ -2,8 +2,11 @@ import { EDGES, TRIANGLES, TRIANGLE_COUNT, EDGE_COUNT } from './geometry';
 import { type Board, LINE, CIRCLE } from './helpers';
 
 // Bounded-depth minimax over the threat-reduced game — the runtime, tractable
-// form of the exact solver (which is only feasible for tiny boards). It answers,
-// within a node budget and depth horizon, a 3-valued question about the position:
+// form of the exact solver (which is only feasible for tiny boards, where it
+// shows the circle player wins side <= 3). On the real side-6 board the LINE
+// player has a proven forced win (see forced-win.ts), so this search now serves
+// the circle side's defence and any position outside the certified line.
+// It answers, within a node budget and depth horizon, a 3-valued question:
 //
 //   'lineWins'  — the line player has a forced win (proven inside the horizon)
 //   'lineLoses' — the line player provably cannot win inside the horizon

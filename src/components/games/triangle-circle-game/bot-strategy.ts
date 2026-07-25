@@ -2,39 +2,38 @@ import { sample } from 'lodash';
 import { EDGES } from './geometry';
 import {
   type Board, LINE,
-  applyShade, freeEdges, freeTriangles, shadedCount,
+  applyShade, applyCircle, freeEdges, freeTriangles, shadedCount,
   liveThreats, preThreatEdges, isWinningShade
 } from './helpers';
+import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
 import { makeMoveEvaluator } from './search';
 import type { Ctx, GameMoves } from '../../game-factory';
 
-// Strong bot — tactically exact, heuristic elsewhere. NOT proven optimal.
+// Smart bot.
 //
-// The exact solver only settles tiny boards (side ≤ 3, where the circle player
-// wins), so on the real side-6 grid this bot combines two layers:
-//   1. A bounded-depth minimax over the threat-reduced game (see search.ts):
-//      it always grabs a forced win, always refuses a move that hands the other
-//      player a forced win, within a per-move node budget and depth horizon.
-//   2. A threat heuristic that orders the search and decides positions the
-//      search leaves 'unknown' (typically the wide-open opening).
+// LINE side — provably winning (see forced-win.ts and the certificate in
+// forced-win.spec.ts): open with the certified central pair-heat, answer the
+// circle player's reply with a second winning pair-heat, then run the forced
+// march. The plan covers every circle reply from the start position, so as the
+// line player this bot always wins.
 //
-// This is far stronger than pure greedy — it never misses a tactic inside the
-// horizon — but a perfect opponent may still beat it in the deep opening. The
-// same function serves whichever side the human did not choose; it branches on
-// `ctx.currentPlayer` (0 = line player, 1 = circle player).
+// CIRCLE side — best-effort defence: the line player wins this board with
+// perfect play, so no circle strategy is "optimal" in the winning sense. The
+// bot never volunteers into a position that is already lost by the two-hot
+// criterion (isLineTurnWon), covers threats, defuses pre-threat edges, and uses
+// the bounded search to dodge deeper tactics — a human playing line only beats
+// it by executing a genuine winning plan.
 
 type Moves = GameMoves<Board>;
 type SearchOpts = { depth: number; budget: number };
 
-// Per-move search limits. Budget is kept modest so a bot turn never blocks the
-// main thread for long: the wide-open opening (where the search can only return
-// 'unknown' anyway) resolves quickly, while tactical mid/endgame positions —
-// which collapse fast under the forced-move pruning — are searched to the end.
+// Per-move limits for the bounded search used in fallback positions. Modest so
+// a bot turn never blocks the UI thread for long.
 const SEARCH: SearchOpts = { depth: 12, budget: 45_000 };
 
-// Build a bot with a given search budget. Exposed so tests (and cheaper
-// variants) can dial the search down; the shipped bot uses SEARCH.
-export const makeHeuristicBotStrategy = (searchOpts: SearchOpts = SEARCH) =>
+// Build a bot with a given search budget. Exposed so tests can dial the
+// fallback search down; the shipped bot uses SEARCH.
+export const makeSmartBotStrategy = (searchOpts: SearchOpts = SEARCH) =>
   ({ board, ctx, moves }: { board: Board; ctx: Ctx; moves: Moves }) => {
     if (ctx.currentPlayer === LINE) {
       moves.shadeEdge(board, chooseLineMove(board, searchOpts));
@@ -43,7 +42,7 @@ export const makeHeuristicBotStrategy = (searchOpts: SearchOpts = SEARCH) =>
     }
   };
 
-export const heuristicBotStrategy = makeHeuristicBotStrategy(SEARCH);
+export const smartBotStrategy = makeSmartBotStrategy(SEARCH);
 
 // Easy "test" bot: plays uniformly at random for whichever side it holds. Good
 // for getting a feel for the rules before a real game.
@@ -59,12 +58,8 @@ export const randomBotStrategy = (
 
 // --- Line player -----------------------------------------------------------
 
-// Higher = a more promising shading move (used to order the search and to break
-// ties among positions the search can't decide).
-const lineHeuristicScore = (board: Board, edgeId: number): number => {
-  const next = applyShade(board, edgeId);
-  return 100 * preThreatEdges(next).length + 10 * liveThreats(next).length + lineProgress(next);
-};
+const isEmptyBoard = (board: Board): boolean =>
+  board.edges.every(e => !e) && board.circles.every(c => !c);
 
 const chooseLineMove = (board: Board, searchOpts: SearchOpts): number => {
   const candidates = freeEdges(board);
@@ -73,12 +68,20 @@ const chooseLineMove = (board: Board, searchOpts: SearchOpts): number => {
   const winning = candidates.filter(e => isWinningShade(board, e));
   if (winning.length > 0) return sample(winning)!;
 
-  // 2. Forced win next turn: create two live threats at once (a double threat).
-  const doubleThreat = candidates.filter(e => liveThreats(applyShade(board, e)).length >= 2);
-  if (doubleThreat.length > 0) return sample(doubleThreat)!;
+  // 2. Two hot triangles in one component: march (every step forces the circle
+  //    player, the last one creates a double threat).
+  const march = marchEdge(board);
+  if (march !== null) return march;
 
-  // 3. Search the most promising moves first. Grab a proven forced win, drop any
-  //    move that lets the circle player force a win, and keep the rest as safe.
+  // 3. From the start position, play the certified opening pair-heat.
+  if (isEmptyBoard(board)) return OPENING_EDGE;
+
+  // 4. A pair-heat all circle replies lose to (the certificate's second move).
+  const pairHeat = winningPairHeatEdge(board);
+  if (pairHeat !== null) return pairHeat;
+
+  // 5. Fallback for positions outside the plan (only reachable if the game
+  //    didn't start from the certified line): bounded search plus heuristic.
   const ordered = candidates
     .map(e => ({ e, score: lineHeuristicScore(board, e) }))
     .sort((a, b) => b.score - a.score);
@@ -91,9 +94,13 @@ const chooseLineMove = (board: Board, searchOpts: SearchOpts): number => {
     if (outcome === 'lineLoses') continue;
     safe.push(e);
   }
-  // Best heuristic move that isn't a proven loss; if every move is a proven loss
-  // inside the horizon, fall back to the best heuristic move as a swindle.
   return safe.length > 0 ? safe[0] : ordered[0].e;
+};
+
+// Higher = a more promising shading move for the fallback ordering.
+const lineHeuristicScore = (board: Board, edgeId: number): number => {
+  const next = applyShade(board, edgeId);
+  return 100 * preThreatEdges(next).length + 10 * liveThreats(next).length + lineProgress(next);
 };
 
 // Sum of shaded edges across un-circled, not-yet-complete triangles: rewards
@@ -112,10 +119,22 @@ const circleHeuristicScore = (board: Board, triangleId: number, preThreatCover: 
   100 * (preThreatCover.get(triangleId) ?? 0) + shadedCount(board, triangleId);
 
 const chooseCircleMove = (board: Board, searchOpts: SearchOpts): number => {
+  // Replies that do not leave a position the line player wins outright by the
+  // two-hot criterion. When any exist, never pick outside this set — this is
+  // the topological "delete the right hot" defence that simple counting rules
+  // miss (it is why they lose even the small boards the circle player wins).
+  const safeSet = new Set(
+    freeTriangles(board).filter(t => !isLineTurnWon(applyCircle(board, t)))
+  );
+  const preferSafe = (candidates: number[]): number[] => {
+    const safe = candidates.filter(t => safeSet.has(t));
+    return safe.length > 0 ? safe : candidates;
+  };
+
   // 1. Cover a live threat (un-circled triangle with two shaded edges). If more
   //    than one exists the position is already lost, but cover one anyway.
   const threats = liveThreats(board);
-  if (threats.length > 0) return sample(threats)!;
+  if (threats.length > 0) return sample(preferSafe(threats))!;
 
   // Pre-threat coverage per triangle, for ordering.
   const preThreatCover = new Map<number, number>();
@@ -123,7 +142,7 @@ const chooseCircleMove = (board: Board, searchOpts: SearchOpts): number => {
     for (const t of EDGES[e].triangleIds) preThreatCover.set(t, (preThreatCover.get(t) ?? 0) + 1);
   }
 
-  const ordered = freeTriangles(board)
+  const ordered = preferSafe(freeTriangles(board))
     .map(t => ({ t, score: circleHeuristicScore(board, t, preThreatCover) }))
     .sort((a, b) => b.score - a.score);
 
