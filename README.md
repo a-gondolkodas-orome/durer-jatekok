@@ -28,7 +28,12 @@ TL;DR;
 
 ## Project setup
 
-There is a (fairly minimal) devcontainer setup if you prefer that.
+There is a (fairly minimal) devcontainer setup if you prefer that. It bakes a
+Chromium build for Playwright into the image at build time, so container creation
+only has to run `npm ci`. If you bump `playwright` in `package.json`, also bump
+`PLAYWRIGHT_VERSION` in `.devcontainer/Dockerfile` and rebuild the container —
+otherwise Playwright will look for a browser revision that is not in the image.
+
 Alternatively, here are the installation instructions:
 
 ### Installing locally 

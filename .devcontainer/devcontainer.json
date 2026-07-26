@@ -1,6 +1,9 @@
 {
   "name": "React Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "build": { "dockerfile": "Dockerfile" },
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -17,7 +20,7 @@
       }
     }
   },
-  "postCreateCommand": "npm ci && npx playwright install --with-deps chromium",
+  "postCreateCommand": "npm ci",
   "forwardPorts": [8012],
   "portsAttributes": {
     "8012": {
