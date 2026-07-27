@@ -4,9 +4,6 @@ import { type Board, cap, BoardClient, getPlayerStepDescription } from '../pebbl
 
 export { cap };
 
-// `maxTake` rule: on the opening move it is 4 (baked into the start board);
-// after every move it becomes the amount the other player just took, plus three.
-
 // You may take up to three more than the other player's last take.
 const INCREMENT = 3;
 // The opening move is capped at four pebbles.

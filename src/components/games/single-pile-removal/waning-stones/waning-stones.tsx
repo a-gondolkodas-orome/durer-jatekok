@@ -4,9 +4,6 @@ import { type Board, cap, BoardClient, getPlayerStepDescription } from '../pebbl
 
 export { cap };
 
-// `maxTake` rule: on the opening move it is ⌊stones/2⌋ (baked into the start
-// board); after every move it becomes the amount just taken.
-
 // t(n): the largest power of 2 dividing n (its lowest set bit).
 export const lowestPow2 = (n: number): number => n & -n;
 
