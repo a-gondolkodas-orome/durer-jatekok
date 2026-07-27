@@ -17,7 +17,6 @@ const StonePile = ({ board, disabled, onTake, moveCount }: {
 }) => {
   const { value, hoverProps } = useHoverPreview<number>(moveCount);
   const previewCount = value ?? 0;
-  const c = cap(board);
 
   return (
     // rotate(180deg) makes the pile fill from the bottom (incomplete row on top)
@@ -25,28 +24,26 @@ const StonePile = ({ board, disabled, onTake, moveCount }: {
     // the pile and the count grows down and to the right. Each pebble re-rotates
     // 180° so its number stays upright. Pebbles are taken from the top, so DOM
     // index i corresponds to taking stones - i.
-    <div className="flex flex-wrap justify-center gap-1.5 p-2" style={{ transform: 'rotate(180deg)' }}>
+    <div className="flex flex-wrap justify-center gap-1.5 p-2 rotate-180">
       {range(board.stones).map(i => {
         const takeCount = board.stones - i; // clicking a pebble takes it and everything above
-        const takeable = takeCount <= c;
         // Only selectable pebbles drive the hover preview. Don't rely on the
         // `disabled` attribute to suppress this — some browsers (e.g. Safari)
         // still fire pointer events on disabled buttons.
-        const canSelect = !disabled && takeable;
+        const canSelect = !disabled && (takeCount <= cap(board));
         return (
           <button
             key={i}
-            disabled={disabled || !takeable}
+            disabled={!canSelect}
+            aria-label={`${takeCount}`}
+            className={`
+              w-[11%] sm:w-[8%] aspect-square rounded-full bg-stone-500 shadow-md shadow-stone-700
+              flex items-center justify-center text-white font-semibold text-xs sm:text-sm rotate-180
+              ${canSelect && takeCount <= previewCount ? 'opacity-30' : ''}
+            `}
             onClick={() => onTake(takeCount)}
             {...(canSelect ? hoverProps(takeCount) : {})}
-            aria-label={`${takeCount}`}
-            className={`w-[11%] sm:w-[8%] aspect-square rounded-full bg-stone-500 shadow-md shadow-stone-700
-              flex items-center justify-center text-white font-semibold text-xs sm:text-sm
-              transition-opacity
-              ${canSelect && takeCount <= previewCount ? 'opacity-30' : ''}`}
-            style={{ transform: 'rotate(180deg)' }}
           >
-            {/* Active pebbles show how many would be removed by clicking them. */}
             {canSelect && <span>{takeCount}</span>}
           </button>
         );

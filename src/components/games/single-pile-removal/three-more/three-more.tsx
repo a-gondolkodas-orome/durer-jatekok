@@ -20,12 +20,12 @@ const OPENING_MAX = 4;
 const winMemo = new Map<string, boolean>();
 export const moverWins = (stones: number, maxTake: number): boolean => {
   if (stones === 0) return false;
-  const c = Math.min(maxTake, stones);
-  const key = `${stones},${c}`;
+  const maxTakeable = Math.min(maxTake, stones);
+  const key = `${stones},${maxTakeable}`;
   const cached = winMemo.get(key);
   if (cached !== undefined) return cached;
   let result = false;
-  for (let k = 1; k <= c; k++) {
+  for (let k = 1; k <= maxTakeable; k++) {
     // After taking k the other player faces `stones - k` with a cap of k + 3.
     if (!moverWins(stones - k, k + INCREMENT)) { result = true; break; }
   }
@@ -41,17 +41,17 @@ export const isWinningTake = (stones: number, k: number): boolean =>
 // The count the optimal bot takes from `board`.
 export const chooseSmartTake = (board: Board): number => {
   const { stones } = board;
-  const c = cap(board);
+  const maxTakeable = cap(board);
 
   // Winning position: play the smallest take that secures the win.
-  const winning = range(1, c + 1).find(k => isWinningTake(stones, k));
+  const winning = range(1, maxTakeable + 1).find(k => isWinningTake(stones, k));
   if (winning !== undefined) return winning;
 
   // Losing position: every legal take hands the other player a win, so play the
   // "trap" that leaves them the fewest winning replies, breaking ties toward the
   // smaller take (range is ascending and minBy keeps the first minimum) to drag
   // the game out and give the human more chances to err.
-  return minBy(range(1, c + 1), k => {
+  return minBy(range(1, maxTakeable + 1), k => {
     const rem = stones - k;
     const oppCap = Math.min(k + INCREMENT, rem);
     return range(1, oppCap + 1).filter(j => isWinningTake(rem, j)).length;

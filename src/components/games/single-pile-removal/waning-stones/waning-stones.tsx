@@ -19,16 +19,16 @@ export const isWinningTake = (stones: number, k: number): boolean =>
 // The count the optimal bot takes from `board`.
 export const chooseSmartTake = (board: Board): number => {
   const { stones } = board;
-  const c = cap(board);
+  const maxTakeable = cap(board);
 
   const winningTake = lowestPow2(stones);
-  if (winningTake <= c) return winningTake;
+  if (winningTake <= maxTakeable) return winningTake;
 
   // Losing position: every legal take hands the opponent a win, so play the
   // "trap" that leaves them the fewest winning replies, breaking ties toward the
   // smaller take (range is ascending and minBy keeps the first minimum) to drag
   // the game out and give the human more chances to err.
-  return minBy(range(1, c + 1), k => {
+  return minBy(range(1, maxTakeable + 1), k => {
     const rem = stones - k;
     const oppCap = Math.min(k, rem);
     return range(1, oppCap + 1).filter(j => isWinningTake(rem, j)).length;

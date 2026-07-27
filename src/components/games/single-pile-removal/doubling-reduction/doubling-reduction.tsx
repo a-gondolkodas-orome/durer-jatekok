@@ -21,16 +21,16 @@ export const isWinningTake = (stones: number, k: number): boolean =>
 // The count the optimal bot takes from `board`.
 export const chooseSmartTake = (board: Board): number => {
   const { stones } = board;
-  const c = cap(board);
+  const maxTakeable = cap(board);
 
   // If the whole pile is within reach, clear it and win now rather than dragging
   // the game out with a smaller "textbook" lowest-bit take.
-  if (stones <= c) return stones;
+  if (stones <= maxTakeable) return stones;
 
   // Otherwise the winning move (when one exists) removes the lowest power-of-2
   // block, handing the opponent a losing position.
   const winningTake = lowestPow2(stones);
-  if (winningTake <= c) return winningTake;
+  if (winningTake <= maxTakeable) return winningTake;
 
   // Losing position: every legal take loses to optimal play, so play a "trap"
   // that makes the opponent actually earn the win.
@@ -39,7 +39,7 @@ export const chooseSmartTake = (board: Board): number => {
   //  2. Among the rest, leave the position whose winning reply is hardest to
   //     find (fewest winning replies), breaking ties toward the *larger* take so
   //     the game keeps some substance instead of collapsing straight to 1-takes.
-  const takes = range(1, c + 1);
+  const takes = range(1, maxTakeable + 1);
   const safe = takes.filter(k => stones - k > 2 * k - 1); // opponent cannot clear
   const pool = safe.length > 0 ? safe : takes; // forced endgame: no safe take exists
   return minBy(pool, k => {
