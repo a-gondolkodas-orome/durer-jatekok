@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { strategyGameFactory, type BoardClientProps, type Ctx, GameBoard } from '../../game-factory';
+import {
+  strategyGameFactory, type BoardClientProps, type Ctx, GameBoard, useHoverPreview
+} from '../../strategy-game-factory';
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import { smartBotStrategy } from './bot-strategy';
 import { generateStartBoard, moves, type Board, type SoldierColor } from './helpers';
-import { useTranslation } from '../../language';
+import { useTranslation } from '../../../language';
 
 type Piece = { rowIndex: number, pieceIndex: number }
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const [hoveredPiece, setHoveredPiece] = useState<(Piece & { moveCount: number }) | null>(null);
-  const validHoveredPiece = hoveredPiece?.moveCount === ctx.moveCount ? hoveredPiece : null;
+  const { value: validHoveredPiece, hoverProps } = useHoverPreview<Piece>(ctx.moveCount);
 
   const isPlayerSultan = ctx.currentPlayer === 0;
   const groupOfHoveredPiece = validHoveredPiece
@@ -74,11 +74,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               disabled={!ctx.isClientMoveAllowed}
               className="aspect-square w-[10%] mx-1"
               onClick={() => clickOnSoldier({ rowIndex, pieceIndex })}
-              onFocus={() => setHoveredPiece({ rowIndex, pieceIndex, moveCount: ctx.moveCount })}
-              onBlur={() => setHoveredPiece(null)}
-              onPointerEnter={() => setHoveredPiece({ rowIndex, pieceIndex, moveCount: ctx.moveCount })}
-              onPointerMove={() => setHoveredPiece({ rowIndex, pieceIndex, moveCount: ctx.moveCount })}
-              onPointerLeave={() => setHoveredPiece(null)}
+              {...hoverProps({ rowIndex, pieceIndex })}
             >
               <svg
                 className={`

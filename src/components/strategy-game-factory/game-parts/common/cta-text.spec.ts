@@ -1,5 +1,5 @@
-import { getCtaText } from './game-controls';
-import { makeCtx } from '../ctx-factory';
+import { getCtaText } from './cta-text';
+import { makeCtx } from '../../../../test-utils';
 
 describe('getCtaText', () => {
   describe('vsHuman mode', () => {
