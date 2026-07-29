@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { EDGES, TRIANGLES, TRIANGLE_COUNT } from './geometry';
 import {
   type Board, LINE,
@@ -7,7 +6,7 @@ import {
 } from './helpers';
 import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
 import { makeSmartBotStrategy } from './bot-strategy';
-import type { Ctx, GameMoves } from '../../game-factory';
+import type { Ctx, GameMoves } from '../../strategy-game-factory';
 
 // The centrepiece: a complete-branching certificate that the LINE player wins
 // the side-6 board. Soundness rests on the March Lemma (see forced-win.ts);

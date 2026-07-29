@@ -7,7 +7,7 @@ import {
 } from './helpers';
 import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
 import { makeMoveEvaluator } from './search';
-import type { Ctx, GameMoves } from '../../game-factory';
+import type { Ctx, GameMoves } from '../../strategy-game-factory';
 
 // Smart bot.
 //

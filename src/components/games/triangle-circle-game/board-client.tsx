@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from '../../language';
-import { GameBoard, type BoardClientProps } from '../../game-factory';
+import { useTranslation } from '../../../language';
+import { GameBoard, type BoardClientProps } from '../../strategy-game-factory';
 import { BOARD_OUTLINE, EDGES, TRIANGLES } from './geometry';
 import { type Board, LINE, CIRCLE } from './helpers';
 

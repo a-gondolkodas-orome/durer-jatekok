@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import {
   VERTICES, TRIANGLES, EDGES,
   TRIANGLE_COUNT, EDGE_COUNT

@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { EDGES, TRIANGLES, TRIANGLE_COUNT } from './geometry';
 import {
   type Board, LINE, CIRCLE,

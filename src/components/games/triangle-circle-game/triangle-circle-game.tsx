@@ -1,4 +1,4 @@
-import { strategyGameFactory, type Ctx, type Events } from '../../game-factory';
+import { strategyGameFactory, type Ctx, type Events } from '../../strategy-game-factory';
 import { BoardClient } from './board-client';
 import {
   type Board, LINE, CIRCLE,
@@ -59,7 +59,7 @@ export const TriangleCircleGame = strategyGameFactory({
     getPlayerStepDescription: ({ ctx }) => {
       if (ctx.currentPlayer === LINE) {
         return {
-          hu: 'Satírozz be egy kis háromszög egyik oldalát: kattints egy élre.',
+          hu: 'Satírozd be egy kis háromszög egyik oldalát: kattints egy élre.',
           en: 'Shade one side of a small triangle: click an edge.'
         };
       }

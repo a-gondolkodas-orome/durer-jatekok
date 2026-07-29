@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { EDGES, TRIANGLES } from './geometry';
 import {
   type Board, LINE, CIRCLE,
@@ -6,7 +5,7 @@ import {
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
 } from './helpers';
 import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
-import type { Ctx, GameMoves } from '../../game-factory';
+import type { Ctx, GameMoves } from '../../strategy-game-factory';
 
 // Cheap search budget so full-game simulations stay fast in CI.
 const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });
