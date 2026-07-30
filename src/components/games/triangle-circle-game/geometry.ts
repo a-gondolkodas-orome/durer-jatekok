@@ -35,10 +35,11 @@ export interface Edge {
 const vertexId = (row: number, col: number): number => (row * (row + 1)) / 2 + col;
 
 // Lay the lattice out inside the 0..100 SVG viewBox: apex at the top-centre,
-// rows 14 units apart, columns 14 units apart, so the base spans x = 8..92.
-const ROW_HEIGHT = 14;
+// columns 14 units apart and rows 14·√3/2 apart so every small triangle is
+// equilateral; the base spans x = 8..92 and the board is centred vertically.
 const COL_WIDTH = 14;
-const TOP_Y = 8;
+const ROW_HEIGHT = (COL_WIDTH * Math.sqrt(3)) / 2;
+const TOP_Y = 50 - (GRID_SIZE * ROW_HEIGHT) / 2;
 const CENTER_X = 50;
 
 const buildVertices = (): Vertex[] => {
@@ -47,8 +48,8 @@ const buildVertices = (): Vertex[] => {
     for (let col = 0; col <= row; col++) {
       vertices.push({
         id: vertexId(row, col),
-        x: CENTER_X + (col - row / 2) * COL_WIDTH,
-        y: TOP_Y + row * ROW_HEIGHT
+        x: Math.round((CENTER_X + (col - row / 2) * COL_WIDTH) * 1000) / 1000,
+        y: Math.round((TOP_Y + row * ROW_HEIGHT) * 1000) / 1000
       });
     }
   }

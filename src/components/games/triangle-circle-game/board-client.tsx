@@ -75,27 +75,16 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           ))}
         </g>
 
-        {/* Grid lines: thin for free edges, thick red for shaded ones */}
+        {/* Thin grid lines for free edges */}
         <g className="pointer-events-none">
-          {EDGES.map(edge => {
-            const shaded = board.edges[edge.id];
-            const hovered = hoveredEdge === edge.id;
-            return (
-              <line
-                key={`edge-${edge.id}`}
-                x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
-                strokeLinecap="round"
-                className={
-                  shaded
-                    ? 'stroke-red-500'
-                    : hovered
-                      ? 'stroke-red-300 dark:stroke-red-700'
-                      : 'stroke-slate-300 dark:stroke-slate-600'
-                }
-                strokeWidth={shaded ? 1.6 : hovered ? 1.4 : 0.4}
-              />
-            );
-          })}
+          {EDGES.filter(edge => !board.edges[edge.id]).map(edge => (
+            <line
+              key={`edge-${edge.id}`}
+              x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
+              className="stroke-slate-300 dark:stroke-slate-600"
+              strokeWidth="0.4"
+            />
+          ))}
         </g>
 
         {/* Board outline */}
@@ -104,6 +93,34 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           className="fill-none stroke-slate-500 dark:stroke-slate-400 pointer-events-none"
           strokeWidth="0.5"
         />
+
+        {/* Shaded edges last, so they cover the grid lines and the outline;
+            clipped to the board so the round caps never spill outside it. */}
+        <defs>
+          <clipPath id="triangle-circle-board-clip">
+            <polygon points={BOARD_OUTLINE} />
+          </clipPath>
+        </defs>
+        <g className="pointer-events-none" clipPath="url(#triangle-circle-board-clip)">
+          {hoveredEdge !== null && !board.edges[hoveredEdge] && (
+            <line
+              x1={EDGES[hoveredEdge].x1} y1={EDGES[hoveredEdge].y1}
+              x2={EDGES[hoveredEdge].x2} y2={EDGES[hoveredEdge].y2}
+              strokeLinecap="round"
+              className="stroke-red-300 dark:stroke-red-700"
+              strokeWidth="1.4"
+            />
+          )}
+          {EDGES.filter(edge => board.edges[edge.id]).map(edge => (
+            <line
+              key={`shaded-${edge.id}`}
+              x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
+              strokeLinecap="round"
+              className="stroke-red-500"
+              strokeWidth="1.6"
+            />
+          ))}
+        </g>
 
         {/* Invisible wide hit targets for edges — only on the line player's turn */}
         {lineToMove && (
