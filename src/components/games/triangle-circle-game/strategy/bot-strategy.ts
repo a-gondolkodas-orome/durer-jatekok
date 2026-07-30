@@ -1,13 +1,13 @@
 import { sample } from 'lodash';
-import { EDGES } from './geometry';
+import { EDGES } from '../geometry';
 import {
   type Board, LINE,
   applyShade, applyCircle, freeEdges, freeTriangles, shadedCount,
   liveThreats, preThreatEdges, isWinningShade
-} from './helpers';
+} from '../helpers';
 import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
 import { makeMoveEvaluator } from './search';
-import type { Ctx, GameMoves } from '../../strategy-game-factory';
+import type { Ctx, GameMoves } from '../../../strategy-game-factory';
 
 // Smart bot.
 //

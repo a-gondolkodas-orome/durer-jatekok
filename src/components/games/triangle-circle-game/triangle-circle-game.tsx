@@ -4,7 +4,7 @@ import {
   type Board, LINE, CIRCLE,
   applyShade, applyCircle, generateStartBoard, isLineWin, isCircleWin
 } from './helpers';
-import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
+import { smartBotStrategy, randomBotStrategy } from './strategy/bot-strategy';
 
 const moves = {
   // Line player shades one edge; they win at once if it completes an un-circled

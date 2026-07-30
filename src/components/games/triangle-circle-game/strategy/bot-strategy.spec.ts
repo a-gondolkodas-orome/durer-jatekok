@@ -1,11 +1,11 @@
-import { EDGES, TRIANGLES } from './geometry';
+import { EDGES, TRIANGLES } from '../geometry';
 import {
   type Board, LINE, CIRCLE,
   generateStartBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
-} from './helpers';
+} from '../helpers';
 import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
-import type { Ctx, GameMoves } from '../../strategy-game-factory';
+import type { Ctx, GameMoves } from '../../../strategy-game-factory';
 
 // Cheap search budget so full-game simulations stay fast in CI.
 const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });
