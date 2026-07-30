@@ -1,51 +1,14 @@
 import { EDGES, TRIANGLES } from '../geometry';
 import {
-  type Board, LINE, CIRCLE,
+  LINE, CIRCLE,
   generateStartBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
 } from '../helpers';
 import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
-import type { Ctx, GameMoves } from '../../../strategy-game-factory';
+import { playBotTurn } from './spec-helpers';
 
 // Cheap search budget so full-game simulations stay fast in CI.
 const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });
-
-// Drive the bot for one turn and capture what it played, applying the move so we
-// can inspect the resulting board too.
-const playBotTurn = (board: Board, currentPlayer: number, strategy = smartBotStrategy) => {
-  const captured: { move: 'shadeEdge' | 'placeCircle'; arg: number; nextBoard: Board } = {
-    move: 'shadeEdge',
-    arg: -1,
-    nextBoard: board
-  };
-  const moves: GameMoves<Board> = {
-    shadeEdge: (b: Board, edgeId: number) => {
-      captured.move = 'shadeEdge';
-      captured.arg = edgeId;
-      captured.nextBoard = applyShade(b, edgeId);
-      return { nextBoard: captured.nextBoard };
-    },
-    placeCircle: (b: Board, triangleId: number) => {
-      captured.move = 'placeCircle';
-      captured.arg = triangleId;
-      captured.nextBoard = applyCircle(b, triangleId);
-      return { nextBoard: captured.nextBoard };
-    }
-  };
-  const ctx: Ctx = {
-    isHumanVsHumanGame: false,
-    resolvedPlayerNames: ['', ''],
-    chosenRoleIndex: null,
-    phase: 'play',
-    turnState: null,
-    currentPlayer,
-    isClientMoveAllowed: true,
-    winnerIndex: null,
-    moveCount: 0
-  };
-  strategy({ board, ctx, moves });
-  return captured;
-};
 
 const otherEdge = (t: number, notEdge: number) => TRIANGLES[t].edgeIds.find(e => e !== notEdge)!;
 
@@ -54,7 +17,7 @@ describe('line-player bot', () => {
     const t = 5;
     const [e0, e1, e2] = TRIANGLES[t].edgeIds;
     const board = applyShade(applyShade(generateStartBoard(), e0), e1);
-    const played = playBotTurn(board, LINE);
+    const played = playBotTurn(board, LINE, smartBotStrategy);
     expect(played.move).toBe('shadeEdge');
     expect(played.arg).toBe(e2);
     expect(isLineWin(played.nextBoard)).toBe(true);
@@ -68,14 +31,14 @@ describe('line-player bot', () => {
     board = applyShade(board, otherEdge(t2, edge.id));
     // No immediate win available, but shading `edge` makes two live threats.
     expect(isWinningShade(board, edge.id)).toBe(false);
-    const played = playBotTurn(board, LINE);
+    const played = playBotTurn(board, LINE, smartBotStrategy);
     expect(played.move).toBe('shadeEdge');
     expect(liveThreats(played.nextBoard).length).toBeGreaterThanOrEqual(2);
   });
 
   it('always plays a legal (still-free) edge', () => {
     const board = applyShade(generateStartBoard(), 0);
-    const played = playBotTurn(board, LINE);
+    const played = playBotTurn(board, LINE, smartBotStrategy);
     expect(board.edges[played.arg]).toBe(false);
   });
 });
@@ -85,7 +48,7 @@ describe('circle-player bot', () => {
     const t = 8;
     const [e0, e1] = TRIANGLES[t].edgeIds;
     const board = applyShade(applyShade(generateStartBoard(), e0), e1);
-    const played = playBotTurn(board, CIRCLE);
+    const played = playBotTurn(board, CIRCLE, smartBotStrategy);
     expect(played.move).toBe('placeCircle');
     expect(played.arg).toBe(t);
     expect(liveThreats(played.nextBoard)).not.toContain(t);
@@ -98,7 +61,7 @@ describe('circle-player bot', () => {
     board = applyShade(board, otherEdge(t1, edge.id));
     board = applyShade(board, otherEdge(t2, edge.id));
     expect(liveThreats(board)).toHaveLength(0);
-    const played = playBotTurn(board, CIRCLE);
+    const played = playBotTurn(board, CIRCLE, smartBotStrategy);
     expect(played.move).toBe('placeCircle');
     expect([t1, t2]).toContain(played.arg);
     expect(preThreatEdges(played.nextBoard)).not.toContain(edge.id);
@@ -106,7 +69,7 @@ describe('circle-player bot', () => {
 
   it('always circles a still-empty triangle', () => {
     const board = applyCircle(generateStartBoard(), 0);
-    const played = playBotTurn(board, CIRCLE);
+    const played = playBotTurn(board, CIRCLE, smartBotStrategy);
     expect(board.circles[played.arg]).toBe(false);
   });
 });

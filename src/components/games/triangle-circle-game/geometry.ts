@@ -26,7 +26,6 @@ export interface Edge {
   id: number;
   x1: number; y1: number;
   x2: number; y2: number;
-  mx: number; my: number; // midpoint, for the edge's click label
   triangleIds: number[]; // the 1 (boundary) or 2 (interior) triangles it bounds
 }
 
@@ -78,8 +77,6 @@ const build = () => {
       y1: va.y,
       x2: vb.x,
       y2: vb.y,
-      mx: (va.x + vb.x) / 2,
-      my: (va.y + vb.y) / 2,
       triangleIds: []
     };
     edgeByKey.set(key, edge);

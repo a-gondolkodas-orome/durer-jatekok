@@ -6,7 +6,7 @@ import {
 } from '../helpers';
 import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
 import { makeSmartBotStrategy } from './bot-strategy';
-import type { Ctx, GameMoves } from '../../../strategy-game-factory';
+import { playBotTurn } from './spec-helpers';
 
 // The centrepiece: a complete-branching certificate that the LINE player wins
 // the side-6 board. Soundness rests on the March Lemma (see forced-win.ts);
@@ -101,30 +101,6 @@ describe('marchEdge', () => {
 describe('bot line player wins against adversarial circle defence', () => {
   const bot = makeSmartBotStrategy({ depth: 4, budget: 500 });
 
-  const botLineEdge = (board: Board): number => {
-    let chosen = -1;
-    const moves: GameMoves<Board> = {
-      shadeEdge: (b: Board, edgeId: number) => {
-        chosen = edgeId;
-        return { nextBoard: applyShade(b, edgeId) };
-      },
-      placeCircle: (b: Board, triangleId: number) => ({ nextBoard: applyCircle(b, triangleId) })
-    };
-    const ctx: Ctx = {
-      isHumanVsHumanGame: false,
-      resolvedPlayerNames: ['', ''],
-      chosenRoleIndex: null,
-      phase: 'play',
-      turnState: null,
-      currentPlayer: LINE,
-      isClientMoveAllowed: true,
-      winnerIndex: null,
-      moveCount: 0
-    };
-    bot({ board, ctx, moves });
-    return chosen;
-  };
-
   // Cover the threat if any (forced), otherwise pick a reply that avoids an
   // immediately lost (two-hot) position when one exists.
   const paranoidCircleReply = (board: Board): number => {
@@ -140,7 +116,7 @@ describe('bot line player wins against adversarial circle defence', () => {
       let board = applyCircle(applyShade(generateStartBoard(), OPENING_EDGE), reply);
       let won = false;
       for (let round = 0; round < 40; round++) {
-        board = applyShade(board, botLineEdge(board));
+        board = playBotTurn(board, LINE, bot).nextBoard;
         if (isLineWin(board)) { won = true; break; }
         board = applyCircle(board, paranoidCircleReply(board));
         if (isCircleWin(board)) break;

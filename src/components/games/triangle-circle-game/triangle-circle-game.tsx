@@ -1,4 +1,4 @@
-import { strategyGameFactory, type Ctx, type Events } from '../../strategy-game-factory';
+import { strategyGameFactory, type Events } from '../../strategy-game-factory';
 import { BoardClient } from './board-client';
 import {
   type Board, LINE, CIRCLE,
@@ -6,10 +6,10 @@ import {
 } from './helpers';
 import { smartBotStrategy, randomBotStrategy } from './strategy/bot-strategy';
 
-const moves = {
+export const moves = {
   // Line player shades one edge; they win at once if it completes an un-circled
   // triangle, otherwise the turn passes.
-  shadeEdge: (board: Board, { events }: { ctx: Ctx; events: Events }, edgeId: number) => {
+  shadeEdge: (board: Board, { events }: { events: Events }, edgeId: number) => {
     const nextBoard = applyShade(board, edgeId);
     if (isLineWin(nextBoard)) {
       events.endGame(LINE);
@@ -20,7 +20,7 @@ const moves = {
   },
   // Circle player drops a circle into one triangle; they win once every triangle
   // is circled, otherwise the turn passes.
-  placeCircle: (board: Board, { events }: { ctx: Ctx; events: Events }, triangleId: number) => {
+  placeCircle: (board: Board, { events }: { events: Events }, triangleId: number) => {
     const nextBoard = applyCircle(board, triangleId);
     if (isCircleWin(nextBoard)) {
       events.endGame(CIRCLE);

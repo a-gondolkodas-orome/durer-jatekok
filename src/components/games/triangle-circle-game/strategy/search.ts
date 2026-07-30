@@ -26,7 +26,7 @@ const TRI_EDGE_IDS: number[][] = TRIANGLES.map(t => [...t.edgeIds]);
 const EDGE_TRI_IDS: number[][] = EDGES.map(e => [...e.triangleIds]);
 const ALL_CIRCLES = (1n << BigInt(TRIANGLE_COUNT)) - 1n;
 
-export const boardToMasks = (board: Board): { edges: bigint; circles: bigint } => {
+const boardToMasks = (board: Board): { edges: bigint; circles: bigint } => {
   let edges = 0n;
   for (let e = 0; e < EDGE_COUNT; e++) if (board.edges[e]) edges |= 1n << BigInt(e);
   let circles = 0n;
@@ -179,7 +179,6 @@ export const evaluatePosition = (
 export interface MoveEvaluator {
   evalAfterShade: (board: Board, edgeId: number) => Outcome;
   evalAfterCircle: (board: Board, triangleId: number) => Outcome;
-  exhausted: () => boolean;
 }
 
 export const makeMoveEvaluator = (
@@ -194,7 +193,6 @@ export const makeMoveEvaluator = (
     evalAfterCircle: (board, triangleId) => {
       const { edges, circles } = boardToMasks(board);
       return search(edges, circles | bit(triangleId), LINE, depth, st);
-    },
-    exhausted: () => st.nodes > st.budget
+    }
   };
 };
