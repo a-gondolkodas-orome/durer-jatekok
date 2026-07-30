@@ -68,20 +68,17 @@ describe('marchEdge', () => {
     // A down triangle B flanked by two up triangles A, C that each own a
     // boundary edge: heat A and C through their boundary edges (heats nothing
     // else), leaving the chain A - B - C with cold interior.
+    const hasBoundaryEdge = (t: number) =>
+      TRIANGLES[t].edgeIds.some(e => EDGES[e].triangleIds.length === 1);
     const B = TRIANGLES.find(t =>
       t.dir === 'down' &&
       t.edgeIds.filter(e =>
-        EDGES[e].triangleIds.length === 2 &&
-        EDGES[e].triangleIds.some(u =>
-          u !== t.id && TRIANGLES[u].edgeIds.some(x => EDGES[x].triangleIds.length === 1)
-        )
+        EDGES[e].triangleIds.some(u => u !== t.id && hasBoundaryEdge(u))
       ).length >= 2
     )!;
     const flank = B.edgeIds
       .map(e => EDGES[e].triangleIds.find(u => u !== B.id))
-      .filter((u): u is number =>
-        u !== undefined && TRIANGLES[u].edgeIds.some(x => EDGES[x].triangleIds.length === 1)
-      );
+      .filter((u): u is number => u !== undefined && hasBoundaryEdge(u));
     const [A, C] = flank;
     const boundaryEdge = (t: number) => TRIANGLES[t].edgeIds.find(x => EDGES[x].triangleIds.length === 1)!;
 

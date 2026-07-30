@@ -34,8 +34,9 @@ import { type Board, applyShade, applyCircle, shadedCount } from '../helpers';
 // triangle and the down triangle below it (id in geometry.ts numbering).
 export const OPENING_EDGE = 22;
 
-// -1 for circled cells, else the number of shaded sides.
-const cellCount = (board: Board, t: number): number =>
+// A triangle's heat: -1 once circled (out of the game), else its number of
+// shaded sides — 0 is cold, 1 is hot, 2+ is completable.
+const heat = (board: Board, t: number): number =>
   board.circles[t] ? -1 : shadedCount(board, t);
 
 // True iff the player to move being LINE wins outright: an uncircled triangle
@@ -44,7 +45,7 @@ const cellCount = (board: Board, t: number): number =>
 export const isLineTurnWon = (board: Board): boolean => {
   const counts: number[] = new Array(TRIANGLE_COUNT);
   for (let t = 0; t < TRIANGLE_COUNT; t++) {
-    counts[t] = cellCount(board, t);
+    counts[t] = heat(board, t);
     if (counts[t] >= 2) return true;
   }
   const parent = Array.from({ length: TRIANGLE_COUNT }, (_, i) => i);
@@ -80,7 +81,7 @@ export const marchEdge = (board: Board): number | null => {
   const counts: number[] = [];
   const hots: number[] = [];
   for (let t = 0; t < TRIANGLE_COUNT; t++) {
-    counts[t] = cellCount(board, t);
+    counts[t] = heat(board, t);
     if (counts[t] === 1) hots.push(t);
   }
   if (hots.length < 2) return null;
@@ -141,7 +142,7 @@ export const winningPairHeatEdge = (board: Board): number | null => {
   for (const edge of EDGES) {
     if (board.edges[edge.id] || edge.triangleIds.length !== 2) continue;
     const [a, b] = edge.triangleIds;
-    if (cellCount(board, a) !== 0 || cellCount(board, b) !== 0) continue;
+    if (heat(board, a) !== 0 || heat(board, b) !== 0) continue;
     const shaded = applyShade(board, edge.id);
     let allRepliesLose = true;
     for (const t of uncircled) {

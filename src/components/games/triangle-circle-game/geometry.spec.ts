@@ -48,6 +48,11 @@ describe('side-6 triangular grid geometry', () => {
     }
   });
 
+  it('draws every edge with the same length, so the small triangles are equilateral', () => {
+    const lengths = EDGES.map(e => Math.hypot(e.x2 - e.x1, e.y2 - e.y1));
+    for (const length of lengths) expect(length).toBeCloseTo(lengths[0], 2);
+  });
+
   it('lays every vertex inside the 0..100 viewBox', () => {
     for (const v of VERTICES) {
       expect(v.x).toBeGreaterThanOrEqual(0);

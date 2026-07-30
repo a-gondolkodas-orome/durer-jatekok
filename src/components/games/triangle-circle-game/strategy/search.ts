@@ -85,6 +85,11 @@ const search = (edges: bigint, circles: bigint, player: number, depth: number, s
   if (circles === ALL_CIRCLES) return 'lineLoses'; // every triangle circled → circle wins
   if (st.nodes > st.budget || depth <= 0) return 'unknown';
 
+  // The key deliberately omits the remaining depth, so an 'unknown' cached from
+  // a shallow visit can short-circuit a later, deeper visit of the same
+  // position. That only ever makes the search more conservative ('lineWins' /
+  // 'lineLoses' are depth-independent proofs) and keeps the memo effective
+  // within the node budget.
   const key = `${edges.toString(36)}|${circles.toString(36)}|${player}`;
   const cached = st.memo.get(key);
   if (cached) return cached;
@@ -182,7 +187,7 @@ export interface MoveEvaluator {
 }
 
 export const makeMoveEvaluator = (
-  { depth = 8, budget = 120_000 }: { depth?: number; budget?: number } = {}
+  { depth, budget }: { depth: number; budget: number }
 ): MoveEvaluator => {
   const st: SearchState = { nodes: 0, budget, memo: new Map() };
   return {

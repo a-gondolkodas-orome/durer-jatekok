@@ -40,9 +40,17 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     return 'fill-transparent';
   };
 
+  const hovered = hoveredEdge !== null && !board.edges[hoveredEdge] ? EDGES[hoveredEdge] : null;
+
   return (
     <GameBoard>
       <svg className="aspect-square w-full" viewBox="0 0 100 100">
+        <defs>
+          <clipPath id="triangle-circle-board-clip">
+            <polygon points={BOARD_OUTLINE} />
+          </clipPath>
+        </defs>
+
         {/* Triangles: fills + circle-player clicks */}
         <g>
           {TRIANGLES.map(tri => (
@@ -96,16 +104,11 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
         {/* Shaded edges last, so they cover the grid lines and the outline;
             clipped to the board so the round caps never spill outside it. */}
-        <defs>
-          <clipPath id="triangle-circle-board-clip">
-            <polygon points={BOARD_OUTLINE} />
-          </clipPath>
-        </defs>
         <g className="pointer-events-none" clipPath="url(#triangle-circle-board-clip)">
-          {hoveredEdge !== null && !board.edges[hoveredEdge] && (
+          {hovered && (
             <line
-              x1={EDGES[hoveredEdge].x1} y1={EDGES[hoveredEdge].y1}
-              x2={EDGES[hoveredEdge].x2} y2={EDGES[hoveredEdge].y2}
+              x1={hovered.x1} y1={hovered.y1}
+              x2={hovered.x2} y2={hovered.y2}
               strokeLinecap="round"
               className="stroke-red-300 dark:stroke-red-700"
               strokeWidth="1.4"

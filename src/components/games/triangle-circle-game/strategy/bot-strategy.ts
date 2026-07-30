@@ -87,14 +87,14 @@ const chooseLineMove = (board: Board, searchOpts: SearchOpts): number => {
     .sort((a, b) => b.score - a.score);
 
   const evaluator = makeMoveEvaluator(searchOpts);
-  const safe: number[] = [];
+  const undecided: number[] = [];
   for (const { e } of ordered) {
     const outcome = evaluator.evalAfterShade(board, e);
     if (outcome === 'lineWins') return e;
     if (outcome === 'lineLoses') continue;
-    safe.push(e);
+    undecided.push(e);
   }
-  return safe.length > 0 ? safe[0] : ordered[0].e;
+  return undecided.length > 0 ? undecided[0] : ordered[0].e;
 };
 
 // Higher = a more promising shading move for the fallback ordering.
@@ -149,14 +149,14 @@ const chooseCircleMove = (board: Board, searchOpts: SearchOpts): number => {
   // 2. Search the most promising fills first. Take a move that provably denies
   //    the line player a win in the horizon, skip any that hand one over.
   const evaluator = makeMoveEvaluator(searchOpts);
-  const safe: number[] = [];
+  const undecided: number[] = [];
   for (const { t } of ordered) {
     const outcome = evaluator.evalAfterCircle(board, t);
     if (outcome === 'lineLoses') return t;
     if (outcome === 'lineWins') continue;
-    safe.push(t);
+    undecided.push(t);
   }
-  return safe.length > 0 ? safe[0] : ordered[0].t;
+  return undecided.length > 0 ? undecided[0] : ordered[0].t;
 };
 
 // Purely random fallbacks, exposed for a "test" bot / property tests.
