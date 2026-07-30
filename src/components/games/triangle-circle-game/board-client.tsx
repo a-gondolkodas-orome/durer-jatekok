@@ -68,7 +68,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               key={`circle-${tri.id}`}
               cx={tri.cx}
               cy={tri.cy}
-              r={tri.dir === 'up' ? 2.6 : 2.2}
+              r={2.4}
               className="fill-none stroke-blue-700 dark:stroke-blue-400"
               strokeWidth="0.9"
             />
