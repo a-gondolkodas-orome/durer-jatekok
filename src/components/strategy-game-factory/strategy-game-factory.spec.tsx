@@ -510,8 +510,8 @@ describe('move validate enforcement', () => {
         <button data-testid="legal-btn" onClick={() => moves.guarded(board, 'ok')}>legal</button>
         <button data-testid="illegal-btn" onClick={() => moves.guarded(board, 'bad')}>illegal</button>
         <span data-testid="board">{board.join(',')}</span>
-        <span data-testid="can-ok">{String(moves.guarded.validate!(board, 'ok'))}</span>
-        <span data-testid="can-bad">{String(moves.guarded.validate!(board, 'bad'))}</span>
+        <span data-testid="can-ok">{String(moves.guarded.isAllowed!(board, 'ok'))}</span>
+        <span data-testid="can-bad">{String(moves.guarded.isAllowed!(board, 'bad'))}</span>
       </>
     ),
     gameplay: {
@@ -552,8 +552,10 @@ describe('move validate enforcement', () => {
     }
   });
 
-  it('exposes the validator on the wrapped move with ctx bound, for BoardClient use', () => {
+  it('exposes isAllowed on the wrapped move: turn ownership AND the validator, ctx bound', () => {
     const { getByTestId } = renderGame(guardedConfig());
+    // outside the play phase nothing is dispatchable, even with legal args
+    expect(getByTestId('can-ok').textContent).toBe('false');
     fireEvent.click(getByTestId('role-btn-0'));
     expect(getByTestId('can-ok').textContent).toBe('true');
     expect(getByTestId('can-bad').textContent).toBe('false');

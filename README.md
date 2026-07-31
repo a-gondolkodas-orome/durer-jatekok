@@ -242,15 +242,19 @@ bugs loudly), and in production it warns, records an `illegal-move` analytics
 event, and no-ops (so a stray or tampered call cannot corrupt the board). A
 shorthand move (plain function) is always accepted, so this is fully opt-in.
 
-The validator is the **single source of truth** for legality. The framework also
-exposes it on the wrapped move with `ctx` already bound, so the `BoardClient`
-computes button `disabled` state as `moves.<name>.validate(board, ...args)`
-(AND-ed with `ctx.isClientMoveAllowed` for turn ownership); the bot can use it
-to enumerate legal moves, and because it is React-free the exact same function
+The validator is the **single source of truth** for legality: it drives the
+framework's enforcement, and because it is React-free the exact same function
 could run server-side in a future authoritative/competition mode. Keep the
 "whose turn is it" check out of the validator — that belongs to the framework,
-not to per-move legality. See `coins-in-3-piles` (two-phase turn) and
-`cube-coloring` (reuses its existing `isAllowedStep` helper) for worked
+not to per-move legality.
+
+For the UI, the framework exposes `moves.<name>.isAllowed(board, ...args)` on
+the wrapped move: `ctx.isClientMoveAllowed` (turn ownership) AND `validate`,
+with `ctx` already bound. A `BoardClient` computes button `disabled` state
+directly from it, with no gating boilerplate. It is not meant for bots — during
+the bot's turn `isClientMoveAllowed` is false by design, so bots enumerate legal
+moves via the raw `validate`/helpers. See `coins-in-3-piles` (two-phase turn)
+and `cube-coloring` (reuses its existing `isAllowedStep` helper) for worked
 examples.
 
 ### BoardClient React component

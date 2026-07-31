@@ -108,15 +108,19 @@ loudly to surface the bug; in prod it warns, fires an `illegal-move` analytics
 event, and no-ops so a stray call cannot corrupt the board). The function
 shorthand means "always legal", so this is fully opt-in and games that predate
 it keep working unchanged. The validator is the **single source of truth** for
-legality: the engine also exposes it on the wrapped move with `ctx` already
-bound, so the `BoardClient` drives button `disabled` state via
-`moves.<name>.validate(board, ...args)` (combined with `ctx.isClientMoveAllowed`
-for turn ownership); bots and — being React-free — a possible future
-server-side authoritative check can reuse the same predicate. Do **not** put the
-"whose turn is it" check (`ctx.isClientMoveAllowed`) inside `validate`; that is
-the engine's concern, not per-move legality. See `coins-in-3-piles` (two-phase
-turn) and `cube-coloring` (reuses the existing `isAllowedStep` helper) for
-examples.
+legality: it drives the engine's enforcement, and — being React-free — a
+possible future server-side authoritative check can reuse the same predicate.
+Do **not** put the "whose turn is it" check (`ctx.isClientMoveAllowed`) inside
+`validate`; the engine folds that in for the UI (below). See `coins-in-3-piles`
+(two-phase turn) and `cube-coloring` (reuses the existing `isAllowedStep`
+helper) for examples.
+
+**`moves.<name>.isAllowed(board, ...args)`** — for moves with a `validate`, the
+engine exposes this on the wrapped move: `ctx.isClientMoveAllowed` (turn
+ownership) AND `validate`, with `ctx` already bound. This is exactly what a
+`BoardClient`'s button `disabled` state should ask, with no gating boilerplate.
+Not for bots: during the bot's turn `isClientMoveAllowed` is false by design, so
+bots enumerate legal moves via the raw `validate`/helpers instead.
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes

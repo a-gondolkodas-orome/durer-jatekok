@@ -252,9 +252,13 @@ export const strategyGameFactory = <TBoard,>({
       const wrapped: GameMoves<TBoard>[string] = (board: TBoard, ...args: unknown[]) =>
         moveWrapper(name, board, args, () => apply(board, { ctx, events }, ...args));
       if (validate) {
-        // Expose the validator with `ctx` bound, so the BoardClient can check
-        // legality as `moves.x.validate(board, ...args)`.
-        wrapped.validate = (board: TBoard, ...args: unknown[]) => validate(board, { ctx }, ...args);
+        // "May the client dispatch this move right now?" — turn ownership plus
+        // the move's own legality, with `ctx` bound, so the BoardClient drives
+        // `disabled` as `moves.x.isAllowed(board, ...args)` with no boilerplate.
+        // (Bots enumerate legal moves via the raw `validate`/helpers instead:
+        // during the bot's turn `isClientMoveAllowed` is false by design.)
+        wrapped.isAllowed = (board: TBoard, ...args: unknown[]) =>
+          isClientMoveAllowed && validate(board, { ctx }, ...args);
       }
       return wrapped;
     });

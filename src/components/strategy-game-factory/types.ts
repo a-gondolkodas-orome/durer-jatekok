@@ -38,13 +38,16 @@ export type MoveValidator<TBoard> = (
 export type MoveDefinition<TBoard> =
   | MoveFunction<TBoard>
   | { apply: MoveFunction<TBoard>; validate?: MoveValidator<TBoard> }
-// Engine-wrapped moves as seen by BoardClient and bots: callable to dispatch,
-// with `validate` (when defined) exposed with `ctx` already bound, so clients
-// can check legality as `moves.x.validate(board, ...args)`.
+// Engine-wrapped moves as seen by BoardClient and bots: callable to dispatch.
+// When the move defines `validate`, the wrapped move also exposes
+// `isAllowed(board, ...args)` — `ctx.isClientMoveAllowed` (turn ownership)
+// AND the move's `validate`, with `ctx` already bound — which is what the
+// BoardClient's `disabled` state should ask. Not for bots: during the bot's
+// turn `isClientMoveAllowed` is false, so bots use the raw `validate`/helpers.
 export type GameMoves<TBoard> = Record<
   string,
   ((board: TBoard, ...args: any[]) => MoveResult<TBoard>)
-    & { validate?: (board: TBoard, ...args: any[]) => boolean }
+    & { isAllowed?: (board: TBoard, ...args: any[]) => boolean }
 >
 export type StrategyArgs<TBoard> = { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }
 export type BoardClientProps<TBoard> = StrategyArgs<TBoard> & { events: Events }

@@ -21,14 +21,11 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const wasCoinAlreadyRemovedInTurn = valueOfRemovedCoin !== null;
 
-  // Legality comes from the move's own validator (single source of truth with
-  // the engine, exposed here with ctx already bound); the board-client only
-  // adds the "is it my turn" gate on top.
-  const isRemovalAllowed = coinValue =>
-    ctx.isClientMoveAllowed && moves.removeCoin.validate!(board, coinValue);
-
-  const isAddAllowed = coinValue =>
-    ctx.isClientMoveAllowed && moves.addCoin.validate!(board, coinValue);
+  // `isAllowed` is the engine-bound combination of turn ownership
+  // (ctx.isClientMoveAllowed) and the move's own `validate` — the single
+  // source of truth shared with the engine's illegal-move enforcement.
+  const isRemovalAllowed = coinValue => moves.removeCoin.isAllowed!(board, coinValue);
+  const isAddAllowed = coinValue => moves.addCoin.isAllowed!(board, coinValue);
 
   const removeFromPile = coinValue => {
     if (!isRemovalAllowed(coinValue)) return;

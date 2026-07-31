@@ -4,7 +4,8 @@ import { makeCtx } from '../../../test-utils';
 // The board-client's `disabled` predicates and the engine's illegal-move
 // enforcement both flow through these validators, so they are the single legality
 // contract worth locking down. `ctx.isClientMoveAllowed` (whose turn) is out of
-// scope here on purpose — that gate lives in the board-client, not the validator.
+// scope here on purpose — the engine folds that into the wrapped `isAllowed`,
+// it is not part of per-move legality.
 describe('coins-in-3-piles move validators', () => {
   type TurnState = { removedCoinValue: number } | null;
   const removeCoin = (board: Board, turnState: TurnState, value: number) =>
