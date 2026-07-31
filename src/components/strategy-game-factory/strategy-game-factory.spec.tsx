@@ -569,51 +569,61 @@ describe('move validate enforcement', () => {
     expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(true); // bot's turn now
   });
 
-  it('validates a bot-chained second move against current turnState, not a stale render', () => {
-    // Mirrors the coins-in-3-piles bots: a two-phase turn chained via setTimeout
-    // on the move wrappers captured when the bot's turn started. The phase-2
-    // validator reads ctx.turnState, which phase 1 just set — the engine must
-    // judge it against the current state, not the render the wrappers came from.
-    vi.useFakeTimers();
-    try {
-      const config = makeConfig({
-        BoardClient: ({ board }: BoardClientProps<Board>) => (
-          <span data-testid="board">{board.join(',')}</span>
-        ),
-        gameplay: {
-          moves: {
-            phase1: {
-              validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState === null,
-              apply: (board: Board, { events }: { events: Events }) => {
-                events.setTurnState({ removedCoinValue: 3 });
-                return { nextBoard: [...board, 'p1'] };
-              }
-            },
-            phase2: {
-              validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState !== null,
-              apply: (board: Board, { events }: { events: Events }) => {
-                events.endTurn();
-                events.setTurnState(null);
-                return { nextBoard: [...board, 'p2'] };
-              }
-            }
+  // Mirrors the coins-in-3-piles bots: a two-phase turn chained via setTimeout
+  // on the move wrappers captured when the bot's turn started. The phase-2
+  // validator reads ctx.turnState, which phase 1 just set — the engine must
+  // judge it against the current game state, not the render the wrappers came
+  // from. The 0-delay variant (smartBotStrategy's "place back nothing" branch)
+  // is the harshest case: phase 2 dispatches before React re-renders at all.
+  const twoPhaseBotConfig = (chainDelayMs: number) => makeConfig({
+    BoardClient: ({ board }: BoardClientProps<Board>) => (
+      <span data-testid="board">{board.join(',')}</span>
+    ),
+    gameplay: {
+      moves: {
+        phase1: {
+          validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState === null,
+          apply: (board: Board, { events }: { events: Events }) => {
+            events.setTurnState({ removedCoinValue: 3 });
+            return { nextBoard: [...board, 'p1'] };
           }
         },
-        botStrategy: ({ board, moves }) => {
-          const { nextBoard } = moves.phase1(board);
-          setTimeout(() => { moves.phase2(nextBoard); }, 750);
+        phase2: {
+          validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState !== null,
+          apply: (board: Board, { events }: { events: Events }) => {
+            events.endTurn();
+            events.setTurnState(null);
+            return { nextBoard: [...board, 'p2'] };
+          }
         }
-      });
-      const { getByTestId } = renderGame(config);
+      }
+    },
+    botStrategy: ({ board, moves }) => {
+      const { nextBoard } = moves.phase1(board);
+      setTimeout(() => { moves.phase2(nextBoard); }, chainDelayMs);
+    }
+  });
+
+  const playTwoPhaseBotTurn = (chainDelayMs: number) => {
+    vi.useFakeTimers();
+    try {
+      const { getByTestId } = renderGame(twoPhaseBotConfig(chainDelayMs));
       fireEvent.click(getByTestId('role-btn-1')); // human is 2nd player → bot moves first
       act(() => { vi.advanceTimersByTime(1500); }); // bot "thinking" delay → phase1
-      expect(getByTestId('board').textContent).toBe('initial,p1');
-      act(() => { vi.advanceTimersByTime(750); }); // bot's chained phase2 — must not be rejected
-      expect(getByTestId('board').textContent).toBe('initial,p1,p2');
+      act(() => { vi.advanceTimersByTime(750); }); // the chained phase2 — must not be rejected
+      return getByTestId('board').textContent;
     } finally {
       vi.clearAllTimers();
       vi.useRealTimers();
     }
+  };
+
+  it('validates a bot-chained second move against current turnState, not a stale render', () => {
+    expect(playTwoPhaseBotTurn(750)).toBe('initial,p1,p2');
+  });
+
+  it('validates a 0-delay chained second move dispatched before React re-renders', () => {
+    expect(playTwoPhaseBotTurn(0)).toBe('initial,p1,p2');
   });
 
   describe('in production (import.meta.env.DEV = false)', () => {

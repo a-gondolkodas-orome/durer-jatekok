@@ -243,7 +243,13 @@ export const strategyGameFactory = <TBoard,>({
     const events: Events = {
       endTurn,
       endGame,
-      setTurnState
+      // Also patch turnState onto ctxRef synchronously: a chained dispatch can
+      // validate before React re-renders (e.g. a bot's 0-delay setTimeout),
+      // when the render-synced ref would still hold the previous turnState.
+      setTurnState: (state) => {
+        setTurnState(state);
+        ctxRef.current = { ...ctxRef.current, turnState: state };
+      }
     };
 
     wrappedGameMoves = mapValues(normalizedMoves, ({ apply, validate }, name) => {
