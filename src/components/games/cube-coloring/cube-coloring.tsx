@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { range, cloneDeep, every, some, map } from 'lodash';
 import { strategyGameFactory, type Events, type BoardClientProps, GameBoard } from '../../strategy-game-factory';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
-import { isAllowedStep, isColored, generateStartBoard, edges, type Board } from './helpers';
+import { isAllowedStep, isColored, generateStartBoard, edges, colors, type Board } from './helpers';
 import { useTranslation } from '../../../language';
 
 // Screen position of each node; the drawn skeleton (see `edges` in helpers)
@@ -43,7 +43,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
-  const isMoveAllowed = (vertex) => moves.colorVertex.isAllowed!(board, { vertex, color });
+  const isColoringAllowed = (vertex) => moves.colorVertex.isAllowed!(board, { vertex, color });
 
   const pick = (pickedColor) => {
     if (!ctx.isClientMoveAllowed) return;
@@ -57,14 +57,14 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   };
 
   const isNearAllowedNode = range(8).some(nodeId => {
-    if (!isMoveAllowed(nodeId)) return false;
+    if (!isColoringAllowed(nodeId)) return false;
     const cx = parseFloat(cubeCoords[nodeId].cx);
     const cy = parseFloat(cubeCoords[nodeId].cy);
     return Math.hypot(x - cx, y - cy) < 6;
   });
 
   const setVertexColor = (vertex) => {
-    if (!isMoveAllowed(vertex)) return;
+    if (!isColoringAllowed(vertex)) return;
     moves.colorVertex(board, { vertex, color });
     setColor(null);
   };
@@ -105,12 +105,12 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           onKeyUp={(event) => {
             if (event.key === 'Enter') setVertexColor(nodeId);
           }}
-          tabIndex={isMoveAllowed(nodeId) ? 0 : undefined}
-          role={isMoveAllowed(nodeId) ? 'button' : undefined}
-          aria-label={isMoveAllowed(nodeId) ? `Node ${nodeId + 1}` : undefined}
+          tabIndex={isColoringAllowed(nodeId) ? 0 : undefined}
+          role={isColoringAllowed(nodeId) ? 'button' : undefined}
+          aria-label={isColoringAllowed(nodeId) ? `Node ${nodeId + 1}` : undefined}
           fill={nodeColors[board[nodeId]]?.svg}
           className={!nodeColors[board[nodeId]]
-            ? (isMoveAllowed(nodeId) || color === null
+            ? (isColoringAllowed(nodeId) || color === null
               ? 'fill-slate-50 dark:fill-slate-300'
               : 'fill-slate-400 dark:fill-slate-600')
             : undefined}
@@ -131,15 +131,13 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
 const isGameEnd = (board: Board) => {
   const canUseColor = color => some(range(0, 8), v => isAllowedStep(board, v, color));
-  return every(Object.keys(nodeColors), color => !canUseColor(color));
+  return every(colors, color => !canUseColor(color));
 };
 
 const moves = {
   colorVertex: {
-    // The colour must be a real palette colour — this also covers the
-    // BoardClient's "no colour picked yet" state (color === null).
     validate: (board: Board, _, { vertex, color }: { vertex: number; color: string | null }) =>
-      color !== null && color in nodeColors && isAllowedStep(board, vertex, color),
+      isAllowedStep(board, vertex, color),
     apply: (board: Board, { events }: { events: Events }, { vertex, color }) => {
       const nextBoard = cloneDeep(board);
       nextBoard[vertex] = color;

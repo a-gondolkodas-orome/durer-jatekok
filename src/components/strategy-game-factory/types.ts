@@ -38,6 +38,11 @@ type MoveValidator<TBoard> = (
 export type MoveDefinition<TBoard> =
   | MoveFunction<TBoard>
   | { apply: MoveFunction<TBoard>; validate?: MoveValidator<TBoard> }
+export interface Gameplay<TBoard> {
+  moves: Record<string, MoveDefinition<TBoard>>
+  // move name auto-executed (after a delay) following moves returning autoEndOfTurn: true
+  endOfTurnMove?: string
+}
 // Engine-wrapped moves as seen by BoardClient and bots: callable to dispatch.
 // When the move defines `validate`, the wrapped move also exposes
 // `isAllowed(board, ...args)` — `ctx.isClientMoveAllowed` (turn ownership)

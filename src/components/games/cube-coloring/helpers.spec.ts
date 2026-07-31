@@ -7,6 +7,11 @@ describe('cube-coloring isAllowedStep', () => {
     expect(isAllowedStep(empty(), 0, 'red')).toBe(true);
   });
 
+  it('rejects a colour outside the palette', () => {
+    expect(isAllowedStep(empty(), 0, 'purple')).toBe(false);
+    expect(isAllowedStep(empty(), 0, null)).toBe(false);
+  });
+
   it('rejects colouring a vertex that is already coloured', () => {
     const board = empty();
     board[0] = 'red';

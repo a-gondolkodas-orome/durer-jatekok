@@ -10,7 +10,7 @@ import { useLocation } from 'react-router';
 import { useGameStats } from './hooks/use-game-stats';
 import { trackEvent } from '../../tracking';
 import type {
-  Phase, Mode, Ctx, Events, MoveResult, MoveDefinition, GameMoves,
+  Phase, Mode, Ctx, Events, MoveResult, Gameplay, GameMoves,
   BoardClientProps, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './helpers/resolve-variants';
@@ -24,16 +24,6 @@ export interface Presentation<TBoard> {
   rule: TranslatableNode
   roleLabels?: [I18nString, I18nString]
   getPlayerStepDescription: (args: { board: TBoard; ctx: Ctx }) => TranslatableNode
-}
-
-export interface Gameplay<TBoard> {
-  // Each move is either a plain apply function (shorthand — always accepted),
-  // or `{ apply, validate? }`. When `validate` is present, the engine rejects
-  // any dispatch whose args fail it (see `moveWrapper`), and exposes it on the
-  // wrapped move (with `ctx` bound) so the BoardClient can drive `disabled`
-  // state from the same predicate.
-  moves: Record<string, MoveDefinition<TBoard>>
-  endOfTurnMove?: string
 }
 
 export type StrategyGameConfig<TBoard> = {
