@@ -57,12 +57,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   return (
     <GameBoard>
       <svg className="aspect-square w-full" viewBox="0 0 100 100">
-        <defs>
-          <clipPath id="triangle-circle-board-clip">
-            <polygon points={BOARD_OUTLINE} />
-          </clipPath>
-        </defs>
-
         {/* Triangles: fills + circle-player clicks */}
         <g>
           {TRIANGLES.map(tri => (
@@ -114,9 +108,10 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           strokeWidth="0.5"
         />
 
-        {/* Shaded edges last, so they cover the grid lines and the outline;
-            clipped to the board so the round caps never spill outside it. */}
-        <g className="pointer-events-none" clipPath="url(#triangle-circle-board-clip)">
+        {/* Shaded edges last, so they cover the grid lines and the outline.
+            The inset keeps their round caps clear of the board corners, so
+            boundary shades can run at full width without clipping. */}
+        <g className="pointer-events-none">
           {hovered && (
             <line
               x1={hovered.x1} y1={hovered.y1}
