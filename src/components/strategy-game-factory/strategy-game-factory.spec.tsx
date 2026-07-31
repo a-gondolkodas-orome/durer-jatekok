@@ -2,7 +2,7 @@
 import { render, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { strategyGameFactory, type StrategyGameConfig } from './strategy-game-factory';
-import type { BoardClientProps, Ctx, Events, Gameplay, GameMoves } from './types';
+import type { BoardClientProps, Ctx, Events, Gameplay, GameMoves, StrategyArgs } from './types';
 
 type Board = string[];
 
@@ -40,7 +40,7 @@ const makeConfig = ({
 }: {
   BoardClient?: StrategyGameConfig<Board>['BoardClient']
   gameplay?: Gameplay<Board>
-  botStrategy?: () => void
+  botStrategy?: (args: StrategyArgs<Board>) => void
 } = {}): StrategyGameConfig<Board> => ({
   presentation: { rule: <></>, getPlayerStepDescription: () => '' },
   BoardClient,
@@ -567,6 +567,53 @@ describe('move validate enforcement', () => {
     fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('move-btn'));
     expect((getByTestId('move-btn') as HTMLButtonElement).disabled).toBe(true); // bot's turn now
+  });
+
+  it('validates a bot-chained second move against current turnState, not a stale render', () => {
+    // Mirrors the coins-in-3-piles bots: a two-phase turn chained via setTimeout
+    // on the move wrappers captured when the bot's turn started. The phase-2
+    // validator reads ctx.turnState, which phase 1 just set — the engine must
+    // judge it against the current state, not the render the wrappers came from.
+    vi.useFakeTimers();
+    try {
+      const config = makeConfig({
+        BoardClient: ({ board }: BoardClientProps<Board>) => (
+          <span data-testid="board">{board.join(',')}</span>
+        ),
+        gameplay: {
+          moves: {
+            phase1: {
+              validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState === null,
+              apply: (board: Board, { events }: { events: Events }) => {
+                events.setTurnState({ removedCoinValue: 3 });
+                return { nextBoard: [...board, 'p1'] };
+              }
+            },
+            phase2: {
+              validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState !== null,
+              apply: (board: Board, { events }: { events: Events }) => {
+                events.endTurn();
+                events.setTurnState(null);
+                return { nextBoard: [...board, 'p2'] };
+              }
+            }
+          }
+        },
+        botStrategy: ({ board, moves }) => {
+          const { nextBoard } = moves.phase1(board);
+          setTimeout(() => { moves.phase2(nextBoard); }, 750);
+        }
+      });
+      const { getByTestId } = renderGame(config);
+      fireEvent.click(getByTestId('role-btn-1')); // human is 2nd player → bot moves first
+      act(() => { vi.advanceTimersByTime(1500); }); // bot "thinking" delay → phase1
+      expect(getByTestId('board').textContent).toBe('initial,p1');
+      act(() => { vi.advanceTimersByTime(750); }); // bot's chained phase2 — must not be rejected
+      expect(getByTestId('board').textContent).toBe('initial,p1,p2');
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
   });
 
   describe('in production (import.meta.env.DEV = false)', () => {

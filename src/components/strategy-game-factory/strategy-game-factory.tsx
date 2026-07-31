@@ -113,7 +113,7 @@ export const strategyGameFactory = <TBoard,>({
       doMove: () => MoveResult<TBoard>
     ): MoveResult<TBoard> => {
       const validator = normalizedMoves[name]!.validate;
-      if (validator && !validator(moveBoard, { ctx }, ...args)) {
+      if (validator && !validator(moveBoard, { ctx: ctxRef.current }, ...args)) {
         reportIllegalMove(name, moveBoard, args);
         return { nextBoard: moveBoard };
       }
@@ -231,6 +231,14 @@ export const strategyGameFactory = <TBoard,>({
       winnerIndex,
       moveCount
     };
+
+    // Bots chain the moves of a multi-move turn through setTimeout on the
+    // wrappers captured when their turn started, so by the time the second
+    // move dispatches, the render-scoped `ctx` those wrappers close over is
+    // stale (e.g. `turnState` still null). Validators must judge the move
+    // against the *current* game state, so they read `ctx` through this ref.
+    const ctxRef = useRef(ctx);
+    ctxRef.current = ctx;
 
     const events: Events = {
       endTurn,
