@@ -1,7 +1,7 @@
 import { isAllowedStep, generateStartBoard, neighbours, type Board } from './helpers';
 
 // `isAllowedStep` is the single legality source shared by the board-client
-// (`disabled`), the bot, and — since moveValidators was added — the engine's
+// (`disabled`), the bot, and — via the move's `validate` — the engine's
 // illegal-move enforcement for `colorVertex`. These tests lock that contract.
 describe('cube-coloring isAllowedStep', () => {
   const empty = (): Board => generateStartBoard();

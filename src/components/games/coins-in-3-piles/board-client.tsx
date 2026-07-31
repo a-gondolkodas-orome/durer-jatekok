@@ -1,6 +1,6 @@
 import { range } from 'lodash';
 import { useTranslation } from '../../../language';
-import { moveValidators, type Board } from './helpers';
+import type { Board } from './helpers';
 import { GameBoard, type BoardClientProps, useHoverPreview } from '../../strategy-game-factory';
 
 const getCoinBgColor = (coinValue) => {
@@ -21,13 +21,14 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const wasCoinAlreadyRemovedInTurn = valueOfRemovedCoin !== null;
 
-  // Legality comes from the shared validator (single source of truth with the
-  // engine); the board-client only adds the "is it my turn" gate on top.
+  // Legality comes from the move's own validator (single source of truth with
+  // the engine, exposed here with ctx already bound); the board-client only
+  // adds the "is it my turn" gate on top.
   const isRemovalAllowed = coinValue =>
-    ctx.isClientMoveAllowed && moveValidators.removeCoin(board, { ctx }, coinValue);
+    ctx.isClientMoveAllowed && moves.removeCoin.validate!(board, coinValue);
 
   const isAddAllowed = coinValue =>
-    ctx.isClientMoveAllowed && moveValidators.addCoin(board, { ctx }, coinValue);
+    ctx.isClientMoveAllowed && moves.addCoin.validate!(board, coinValue);
 
   const removeFromPile = coinValue => {
     if (!isRemovalAllowed(coinValue)) return;

@@ -2,7 +2,7 @@ import { random, sample, sum } from 'lodash';
 import { strategyGameFactory } from '../../strategy-game-factory';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import { BoardClient } from './board-client';
-import { getPlayerStepDescription, canWin, moves, moveValidators, type Board } from './helpers';
+import { getPlayerStepDescription, canWin, moves, type Board } from './helpers';
 
 const generateWinningStartBoard = (): Board => {
   const board = [random(0, 5), random(0, 7), random(1, 8)];
@@ -64,7 +64,7 @@ export const CoinsIn3Piles = strategyGameFactory({
     getPlayerStepDescription
   },
   BoardClient,
-  gameplay: { moves, moveValidators },
+  gameplay: { moves },
   variants: [
     {
       botStrategy: randomBotStrategy,

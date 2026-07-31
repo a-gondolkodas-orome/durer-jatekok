@@ -503,21 +503,23 @@ describe('umami game-finished event', () => {
   });
 });
 
-describe('moveValidators enforcement', () => {
+describe('move validate enforcement', () => {
   const guardedConfig = () => makeConfig({
     BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
       <>
         <button data-testid="legal-btn" onClick={() => moves.guarded(board, 'ok')}>legal</button>
         <button data-testid="illegal-btn" onClick={() => moves.guarded(board, 'bad')}>illegal</button>
         <span data-testid="board">{board.join(',')}</span>
+        <span data-testid="can-ok">{String(moves.guarded.validate!(board, 'ok'))}</span>
+        <span data-testid="can-bad">{String(moves.guarded.validate!(board, 'bad'))}</span>
       </>
     ),
     gameplay: {
       moves: {
-        guarded: (board: Board, _meta: { events: Events }, arg: string) => ({ nextBoard: [...board, arg] })
-      },
-      moveValidators: {
-        guarded: (_board: Board, _meta: { ctx: Ctx }, arg: string) => arg === 'ok'
+        guarded: {
+          apply: (board: Board, _meta: { events: Events }, arg: string) => ({ nextBoard: [...board, arg] }),
+          validate: (_board: Board, _meta: { ctx: Ctx }, arg: string) => arg === 'ok'
+        }
       }
     }
   });
@@ -550,8 +552,15 @@ describe('moveValidators enforcement', () => {
     }
   });
 
-  it('runs a move unchanged when no validator is registered for it', () => {
-    // defaultGameplay registers no validators, so mainMove applies + endTurn as before
+  it('exposes the validator on the wrapped move with ctx bound, for BoardClient use', () => {
+    const { getByTestId } = renderGame(guardedConfig());
+    fireEvent.click(getByTestId('role-btn-0'));
+    expect(getByTestId('can-ok').textContent).toBe('true');
+    expect(getByTestId('can-bad').textContent).toBe('false');
+  });
+
+  it('runs a plain-function (shorthand) move unchanged — no validator', () => {
+    // defaultGameplay uses the function shorthand, so mainMove applies + endTurn as before
     const { getByTestId } = renderGame(ctxAwareConfig());
     fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('move-btn'));

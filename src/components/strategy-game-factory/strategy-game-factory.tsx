@@ -10,7 +10,7 @@ import { useLocation } from 'react-router';
 import { useGameStats } from './hooks/use-game-stats';
 import { trackEvent } from '../../tracking';
 import type {
-  Phase, Mode, Ctx, Events, MoveResult, MoveFunction, MoveValidator, GameMoves,
+  Phase, Mode, Ctx, Events, MoveResult, MoveDefinition, GameMoves,
   BoardClientProps, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './helpers/resolve-variants';
@@ -27,11 +27,12 @@ export interface Presentation<TBoard> {
 }
 
 export interface Gameplay<TBoard> {
-  moves: Record<string, MoveFunction<TBoard>>
-  // Optional, keyed by move name. When present for a move, the engine rejects
-  // any dispatch whose args fail the predicate (see `moveWrapper`). Missing key
-  // = always legal, so games that predate this field keep working unchanged.
-  moveValidators?: Record<string, MoveValidator<TBoard>>
+  // Each move is either a plain apply function (shorthand — always accepted),
+  // or `{ apply, validate? }`. When `validate` is present, the engine rejects
+  // any dispatch whose args fail it (see `moveWrapper`), and exposes it on the
+  // wrapped move (with `ctx` bound) so the BoardClient can drive `disabled`
+  // state from the same predicate.
+  moves: Record<string, MoveDefinition<TBoard>>
   endOfTurnMove?: string
 }
 
@@ -49,8 +50,11 @@ export const strategyGameFactory = <TBoard,>({
   variants
 }: StrategyGameConfig<TBoard>) => {
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
-  const { moves, moveValidators, endOfTurnMove } = gameplay;
+  const { moves, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
+  // Normalize the shorthand (plain function = apply with no validator) so the
+  // rest of the engine deals with a single long-form shape.
+  const normalizedMoves = mapValues(moves, (m) => typeof m === 'function' ? { apply: m } : m);
 
   return () => {
     const { t } = useTranslation();
@@ -118,7 +122,7 @@ export const strategyGameFactory = <TBoard,>({
       args: unknown[],
       doMove: () => MoveResult<TBoard>
     ): MoveResult<TBoard> => {
-      const validator = moveValidators?.[name];
+      const validator = normalizedMoves[name]!.validate;
       if (validator && !validator(moveBoard, { ctx }, ...args)) {
         reportIllegalMove(name, moveBoard, args);
         return { nextBoard: moveBoard };
@@ -244,11 +248,16 @@ export const strategyGameFactory = <TBoard,>({
       setTurnState
     };
 
-    wrappedGameMoves = mapValues(
-      moves,
-      (f, name) => (board: TBoard, ...args: unknown[]) =>
-        moveWrapper(name, board, args, () => f(board, { ctx, events }, ...args))
-    ) as GameMoves<TBoard>;
+    wrappedGameMoves = mapValues(normalizedMoves, ({ apply, validate }, name) => {
+      const wrapped: GameMoves<TBoard>[string] = (board: TBoard, ...args: unknown[]) =>
+        moveWrapper(name, board, args, () => apply(board, { ctx, events }, ...args));
+      if (validate) {
+        // Expose the validator with `ctx` bound, so the BoardClient can check
+        // legality as `moves.x.validate(board, ...args)`.
+        wrapped.validate = (board: TBoard, ...args: unknown[]) => validate(board, { ctx }, ...args);
+      }
+      return wrapped;
+    });
 
     const doBotTurn = () => {
       const { botStrategy } = activeVariant;

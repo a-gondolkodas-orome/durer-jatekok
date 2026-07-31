@@ -23,44 +23,45 @@ export const canWin = (board: Board) => {
   return (oddPiles.length === 3 || oddPiles.length === 0);
 }
 
-// Single source of legality for both the UI (button `disabled` in board-client)
-// and the engine's illegal-move enforcement. Deliberately excludes the "whose
-// turn is it" check (`ctx.isClientMoveAllowed`) — that is the engine's concern,
-// not per-move legality.
-export const moveValidators = {
-  removeCoin: (board: Board, { ctx }: { ctx: Ctx }, value: number) =>
-    ctx.turnState === null && value >= 1 && value <= 3 && board[value - 1] > 0,
-  addCoin: (board: Board, { ctx }: { ctx: Ctx }, value: number | null) => {
-    const removed = (ctx.turnState as { removedCoinValue: number } | null)?.removedCoinValue;
-    if (removed == null) return false;
-    return value === null || (value >= 1 && value < removed);
-  }
-};
-
+// Each `validate` is the single source of legality for both the UI (button
+// `disabled` in board-client) and the engine's illegal-move enforcement. It
+// deliberately excludes the "whose turn is it" check (`ctx.isClientMoveAllowed`)
+// — that is the engine's concern, not per-move legality.
 export const moves = {
-  removeCoin: (board: Board, { events }: { events: Events }, value) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard[value - 1] -= 1;
-    if (value === 1) {
+  removeCoin: {
+    validate: (board: Board, { ctx }: { ctx: Ctx }, value: number) =>
+      ctx.turnState === null && value >= 1 && value <= 3 && board[value - 1] > 0,
+    apply: (board: Board, { events }: { events: Events }, value) => {
+      const nextBoard = cloneDeep(board);
+      nextBoard[value - 1] -= 1;
+      if (value === 1) {
+        events.endTurn();
+        if (isEqual(nextBoard, [0, 0, 0])) {
+          events.endGame();
+        }
+      } else {
+        events.setTurnState({ removedCoinValue: value });
+      }
+      return { nextBoard };
+    }
+  },
+  addCoin: {
+    validate: (board: Board, { ctx }: { ctx: Ctx }, value: number | null) => {
+      const removed = (ctx.turnState as { removedCoinValue: number } | null)?.removedCoinValue;
+      if (removed == null) return false;
+      return value === null || (value >= 1 && value < removed);
+    },
+    apply: (board: Board, { events }: { events: Events }, value) => {
+      const nextBoard = cloneDeep(board);
+      if (value !== null) {
+        nextBoard[value - 1] += 1;
+      }
       events.endTurn();
+      events.setTurnState(null);
       if (isEqual(nextBoard, [0, 0, 0])) {
         events.endGame();
       }
-    } else {
-      events.setTurnState({ removedCoinValue: value });
+      return { nextBoard };
     }
-    return { nextBoard };
-  },
-  addCoin: (board: Board, { events }: { events: Events }, value) => {
-    const nextBoard = cloneDeep(board);
-    if (value !== null) {
-      nextBoard[value - 1] += 1;
-    }
-    events.endTurn();
-    events.setTurnState(null);
-    if (isEqual(nextBoard, [0, 0, 0])) {
-      events.endGame();
-    }
-    return { nextBoard };
   }
 }

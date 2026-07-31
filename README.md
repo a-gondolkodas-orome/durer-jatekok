@@ -205,11 +205,11 @@ Conceptually a `move` is a unit that captures a change in the board initiated by
 a player. Moves help ensure that the game is played according to rules by all
 players.
 
-Technically a move is a function whose first param is board, second param is `{
-ctx, events }` and may receive any number of additional params. The second param
-is provided by the framework, additional params will be provided by the client
-based on player interaction or by the bot strategy. Each move must return an
-object with `nextBoard`.
+Technically the apply function of a move takes board as first param, `{
+ctx, events }` as second param and may receive any number of additional params.
+The second param is provided by the framework, additional params will be
+provided by the client based on player interaction or by the bot strategy. Each
+move must return an object with `nextBoard`.
 
 A move may result in ending the turn of the current player or ending the game or
 allow further moves within the same turn.
@@ -218,28 +218,40 @@ You must always pass `board` as a first param to all moves (meaning you must
 pass the updated board to subsequent moves in case of multiple moves within a
 turn).
 
-Moves themselves do **not** validate their arguments — they apply them blindly.
-Legality is enforced separately (see below), so a move called with out-of-contract
-arguments would otherwise silently corrupt the board.
+In `gameplay.moves`, each entry is either the apply function itself (shorthand)
+or a long-form object `{ apply, validate? }`:
 
-### move validators (optional)
+```ts
+moves: {
+  removeCoin: {
+    validate: (board, { ctx }, value) => board[value - 1] > 0,
+    apply: (board, { events }, value) => { /* ... */ return { nextBoard }; }
+  }
+}
+```
 
-`gameplay.moveValidators` is an optional map keyed by move name of pure,
-side-effect-free predicates `(board, { ctx }, ...args) => boolean`. When a move
-has a validator, the framework checks it before applying the move: in development
-it throws (surfacing bot/UI bugs loudly), and in production it warns, records an
-`illegal-move` analytics event, and no-ops (so a stray or tampered call cannot
-corrupt the board). A move with no validator is always accepted, so this is fully
-opt-in.
+`apply` does **not** validate its arguments — it applies them blindly; legality
+lives in `validate`, right next to it.
 
-Define the validator once and treat it as the **single source of truth** for
-legality: the `BoardClient` uses it to compute button `disabled` state (AND-ed
-with `ctx.isClientMoveAllowed` for turn ownership), the bot uses it to enumerate
-legal moves, and because it is React-free the exact same function could run
-server-side in a future authoritative/competition mode. Keep the "whose turn is
-it" check out of the validator — that belongs to the framework, not to per-move
-legality. See `coins-in-3-piles` (two-phase turn) and `cube-coloring` (reuses its
-existing `isAllowedStep` helper) for worked examples.
+### validate (optional, per move)
+
+`validate` is a pure, side-effect-free predicate
+`(board, { ctx }, ...args) => boolean`. When a move has one, the framework
+checks it before applying the move: in development it throws (surfacing bot/UI
+bugs loudly), and in production it warns, records an `illegal-move` analytics
+event, and no-ops (so a stray or tampered call cannot corrupt the board). A
+shorthand move (plain function) is always accepted, so this is fully opt-in.
+
+The validator is the **single source of truth** for legality. The framework also
+exposes it on the wrapped move with `ctx` already bound, so the `BoardClient`
+computes button `disabled` state as `moves.<name>.validate(board, ...args)`
+(AND-ed with `ctx.isClientMoveAllowed` for turn ownership); the bot can use it
+to enumerate legal moves, and because it is React-free the exact same function
+could run server-side in a future authoritative/competition mode. Keep the
+"whose turn is it" check out of the validator — that belongs to the framework,
+not to per-move legality. See `coins-in-3-piles` (two-phase turn) and
+`cube-coloring` (reuses its existing `isAllowedStep` helper) for worked
+examples.
 
 ### BoardClient React component
 

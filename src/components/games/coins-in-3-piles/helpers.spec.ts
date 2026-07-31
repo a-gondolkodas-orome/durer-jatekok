@@ -1,16 +1,16 @@
-import { moveValidators, type Board } from './helpers';
+import { moves, type Board } from './helpers';
 import { makeCtx } from '../../../test-utils';
 
 // The board-client's `disabled` predicates and the engine's illegal-move
 // enforcement both flow through these validators, so they are the single legality
 // contract worth locking down. `ctx.isClientMoveAllowed` (whose turn) is out of
 // scope here on purpose — that gate lives in the board-client, not the validator.
-describe('coins-in-3-piles moveValidators', () => {
+describe('coins-in-3-piles move validators', () => {
   type TurnState = { removedCoinValue: number } | null;
   const removeCoin = (board: Board, turnState: TurnState, value: number) =>
-    moveValidators.removeCoin(board, { ctx: makeCtx({ turnState }) }, value);
+    moves.removeCoin.validate(board, { ctx: makeCtx({ turnState }) }, value);
   const addCoin = (board: Board, turnState: TurnState, value: number | null) =>
-    moveValidators.addCoin(board, { ctx: makeCtx({ turnState }) }, value);
+    moves.addCoin.validate(board, { ctx: makeCtx({ turnState }) }, value);
 
   describe('removeCoin', () => {
     it('allows removing from a non-empty pile at the start of a turn', () => {

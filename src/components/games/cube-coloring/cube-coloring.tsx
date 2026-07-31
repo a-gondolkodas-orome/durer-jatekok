@@ -144,24 +144,24 @@ const isGameEnd = (board: Board) => {
 };
 
 const moves = {
-  colorVertex: (board: Board, { events }: { events: Events }, { vertex, color }) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard[vertex] = color;
-    events.endTurn();
-    if (isGameEnd(nextBoard)) {
-      const winnerIndex = every(range(0, 8), v => isColored(nextBoard, v)) ? 0 : 1;
-      events.endGame(winnerIndex)
+  colorVertex: {
+    // Reuses the same `isAllowedStep` legality helper the BoardClient and bot
+    // already rely on, so the engine enforces the colouring rule (no colouring
+    // an already coloured vertex, no two adjacent equal colours) from a single
+    // source.
+    validate: (board: Board, _, { vertex, color }: { vertex: number; color: string }) =>
+      isAllowedStep(board, vertex, color),
+    apply: (board: Board, { events }: { events: Events }, { vertex, color }) => {
+      const nextBoard = cloneDeep(board);
+      nextBoard[vertex] = color;
+      events.endTurn();
+      if (isGameEnd(nextBoard)) {
+        const winnerIndex = every(range(0, 8), v => isColored(nextBoard, v)) ? 0 : 1;
+        events.endGame(winnerIndex)
+      }
+      return { nextBoard };
     }
-    return { nextBoard };
   }
-}
-
-// Reuses the same `isAllowedStep` legality helper the BoardClient and bot already
-// rely on, so the engine now enforces the colouring rule (no colouring an already
-// coloured vertex, no two adjacent equal colours) from a single source.
-const moveValidators = {
-  colorVertex: (board: Board, _, { vertex, color }: { vertex: number; color: string }) =>
-    isAllowedStep(board, vertex, color)
 }
 
 const rule = {
@@ -195,7 +195,7 @@ export const CubeColoring = strategyGameFactory({
     })
   },
   BoardClient,
-  gameplay: { moves, moveValidators },
+  gameplay: { moves },
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
     // smart bot: verified as optimal

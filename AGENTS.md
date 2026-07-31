@@ -80,8 +80,7 @@ strategyGameFactory({
   },
   BoardClient,                 // React component receiving { board, ctx, events, moves }
   gameplay: {
-    moves,                     // object of move functions: (board, { ctx, events }, ...args) => { nextBoard }
-    moveValidators?,           // optional: { [moveName]: (board, { ctx }, ...args) => boolean } — see below
+    moves,                     // { [name]: apply | { apply, validate? } } — see below
     endOfTurnMove?,            // optional move name auto-executed after moves with autoEndOfTurn: true
   },
   variants,                    // see below
@@ -95,25 +94,29 @@ omitted on a variant, the default variant's `botStrategy` is used as fallback.
 If multiple variants are provided, exactly one must be `isDefault: true`. A
 single-entry array needs no `isDefault` flag.
 
-**`moves`** — each move is `(board, { ctx, events }, ...args) => { nextBoard }`.
-Always pass the current `board` as first arg when chaining moves within a turn.
-Moves trust their arguments and apply them blindly; legality is enforced by
-`moveValidators` (below) and/or the `BoardClient`'s `disabled` gating.
+**`moves`** — each move is either a plain apply function
+`(board, { ctx, events }, ...args) => { nextBoard }` (shorthand), or a long-form
+object `{ apply, validate? }` colocating it with a legality predicate. Always
+pass the current `board` as first arg when chaining moves within a turn. `apply`
+trusts its arguments and applies them blindly; legality is enforced by
+`validate` (below) and/or the `BoardClient`'s `disabled` gating.
 
-**`moveValidators`** (optional) — a map keyed by move name of pure, side-effect-free
-legality predicates `(board, { ctx }, ...args) => boolean`. When present for a
-move, the engine rejects any dispatch whose args fail the predicate (in dev it
-throws loudly to surface the bug; in prod it warns, fires an `illegal-move`
-analytics event, and no-ops so a stray call cannot corrupt the board). A missing
-key means "always legal", so this is fully opt-in and games that predate it keep
-working unchanged. Prefer defining the validator once and reusing it as the
-**single source of truth**: the same function should drive the `BoardClient`'s
-button `disabled` state (combined with `ctx.isClientMoveAllowed` for turn
-ownership), the bot's legal-move enumeration, and — being React-free — a possible
-future server-side authoritative check. Do **not** put the "whose turn is it"
-check (`ctx.isClientMoveAllowed`) inside a validator; that is the engine's
-concern, not per-move legality. See `coins-in-3-piles` (two-phase turn) and
-`cube-coloring` (reuses the existing `isAllowedStep` helper) for examples.
+**`validate`** (optional, per move) — a pure, side-effect-free legality predicate
+`(board, { ctx }, ...args) => boolean` sitting right next to its `apply`. When
+present, the engine rejects any dispatch whose args fail it (in dev it throws
+loudly to surface the bug; in prod it warns, fires an `illegal-move` analytics
+event, and no-ops so a stray call cannot corrupt the board). The function
+shorthand means "always legal", so this is fully opt-in and games that predate
+it keep working unchanged. The validator is the **single source of truth** for
+legality: the engine also exposes it on the wrapped move with `ctx` already
+bound, so the `BoardClient` drives button `disabled` state via
+`moves.<name>.validate(board, ...args)` (combined with `ctx.isClientMoveAllowed`
+for turn ownership); bots and — being React-free — a possible future
+server-side authoritative check can reuse the same predicate. Do **not** put the
+"whose turn is it" check (`ctx.isClientMoveAllowed`) inside `validate`; that is
+the engine's concern, not per-move legality. See `coins-in-3-piles` (two-phase
+turn) and `cube-coloring` (reuses the existing `isAllowedStep` helper) for
+examples.
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes
