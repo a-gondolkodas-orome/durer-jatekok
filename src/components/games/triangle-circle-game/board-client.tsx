@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from '../../../language';
 import { GameBoard, type BoardClientProps } from '../../strategy-game-factory';
-import { BOARD_OUTLINE, EDGES, TRIANGLES } from './geometry';
+import { BOARD_OUTLINE, EDGES, TRIANGLES, type Edge } from './geometry';
 import { type Board, LINE, CIRCLE } from './helpers';
 
 // Two very different interactions share one board: on the line player's turn the
 // edges are clickable, on the circle player's turn the triangles are. Only the
 // active layer receives pointer/keyboard events, so a click near an edge never
 // gets swallowed by a triangle (or vice versa).
+// Shaded (and hover-previewed) edges are drawn slightly shorter than the
+// lattice edge, so their round caps leave the lattice nodes visible.
+const EDGE_INSET = 0.1;
+const insetEdge = (edge: Edge) => ({
+  x1: edge.x1 + (edge.x2 - edge.x1) * EDGE_INSET,
+  y1: edge.y1 + (edge.y2 - edge.y1) * EDGE_INSET,
+  x2: edge.x2 - (edge.x2 - edge.x1) * EDGE_INSET,
+  y2: edge.y2 - (edge.y2 - edge.y1) * EDGE_INSET
+});
+
 export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const [hoveredEdge, setHoveredEdge] = useState<number | null>(null);
@@ -40,7 +50,9 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     return 'fill-transparent';
   };
 
-  const hovered = hoveredEdge !== null && !board.edges[hoveredEdge] ? EDGES[hoveredEdge] : null;
+  const hovered = hoveredEdge !== null && !board.edges[hoveredEdge]
+    ? insetEdge(EDGES[hoveredEdge])
+    : null;
 
   return (
     <GameBoard>
@@ -111,18 +123,21 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               x2={hovered.x2} y2={hovered.y2}
               strokeLinecap="round"
               className="stroke-red-300 dark:stroke-red-700"
-              strokeWidth="1.4"
+              strokeWidth="1.2"
             />
           )}
-          {EDGES.filter(edge => board.edges[edge.id]).map(edge => (
-            <line
-              key={`shaded-${edge.id}`}
-              x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
-              strokeLinecap="round"
-              className="stroke-red-500"
-              strokeWidth="1.6"
-            />
-          ))}
+          {EDGES.filter(edge => board.edges[edge.id]).map(edge => {
+            const seg = insetEdge(edge);
+            return (
+              <line
+                key={`shaded-${edge.id}`}
+                x1={seg.x1} y1={seg.y1} x2={seg.x2} y2={seg.y2}
+                strokeLinecap="round"
+                className="stroke-red-500"
+                strokeWidth="1.2"
+              />
+            );
+          })}
         </g>
 
         {/* Invisible wide hit targets for edges — only on the line player's turn */}
