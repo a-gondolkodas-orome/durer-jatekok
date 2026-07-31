@@ -5,17 +5,19 @@ import {
   applyShade, applyCircle, freeEdges, freeTriangles, shadedCount,
   liveThreats, preThreatEdges, isWinningShade
 } from '../helpers';
-import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
+import { OPENING_EDGES, isLineTurnWon, marchEdges, winningPairHeatEdges } from './forced-win';
 import { makeMoveEvaluator } from './search';
 import type { Ctx, GameMoves } from '../../../strategy-game-factory';
 
 // Smart bot.
 //
 // LINE side — provably winning (see forced-win.ts and the certificate in
-// forced-win.spec.ts): open with the certified central pair-heat, answer the
-// circle player's reply with a second winning pair-heat, then run the forced
-// march. The plan covers every circle reply from the start position, so as the
-// line player this bot always wins.
+// forced-win.spec.ts): open with one of the certified central pair-heats,
+// answer the circle player's reply with a second winning pair-heat, then run
+// the forced march. The plan covers every circle reply from the start position,
+// so as the line player this bot always wins; where several moves win equally
+// (symmetric openings, multiple march steps or pair-heats) it samples among
+// them for variety.
 //
 // CIRCLE side — best-effort defence: the line player wins this board with
 // perfect play, so no circle strategy is "optimal" in the winning sense. The
@@ -70,15 +72,16 @@ const chooseLineMove = (board: Board, searchOpts: SearchOpts): number => {
 
   // 2. Two hot triangles in one component: march (every step forces the circle
   //    player, the last one creates a double threat).
-  const march = marchEdge(board);
-  if (march !== null) return march;
+  const march = marchEdges(board);
+  if (march.length > 0) return sample(march)!;
 
-  // 3. From the start position, play the certified opening pair-heat.
-  if (isEmptyBoard(board)) return OPENING_EDGE;
+  // 3. From the start position, play one of the certified opening pair-heats
+  //    (the certificate's edge or a symmetric image of it).
+  if (isEmptyBoard(board)) return sample(OPENING_EDGES)!;
 
   // 4. A pair-heat all circle replies lose to (the certificate's second move).
-  const pairHeat = winningPairHeatEdge(board);
-  if (pairHeat !== null) return pairHeat;
+  const pairHeats = winningPairHeatEdges(board);
+  if (pairHeats.length > 0) return sample(pairHeats)!;
 
   // 5. Fallback for positions outside the plan (only reachable if the game
   //    didn't start from the certified line): bounded search plus heuristic.

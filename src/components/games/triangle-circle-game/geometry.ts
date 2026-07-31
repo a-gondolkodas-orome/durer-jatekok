@@ -64,6 +64,7 @@ const edgeKey = (a: number, b: number): string => (a < b ? `${a}-${b}` : `${b}-$
 const build = () => {
   const edgeByKey = new Map<string, Edge>();
   const edges: Edge[] = [];
+  const edgeVertexIds: [number, number][] = [];
 
   const internEdge = (a: number, b: number): number => {
     const key = edgeKey(a, b);
@@ -81,6 +82,7 @@ const build = () => {
     };
     edgeByKey.set(key, edge);
     edges.push(edge);
+    edgeVertexIds.push(a < b ? [a, b] : [b, a]);
     return edge.id;
   };
 
@@ -117,13 +119,46 @@ const build = () => {
     }
   }
 
-  return { triangles, edges };
+  return { triangles, edges, edgeVertexIds, edgeByKey };
 };
 
 const built = build();
 
 export const TRIANGLES: Triangle[] = built.triangles;
 export const EDGES: Edge[] = built.edges;
+
+// --- Board symmetries ------------------------------------------------------
+//
+// A vertex at (row, col) is described by the triple
+// (row - col, col, GRID_SIZE - row) — its lattice distances from the three
+// sides of the big triangle — and the board's six symmetries (identity, two
+// rotations, three reflections) are exactly the permutations of that triple.
+
+const VERTEX_TRIPLES: [number, number, number][] = [];
+for (let row = 0; row <= GRID_SIZE; row++) {
+  for (let col = 0; col <= row; col++) VERTEX_TRIPLES.push([row - col, col, GRID_SIZE - row]);
+}
+
+const PERMUTATIONS: [number, number, number][] = [
+  [0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]
+];
+
+const mapVertex = (id: number, perm: [number, number, number]): number => {
+  const triple = VERTEX_TRIPLES[id];
+  return vertexId(GRID_SIZE - triple[perm[2]], triple[perm[1]]);
+};
+
+// All images of an edge under the six board symmetries (its orbit, which
+// includes the edge itself). Symmetric edges are strategically interchangeable,
+// so a bot may pick among them freely.
+export const edgeOrbit = (edgeId: number): number[] => {
+  const [a, b] = built.edgeVertexIds[edgeId];
+  const orbit = new Set<number>();
+  for (const perm of PERMUTATIONS) {
+    orbit.add(built.edgeByKey.get(edgeKey(mapVertex(a, perm), mapVertex(b, perm)))!.id);
+  }
+  return [...orbit];
+};
 
 // Outline of the whole board, for the bounding stroke.
 export const BOARD_OUTLINE = [

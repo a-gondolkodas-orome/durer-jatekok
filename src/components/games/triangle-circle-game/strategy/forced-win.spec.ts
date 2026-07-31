@@ -4,7 +4,7 @@ import {
   generateStartBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, liveThreats, freeTriangles
 } from '../helpers';
-import { OPENING_EDGE, isLineTurnWon, marchEdge, winningPairHeatEdge } from './forced-win';
+import { OPENING_EDGE, OPENING_EDGES, isLineTurnWon, marchEdges, winningPairHeatEdges } from './forced-win';
 import { makeSmartBotStrategy } from './bot-strategy';
 import { playBotTurn } from './spec-helpers';
 
@@ -14,21 +14,24 @@ import { playBotTurn } from './spec-helpers';
 // solver shows the circle player wins those boards (near-tree free-graphs).
 
 describe('forced-win certificate (line player wins the side-6 board)', () => {
-  it('opening edge is a central interior edge', () => {
-    expect(EDGES[OPENING_EDGE].triangleIds).toHaveLength(2);
+  it('the opening orbit consists of interior edges and contains the certified one', () => {
+    expect(OPENING_EDGES).toContain(OPENING_EDGE);
+    for (const e of OPENING_EDGES) expect(EDGES[e].triangleIds).toHaveLength(2);
   });
 
-  it('after the opening, every circle reply is answered: two-hot already, or a ' +
-     'second pair-heat exists after which ALL circle replies leave two-hot', () => {
+  it('after any symmetric opening, every circle reply is answered: two-hot already, ' +
+     'or a second pair-heat exists after which ALL circle replies leave two-hot', () => {
     const empty = generateStartBoard();
     expect(isLineTurnWon(empty)).toBe(false);
 
-    const afterOpening = applyShade(empty, OPENING_EDGE);
-    for (let reply = 0; reply < TRIANGLE_COUNT; reply++) {
-      const pos = applyCircle(afterOpening, reply);
-      if (isLineTurnWon(pos)) continue; // careless reply: march wins at once
-      // The only serious replies; the certified second pair-heat must exist.
-      expect(winningPairHeatEdge(pos)).not.toBeNull();
+    for (const opening of OPENING_EDGES) {
+      const afterOpening = applyShade(empty, opening);
+      for (let reply = 0; reply < TRIANGLE_COUNT; reply++) {
+        const pos = applyCircle(afterOpening, reply);
+        if (isLineTurnWon(pos)) continue; // careless reply: march wins at once
+        // The only serious replies; a certified second pair-heat must exist.
+        expect(winningPairHeatEdges(pos).length).toBeGreaterThan(0);
+      }
     }
   });
 });
@@ -53,7 +56,7 @@ describe('isLineTurnWon (two-hot criterion)', () => {
   });
 });
 
-describe('marchEdge', () => {
+describe('marchEdges', () => {
   it('returns the shared free edge of two adjacent hot triangles', () => {
     const edge = EDGES.find(e => e.triangleIds.length === 2)!;
     const [t1, t2] = edge.triangleIds;
@@ -61,7 +64,7 @@ describe('marchEdge', () => {
     let board = generateStartBoard();
     board = applyShade(board, other(t1));
     board = applyShade(board, other(t2));
-    expect(marchEdge(board)).toBe(edge.id);
+    expect(marchEdges(board)).toEqual([edge.id]);
   });
 
   it('starts a forcing chain between two hots separated by a cold triangle', () => {
@@ -86,10 +89,13 @@ describe('marchEdge', () => {
     board = applyShade(board, boundaryEdge(A));
     board = applyShade(board, boundaryEdge(C));
 
-    const step = marchEdge(board);
-    expect(step).not.toBeNull();
-    // The first chain shade must create a completion threat (the forcing move).
-    expect(liveThreats(applyShade(board, step!)).length).toBeGreaterThanOrEqual(1);
+    const steps = marchEdges(board);
+    expect(steps.length).toBeGreaterThan(0);
+    // Every candidate chain shade must create a completion threat (the forcing
+    // move) — the bot may sample any of them.
+    for (const step of steps) {
+      expect(liveThreats(applyShade(board, step)).length).toBeGreaterThanOrEqual(1);
+    }
   });
 });
 

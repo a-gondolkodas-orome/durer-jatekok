@@ -1,4 +1,4 @@
-import { EDGES, TRIANGLE_COUNT } from '../geometry';
+import { EDGES, TRIANGLE_COUNT, edgeOrbit } from '../geometry';
 import { type Board, applyShade, applyCircle, shadedCount } from '../helpers';
 
 // The line player's proven forced win on the side-6 board, built on two facts.
@@ -33,6 +33,11 @@ import { type Board, applyShade, applyCircle, shadedCount } from '../helpers';
 // The certified opening: the central interior edge between the row-4 up
 // triangle and the down triangle below it (id in geometry.ts numbering).
 export const OPENING_EDGE = 22;
+
+// Its full symmetry orbit: by the board's symmetries every image is an equally
+// winning opening (the certificate spec re-checks each one), and the bot varies
+// among them instead of always playing the same first move.
+export const OPENING_EDGES: number[] = edgeOrbit(OPENING_EDGE);
 
 // A triangle's heat: -1 once circled (out of the game), else its number of
 // shaded sides — 0 is cold, 1 is hot, 2+ is completable.
@@ -74,17 +79,19 @@ export const isLineTurnWon = (board: Board): boolean => {
   return false;
 };
 
-// The next march step from a two-hot position: the free edge between two
-// adjacent hots (instant double threat), or the first edge of a cold path
-// between two hots in one component. Null if no two-hot pattern exists.
-export const marchEdge = (board: Board): number | null => {
+// Every candidate next march step from a two-hot position: the free edges
+// between adjacent hot pairs (instant double threats) or, failing that, the
+// first edge of a cold path from each hot toward another hot in its component.
+// Empty if no two-hot pattern exists. Each candidate is equally winning (the
+// March Lemma argument applies to any hot pair), so the bot samples among them.
+export const marchEdges = (board: Board): number[] => {
   const counts: number[] = [];
   const hots: number[] = [];
   for (let t = 0; t < TRIANGLE_COUNT; t++) {
     counts[t] = heat(board, t);
     if (counts[t] === 1) hots.push(t);
   }
-  if (hots.length < 2) return null;
+  if (hots.length < 2) return [];
   const hotSet = new Set(hots);
 
   const adjacency: { cell: number; edge: number }[][] =
@@ -98,15 +105,17 @@ export const marchEdge = (board: Board): number | null => {
   }
 
   // Two hots sharing a free edge: shading it is an immediate double threat.
+  const shared = new Set<number>();
   for (const h of hots) {
     for (const { cell, edge } of adjacency[h]) {
-      if (hotSet.has(cell)) return edge;
+      if (hotSet.has(cell)) shared.add(edge);
     }
   }
+  if (shared.size > 0) return [...shared];
 
-  // Otherwise BFS from each hot through cold cells toward another hot; return
-  // the first edge of the found path (the forcing shade).
-  for (const h of hots) {
+  // Otherwise BFS from a hot through cold cells toward another hot; the first
+  // edge of the found path is the forcing shade.
+  const pathStart = (h: number): number | null => {
     const visited = new Set<number>([h]);
     const queue: { cell: number; firstEdge: number }[] = [];
     for (const { cell, edge } of adjacency[h]) {
@@ -127,18 +136,27 @@ export const marchEdge = (board: Board): number | null => {
         }
       }
     }
+    return null;
+  };
+
+  const firstEdges = new Set<number>();
+  for (const h of hots) {
+    const e = pathStart(h);
+    if (e !== null) firstEdges.add(e);
   }
-  return null;
+  return [...firstEdges];
 };
 
-// A pair-heat (free interior edge, both sides cold and uncircled) after which
-// EVERY circle reply leaves a two-hot / immediately-won position for line.
-// This is the runtime form of the certificate's second move.
-export const winningPairHeatEdge = (board: Board): number | null => {
+// Every pair-heat (free interior edge, both sides cold and uncircled) after
+// which EVERY circle reply leaves a two-hot / immediately-won position for
+// line — the runtime form of the certificate's second move. Each returned edge
+// is winning on its own, so the bot samples among them.
+export const winningPairHeatEdges = (board: Board): number[] => {
   const uncircled: number[] = [];
   for (let t = 0; t < TRIANGLE_COUNT; t++) if (!board.circles[t]) uncircled.push(t);
-  if (uncircled.length === 0) return null;
+  if (uncircled.length === 0) return [];
 
+  const winning: number[] = [];
   for (const edge of EDGES) {
     if (board.edges[edge.id] || edge.triangleIds.length !== 2) continue;
     const [a, b] = edge.triangleIds;
@@ -151,7 +169,7 @@ export const winningPairHeatEdge = (board: Board): number | null => {
         break;
       }
     }
-    if (allRepliesLose) return edge.id;
+    if (allRepliesLose) winning.push(edge.id);
   }
-  return null;
+  return winning;
 };
