@@ -35,6 +35,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   };
 
   const passAddition = () => {
+    if (!isAddAllowed(null)) return;
     moves.addCoin(board, null);
   };
 

@@ -250,7 +250,9 @@ bound) for the `BoardClient`'s `disabled` state. Full contract in
   tampered call cannot corrupt the board.
 - A shorthand move (plain function) is always accepted — fully opt-in.
 - Keep the "whose turn is it" check out of `validate` — `isAllowed` folds
-  `ctx.isClientMoveAllowed` in for you.
+  `ctx.isClientMoveAllowed` in for you. The engine consequently enforces
+  argument legality only (it cannot tell a bot dispatch from a client one);
+  out-of-turn protection stays with the `BoardClient`'s `disabled` gating.
 - `isAllowed` is not for bots: during the bot's turn `isClientMoveAllowed` is
   false by design, so bots enumerate legal moves via the raw `validate`/helpers.
 - `validate` is React-free, so a future authoritative/competition server could

@@ -1,4 +1,11 @@
-import { isAllowedStep, generateStartBoard, neighbours, type Board } from './helpers';
+import { isAllowedStep, generateStartBoard, neighbours, colors, type Board } from './helpers';
+import { nodeColors } from './cube-coloring';
+
+describe('cube-coloring palette', () => {
+  it('logic-side colors stay in sync with the styling palette nodeColors', () => {
+    expect(Object.keys(nodeColors)).toEqual(colors);
+  });
+});
 
 describe('cube-coloring isAllowedStep', () => {
   const empty = (): Board => generateStartBoard();

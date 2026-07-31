@@ -111,7 +111,10 @@ it keep working unchanged. The validator is the **single source of truth** for
 legality: it drives the engine's enforcement, and — being React-free — a
 possible future server-side authoritative check can reuse the same predicate.
 Do **not** put the "whose turn is it" check (`ctx.isClientMoveAllowed`) inside
-`validate`; the engine folds that in for the UI (below). See `coins-in-3-piles`
+`validate`; the engine folds that in for the UI (below). Note the engine
+therefore enforces argument legality only — it cannot tell a bot dispatch from
+a client one, so out-of-turn protection stays with the `BoardClient`'s
+`isAllowed`/`disabled` gating. See `coins-in-3-piles`
 (two-phase turn) and `cube-coloring` (reuses the existing `isAllowedStep`
 helper) for examples.
 
