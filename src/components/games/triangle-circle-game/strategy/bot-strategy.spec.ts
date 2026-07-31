@@ -74,6 +74,16 @@ describe('circle-player bot', () => {
   });
 });
 
+describe('test bot', () => {
+  it('takes an immediate win as the line player even though it otherwise plays randomly', () => {
+    const [e0, e1, e2] = TRIANGLES[5].edgeIds;
+    const board = applyShade(applyShade(generateStartBoard(), e0), e1);
+    const played = playBotTurn(board, LINE, randomBotStrategy);
+    expect(played.arg).toBe(e2);
+    expect(isLineWin(played.nextBoard)).toBe(true);
+  });
+});
+
 describe('full playthroughs terminate with a valid winner', () => {
   const simulate = (lineStrategy: typeof smartBotStrategy, circleStrategy: typeof smartBotStrategy) => {
     let board = generateStartBoard();

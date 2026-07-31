@@ -46,8 +46,9 @@ export const makeSmartBotStrategy = (searchOpts: SearchOpts = SEARCH) =>
 
 export const smartBotStrategy = makeSmartBotStrategy(SEARCH);
 
-// Easy "test" bot: plays uniformly at random for whichever side it holds. Good
-// for getting a feel for the rules before a real game.
+// Easy "test" bot: plays at random for whichever side it holds, except that it
+// grabs an immediate (one-move) win when one exists. Good for getting a feel
+// for the rules before a real game.
 export const randomBotStrategy = (
   { board, ctx, moves }: { board: Board; ctx: Ctx; moves: Moves }
 ) => {
@@ -162,6 +163,12 @@ const chooseCircleMove = (board: Board, searchOpts: SearchOpts): number => {
   return undecided.length > 0 ? undecided[0] : ordered[0].t;
 };
 
-// Purely random fallbacks, exposed for a "test" bot / property tests.
-export const randomLineMove = (board: Board): number => sample(freeEdges(board))!;
+// Random moves for the test bot / property tests. The line side still takes an
+// immediate win (a triangle at two shaded sides) when one is on the board; the
+// circle side's only one-move win is filling the last triangle, which a random
+// pick makes anyway.
+export const randomLineMove = (board: Board): number => {
+  const winning = freeEdges(board).filter(e => isWinningShade(board, e));
+  return sample(winning.length > 0 ? winning : freeEdges(board))!;
+};
 export const randomCircleMove = (board: Board): number => sample(freeTriangles(board))!;
