@@ -85,7 +85,7 @@ export const TriangleCircleGame = strategyGameFactory({
     {
       botStrategy: smartBotStrategy,
       generateStartBoard,
-      label: { hu: 'Okos', en: 'Smart' },
+      label: { hu: 'Teljes', en: 'Full' },
       notAlwaysOptimal: true,
       isDefault: true
     }
