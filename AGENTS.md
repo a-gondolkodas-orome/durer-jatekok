@@ -136,6 +136,38 @@ bots enumerate legal moves via the raw `validate`/helpers instead.
 
 **`events`**: `endTurn()`, `endGame(winnerIndex?)`, `setTurnState(stage)`.
 
+### Known limitation: React state staleness in multi-move turns
+
+The engine keeps authoritative game state (`board`, `turnState`,
+`currentPlayer`) in React render state, but bots and chained dispatches run in
+`setTimeout` closures that captured a snapshot from an earlier render. Anything
+they need that is newer than their snapshot must reach them some other way.
+Two workarounds exist for two symptoms of this one root cause:
+
+- **`board`** — threaded explicitly by convention: every move returns
+  `nextBoard`, and a multi-move bot must pass the intermediate `nextBoard` to
+  its next calculation/dispatch instead of its (stale) `board` argument. Fails
+  loudly when violated (visibly wrong moves).
+- **`ctx.turnState`** — shadowed engine-side: move validation reads `ctx`
+  through a ref that is re-synced every render *and* patched synchronously by
+  `events.setTurnState`, because a chained dispatch (e.g. a bot's 0-delay
+  `setTimeout`) can fire before React re-renders. See `ctxRef` in
+  `strategy-game-factory.tsx` and the two-phase bot regression tests.
+
+The asymmetry matters when reviewing new games: a validator that depends on
+some *other* mid-turn-changing `ctx` field (e.g. `moveCount`) would need the
+same ref treatment — there is no general mechanism, only per-field shadows.
+
+There is no fully robust fix within the current shape. The known-robust
+architecture is a boardgame.io-style imperative game-state store outside React
+(React subscribing via `useSyncExternalStore`): moves would read/write current
+state synchronously, `board` threading and the ctx ref would both become
+unnecessary by construction. That refactor converges with the possible future
+server-side authoritative check (a server needs the React-free state machine
+anyway), so if that check is ever built, do both together rather than bolting
+on more per-field shadows. Until then, the current conventions are a deliberate
+simplicity trade-off — don't "fix" them piecemeal.
+
 ### New game checklist
 
 - Game works correctly in both `vsComputer` and `vsHuman` mode

@@ -216,7 +216,11 @@ allow further moves within the same turn.
 
 You must always pass `board` as a first param to all moves (meaning you must
 pass the updated board to subsequent moves in case of multiple moves within a
-turn).
+turn). This threading is not incidental: the framework holds game state in
+React render state, which a bot's `setTimeout` closures see only as a stale
+snapshot — see [AGENTS.md § Known limitation: React state staleness in
+multi-move turns](AGENTS.md#known-limitation-react-state-staleness-in-multi-move-turns)
+for the root cause and how `ctx.turnState` is handled.
 
 In `gameplay.moves`, each entry is either the apply function itself (shorthand)
 or a long-form object `{ apply, validate? }`:
