@@ -38,22 +38,16 @@ export const nodeColors = {
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const [color, setColor] = useState('');
-  const [show, setShow] = useState(false);
+  // null = no colour picked; picking the selected colour again deselects it
+  const [color, setColor] = useState<string | null>(null);
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
-  const isMoveAllowed = (vertex) =>
-    show && moves.colorVertex.isAllowed!(board, { vertex, color });
+  const isMoveAllowed = (vertex) => moves.colorVertex.isAllowed!(board, { vertex, color });
 
   const pick = (pickedColor) => {
     if (!ctx.isClientMoveAllowed) return;
-    if (pickedColor === color) {
-      setShow(!show);
-    } else {
-      setShow(true);
-      setColor(pickedColor);
-    }
+    setColor(pickedColor === color ? null : pickedColor);
   };
 
   const drawPickedColor = (event) => {
@@ -62,7 +56,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     setY(event.nativeEvent.offsetY / svg.clientHeight * 100);
   };
 
-  const isNearAllowedNode = show && range(8).some(nodeId => {
+  const isNearAllowedNode = range(8).some(nodeId => {
     if (!isMoveAllowed(nodeId)) return false;
     const cx = parseFloat(cubeCoords[nodeId].cx);
     const cy = parseFloat(cubeCoords[nodeId].cy);
@@ -72,7 +66,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const setVertexColor = (vertex) => {
     if (!isMoveAllowed(vertex)) return;
     moves.colorVertex(board, { vertex, color });
-    setShow(false);
+    setColor(null);
   };
 
   return (
@@ -81,7 +75,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       {map(nodeColors, ({ bg, name }, colorKey) =>
         <button
           key={colorKey}
-          disabled={!ctx.isClientMoveAllowed || (show && color !== colorKey)}
+          disabled={!ctx.isClientMoveAllowed || (color !== null && color !== colorKey)}
           className={`primary-button ${bg}`}
           onClick={() => pick(colorKey)}
         >
@@ -116,7 +110,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           aria-label={isMoveAllowed(nodeId) ? `Node ${nodeId + 1}` : undefined}
           fill={nodeColors[board[nodeId]]?.svg}
           className={!nodeColors[board[nodeId]]
-            ? (isMoveAllowed(nodeId) || !show
+            ? (isMoveAllowed(nodeId) || color === null
               ? 'fill-slate-50 dark:fill-slate-300'
               : 'fill-slate-400 dark:fill-slate-600')
             : undefined}
@@ -126,7 +120,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       {isNearAllowedNode && (
         <circle
           cx={x + '%'} cy={y + '%'} r="4%"
-          fill={nodeColors[color].svg}
+          fill={nodeColors[color!].svg}
           className="pointer-events-none opacity-50 stroke-0"
         />
       )}
@@ -145,9 +139,10 @@ const moves = {
     // Reuses the same `isAllowedStep` legality helper the BoardClient and bot
     // already rely on, so the engine enforces the colouring rule (no colouring
     // an already coloured vertex, no two adjacent equal colours) from a single
-    // source.
-    validate: (board: Board, _, { vertex, color }: { vertex: number; color: string }) =>
-      isAllowedStep(board, vertex, color),
+    // source. The colour must be a real palette colour — this also covers the
+    // BoardClient's "no colour picked yet" state (color === null).
+    validate: (board: Board, _, { vertex, color }: { vertex: number; color: string | null }) =>
+      color !== null && color in nodeColors && isAllowedStep(board, vertex, color),
     apply: (board: Board, { events }: { events: Events }, { vertex, color }) => {
       const nextBoard = cloneDeep(board);
       nextBoard[vertex] = color;

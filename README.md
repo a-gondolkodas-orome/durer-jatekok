@@ -235,27 +235,30 @@ lives in `validate`, right next to it.
 
 ### validate (optional, per move)
 
-`validate` is a pure, side-effect-free predicate
-`(board, { ctx }, ...args) => boolean`. When a move has one, the framework
-checks it before applying the move: in development it throws (surfacing bot/UI
-bugs loudly), and in production it warns, records an `illegal-move` analytics
-event, and no-ops (so a stray or tampered call cannot corrupt the board). A
-shorthand move (plain function) is always accepted, so this is fully opt-in.
+`validate` is a pure predicate `(board, { ctx }, ...args) => boolean` colocated
+with `apply` — the single source of truth for move legality. The framework
+rejects dispatches that fail it, and exposes it on the wrapped move as
+`moves.<name>.isAllowed(board, ...args)` (turn ownership AND `validate`, `ctx`
+bound) for the `BoardClient`'s `disabled` state. Full contract in
+[AGENTS.md](AGENTS.md#strategygamefactory-api).
 
-The validator is the **single source of truth** for legality: it drives the
-framework's enforcement, and because it is React-free the exact same function
-could run server-side in a future authoritative/competition mode. Keep the
-"whose turn is it" check out of the validator — that belongs to the framework,
-not to per-move legality.
+<details>
+<summary>Details</summary>
 
-For the UI, the framework exposes `moves.<name>.isAllowed(board, ...args)` on
-the wrapped move: `ctx.isClientMoveAllowed` (turn ownership) AND `validate`,
-with `ctx` already bound. A `BoardClient` computes button `disabled` state
-directly from it, with no gating boilerplate. It is not meant for bots — during
-the bot's turn `isClientMoveAllowed` is false by design, so bots enumerate legal
-moves via the raw `validate`/helpers. See `coins-in-3-piles` (two-phase turn)
-and `cube-coloring` (reuses its existing `isAllowedStep` helper) for worked
-examples.
+- Enforcement: in development an illegal dispatch throws; in production it
+  warns, records an `illegal-move` analytics event, and no-ops so a stray or
+  tampered call cannot corrupt the board.
+- A shorthand move (plain function) is always accepted — fully opt-in.
+- Keep the "whose turn is it" check out of `validate` — `isAllowed` folds
+  `ctx.isClientMoveAllowed` in for you.
+- `isAllowed` is not for bots: during the bot's turn `isClientMoveAllowed` is
+  false by design, so bots enumerate legal moves via the raw `validate`/helpers.
+- `validate` is React-free, so a future authoritative/competition server could
+  run the exact same predicate.
+- Worked examples: `coins-in-3-piles` (two-phase turn), `cube-coloring` (reuses
+  its `isAllowedStep` helper).
+
+</details>
 
 ### BoardClient React component
 
