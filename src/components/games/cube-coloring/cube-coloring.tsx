@@ -136,10 +136,7 @@ const isGameEnd = (board: Board) => {
 
 const moves = {
   colorVertex: {
-    // Reuses the same `isAllowedStep` legality helper the BoardClient and bot
-    // already rely on, so the engine enforces the colouring rule (no colouring
-    // an already coloured vertex, no two adjacent equal colours) from a single
-    // source. The colour must be a real palette colour — this also covers the
+    // The colour must be a real palette colour — this also covers the
     // BoardClient's "no colour picked yet" state (color === null).
     validate: (board: Board, _, { vertex, color }: { vertex: number; color: string | null }) =>
       color !== null && color in nodeColors && isAllowedStep(board, vertex, color),

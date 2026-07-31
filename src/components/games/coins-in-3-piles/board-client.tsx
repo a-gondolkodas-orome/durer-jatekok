@@ -21,9 +21,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const wasCoinAlreadyRemovedInTurn = valueOfRemovedCoin !== null;
 
-  // `isAllowed` is the engine-bound combination of turn ownership
-  // (ctx.isClientMoveAllowed) and the move's own `validate` — the single
-  // source of truth shared with the engine's illegal-move enforcement.
   const isRemovalAllowed = coinValue => moves.removeCoin.isAllowed!(board, coinValue);
   const isAddAllowed = coinValue => moves.addCoin.isAllowed!(board, coinValue);
 

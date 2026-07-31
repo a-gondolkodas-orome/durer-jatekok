@@ -23,10 +23,6 @@ export const canWin = (board: Board) => {
   return (oddPiles.length === 3 || oddPiles.length === 0);
 }
 
-// Each `validate` is the single source of legality for both the UI (button
-// `disabled` in board-client) and the engine's illegal-move enforcement. It
-// deliberately excludes the "whose turn is it" check (`ctx.isClientMoveAllowed`)
-// — that is the engine's concern, not per-move legality.
 export const moves = {
   removeCoin: {
     validate: (board: Board, { ctx }: { ctx: Ctx }, value: number) =>

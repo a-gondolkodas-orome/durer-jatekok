@@ -30,7 +30,7 @@ export type MoveFunction<TBoard> = (
 // `board` + `ctx` (no React, no `events`), the same function drives the UI
 // (button `disabled`), the engine (illegal-move enforcement) and, in the
 // future, an authoritative server-side check.
-export type MoveValidator<TBoard> = (
+type MoveValidator<TBoard> = (
   board: TBoard, meta: { ctx: Ctx }, ...args: any[]
 ) => boolean
 // A move is either a plain apply function (shorthand — always accepted by the
