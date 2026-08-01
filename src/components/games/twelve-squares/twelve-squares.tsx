@@ -8,19 +8,16 @@ import { ChessBishopSvg } from '../chess-bishops/chess-bishop-svg';
 
 type Board = { left: number, right: number }
 
-const isValidStep = (board: Board, step) =>
+// A piece advances one or two squares; landing exactly on the other piece is
+// the one thing forbidden. Both players step by the same rule, so whose turn it
+// is does not enter into legality — only which piece the step then moves.
+export const isValidStep = (board: Board, step) =>
   (step === 1 || step === 2) && step !== board.right - board.left;
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const isMoveAllowed = (step) => {
-    if (!ctx.isClientMoveAllowed) return false;
-    return isValidStep(board, step);
-  };
+  const isMoveAllowed = (step) => moves.step.isAllowed!(board, step);
 
-  const makeStep = (step) => {
-    if (!isMoveAllowed(step)) return;
-    moves.step(board, step);
-  };
+  const makeStep = (step) => moves.step(board, step);
 
   const potentialStep = i => {
     return ctx.currentPlayer === 0 ? i - board.left : board.right - i;
@@ -81,15 +78,18 @@ const getOptimalBotStep = ({ left, right }) => {
 };
 
 const moves = {
-  step: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, step) => {
-    const nextBoard = ctx.currentPlayer === 0
-      ? { left: board.left + step, right: board.right }
-      : { left: board.left, right: board.right - step };
-    events.endTurn();
-    if (nextBoard.right < nextBoard.left) {
-      events.endGame();
+  step: {
+    validate: (board: Board, _, step) => isValidStep(board, step),
+    apply: (board: Board, { ctx, events }: { ctx: Ctx, events: Events }, step) => {
+      const nextBoard = ctx.currentPlayer === 0
+        ? { left: board.left + step, right: board.right }
+        : { left: board.left, right: board.right - step };
+      events.endTurn();
+      if (nextBoard.right < nextBoard.left) {
+        events.endGame();
+      }
+      return { nextBoard };
     }
-    return { nextBoard };
   }
 };
 

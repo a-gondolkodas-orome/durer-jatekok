@@ -5,7 +5,7 @@ import {
 import { useTranslation } from '../../../language';
 import {
   type Board, type Orientation, type Move,
-  getRectangleAt, applyMove, isEmpty
+  getRectangleAt, applyMove, isEmpty, isRemovalAllowed
 } from './helpers';
 
 type Selected = { r: number; c: number } | null
@@ -26,7 +26,7 @@ export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Boar
   };
 
   const removeLine = (orientation: Orientation) => {
-    if (!ctx.isClientMoveAllowed || !selected) return;
+    if (!selected) return;
     moves.removeLine(board, { ...selected, orientation });
   };
 
@@ -110,16 +110,19 @@ export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Boar
 };
 
 export const moves = {
-  removeLine: (board: Board, { events }: { events: Events }, move: Move) => {
-    const nextBoard = { grid: applyMove(board.grid, move) };
-    events.setTurnState(null);
-    events.endTurn();
-    // Whoever removes the last disc wins; endGame() defaults the winner to the
-    // player who just moved (currentPlayer at move time).
-    if (isEmpty(nextBoard.grid)) {
-      events.endGame();
+  removeLine: {
+    validate: (board: Board, _, move: Move) => isRemovalAllowed(board.grid, move),
+    apply: (board: Board, { events }: { events: Events }, move: Move) => {
+      const nextBoard = { grid: applyMove(board.grid, move) };
+      events.setTurnState(null);
+      events.endTurn();
+      // Whoever removes the last disc wins; endGame() defaults the winner to the
+      // player who just moved (currentPlayer at move time).
+      if (isEmpty(nextBoard.grid)) {
+        events.endGame();
+      }
+      return { nextBoard };
     }
-    return { nextBoard };
   }
 };
 
