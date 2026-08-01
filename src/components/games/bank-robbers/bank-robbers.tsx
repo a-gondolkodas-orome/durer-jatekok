@@ -20,8 +20,6 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
 
   const isAllowedBank = index => isRobbable(board, index);
 
-  const clickBank = (index) => moves.rob(board, index);
-
   const getBankColor = index => {
     if (index === board.lastMove) return "fill-red-800 stroke-red-600";
     if (board.circle[index] === false) return "fill-red-800";
@@ -54,9 +52,9 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
               r="4%"
               className={`${getBankColor(index)}`}
               strokeWidth={index === board.lastMove ? "1%" : "0"}
-              onClick={() => clickBank(index)}
+              onClick={() => moves.rob(board, index)}
               onKeyUp={(event) => {
-                if (event.key === 'Enter') clickBank(index);
+                if (event.key === 'Enter') moves.rob(board, index);
               }}
               tabIndex={isAllowedMove(index) ? 0 : undefined}
               role={isAllowedMove(index) ? 'button' : undefined}

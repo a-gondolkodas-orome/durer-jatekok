@@ -16,10 +16,6 @@ const generateStartBoard = (ROWS: number, COLS: number) => (): Board => {
 
 // Board-driven: reads its dimensions from the board, so it renders any size.
 const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-  const clickField = (field: Field) => moves.placeDuck(board, field);
-
-  const isMoveAllowed = (targetField: Field) => moves.placeDuck.isAllowed!(board, targetField);
-
   const isForbidden = ({ row, col }: Field) => {
     return board[row][col] === FORBIDDEN;
   };
@@ -44,8 +40,8 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
                 >
                   <button
                     className="w-full aspect-square p-[5%]"
-                    disabled={!isMoveAllowed({ row, col })}
-                    onClick={() => clickField({ row, col })}
+                    disabled={!moves.placeDuck.isAllowed!(board, { row, col })}
+                    onClick={() => moves.placeDuck(board, { row, col })}
                   >
                     {isDuck({ row, col }) && (
                       <svg className="w-full aspect-square">
