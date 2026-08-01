@@ -1,9 +1,8 @@
 import { strategyGameFactory, type BoardClientProps, GameBoard } from '../../strategy-game-factory';
-import { some, range, isEqual, sample } from 'lodash';
+import { range, sample } from 'lodash';
 import { DuckSvg } from './rubber-duck-svg';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import {
-  getAllowedMoves,
   DUCK,
   FORBIDDEN,
   moves,
@@ -16,17 +15,10 @@ const generateStartBoard = (ROWS: number, COLS: number) => (): Board => {
 };
 
 // Board-driven: reads its dimensions from the board, so it renders any size.
-const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const clickField = (field: Field) => {
-    if (!isMoveAllowed(field)) return;
+const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
+  const clickField = (field: Field) => moves.placeDuck(board, field);
 
-    moves.placeDuck(board, field);
-  };
-
-  const isMoveAllowed = (targetField: Field) => {
-    if (!ctx.isClientMoveAllowed) return false;
-    return some(getAllowedMoves(board), field => isEqual(field, targetField));
-  };
+  const isMoveAllowed = (targetField: Field) => moves.placeDuck.isAllowed!(board, targetField);
 
   const isForbidden = ({ row, col }: Field) => {
     return board[row][col] === FORBIDDEN;
