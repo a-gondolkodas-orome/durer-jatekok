@@ -23,7 +23,6 @@ const edges = [
 export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   const isClickable = (node: number) => moves.placeCoin.isAllowed!(board, node);
 
-
   return (
     <GameBoard>
       <svg className="aspect-square stroke-slate-900 dark:stroke-slate-300 stroke-2">
