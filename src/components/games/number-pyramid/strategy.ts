@@ -143,7 +143,7 @@ const canWin = (board: Board): boolean => {
 };
 
 // Slot states: null = empty placeholder, { value, state:'active'|'consumed' }
-export const activeSlotIndices = (level: Level): number[] =>
+const activeSlotIndices = (level: Level): number[] =>
   level.flatMap((s, i) => (s?.state === 'active' ? [i] : []));
 
 // A move erases two distinct numbers that are still active on one level and
