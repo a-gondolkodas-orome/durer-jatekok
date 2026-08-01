@@ -1,10 +1,8 @@
-import { isArchitectStepAllowed, isDestructionAllowed } from './helpers';
-
-type BoardOverrides = Partial<{ architectPosition: number; towers: boolean[]; kmUsedToday: number }>;
+import { type Board, isArchitectStepAllowed, isDestructionAllowed } from './helpers';
 
 // A fresh day on a regular polygon with `vertexCount` towers, all standing, the
 // architect at A(0).
-const boardOn = (vertexCount: number) => (over: BoardOverrides = {}) => ({
+const boardOn = (vertexCount: number) => (over: Partial<Board> = {}): Board => ({
   architectPosition: 0,
   towers: Array(vertexCount).fill(true),
   day: 1,

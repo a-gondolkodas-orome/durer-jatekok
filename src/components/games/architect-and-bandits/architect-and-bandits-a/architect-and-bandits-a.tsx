@@ -1,12 +1,12 @@
 import { cloneDeep } from 'lodash';
 import { strategyGameFactory, type Ctx, type Events } from '../../../strategy-game-factory';
 import {
-  ARCHITECT, BANDITS, isArchitectStepAllowed, isDestructionAllowed
+  type Board, ARCHITECT, BANDITS, isArchitectStepAllowed, isDestructionAllowed
 } from '../helpers';
 import { BoardClient } from './board-client';
-
-export type Board = { architectPosition: number, towers: boolean[], day: number, kmUsedToday: number }
 import { smartBotStrategy } from './bot-strategy';
+
+export type { Board };
 
 // Vertices A(0)..H(7) clockwise, each edge 10 km, max 40 km/day
 
