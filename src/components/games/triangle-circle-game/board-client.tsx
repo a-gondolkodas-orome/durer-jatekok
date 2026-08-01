@@ -26,11 +26,8 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     setHoveredEdge(null);
   }, [ctx.moveCount]);
 
-  const edgeClickable = (e: number) => moves.shadeEdge.isAllowed!(board, e);
   const triangleClickable = (t: number) => moves.placeCircle.isAllowed!(board, t);
 
-  const shadeEdge = (e: number) => moves.shadeEdge(board, e);
-  const placeCircle = (t: number) => moves.placeCircle(board, t);
 
   const triangleClass = (t: number) => {
     if (board.circles[t]) return 'fill-slate-900/5 dark:fill-white/5';
@@ -54,8 +51,8 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               key={`tri-${tri.id}`}
               points={tri.points}
               className={triangleClass(tri.id)}
-              onClick={() => placeCircle(tri.id)}
-              onKeyUp={event => { if (event.key === 'Enter') placeCircle(tri.id); }}
+              onClick={() => moves.placeCircle(board, tri.id)}
+              onKeyUp={event => { if (event.key === 'Enter') moves.placeCircle(board, tri.id); }}
               tabIndex={triangleClickable(tri.id) ? 0 : undefined}
               role={triangleClickable(tri.id) ? 'button' : undefined}
               aria-label={triangleClickable(tri.id)
@@ -136,12 +133,12 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               strokeWidth="4"
               strokeLinecap="round"
               className="cursor-pointer outline-none"
-              onClick={() => shadeEdge(edge.id)}
+              onClick={() => moves.shadeEdge(board, edge.id)}
               onMouseEnter={() => setHoveredEdge(edge.id)}
               onMouseLeave={() => setHoveredEdge(null)}
               onFocus={() => setHoveredEdge(edge.id)}
               onBlur={() => setHoveredEdge(null)}
-              onKeyUp={event => { if (event.key === 'Enter') shadeEdge(edge.id); }}
+              onKeyUp={event => { if (event.key === 'Enter') moves.shadeEdge(board, edge.id); }}
               tabIndex={0}
               role="button"
               aria-label={t({ hu: `${edge.id + 1}. él — satírozd be`, en: `Edge ${edge.id + 1} — shade it` })}
