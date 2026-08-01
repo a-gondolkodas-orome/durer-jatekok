@@ -175,6 +175,12 @@ anyway), so if that check is ever built, do both together rather than bolting
 on more per-field shadows. Until then, the current conventions are a deliberate
 simplicity trade-off — don't "fix" them piecemeal.
 
+Note "boardgame.io-style" means the architecture only. **Do not propose
+adopting boardgame.io itself**: it is a good library but effectively
+unmaintained (no meaningful releases for years, and its React client pins
+React versions well behind the one used here). Borrow its ideas — the
+long-form move shape already does — and build the rest in-repo.
+
 ### New game checklist
 
 - Game works correctly in both `vsComputer` and `vsHuman` mode
