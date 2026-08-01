@@ -77,7 +77,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     });
   };
 
-  const submitPoint = () => moves.pointPiles(board, selectedForPoint);
 
   const adjustRemoval = (i: number, delta: number) => {
     if (!canInteract || stage !== 'remove') return;
@@ -161,7 +160,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       {canInteract && stage === 'point' && (
         <button
           disabled={!pointingReady}
-          onClick={submitPoint}
+          onClick={() => moves.pointPiles(board, selectedForPoint)}
           className="primary-button w-auto mt-4 mx-auto"
         >
           {pointCount === 1
