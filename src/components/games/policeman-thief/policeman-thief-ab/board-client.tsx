@@ -1,5 +1,4 @@
 import { range } from "lodash";
-import { neighbours } from "./helpers";
 import type { Board } from "./policeman-thief-ab";
 import { GameBoard, type BoardClientProps } from "../../../strategy-game-factory";
 
@@ -15,29 +14,16 @@ const cubeCoords = [
 ];
 
 export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const handleCircleClick = (vertex: number) => {
-    if (!isClickable(vertex)) return;
-    if (ctx.currentPlayer === 1) {
-      moves.moveThief(board, vertex);
-      return;
-    }
-    if (board.firstPolicemanMoved) {
-      moves.moveSecondPoliceman(board, vertex);
-      return;
-    }
-    moves.moveFirstPoliceman(board, vertex);
+  // Exactly one piece is due to move at any moment; the same move then decides
+  // both what a click does and which intersections are offered.
+  const activeMove = () => {
+    if (ctx.currentPlayer === 1) return moves.moveThief;
+    return board.firstPolicemanMoved ? moves.moveSecondPoliceman : moves.moveFirstPoliceman;
   };
 
-  const isClickable = (vertex: number) => {
-    if (!ctx.isClientMoveAllowed) return false;
-    if (ctx.currentPlayer === 1) {
-      return neighbours[board.thief].includes(vertex);
-    }
-    if (board.firstPolicemanMoved) {
-      return neighbours[board.policemen[1]].includes(vertex)
-    }
-    return neighbours[board.policemen[0]].includes(vertex)
-  }
+  const handleCircleClick = (vertex: number) => activeMove()(board, vertex);
+
+  const isClickable = (vertex: number) => activeMove().isAllowed!(board, vertex);
 
   const getColor = (vertex: number) => {
     if (isClickable(vertex)) {
