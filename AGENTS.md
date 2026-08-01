@@ -181,6 +181,8 @@ simplicity trade-off — don't "fix" them piecemeal.
 - Starting positions representative of the game's complexity; each player wins
   with ~50% probability across random starting boards
 - Player cannot win with a non-winning strategy (i.e. AI is truly optimal)
+- Moves with non-trivial legality define `validate` (single source of truth for
+  the engine, the `BoardClient`'s `disabled` state and the bot)
 - Clear what the player should do next (`getPlayerStepDescription`)
 - Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
 - Mobile-friendly and keyboard-navigable
