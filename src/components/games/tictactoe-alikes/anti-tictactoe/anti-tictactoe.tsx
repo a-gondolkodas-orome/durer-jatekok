@@ -7,7 +7,6 @@ import { isGameEnd, hasFirstPlayerWon, type Board } from './helpers';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
 const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-  const isMoveAllowed = (id) => moves.placePiece.isAllowed!(board, id);
   const pieceColor = (id) => {
     const colorCode = board[id];
     if (colorCode === 'red') return 'bg-red-800';
@@ -24,7 +23,7 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
       {range(9).map(id => (
         <button
           key={id}
-          disabled={!isMoveAllowed(id)}
+          disabled={!moves.placePiece.isAllowed!(board, id)}
           onClick={() => moves.placePiece(board, id)}
           className="aspect-square p-[25%] bg-surface-elevated"
         >
