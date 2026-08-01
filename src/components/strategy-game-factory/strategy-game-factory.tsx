@@ -252,19 +252,27 @@ export const strategyGameFactory = <TBoard,>({
       }
     };
 
-    wrappedGameMoves = mapValues(normalizedMoves, ({ apply, validate }, name) => {
+    wrappedGameMoves = mapValues(normalizedMoves, ({ apply }, name) => {
       const wrapped: GameMoves<TBoard>[string] = (board: TBoard, ...args: unknown[]) =>
         moveWrapper(name, board, args, () => apply(board, { ctx, events }, ...args));
-      if (validate) {
-        // "May the client dispatch this move right now?" — turn ownership plus
-        // the move's own legality, with `ctx` bound, so the BoardClient drives
-        // `disabled` as `moves.x.isAllowed(board, ...args)` with no boilerplate.
-        // (Bots enumerate legal moves via the raw `validate`/helpers instead:
-        // during the bot's turn `isClientMoveAllowed` is false by design.)
-        wrapped.isAllowed = (board: TBoard, ...args: unknown[]) =>
-          isClientMoveAllowed && validate(board, { ctx }, ...args);
-      }
       return wrapped;
+    });
+
+    // What the BoardClient receives: the same moves, but a dispatch is silently
+    // ignored unless `isAllowed` holds — turn ownership (ctx.isClientMoveAllowed)
+    // AND the move's validator. This engine-side gate replaces per-handler
+    // `if (!allowed) return` guards, and also covers browsers that fire pointer
+    // events on disabled buttons. Bots and the auto `endOfTurnMove` dispatch use
+    // `wrappedGameMoves` instead: there an illegal move is a bug, and the
+    // validator fails loudly (see `reportIllegalMove`).
+    const clientGameMoves: GameMoves<TBoard> = mapValues(normalizedMoves, ({ validate }, name) => {
+      const isAllowed = (board: TBoard, ...args: unknown[]) =>
+        ctxRef.current.isClientMoveAllowed
+          && (!validate || validate(board, { ctx: ctxRef.current }, ...args));
+      const clientWrapped: GameMoves<TBoard>[string] = (board: TBoard, ...args: unknown[]) =>
+        isAllowed(board, ...args) ? wrappedGameMoves[name]!(board, ...args) : { nextBoard: board };
+      clientWrapped.isAllowed = isAllowed;
+      return clientWrapped;
     });
 
     const doBotTurn = () => {
@@ -291,7 +299,7 @@ export const strategyGameFactory = <TBoard,>({
               board={board}
               ctx={ctx}
               events={events}
-              moves={wrappedGameMoves}
+              moves={clientGameMoves}
             />
             <GameSidebar
               roleLabels={roleLabels}

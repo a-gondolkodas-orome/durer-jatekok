@@ -111,19 +111,26 @@ it keep working unchanged. The validator is the **single source of truth** for
 legality: it drives the engine's enforcement, and — being React-free — a
 possible future server-side authoritative check can reuse the same predicate.
 Do **not** put the "whose turn is it" check (`ctx.isClientMoveAllowed`) inside
-`validate`; the engine folds that in for the UI (below). Note the engine
-therefore enforces argument legality only — it cannot tell a bot dispatch from
-a client one, so out-of-turn protection stays with the `BoardClient`'s
-`isAllowed`/`disabled` gating. See `coins-in-3-piles`
+`validate`; the engine folds that in for the client (below). The engine hands
+out two wrappings of the same moves: the `moves` object the `BoardClient`
+receives **silently ignores** any dispatch that fails `isAllowed` (so a stray
+click — even on a button a browser failed to disable — is a harmless no-op),
+while bot and auto `endOfTurnMove` dispatches are checked against `validate`
+alone and fail loudly (dev: throw; prod: warn + `illegal-move` analytics event
++ no-op), since there an illegal move is a bug. See `coins-in-3-piles`
 (two-phase turn) and `cube-coloring` (reuses the existing `isAllowedStep`
 helper) for examples.
 
-**`moves.<name>.isAllowed(board, ...args)`** — for moves with a `validate`, the
-engine exposes this on the wrapped move: `ctx.isClientMoveAllowed` (turn
-ownership) AND `validate`, with `ctx` already bound. This is exactly what a
-`BoardClient`'s button `disabled` state should ask, with no gating boilerplate.
-Not for bots: during the bot's turn `isClientMoveAllowed` is false by design, so
-bots enumerate legal moves via the raw `validate`/helpers instead.
+**`moves.<name>.isAllowed(board, ...args)`** — exposed on every move of the
+`BoardClient`'s wrapped `moves` object: `ctx.isClientMoveAllowed` (turn
+ownership) AND the move's `validate` (when defined), with `ctx` already bound.
+Drive button `disabled` state with it. Because the engine applies the same
+check to every client dispatch, click handlers need no `if (!allowed) return`
+guards — keep one only when the handler couples local UI state to a successful
+move (see `cube-coloring`'s colour-selection reset). Not for bots: their
+`moves` copy carries no `isAllowed` (during the bot's turn
+`isClientMoveAllowed` is false by design), so bots enumerate legal moves via
+the raw `validate`/helpers instead.
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes

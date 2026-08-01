@@ -64,6 +64,8 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   });
 
   const setVertexColor = (vertex) => {
+    // the engine ignores disallowed dispatches, but the guard is still needed
+    // here: a rejected click must not clear the colour selection below
     if (!isColoringAllowed(vertex)) return;
     moves.colorVertex(board, { vertex, color });
     setColor(null);

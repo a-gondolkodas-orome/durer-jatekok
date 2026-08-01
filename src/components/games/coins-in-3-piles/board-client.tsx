@@ -25,20 +25,9 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isAddAllowed = coinValue => moves.addCoin.isAllowed!(board, coinValue);
   const isPassAllowed = () => moves.passAddition.isAllowed!(board);
 
-  const removeFromPile = coinValue => {
-    if (!isRemovalAllowed(coinValue)) return;
-    moves.removeCoin(board, coinValue);
-  };
-
-  const addToPile = coinValue => {
-    if (!isAddAllowed(coinValue)) return;
-    moves.addCoin(board, coinValue);
-  };
-
-  const passAddition = () => {
-    if (!isPassAllowed()) return;
-    moves.passAddition(board);
-  };
+  const removeFromPile = coinValue => moves.removeCoin(board, coinValue);
+  const addToPile = coinValue => moves.addCoin(board, coinValue);
+  const passAddition = () => moves.passAddition(board);
 
   const shouldShowCoinToBeRemoved = (coinValue) => {
     if (!ctx.isClientMoveAllowed) return false;

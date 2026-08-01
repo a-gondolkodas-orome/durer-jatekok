@@ -44,11 +44,13 @@ export interface Gameplay<TBoard> {
   endOfTurnMove?: string
 }
 // Engine-wrapped moves as seen by BoardClient and bots: callable to dispatch.
-// When the move defines `validate`, the wrapped move also exposes
-// `isAllowed(board, ...args)` — `ctx.isClientMoveAllowed` (turn ownership)
-// AND the move's `validate`, with `ctx` already bound — which is what the
-// BoardClient's `disabled` state should ask. Not for bots: during the bot's
-// turn `isClientMoveAllowed` is false, so bots use the raw `validate`/helpers.
+// The BoardClient's copy exposes `isAllowed(board, ...args)` on every move —
+// `ctx.isClientMoveAllowed` (turn ownership) AND the move's `validate`, with
+// `ctx` already bound — which is what its `disabled` state should ask; the
+// same check silently gates every client dispatch, so handlers need no
+// `if (!allowed) return` guards. Not for bots: their copy carries no
+// `isAllowed` (during the bot's turn `isClientMoveAllowed` is false), so bots
+// use the raw `validate`/helpers to enumerate legal moves.
 export type GameMoves<TBoard> = Record<
   string,
   ((board: TBoard, ...args: any[]) => MoveResult<TBoard>)

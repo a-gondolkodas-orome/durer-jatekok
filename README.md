@@ -158,14 +158,11 @@ const moves = {
 };
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const clickNumber = (number) => {
-    if (!ctx.isClientMoveAllowed) return;
-    moves.addNumber(board, number);
-  };
-
+  // no handler guard needed: the framework ignores dispatches that are not
+  // allowed; `disabled` is for the player's benefit
   return <GameBoard>
-    <button onClick={() => clickNumber(1)}>1</button>
-    <button onClick={() => clickNumber(2)}>2</button>
+    <button disabled={!ctx.isClientMoveAllowed} onClick={() => moves.addNumber(board, 1)}>1</button>
+    <button disabled={!ctx.isClientMoveAllowed} onClick={() => moves.addNumber(board, 2)}>2</button>
   </GameBoard>
 };
 
@@ -249,14 +246,15 @@ bound) for the `BoardClient`'s `disabled` state. Full contract in
 <details>
 <summary>Details</summary>
 
-- Enforcement: in development an illegal dispatch throws; in production it
-  warns, records an `illegal-move` analytics event, and no-ops so a stray or
-  tampered call cannot corrupt the board.
-- A shorthand move (plain function) is always accepted — fully opt-in.
+- Enforcement: the `moves` object the `BoardClient` receives silently ignores
+  any dispatch that fails `isAllowed` — click handlers need no
+  `if (!allowed) return` guards (keep one only when the handler couples local
+  UI state to a successful move, see `cube-coloring`). Bot and auto
+  end-of-turn dispatches failing `validate` throw in development, and warn +
+  record an `illegal-move` analytics event + no-op in production.
+- A shorthand move (plain function) has no argument validation — fully opt-in.
 - Keep the "whose turn is it" check out of `validate` — `isAllowed` folds
-  `ctx.isClientMoveAllowed` in for you. The engine consequently enforces
-  argument legality only (it cannot tell a bot dispatch from a client one);
-  out-of-turn protection stays with the `BoardClient`'s `disabled` gating.
+  `ctx.isClientMoveAllowed` in for you.
 - `isAllowed` is not for bots: during the bot's turn `isClientMoveAllowed` is
   false by design, so bots enumerate legal moves via the raw `validate`/helpers.
 - `validate` is React-free, so a future authoritative/competition server could

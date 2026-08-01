@@ -137,6 +137,7 @@ describe('strategyGameFactory endOfTurnMove', () => {
     };
 
     const { getByTestId } = renderGame(minimalConfig({ moves, endOfTurnMove: 'autoMove' }));
+    fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('move-btn'));
 
     expect(autoMove).not.toHaveBeenCalled();
@@ -157,6 +158,7 @@ describe('strategyGameFactory endOfTurnMove', () => {
     };
 
     const { getByTestId } = renderGame(minimalConfig({ moves, endOfTurnMove: 'autoMove' }));
+    fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('move-btn'));
     act(() => { vi.advanceTimersByTime(750); });
 
@@ -504,11 +506,12 @@ describe('umami game-finished event', () => {
 });
 
 describe('move validate enforcement', () => {
-  const guardedConfig = () => makeConfig({
+  const guardedConfig = (botStrategy: () => void = () => {}) => makeConfig({
     BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
       <>
         <button data-testid="legal-btn" onClick={() => moves.guarded(board, 'ok')}>legal</button>
         <button data-testid="illegal-btn" onClick={() => moves.guarded(board, 'bad')}>illegal</button>
+        <button data-testid="hand-over-btn" onClick={() => moves.handOver(board)}>hand over</button>
         <span data-testid="board">{board.join(',')}</span>
         <span data-testid="can-ok">{String(moves.guarded.isAllowed!(board, 'ok'))}</span>
         <span data-testid="can-bad">{String(moves.guarded.isAllowed!(board, 'bad'))}</span>
@@ -519,36 +522,56 @@ describe('move validate enforcement', () => {
         guarded: {
           apply: (board: Board, _meta: { events: Events }, arg: string) => ({ nextBoard: [...board, arg] }),
           validate: (_board: Board, _meta: { ctx: Ctx }, arg: string) => arg === 'ok'
+        },
+        handOver: (board: Board, { events }: { events: Events }) => {
+          events.endTurn();
+          return { nextBoard: board };
         }
       }
-    }
+    },
+    botStrategy
   });
 
-  it('applies a move whose args pass its validator', () => {
+  it('applies a client dispatch whose args pass its validator', () => {
     const { getByTestId } = renderGame(guardedConfig());
     fireEvent.click(getByTestId('role-btn-0'));
     fireEvent.click(getByTestId('legal-btn'));
     expect(getByTestId('board').textContent).toBe('initial,ok');
   });
 
-  it('throws a loud error in dev when a move fails its validator', () => {
-    // React 19 does not propagate an event-handler throw back to fireEvent; it
-    // reports it on the global `error` event. Capture that (and preventDefault so
-    // vitest does not flag it as an unhandled error).
-    const caught: string[] = [];
-    const onError = (event: ErrorEvent) => {
-      caught.push(event.error?.message ?? event.message);
-      event.preventDefault();
-    };
-    window.addEventListener('error', onError);
+  it('silently ignores a client dispatch whose args fail the validator', () => {
+    const { getByTestId } = renderGame(guardedConfig());
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('illegal-btn')); // must not throw
+    expect(getByTestId('board').textContent).toBe('initial');
+  });
+
+  it('silently ignores a client dispatch when it is not the client turn', () => {
+    const { getByTestId } = renderGame(guardedConfig());
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('hand-over-btn')); // endTurn → bot's turn
+    fireEvent.click(getByTestId('legal-btn')); // legal args, wrong turn
+    expect(getByTestId('board').textContent).toBe('initial');
+  });
+
+  it('silently ignores a client dispatch before the game starts', () => {
+    const { getByTestId } = renderGame(guardedConfig());
+    fireEvent.click(getByTestId('legal-btn'));
+    expect(getByTestId('board').textContent).toBe('initial');
+  });
+
+  it('throws a loud error in dev when a bot dispatches a move that fails its validator', () => {
+    vi.useFakeTimers();
     try {
-      const { getByTestId } = renderGame(guardedConfig());
+      const botStrategy = vi.fn().mockImplementation((args: any) => { args.moves.guarded(args.board, 'bad'); });
+      const { getByTestId } = renderGame(guardedConfig(botStrategy));
       fireEvent.click(getByTestId('role-btn-0'));
-      fireEvent.click(getByTestId('illegal-btn'));
-      expect(caught.some(message => /illegal move/.test(message))).toBe(true);
+      fireEvent.click(getByTestId('hand-over-btn')); // → bot's turn
+      expect(() => act(() => { vi.advanceTimersByTime(1500); })).toThrow(/illegal move/);
       expect(getByTestId('board').textContent).toBe('initial'); // threw before touching the board
     } finally {
-      window.removeEventListener('error', onError);
+      vi.clearAllTimers();
+      vi.useRealTimers();
     }
   });
 
@@ -627,14 +650,18 @@ describe('move validate enforcement', () => {
   });
 
   describe('in production (import.meta.env.DEV = false)', () => {
-    beforeEach(() => { vi.stubEnv('DEV', false); });
-    afterEach(() => { vi.unstubAllEnvs(); });
+    beforeEach(() => { vi.stubEnv('DEV', false); vi.useFakeTimers(); });
+    afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllEnvs(); });
 
-    it('does not throw and leaves the board unchanged on an illegal move', () => {
+    const illegalBotStrategy = () =>
+      vi.fn().mockImplementation((args: any) => { args.moves.guarded(args.board, 'bad'); });
+
+    it('does not throw and leaves the board unchanged on an illegal bot move', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const { getByTestId } = renderGame(guardedConfig());
+      const { getByTestId } = renderGame(guardedConfig(illegalBotStrategy()));
       fireEvent.click(getByTestId('role-btn-0'));
-      fireEvent.click(getByTestId('illegal-btn'));
+      fireEvent.click(getByTestId('hand-over-btn')); // → bot's turn
+      act(() => { vi.advanceTimersByTime(1500); }); // bot dispatches 'bad' — must not throw
       expect(getByTestId('board').textContent).toBe('initial'); // no-op, not corrupted
       expect(warn).toHaveBeenCalled();
       warn.mockRestore();
@@ -644,9 +671,10 @@ describe('move validate enforcement', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
       const track = vi.fn();
       window.umami = { track: track as NonNullable<Window['umami']>['track'] };
-      const { getByTestId } = renderGame(guardedConfig());
+      const { getByTestId } = renderGame(guardedConfig(illegalBotStrategy()));
       fireEvent.click(getByTestId('role-btn-0'));
-      fireEvent.click(getByTestId('illegal-btn'));
+      fireEvent.click(getByTestId('hand-over-btn'));
+      act(() => { vi.advanceTimersByTime(1500); });
       expect(track).toHaveBeenCalledWith('illegal-move', expect.objectContaining({ move: 'guarded' }));
       delete window.umami;
       vi.restoreAllMocks();
