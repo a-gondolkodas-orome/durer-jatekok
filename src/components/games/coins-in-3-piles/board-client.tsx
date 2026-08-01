@@ -25,9 +25,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isAddAllowed = coinValue => moves.addCoin.isAllowed!(board, coinValue);
   const isPassAllowed = () => moves.passAddition.isAllowed!(board);
 
-  const removeFromPile = coinValue => moves.removeCoin(board, coinValue);
-  const addToPile = coinValue => moves.addCoin(board, coinValue);
-  const passAddition = () => moves.passAddition(board);
 
   const shouldShowCoinToBeRemoved = (coinValue) => {
     if (!ctx.isClientMoveAllowed) return false;
@@ -56,7 +53,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
             <button
               disabled={!isPassAllowed()}
               className="secondary-button w-auto"
-              onClick={passAddition}
+              onClick={() => moves.passAddition(board)}
             >
               {t({ hu: 'Semmi ∅', en: 'Nothing ∅' })}
             </button>
@@ -68,7 +65,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                   primary-button w-auto min-w-[4ch] rounded-2xl
                   ${getCoinBgColor(coinValue)} enabled:hocus:brightness-75
                 `}
-                onClick={() => addToPile(coinValue)}
+                onClick={() => moves.addCoin(board, coinValue)}
                 {...(isAddAllowed(coinValue) ? hoverProps(coinValue) : {})}
               >{coinValue}</button>
             ))}
@@ -101,7 +98,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                     ? 'opacity-50' : ''}
                 `}
                 style={{ transform: 'scaleY(-1)' }}
-                onClick={() => removeFromPile(coinValue)}
+                onClick={() => moves.removeCoin(board, coinValue)}
                 {...(isRemovalAllowed(coinValue) ? hoverProps(coinValue) : {})}
               >{coinValue}</button>
             ))}
