@@ -10,8 +10,6 @@ import {
 import { moves, CARD_COUNT } from './moves';
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-
-
   const getCardColor = num => {
     if (board.cards[Thief].includes(num)) return 'bg-red-800';
     if (board.cards[Sheriff].includes(num)) return 'bg-blue-800 text-white';
