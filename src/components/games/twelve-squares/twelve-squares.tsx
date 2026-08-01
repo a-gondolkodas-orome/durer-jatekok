@@ -15,10 +15,6 @@ export const isValidStep = (board: Board, step) =>
   (step === 1 || step === 2) && step !== board.right - board.left;
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const isMoveAllowed = (step) => moves.step.isAllowed!(board, step);
-
-  const makeStep = (step) => moves.step(board, step);
-
   const potentialStep = i => {
     return ctx.currentPlayer === 0 ? i - board.left : board.right - i;
   }
@@ -26,7 +22,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const cellBackground = (i) => {
     if (i === board.left) return 'bg-green-400';
     if (i === board.right) return 'bg-purple-400';
-    if (isMoveAllowed(potentialStep(i))) {
+    if (moves.step.isAllowed!(board, potentialStep(i))) {
       return ctx.currentPlayer === 0
         ? 'bg-green-200 dark:bg-green-700 enabled:hocus:bg-green-400 dark:enabled:hocus:bg-green-600'
         : 'bg-purple-200 dark:bg-purple-700 enabled:hocus:bg-purple-400 dark:enabled:hocus:bg-purple-600';
@@ -45,8 +41,8 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
               w-full aspect-square text-xl font-bold rounded-sm drop-shadow-sm p-[10%]
               ${cellBackground(i)}
             `}
-            disabled={!isMoveAllowed(potentialStep(i))}
-            onClick={() => makeStep(potentialStep(i))}
+            disabled={!moves.step.isAllowed!(board, potentialStep(i))}
+            onClick={() => moves.step(board, potentialStep(i))}
           >{ i === board.left || i === board.right
             ? <svg className="w-full aspect-square">
                 <use href="#game-chess-bishop" />
