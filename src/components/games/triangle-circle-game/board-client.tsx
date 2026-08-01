@@ -126,10 +126,9 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         </g>
 
         {/* Invisible wide hit targets for edges — only on the line player's turn,
-            where `edgeClickable` (the move's own validator) is what makes the
-            list non-empty. */}
+            where the move's own validator is what makes the list non-empty. */}
         <g>
-          {EDGES.filter(edge => edgeClickable(edge.id)).map(edge => (
+          {EDGES.filter(edge => moves.shadeEdge.isAllowed!(board, edge.id)).map(edge => (
             <line
               key={`hit-${edge.id}`}
               x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
