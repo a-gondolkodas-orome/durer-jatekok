@@ -1,5 +1,6 @@
 import {
-  type Grid, getRectangleAt, getRectangles, applyMove, isEmpty, getAllMoves, isRemovalAllowed
+  type Grid, type Move,
+  getRectangleAt, getRectangles, applyMove, isEmpty, getAllMoves, isRemovalAllowed
 } from './helpers';
 
 const g = (rows: number[][]): Grid => rows.map(r => r.map(Boolean));
@@ -96,6 +97,14 @@ describe('isRemovalAllowed', () => {
     expect(isRemovalAllowed(grid, { r: -1, c: 0, orientation: 'row' })).toBe(false);
     expect(isRemovalAllowed(grid, { r: 0, c: 9, orientation: 'row' })).toBe(false);
     expect(isRemovalAllowed(grid, { r: 9, c: 0, orientation: 'row' })).toBe(false);
+  });
+
+  // The board client builds the move by spreading the selected disc into
+  // `{ ...selected, orientation }`, so with nothing selected it has no r/c at
+  // all. That is what makes the selection itself part of legality — the client
+  // needs no null-check of its own.
+  it('refuses a move with no disc named at all', () => {
+    expect(isRemovalAllowed(grid, { orientation: 'row' } as Move)).toBe(false);
   });
 
   it('accepts every move the generator lists', () => {

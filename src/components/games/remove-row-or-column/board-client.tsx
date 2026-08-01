@@ -25,11 +25,6 @@ export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Boar
     events.setTurnState(selected && selected.r === r && selected.c === c ? null : { r, c });
   };
 
-  const removeLine = (orientation: Orientation) => {
-    if (!selected) return;
-    moves.removeLine(board, { ...selected, orientation });
-  };
-
   const discClass = (r: number, c: number) => {
     if (!rect || !selected) return 'bg-blue-500';
     const inRect = r >= rect.minR && r <= rect.maxR && c >= rect.minC && c <= rect.maxC;
@@ -97,7 +92,7 @@ export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Boar
             <button
               key={orientation}
               className="primary-button w-auto grow"
-              onClick={() => removeLine(orientation)}
+              onClick={() => moves.removeLine(board, { ...selected, orientation })}
               {...hoverProps(orientation)}
             >
               {t(label)} ({count})
