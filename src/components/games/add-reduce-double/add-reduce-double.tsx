@@ -20,9 +20,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isDisabled = ({ pileId, pieceId }: Piece) =>
     !moves.moveHalvedPieces.isAllowed!(board, { pileId, pieceCount: board[pileId] - pieceId });
 
-  const clickPiece = ({ pileId, pieceId }: Piece) =>
-    moves.moveHalvedPieces(board, { pileId, pieceCount: board[pileId] - pieceId });
-
   // The pieces removed by clicking the hovered piece: it and everything above it.
   const removedCount = () => (validHoveredPiece ? board[validHoveredPiece.pileId] - validHoveredPiece.pieceId : 0);
 
@@ -83,7 +80,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
                 }
                 ${!nonExistent({ pileId, pieceId }) && !toBeRemoved({ pileId, pieceId }) ? 'bg-blue-800' : ''}
               `}
-              onClick={() => clickPiece({ pileId, pieceId })}
+              onClick={() => moves.moveHalvedPieces(board, { pileId, pieceCount: board[pileId] - pieceId })}
               {...(isDisabled({ pileId, pieceId }) ? {} : hoverProps({ pileId, pieceId }))}
             >
               {!isDisabled({ pileId, pieceId }) &&
