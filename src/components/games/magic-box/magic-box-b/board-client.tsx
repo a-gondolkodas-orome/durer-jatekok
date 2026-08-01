@@ -9,7 +9,6 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const { stones, pendingLine } = board;
 
-  const canDesignate = (lineIndex: number) => moves.designateLine.isAllowed!(board, lineIndex);
 
   const isCellHighlighted = (id) => pendingLine !== null && LINES[pendingLine].includes(id);
 
@@ -43,7 +42,7 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
             {range(3).map(row => (
               <button
                 key={row}
-                disabled={!canDesignate(row)}
+                disabled={!moves.designateLine.isAllowed!(board, row)}
                 onClick={() => moves.designateLine(board, row)}
                 title={t(LINE_LABELS[row])}
                 aria-label={t(LINE_LABELS[row])}
@@ -59,7 +58,7 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
           {range(3).map(col => (
             <button
               key={col}
-              disabled={!canDesignate(3 + col)}
+              disabled={!moves.designateLine.isAllowed!(board, 3 + col)}
               onClick={() => moves.designateLine(board, 3 + col)}
               title={t(LINE_LABELS[3 + col])}
               aria-label={t(LINE_LABELS[3 + col])}
