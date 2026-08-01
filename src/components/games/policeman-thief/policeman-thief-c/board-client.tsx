@@ -1,5 +1,5 @@
 import { range } from "lodash";
-import { coords, edges, VERTEX_COUNT } from "./helpers";
+import { coords, edges, POLICE, VERTEX_COUNT } from "./helpers";
 import type { Board } from "./policeman-thief-c";
 import { GameBoard, type BoardClientProps } from "../../../strategy-game-factory";
 import { useTranslation } from "../../../../language";
@@ -20,7 +20,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const activeMove = () => {
     if (phase === 'placingCops') return moves.placeCop;
     if (phase === 'placingThief') return moves.placeThief;
-    return ctx.currentPlayer === 0 ? moves.moveCop : moves.moveThief;
+    return ctx.currentPlayer === POLICE ? moves.moveCop : moves.moveThief;
   };
 
   const isClickable = (vertex: number) => activeMove().isAllowed!(board, vertex);
@@ -31,7 +31,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   // as a small cluster rather than overlapping discs.
   const piecesByVertex: Piece[][] = range(VERTEX_COUNT).map(() => []);
   board.policemen.forEach((vertex, i) => {
-    const isActive = phase === 'chasing' && ctx.currentPlayer === 0
+    const isActive = phase === 'chasing' && ctx.currentPlayer === POLICE
       && ctx.isClientMoveAllowed && i === board.copCursor;
     piecesByVertex[vertex].push({ color: COP_COLORS[i], isThief: false, isActive });
   });

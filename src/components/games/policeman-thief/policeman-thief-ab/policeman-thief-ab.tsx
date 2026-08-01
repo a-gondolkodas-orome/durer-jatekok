@@ -1,6 +1,6 @@
 import { range, random, sample, difference, cloneDeep } from "lodash";
 import { strategyGameFactory, type Ctx, type Events } from "../../../strategy-game-factory";
-import { neighbours, isNeighbour } from "./helpers";
+import { neighbours, isNeighbour, POLICE, THIEF } from "./helpers";
 import { smartBotStrategy } from "./bot-strategy";
 import { BoardClient } from "./board-client";
 
@@ -43,8 +43,6 @@ const generateStartBoardB = (): Board => {
   };
 };
 
-export const [POLICE, THIEF] = [0, 1];
-
 // A police round is two half-moves — blue then green — and `firstPolicemanMoved`
 // records which half is due, so no turn state is needed. The thief's move
 // belongs to the other player entirely, hence the currentPlayer checks: they
@@ -58,7 +56,7 @@ export const moves = {
       const nextBoard = { ...cloneDeep(board), ...overrides };
       events.endTurn();
       if (isGameEnd(nextBoard)) {
-        events.endGame(hasFirstPlayerWon(nextBoard) ? 0 : 1);
+        events.endGame(hasFirstPlayerWon(nextBoard) ? POLICE : THIEF);
       }
       return { nextBoard };
     }
@@ -84,7 +82,7 @@ export const moves = {
       nextBoard.firstPolicemanMoved = false;
       events.endTurn();
       if (isGameEnd(nextBoard)) {
-        events.endGame(hasFirstPlayerWon(nextBoard) ? 0 : 1);
+        events.endGame(hasFirstPlayerWon(nextBoard) ? POLICE : THIEF);
       }
       return { nextBoard };
     }
@@ -149,7 +147,7 @@ const ruleB = {
 }
 
 const getPlayerStepDescription = ({ board, ctx }: { board: Board; ctx: Ctx }) => {
-  if (ctx.currentPlayer === 0) {
+  if (ctx.currentPlayer === POLICE) {
     return {
       hu: `Kattints arra az útkereszteződésre, ahová a ` +
         `${board.firstPolicemanMoved ? "zöld" : "kék"} rendőrrel lépni szeretnél.`,

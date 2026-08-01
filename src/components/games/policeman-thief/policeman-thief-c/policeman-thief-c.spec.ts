@@ -1,5 +1,5 @@
 import { moves, generateStartBoard, pickCopCount, type Board } from './policeman-thief-c';
-import { VERTEX_COUNT } from './helpers';
+import { POLICE, THIEF, VERTEX_COUNT } from './helpers';
 import { range } from 'lodash';
 import { makeEvents, makeCtx } from '../../../../test-utils';
 
@@ -129,8 +129,8 @@ describe('moves.moveThief', () => {
 });
 
 describe('move legality', () => {
-  const asPolice = { ctx: makeCtx({ currentPlayer: 0 }) };
-  const asThief = { ctx: makeCtx({ currentPlayer: 1 }) };
+  const asPolice = { ctx: makeCtx({ currentPlayer: POLICE }) };
+  const asThief = { ctx: makeCtx({ currentPlayer: THIEF }) };
 
   it('accepts a policeman on any vertex during the placement phase', () => {
     const board = generateStartBoard();

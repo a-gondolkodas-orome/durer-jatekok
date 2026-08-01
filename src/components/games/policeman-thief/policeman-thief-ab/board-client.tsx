@@ -1,5 +1,6 @@
 import { range } from "lodash";
 import type { Board } from "./policeman-thief-ab";
+import { POLICE, THIEF } from "./helpers";
 import { GameBoard, type BoardClientProps } from "../../../strategy-game-factory";
 
 const cubeCoords = [
@@ -17,7 +18,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   // Exactly one piece is due to move at any moment; the same move then decides
   // both what a click does and which intersections are offered.
   const activeMove = () => {
-    if (ctx.currentPlayer === 1) return moves.moveThief;
+    if (ctx.currentPlayer === THIEF) return moves.moveThief;
     return board.firstPolicemanMoved ? moves.moveSecondPoliceman : moves.moveFirstPoliceman;
   };
 
@@ -27,12 +28,12 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const getColor = (vertex: number) => {
     if (isClickable(vertex)) {
-      if (ctx.currentPlayer === 1) {
+      if (ctx.currentPlayer === THIEF) {
         if (board.policemen[0] === vertex) return "url(#thief-and-first-policeman)";
         if (board.policemen[1] === vertex) return "url(#thief-and-second-policeman)";
         return "var(--color-red-500)";
       }
-      if (ctx.currentPlayer === 0) {
+      if (ctx.currentPlayer === POLICE) {
         if (board.firstPolicemanMoved) {
           if (board.thief === vertex) return "url(#thief-and-second-policeman)";
           if (board.policemen[0] === vertex) return "url(#2policemen)";

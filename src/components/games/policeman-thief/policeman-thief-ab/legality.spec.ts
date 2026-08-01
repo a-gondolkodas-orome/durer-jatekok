@@ -1,4 +1,4 @@
-import { isNeighbour, isVertex, neighbours, VERTEX_COUNT } from './helpers';
+import { isNeighbour, isVertex, neighbours, POLICE, THIEF, VERTEX_COUNT } from './helpers';
 import { moves, type Board } from './policeman-thief-ab';
 import { makeCtx } from '../../../../test-utils';
 
@@ -10,8 +10,8 @@ const board = (overrides: Partial<Board> = {}): Board => ({
   ...overrides
 });
 
-const asPolice = { ctx: makeCtx({ currentPlayer: 0 }) };
-const asThief = { ctx: makeCtx({ currentPlayer: 1 }) };
+const asPolice = { ctx: makeCtx({ currentPlayer: POLICE }) };
+const asThief = { ctx: makeCtx({ currentPlayer: THIEF }) };
 
 describe('graph predicates', () => {
   it('accepts only the eight intersections', () => {

@@ -1,7 +1,7 @@
 import { cloneDeep, random } from "lodash";
 import { strategyGameFactory, type Ctx, type Events } from "../../../strategy-game-factory";
 import { smartBotStrategy, randomBotStrategy } from "./bot-strategy";
-import { isNeighbour, isVertex } from "./helpers";
+import { isNeighbour, isVertex, POLICE, THIEF } from "./helpers";
 import { BoardClient } from "./board-client";
 
 export type Phase = 'placingCops' | 'placingThief' | 'chasing';
@@ -29,8 +29,6 @@ export const generateStartBoard = (): Board => ({
   thiefMoveCount: 0,
   copCursor: 0
 });
-
-export const [POLICE, THIEF] = [0, 1];
 
 // `phase` and `copCursor` record how far the setup and the current police round
 // have got, so every validator is a pure function of the board. The
@@ -76,7 +74,7 @@ export const moves = {
       nextBoard.policemen[nextBoard.copCursor] = vertex;
       nextBoard.copCursor += 1;
       if (vertex === nextBoard.thief) {
-        events.endGame(0);
+        events.endGame(POLICE);
         return { nextBoard };
       }
       if (nextBoard.copCursor === nextBoard.copCount) {
@@ -97,11 +95,11 @@ export const moves = {
       nextBoard.thief = vertex;
       nextBoard.thiefMoveCount += 1;
       if (nextBoard.policemen.includes(vertex)) {
-        events.endGame(0);
+        events.endGame(POLICE);
         return { nextBoard };
       }
       if (nextBoard.thiefMoveCount === 3) {
-        events.endGame(1);
+        events.endGame(THIEF);
         return { nextBoard };
       }
       events.endTurn();
@@ -149,7 +147,7 @@ const getPlayerStepDescription = ({ board, ctx }: { board: Board; ctx: Ctx }) =>
     };
   }
   // chasing
-  if (ctx.currentPlayer === 0) {
+  if (ctx.currentPlayer === POLICE) {
     return {
       hu: `Lépj a ${copColorName.hu[board.copCursor]} rendőrrel egy szomszédos csúcsra.`,
       en: `Move the ${copColorName.en[board.copCursor]} policeman to a neighbouring vertex.`

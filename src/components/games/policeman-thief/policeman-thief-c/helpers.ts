@@ -85,3 +85,7 @@ export const isVertex = (vertex: number): boolean =>
 // reduces to "is the target adjacent to where the piece stands".
 export const isNeighbour = (from: number, to: number): boolean =>
   isVertex(from) && isVertex(to) && neighbours[from].includes(to);
+
+// Player 0 chases, player 1 runs. Both indices appear in move legality, in the
+// winner handed to endGame and in the board client, so they get names.
+export const [POLICE, THIEF] = [0, 1];
