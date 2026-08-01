@@ -13,15 +13,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const isCurrentPlayerResearcher = ctx.currentPlayer === 0;
   const isCurrentPlayerShark = ctx.currentPlayer === 1;
 
-  let possibleMoves: number[] = [];
-  if (ctx.isClientMoveAllowed) {
-    if (isCurrentPlayerShark) {
-      possibleMoves = range(25).filter(i => distance(board.shark, i) <= 1);
-    } else if (chosenPiece !== null) {
-      possibleMoves = range(25).filter(i => distance(chosenPiece, i) === 1);
-    }
-  }
-
   const isAllowed_choosePiece = (id: number): boolean => {
     if (!ctx.isClientMoveAllowed) return false;
     if (isCurrentPlayerResearcher) return board.submarines[id] >= 1;
@@ -29,13 +20,14 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     return false;
   };
 
-  const isAllowed_movePiece = (id: number): boolean => {
-    if (!ctx.isClientMoveAllowed) return false;
-    if (isCurrentPlayerResearcher) return chosenPiece !== null && distance(chosenPiece, id) === 1;
-    if (isCurrentPlayerShark) return distance(board.shark, id) <= 1;
-    return false;
-  };
+  const isAllowed_movePiece = (id: number): boolean => (isCurrentPlayerShark
+    ? moves.moveShark.isAllowed!(board, id)
+    : chosenPiece !== null && moves.moveSubmarine.isAllowed!(board, { from: chosenPiece, to: id }));
 
+  const possibleMoves = range(25).filter(isAllowed_movePiece);
+
+  // The click handler keeps its guards: a rejected click must leave the local
+  // piece selection alone, which the engine's silent gating cannot do for us.
   const clickField = (id: number) => {
     if (!ctx.isClientMoveAllowed) return;
     if (isCurrentPlayerResearcher) {
@@ -100,13 +92,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       ))}
     </div>
   </GameBoard>
-  );
-};
-
-const distance = (fieldA: number, fieldB: number): number => {
-  return (
-    Math.abs((fieldA % 5) - (fieldB % 5)) +
-    Math.abs(Math.floor(fieldA / 5) - Math.floor(fieldB / 5))
   );
 };
 
