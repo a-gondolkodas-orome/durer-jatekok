@@ -1,8 +1,7 @@
-import { isCardAvailable, Sheriff, Thief, type Board } from './helpers';
+import { isCardAvailable, type Board } from './helpers';
 
-const board: Board = { cards: [[], []], numTurns: 0 };
-board.cards[Sheriff] = [2, 5];
-board.cards[Thief] = [3];
+// cards[Sheriff] first, then cards[Thief].
+const board: Board = { cards: [[2, 5], [3]], numTurns: 0 };
 
 describe('isCardAvailable', () => {
   it('allows a card no-one is holding yet', () => {
