@@ -4,14 +4,14 @@ import { range } from 'lodash';
 import { SharkSvg } from '../assets/shark-chase-shark-svg';
 import { SubmarineSvg } from '../assets/shark-chase-submarine-svg';
 import { useTranslation } from '../../../../language';
-import { type Board } from './shark-chase';
+import { type Board, RESEARCHERS, SHARK } from '../helpers';
 import { GameBoard, type BoardClientProps } from '../../../strategy-game-factory';
 
 export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const [chosenPiece, setChosenPiece] = useState<number | null>(null);
-  const isCurrentPlayerResearcher = ctx.currentPlayer === 0;
-  const isCurrentPlayerShark = ctx.currentPlayer === 1;
+  const isCurrentPlayerResearcher = ctx.currentPlayer === RESEARCHERS;
+  const isCurrentPlayerShark = ctx.currentPlayer === SHARK;
 
   const isAllowed_choosePiece = (id: number): boolean => {
     if (!ctx.isClientMoveAllowed) return false;
@@ -24,7 +24,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     ? moves.moveShark.isAllowed!(board, id)
     : chosenPiece !== null && moves.moveSubmarine.isAllowed!(board, { from: chosenPiece, to: id }));
 
-  const possibleMoves = range(25).filter(isAllowed_movePiece);
+  const possibleMoves = range(board.submarines.length).filter(isAllowed_movePiece);
 
   // The click handler keeps its guards: a rejected click must leave the local
   // piece selection alone, which the engine's silent gating cannot do for us.
@@ -57,7 +57,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     <SubmarineSvg/>
     <SharkSvg/>
     <div className="grid grid-cols-5 border-t-2 border-l-2">
-      {range(25).map(id => (
+      {range(board.submarines.length).map(id => (
         <button
           key={id}
           onClick={() => clickField(id)}

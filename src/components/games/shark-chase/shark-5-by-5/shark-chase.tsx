@@ -3,17 +3,9 @@ import { strategyGameFactory, type Ctx, type Events } from '../../../strategy-ga
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import { BoardClient } from './board-client';
 import { isGameEnd, getWinnerIndex } from './helpers';
-import { RESEARCHERS, SHARK, isSharkMoveAllowed, isSubmarineMoveAllowed } from '../helpers';
-
-// A side of the lake is this many sectors long.
-export const SIZE = 5;
-
-export type Board = {
-  submarines: number[];
-  shark: number;
-  turn: number;
-  sharkMovesInTurn: number;
-};
+import {
+  type Board, RESEARCHERS, SHARK, isSharkMoveAllowed, isSubmarineMoveAllowed
+} from '../helpers';
 
 const generateStartBoard = (): Board => {
   return {
@@ -33,7 +25,7 @@ const generateStartBoard = (): Board => {
 const moves = {
   moveSubmarine: {
     validate: (board: Board, { ctx }: { ctx: Ctx }, move: { from: number; to: number }) =>
-      ctx.currentPlayer === RESEARCHERS && !!move && isSubmarineMoveAllowed(board, move.from, move.to, SIZE),
+      ctx.currentPlayer === RESEARCHERS && !!move && isSubmarineMoveAllowed(board, move.from, move.to),
     apply: (board: Board, { events }: { events: Events }, { from, to }: { from: number; to: number }) => {
       const nextBoard = cloneDeep(board);
       nextBoard.submarines[from] -= 1;
@@ -47,7 +39,7 @@ const moves = {
   },
   moveShark: {
     validate: (board: Board, { ctx }: { ctx: Ctx }, to: number) =>
-      ctx.currentPlayer === SHARK && isSharkMoveAllowed(board, to, SIZE),
+      ctx.currentPlayer === SHARK && isSharkMoveAllowed(board, to),
     apply: (board: Board, { events }: { events: Events }, to: number) => {
       const nextBoard = cloneDeep(board);
       nextBoard.shark = to;
