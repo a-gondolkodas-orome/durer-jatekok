@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from '../../../language';
 import { GameBoard, type BoardClientProps } from '../../strategy-game-factory';
 import { BOARD_OUTLINE, EDGES, TRIANGLES, type Edge } from './geometry';
-import { type Board, LINE, CIRCLE } from './helpers';
+import { type Board } from './helpers';
 
 // Two very different interactions share one board: on the line player's turn the
 // edges are clickable, on the circle player's turn the triangles are. Only the
@@ -26,21 +26,11 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     setHoveredEdge(null);
   }, [ctx.moveCount]);
 
-  const myTurn = ctx.isClientMoveAllowed;
-  const lineToMove = myTurn && ctx.currentPlayer === LINE;
-  const circleToMove = myTurn && ctx.currentPlayer === CIRCLE;
+  const edgeClickable = (e: number) => moves.shadeEdge.isAllowed!(board, e);
+  const triangleClickable = (t: number) => moves.placeCircle.isAllowed!(board, t);
 
-  const edgeClickable = (e: number) => lineToMove && !board.edges[e];
-  const triangleClickable = (t: number) => circleToMove && !board.circles[t];
-
-  const shadeEdge = (e: number) => {
-    if (!edgeClickable(e)) return;
-    moves.shadeEdge(board, e);
-  };
-  const placeCircle = (t: number) => {
-    if (!triangleClickable(t)) return;
-    moves.placeCircle(board, t);
-  };
+  const shadeEdge = (e: number) => moves.shadeEdge(board, e);
+  const placeCircle = (t: number) => moves.placeCircle(board, t);
 
   const triangleClass = (t: number) => {
     if (board.circles[t]) return 'fill-slate-900/5 dark:fill-white/5';
@@ -135,30 +125,30 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           })}
         </g>
 
-        {/* Invisible wide hit targets for edges — only on the line player's turn */}
-        {lineToMove && (
-          <g>
-            {EDGES.filter(edge => !board.edges[edge.id]).map(edge => (
-              <line
-                key={`hit-${edge.id}`}
-                x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
-                stroke="transparent"
-                strokeWidth="4"
-                strokeLinecap="round"
-                className="cursor-pointer outline-none"
-                onClick={() => shadeEdge(edge.id)}
-                onMouseEnter={() => setHoveredEdge(edge.id)}
-                onMouseLeave={() => setHoveredEdge(null)}
-                onFocus={() => setHoveredEdge(edge.id)}
-                onBlur={() => setHoveredEdge(null)}
-                onKeyUp={event => { if (event.key === 'Enter') shadeEdge(edge.id); }}
-                tabIndex={0}
-                role="button"
-                aria-label={t({ hu: `${edge.id + 1}. él — satírozd be`, en: `Edge ${edge.id + 1} — shade it` })}
-              />
-            ))}
-          </g>
-        )}
+        {/* Invisible wide hit targets for edges — only on the line player's turn,
+            where `edgeClickable` (the move's own validator) is what makes the
+            list non-empty. */}
+        <g>
+          {EDGES.filter(edge => edgeClickable(edge.id)).map(edge => (
+            <line
+              key={`hit-${edge.id}`}
+              x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2}
+              stroke="transparent"
+              strokeWidth="4"
+              strokeLinecap="round"
+              className="cursor-pointer outline-none"
+              onClick={() => shadeEdge(edge.id)}
+              onMouseEnter={() => setHoveredEdge(edge.id)}
+              onMouseLeave={() => setHoveredEdge(null)}
+              onFocus={() => setHoveredEdge(edge.id)}
+              onBlur={() => setHoveredEdge(null)}
+              onKeyUp={event => { if (event.key === 'Enter') shadeEdge(edge.id); }}
+              tabIndex={0}
+              role="button"
+              aria-label={t({ hu: `${edge.id + 1}. él — satírozd be`, en: `Edge ${edge.id + 1} — shade it` })}
+            />
+          ))}
+        </g>
       </svg>
     </GameBoard>
   );
