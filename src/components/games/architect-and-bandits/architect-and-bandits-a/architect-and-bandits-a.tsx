@@ -6,8 +6,6 @@ import {
 import { BoardClient } from './board-client';
 import { smartBotStrategy } from './bot-strategy';
 
-export type { Board };
-
 // Vertices A(0)..H(7) clockwise, each edge 10 km, max 40 km/day
 
 const generateStartBoard = (): Board => {
