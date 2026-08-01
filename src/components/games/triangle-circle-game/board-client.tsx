@@ -28,7 +28,6 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const triangleClickable = (t: number) => moves.placeCircle.isAllowed!(board, t);
 
-
   const triangleClass = (t: number) => {
     if (board.circles[t]) return 'fill-slate-900/5 dark:fill-white/5';
     if (triangleClickable(t)) {
