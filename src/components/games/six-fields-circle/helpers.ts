@@ -15,7 +15,7 @@ export const OPPOSITE_PAIRS: Move[] = [[0, 3], [1, 4], [2, 5]];
 
 export const isOpposite = (i: number, j: number) => Math.abs(i - j) === 3;
 
-export const isField = (i: number) => Number.isInteger(i) && i >= 0 && i < FIELD_COUNT;
+const isField = (i: number) => Number.isInteger(i) && i >= 0 && i < FIELD_COUNT;
 
 // Two distinct, non-empty fields that are not opposite each other. The order of
 // the pair is irrelevant — the board client hands it over in click order.

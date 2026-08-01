@@ -1,14 +1,4 @@
-import { type Board, getLegalMoves, isField, isOpposite, isRemovalAllowed } from './helpers';
-
-describe('isField', () => {
-  it('accepts only the six field indices', () => {
-    expect(isField(0)).toBe(true);
-    expect(isField(5)).toBe(true);
-    expect(isField(6)).toBe(false);
-    expect(isField(-1)).toBe(false);
-    expect(isField(2.5)).toBe(false);
-  });
-});
+import { type Board, getLegalMoves, isOpposite, isRemovalAllowed } from './helpers';
 
 describe('isRemovalAllowed', () => {
   const board: Board = [2, 1, 0, 3, 1, 1];
@@ -29,10 +19,15 @@ describe('isRemovalAllowed', () => {
     expect(isRemovalAllowed([1, 1, 1, 1, 1, 1], [2, 5])).toBe(false);
   });
 
-  it('refuses an empty field, the same field twice, and indices off the circle', () => {
+  it('refuses an empty field and the same field twice', () => {
     expect(isRemovalAllowed(board, [1, 2])).toBe(false); // field 2 is empty
     expect(isRemovalAllowed(board, [0, 0])).toBe(false);
+  });
+
+  it('refuses anything that is not one of the six field indices', () => {
     expect(isRemovalAllowed(board, [0, 6])).toBe(false);
+    expect(isRemovalAllowed(board, [-1, 0])).toBe(false);
+    expect(isRemovalAllowed(board, [0, 2.5])).toBe(false);
   });
 
   it('accepts every move the generator lists, and nothing else', () => {
