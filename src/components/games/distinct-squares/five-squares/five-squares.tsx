@@ -37,8 +37,6 @@ const moves = {
 }
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const placePiece = (id: number) => moves.addPiece(board, id);
-
   const turnState = ctx.turnState as TurnState;
   const firstPlacedSquareIndex = turnState?.firstPlacedSquareIndex ?? null;
   const showDimmedDisc = ctx.isClientMoveAllowed && firstPlacedSquareIndex !== null;
@@ -50,7 +48,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         <button
           key={id}
           disabled={!moves.addPiece.isAllowed!(board, id)}
-          onClick={() => placePiece(id)}
+          onClick={() => moves.addPiece(board, id)}
           className="aspect-square border-r-4 border-b-4 p-[3%]"
         >
           {range(board[id]).map((i) =>

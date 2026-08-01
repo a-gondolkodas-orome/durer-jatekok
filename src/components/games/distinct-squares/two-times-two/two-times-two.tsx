@@ -23,17 +23,14 @@ const moves = {
   }
 }
 
-const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-  const placePiece = id => moves.addPiece(board, id);
-
-  return (
+const BoardClient = ({ board, moves }: BoardClientProps<Board>) => (
   <GameBoard>
     <div className="grid grid-cols-2 border-t-2 border-l-2">
       {range(board.length).map(id =>
         <button
           key={id}
           disabled={!moves.addPiece.isAllowed!(board, id)}
-          onClick={() => placePiece(id)}
+          onClick={() => moves.addPiece(board, id)}
           className="aspect-square border-r-2 border-b-2 p-[4%]"
         >
           {range(board[id]).map((i) =>
@@ -50,8 +47,7 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
       )}
     </div>
   </GameBoard>
-  );
-};
+);
 
 const getPlayerStepDescription = () => ({
   hu: 'Kattints arra a mezőre, ahova korongot szeretnél lerakni.',
