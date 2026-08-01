@@ -19,7 +19,6 @@ const edges = side1.flatMap((a) => side2.map((b) => [a, b] as const));
 export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   const isClickable = (node: number) => moves.placeCoin.isAllowed!(board, node);
 
-  const handleClick = (node: number) => moves.placeCoin(board, node);
 
   return (
     <GameBoard>
@@ -37,9 +36,9 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
         {range(5).map((node) => (
           <g
             key={node}
-            onClick={() => handleClick(node)}
+            onClick={() => moves.placeCoin(board, node)}
             onKeyUp={(event) => {
-              if (event.key === "Enter") handleClick(node);
+              if (event.key === "Enter") moves.placeCoin(board, node);
             }}
             tabIndex={isClickable(node) ? 0 : undefined}
             role={isClickable(node) ? "button" : undefined}
