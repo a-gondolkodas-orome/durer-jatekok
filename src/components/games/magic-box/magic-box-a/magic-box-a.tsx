@@ -5,9 +5,7 @@ import {
 import { generateEmptyBoard, isGameEnd, isPlacementAllowed, placeStone, type Board } from './helpers';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
-const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-
-  return (
+const BoardClient = ({ board, moves }: BoardClientProps<Board>) => (
   <GameBoard>
     <div className="grid grid-cols-3 bg-slate-200 dark:bg-slate-600 gap-1 p-1">
       {range(9).map(id => (
@@ -24,8 +22,7 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
       ))}
     </div>
   </GameBoard>
-  );
-};
+);
 
 const moves = {
   placeStone: {
