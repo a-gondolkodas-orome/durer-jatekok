@@ -105,8 +105,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     setRemovals(prev => prev.map((r, idx) => (idx === i ? r + delta : r)));
   };
 
-  const submit = () => moves.takeStones(board, removals);
-
   return (
     <GameBoard>
       <div className="flex gap-2 sm:gap-6 justify-center items-end">
@@ -127,7 +125,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         <div className="mt-4 flex flex-col items-center gap-2">
           <button
             disabled={!readyToMove}
-            onClick={submit}
+            onClick={() => moves.takeStones(board, removals)}
             className="primary-button w-auto"
           >
             {t({ hu: 'Elveszem a kavicsokat', en: 'Remove the stones' })}
