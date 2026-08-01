@@ -26,20 +26,11 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const gameStarted = ctx.isHumanVsHumanGame || ctx.chosenRoleIndex !== null;
 
-  const isAdjacentToArchitect = (v) =>
-    (v - board.architectPosition + 10) % 10 === 1 ||
-    (board.architectPosition - v + 10) % 10 === 1;
-
-  const isClickable = (v) => {
-    if (!ctx.isClientMoveAllowed) return false;
-    if (ctx.currentPlayer === 0) {
-      return board.kmUsedToday < 50 && isAdjacentToArchitect(v);
-    }
-    return board.towers[v];
-  };
+  const isClickable = (v) => (ctx.currentPlayer === 0
+    ? moves.moveArchitect.isAllowed!(board, v)
+    : moves.destroyTower.isAllowed!(board, v));
 
   const handleVertexClick = (v) => {
-    if (!isClickable(v)) return;
     if (ctx.currentPlayer === 0) {
       moves.moveArchitect(board, v);
     } else {
@@ -47,7 +38,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     }
   };
 
-  const canEndDay = ctx.isClientMoveAllowed && ctx.currentPlayer === 0;
+  const canEndDay = moves.endDay.isAllowed!(board);
 
   return (
     <GameBoard className="flex flex-col items-center">

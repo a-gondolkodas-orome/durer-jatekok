@@ -1,5 +1,8 @@
 import { cloneDeep } from 'lodash';
-import { strategyGameFactory, type Events } from '../../../strategy-game-factory';
+import { strategyGameFactory, type Ctx, type Events } from '../../../strategy-game-factory';
+import {
+  ARCHITECT, BANDITS, isArchitectStepAllowed, isDestructionAllowed
+} from '../helpers';
 import { BoardClient } from './board-client';
 
 export type Board = { architectPosition: number, towers: boolean[], day: number, kmUsedToday: number }
@@ -18,31 +21,45 @@ const generateStartBoard = (): Board => {
   };
 };
 
-const moves = {
-  moveArchitect: (board: Board, _, targetVertex) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard.architectPosition = targetVertex;
-    nextBoard.towers[targetVertex] = true;
-    nextBoard.kmUsedToday += 10;
-    return { nextBoard };
-  },
+// The architect may walk this far along the wall each day.
+export const KM_PER_DAY = 50;
 
-  endDay: (board: Board, { events }: { events: Events }) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard.kmUsedToday = 0;
-    if (board.day === 4) {
-      const allTowers = nextBoard.towers.every(t => t);
-      events.endGame(allTowers ? 0 : 1);
+const moves = {
+  moveArchitect: {
+    validate: (board: Board, { ctx }: { ctx: Ctx }, targetVertex: number) =>
+      ctx.currentPlayer === ARCHITECT && isArchitectStepAllowed(board, targetVertex, KM_PER_DAY),
+    apply: (board: Board, _, targetVertex) => {
+      const nextBoard = cloneDeep(board);
+      nextBoard.architectPosition = targetVertex;
+      nextBoard.towers[targetVertex] = true;
+      nextBoard.kmUsedToday += 10;
       return { nextBoard };
     }
-    events.endTurn();
-    return { nextBoard };
   },
 
-  destroyTower: (board: Board, _, vertex) => {
-    const nextBoard = cloneDeep(board);
-    nextBoard.towers[vertex] = false;
-    return { nextBoard, autoEndOfTurn: true };
+  endDay: {
+    validate: (_board: Board, { ctx }: { ctx: Ctx }) => ctx.currentPlayer === ARCHITECT,
+    apply: (board: Board, { events }: { events: Events }) => {
+      const nextBoard = cloneDeep(board);
+      nextBoard.kmUsedToday = 0;
+      if (board.day === 4) {
+        const allTowers = nextBoard.towers.every(t => t);
+        events.endGame(allTowers ? 0 : 1);
+        return { nextBoard };
+      }
+      events.endTurn();
+      return { nextBoard };
+    }
+  },
+
+  destroyTower: {
+    validate: (board: Board, { ctx }: { ctx: Ctx }, vertex: number) =>
+      ctx.currentPlayer === BANDITS && isDestructionAllowed(board, vertex),
+    apply: (board: Board, _, vertex) => {
+      const nextBoard = cloneDeep(board);
+      nextBoard.towers[vertex] = false;
+      return { nextBoard, autoEndOfTurn: true };
+    }
   },
 
   startNextDay: (board: Board, { events }: { events: Events }) => {
