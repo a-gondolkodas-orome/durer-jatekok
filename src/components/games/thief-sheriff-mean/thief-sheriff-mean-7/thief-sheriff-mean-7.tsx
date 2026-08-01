@@ -4,22 +4,15 @@ import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import {
   Sheriff,
   Thief,
-  getUntakenCards,
   generateStartBoard,
   type Board
 } from "../helpers";
 import { moves, CARD_COUNT } from './moves';
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
-  const isAllowedMove = index => {
-    if (!ctx.isClientMoveAllowed) return false;
-    return getUntakenCards(board, CARD_COUNT).includes(index);
-  }
+  const isAllowedMove = (index: number) => moves.takeCard.isAllowed!(board, [index]);
 
-  const clickCard = (index) => {
-    if (!isAllowedMove(index)) return;
-    moves.takeCard(board, [index]);
-  }
+  const clickCard = (index: number) => moves.takeCard(board, [index]);
 
   const getCardColor = num => {
     if (board.cards[Thief].includes(num)) return 'bg-red-800';
