@@ -60,12 +60,10 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
   const selectedValue = ctx.turnState as number | null;
   const presentValues = distinctValues(board);
 
-  // Value-1 coins can't be selected: there is no smaller value to change them
-  // to, so not even the most generous target (L = 1) makes a legal move.
-  const isSelectable = (v: number) => moves.convert.isAllowed!(board, v, 1);
-
+  // Asking about L = 1 asks whether these coins can be changed at all: it is the
+  // most generous target, so value-1 coins fall out as unselectable.
   const selectValue = (v: number) => {
-    if (!isSelectable(v)) return;
+    if (!moves.convert.isAllowed!(board, v, 1)) return;
     events.setTurnState(selectedValue === v ? null : v);
   };
 
@@ -83,7 +81,7 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
           return (
             <button
               key={v}
-              disabled={!isSelectable(v)}
+              disabled={!moves.convert.isAllowed!(board, v, 1)}
               onClick={() => selectValue(v)}
               aria-pressed={isSelected}
               aria-label={t({
