@@ -4,7 +4,7 @@ import {
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import { smartBotStrategy } from './bot-strategy';
-import { generateStartBoard, moves, type Board, type SoldierColor } from './helpers';
+import { generateStartBoard, moves, SULTAN, type Board, type SoldierColor } from './helpers';
 import { useTranslation } from '../../../language';
 
 type Piece = { rowIndex: number, pieceIndex: number }
@@ -13,7 +13,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const { value: validHoveredPiece, hoverProps } = useHoverPreview<Piece>(ctx.moveCount);
 
-  const isPlayerSultan = ctx.currentPlayer === 0;
+  const isPlayerSultan = ctx.currentPlayer === SULTAN;
   const groupOfHoveredPiece = validHoveredPiece
     ? board[validHoveredPiece.rowIndex][validHoveredPiece.pieceIndex]
     : null;
@@ -106,7 +106,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 };
 
 const getPlayerStepDescription = ({ ctx }: { ctx: Ctx }) => {
-  return ctx.currentPlayer === 0
+  return ctx.currentPlayer === SULTAN
     ? {
       hu: 'Kattints a katonákra és válaszd két részre a seregedet.',
       en: 'Click soldiers to split your army in two.'
