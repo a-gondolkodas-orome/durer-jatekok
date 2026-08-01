@@ -20,15 +20,13 @@ export const isMoveValid = (board: Board, target: number): boolean => {
 };
 
 const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-  const isTargetAllowed = (target: number) => moves.moveTo.isAllowed!(board, target);
-
   return (
     <GameBoard>
       <div className="flex flex-wrap gap-2">
         {range(maxStart + 1).map(i =>
           <button
             key={i}
-            disabled={!isTargetAllowed(i)}
+            disabled={!moves.moveTo.isAllowed!(board, i)}
             onClick={() => moves.moveTo(board, i)}
             className={`
               border-2 rounded-sm text-2xl min-w-[4ch] p-1 my-1 font-bold
