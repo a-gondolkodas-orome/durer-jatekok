@@ -20,8 +20,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     ? (findWinningTriple(numbersOwnedBy(owner, ctx.winnerIndex as 0 | 1)) ?? [])
     : [];
 
-  const clickNumber = (n: number) => moves.chooseNumber(board, n);
-
   const ownerLabel = (player: 0 | 1) => {
     const colorClass = player === 0
       ? 'font-bold text-red-700 dark:text-red-400'
@@ -61,7 +59,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           <button
             key={n}
             disabled={!moves.chooseNumber.isAllowed!(board, n)}
-            onClick={(e) => { clickNumber(n); e.currentTarget.blur(); }}
+            onClick={(e) => { moves.chooseNumber(board, n); e.currentTarget.blur(); }}
             className={numberClass(n)}
           >
             {n}
