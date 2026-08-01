@@ -1,9 +1,10 @@
+import { makeCtx } from '../../../../test-utils';
 import { inPlacingPhase, isWhiteningAllowed, type Board } from "./helpers";
 
 // vsHuman keeps the colours independent of role choice: player 0 is blue, so the
 // other player's colour is red.
-const ctxForFirstPlayer = { isHumanVsHumanGame: true, currentPlayer: 0 };
-const ctxForSecondPlayer = { isHumanVsHumanGame: true, currentPlayer: 1 };
+const ctxForFirstPlayer = makeCtx({ isHumanVsHumanGame: true, currentPlayer: 0 });
+const ctxForSecondPlayer = makeCtx({ isHumanVsHumanGame: true, currentPlayer: 1 });
 
 const fullBoard: Board = [
   'blue', 'red', 'blue',
