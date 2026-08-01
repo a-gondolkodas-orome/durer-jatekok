@@ -38,4 +38,13 @@ describe('isAllowed', () => {
     // 1-2 starts where the existing rope ends, but passes through nothing
     expect(isAllowed(board, { from: 1, to: 2 })).toBe(true);
   });
+
+  // The board client asks about the rope the player is halfway through picking,
+  // so it hands over an edge with an end still unchosen.
+  it('rejects an edge that is missing an end', () => {
+    expect(isAllowed(emptyBoard, { from: 0, to: null })).toBe(false);
+    expect(isAllowed(emptyBoard, { from: null, to: 1 })).toBe(false);
+    expect(isAllowed(emptyBoard, null)).toBe(false);
+    expect(isAllowed(emptyBoard)).toBe(false);
+  });
 });

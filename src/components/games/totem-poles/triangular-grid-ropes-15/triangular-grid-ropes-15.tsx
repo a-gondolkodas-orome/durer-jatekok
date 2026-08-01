@@ -12,9 +12,6 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const [firstNode, setFirstNode] = useState<number | null>(null);
   const { value: validHoveredNode, hoverProps } = useHoverPreview<number>(ctx.moveCount);
 
-  const isRopeAllowed = (from: number | null, to: number | null) =>
-    from !== null && to !== null && moves.stretchRope.isAllowed!(board, { from, to });
-
   // The click handler keeps its guards: a rejected click must leave the local
   // node selection alone, which the engine's silent gating cannot do for us.
   const connectNode = node => {
@@ -24,13 +21,13 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     } else if (node === firstNode) {
       setFirstNode(null);
     } else {
-      if (!isRopeAllowed(firstNode, node)) return;
+      if (!moves.stretchRope.isAllowed!(board, { from: firstNode, to: node })) return;
       moves.stretchRope(board, { from: firstNode, to: node });
       setFirstNode(null);
     }
   };
 
-  const isCandidateAllowed = isRopeAllowed(firstNode, validHoveredNode);
+  const isCandidateAllowed = moves.stretchRope.isAllowed!(board, { from: firstNode, to: validHoveredNode });
 
   const candidateEdge = getAllowedSuperset(board, { from: firstNode, to: validHoveredNode });
   const candidateFromV = candidateEdge ? vertices[candidateEdge.from] : null;
@@ -71,7 +68,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       const isClickable = ctx.isClientMoveAllowed && (
         firstNode === null ||
         vertex.id === firstNode ||
-        isRopeAllowed(firstNode, vertex.id)
+        moves.stretchRope.isAllowed!(board, { from: firstNode, to: vertex.id })
       );
       const isInvalidHover = firstNode !== null &&
         vertex.id === validHoveredNode &&
@@ -105,7 +102,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
 const moves = {
   stretchRope: {
-    validate: (board: Board, _, edge: Edge) => !!edge && isAllowed(board, edge),
+    validate: (board: Board, _, edge: Edge) => isAllowed(board, edge),
     apply: (board: Board, { events }: { events: Events }, { from, to }) => {
       const nextBoard = cloneDeep(board);
       // A rope is stretched as far as it legally reaches, not just between the
