@@ -23,6 +23,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const isRemovalAllowed = coinValue => moves.removeCoin.isAllowed!(board, coinValue);
   const isAddAllowed = coinValue => moves.addCoin.isAllowed!(board, coinValue);
+  const isPassAllowed = () => moves.passAddition.isAllowed!(board);
 
   const removeFromPile = coinValue => {
     if (!isRemovalAllowed(coinValue)) return;
@@ -35,8 +36,8 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   };
 
   const passAddition = () => {
-    if (!isAddAllowed(null)) return;
-    moves.addCoin(board, null);
+    if (!isPassAllowed()) return;
+    moves.passAddition(board);
   };
 
   const shouldShowCoinToBeRemoved = (coinValue) => {
@@ -64,7 +65,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
           </span>
           <div className="flex gap-2">
             <button
-              disabled={!isAddAllowed(1)}
+              disabled={!isPassAllowed()}
               className="secondary-button w-auto"
               onClick={passAddition}
             >

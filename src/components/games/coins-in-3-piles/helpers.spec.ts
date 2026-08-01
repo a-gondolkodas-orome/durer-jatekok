@@ -5,8 +5,10 @@ describe('coins-in-3-piles move validators', () => {
   type TurnState = { removedCoinValue: number } | null;
   const isRemovalAllowed = (board: Board, turnState: TurnState, value: number) =>
     moves.removeCoin.validate(board, { ctx: makeCtx({ turnState }) }, value);
-  const isAddAllowed = (board: Board, turnState: TurnState, value: number | null) =>
+  const isAddAllowed = (board: Board, turnState: TurnState, value: number) =>
     moves.addCoin.validate(board, { ctx: makeCtx({ turnState }) }, value);
+  const isPassAllowed = (board: Board, turnState: TurnState) =>
+    moves.passAddition.validate(board, { ctx: makeCtx({ turnState }) });
 
   describe('removeCoin', () => {
     it('allows removing from a non-empty pile at the start of a turn', () => {
@@ -31,7 +33,6 @@ describe('coins-in-3-piles move validators', () => {
   describe('addCoin', () => {
     it('rejects placing back before any coin was removed', () => {
       expect(isAddAllowed([3, 5, 7], null, 1)).toBe(false);
-      expect(isAddAllowed([3, 5, 7], null, null)).toBe(false);
     });
 
     it('allows placing back a strictly smaller coin', () => {
@@ -44,8 +45,15 @@ describe('coins-in-3-piles move validators', () => {
       expect(isAddAllowed([3, 5, 6], { removedCoinValue: 2 }, 3)).toBe(false);
     });
 
-    it('allows placing back nothing', () => {
-      expect(isAddAllowed([3, 5, 6], { removedCoinValue: 2 }, null)).toBe(true);
+  });
+
+  describe('passAddition', () => {
+    it('allows passing once a coin was removed', () => {
+      expect(isPassAllowed([3, 5, 6], { removedCoinValue: 2 })).toBe(true);
+    });
+
+    it('rejects passing before any coin was removed', () => {
+      expect(isPassAllowed([3, 5, 7], null)).toBe(false);
     });
   });
 });

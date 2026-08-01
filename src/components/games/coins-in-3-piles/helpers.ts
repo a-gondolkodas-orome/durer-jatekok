@@ -42,22 +42,29 @@ export const moves = {
     }
   },
   addCoin: {
-    validate: (board: Board, { ctx }: { ctx: Ctx }, value: number | null) => {
+    validate: (board: Board, { ctx }: { ctx: Ctx }, value: number) => {
       const removed = (ctx.turnState as { removedCoinValue: number } | null)?.removedCoinValue;
-      if (removed == null) return false;
-      return value === null || (value >= 1 && value < removed);
+      return removed != null && value >= 1 && value < removed;
     },
     apply: (board: Board, { events }: { events: Events }, value) => {
       const nextBoard = cloneDeep(board);
-      if (value !== null) {
-        nextBoard[value - 1] += 1;
-      }
-      events.endTurn();
-      events.setTurnState(null);
-      if (isEqual(nextBoard, [0, 0, 0])) {
-        events.endGame();
-      }
-      return { nextBoard };
+      nextBoard[value - 1] += 1;
+      return finishPlaceBack(nextBoard, events);
     }
+  },
+  passAddition: {
+    validate: (board: Board, { ctx }: { ctx: Ctx }) => ctx.turnState !== null,
+    apply: (board: Board, { events }: { events: Events }) => finishPlaceBack(board, events)
   }
+}
+
+// Shared second half of the place-back phase: whether a coin was added or the
+// player passed, the turn ends the same way.
+function finishPlaceBack(nextBoard: Board, events: Events) {
+  events.endTurn();
+  events.setTurnState(null);
+  if (isEqual(nextBoard, [0, 0, 0])) {
+    events.endGame();
+  }
+  return { nextBoard };
 }
