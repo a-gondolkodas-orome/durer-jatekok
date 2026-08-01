@@ -82,8 +82,6 @@ const PieceView = ({ piece, ctx, hovered, setHovered, clearHovered, onActivate }
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { value: hovered, set: setHovered, clear: clearHovered } = useHoverPreview<Move>(ctx.moveCount);
 
-  const onBreak = (move: Move) => moves.breakPiece(board, move);
-
   // A cut is broken once it is the highlighted one: on desktop hover/focus
   // highlights it so a single click/Enter breaks straight away; on touch the
   // first tap highlights (showing the preview) and the second tap confirms.
@@ -93,7 +91,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     if (!ctx.isClientMoveAllowed) return;
     const isSelected = hovered?.id === move.id
       && hovered?.dir === move.dir && hovered?.pos === move.pos;
-    if (isSelected) onBreak(move);
+    if (isSelected) moves.breakPiece(board, move);
     else setHovered(move);
   };
 
