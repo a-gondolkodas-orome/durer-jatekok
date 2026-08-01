@@ -10,7 +10,6 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   const { stones, pendingLine } = board;
 
   const canDesignate = (lineIndex: number) => moves.designateLine.isAllowed!(board, lineIndex);
-  const isCellClickable = (id: number) => moves.placeStone.isAllowed!(board, id);
 
   const isCellHighlighted = (id) => pendingLine !== null && LINES[pendingLine].includes(id);
 
@@ -27,7 +26,7 @@ export const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
             {range(9).map(id => (
               <button
                 key={id}
-                disabled={!isCellClickable(id)}
+                disabled={!moves.placeStone.isAllowed!(board, id)}
                 onClick={() => moves.placeStone(board, id)}
                 className={`p-[20%] ${
                   isCellHighlighted(id) ? 'bg-amber-200 dark:bg-amber-700' : 'bg-surface-elevated'

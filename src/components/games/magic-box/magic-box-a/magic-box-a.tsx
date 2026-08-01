@@ -6,7 +6,6 @@ import { generateEmptyBoard, isGameEnd, isPlacementAllowed, placeStone, type Boa
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
 const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
-  const isMoveAllowed = (id: number) => moves.placeStone.isAllowed!(board, id);
 
   return (
   <GameBoard>
@@ -14,7 +13,7 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
       {range(9).map(id => (
         <button
           key={id}
-          disabled={!isMoveAllowed(id)}
+          disabled={!moves.placeStone.isAllowed!(board, id)}
           onClick={() => moves.placeStone(board, id)}
           className="aspect-square p-[25%] bg-surface-elevated"
         >
