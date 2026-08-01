@@ -108,7 +108,7 @@ export const ArchitectAndBandits = strategyGameFactory({
       { hu: 'Banditák', en: 'Bandits' }
     ],
     getPlayerStepDescription: ({ board, ctx }) => {
-      if (ctx.currentPlayer === 0) {
+      if (ctx.currentPlayer === ARCHITECT) {
         const movesLeft = (40 - board.kmUsedToday) / 10;
         if (movesLeft === 0) {
           return {

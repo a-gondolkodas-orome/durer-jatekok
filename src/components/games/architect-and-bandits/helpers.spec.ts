@@ -1,56 +1,79 @@
 import { isArchitectStepAllowed, isDestructionAllowed } from './helpers';
 
-// The 8-vertex variant: the architect starts at A(0) with 40 km per day.
-const octagon = (over: Partial<{ architectPosition: number; towers: boolean[]; kmUsedToday: number }> = {}) => ({
+type BoardOverrides = Partial<{ architectPosition: number; towers: boolean[]; kmUsedToday: number }>;
+
+// A fresh day on a regular polygon with `vertexCount` towers, all standing, the
+// architect at A(0).
+const boardOn = (vertexCount: number) => (over: BoardOverrides = {}) => ({
   architectPosition: 0,
-  towers: Array(8).fill(true),
+  towers: Array(vertexCount).fill(true),
   day: 1,
   kmUsedToday: 0,
   ...over
 });
 
-const KM_PER_DAY = 40;
-const stepAllowed = (board, target: number) => isArchitectStepAllowed(board, target, KM_PER_DAY);
-
 describe('isArchitectStepAllowed', () => {
-  it('allows a step to either neighbour along the wall', () => {
-    expect(stepAllowed(octagon({ architectPosition: 3 }), 2)).toBe(true);
-    expect(stepAllowed(octagon({ architectPosition: 3 }), 4)).toBe(true);
+  // Variant A: an 8-vertex wall, 40 km (four edges) per day.
+  describe('on the octagon', () => {
+    const octagon = boardOn(8);
+    const stepAllowed = (board, target: number) => isArchitectStepAllowed(board, target, 40);
+
+    it('allows a step to either neighbour along the wall', () => {
+      expect(stepAllowed(octagon({ architectPosition: 3 }), 2)).toBe(true);
+      expect(stepAllowed(octagon({ architectPosition: 3 }), 4)).toBe(true);
+    });
+
+    it('allows the step that wraps round between the last and first vertex', () => {
+      expect(stepAllowed(octagon({ architectPosition: 0 }), 7)).toBe(true);
+      expect(stepAllowed(octagon({ architectPosition: 7 }), 0)).toBe(true);
+    });
+
+    it('rejects a jump across the polygon', () => {
+      expect(stepAllowed(octagon({ architectPosition: 0 }), 4)).toBe(false);
+      expect(stepAllowed(octagon({ architectPosition: 0 }), 2)).toBe(false);
+    });
+
+    it('rejects staying put', () => {
+      expect(stepAllowed(octagon({ architectPosition: 3 }), 3)).toBe(false);
+    });
+
+    it("allows the fourth edge of the day but not a fifth", () => {
+      expect(stepAllowed(octagon({ kmUsedToday: 30 }), 1)).toBe(true);
+      expect(stepAllowed(octagon({ kmUsedToday: 40 }), 1)).toBe(false);
+    });
+
+    it('rejects a vertex that is not on the wall', () => {
+      expect(stepAllowed(octagon(), 8)).toBe(false);
+      expect(stepAllowed(octagon(), 9)).toBe(false);
+      expect(stepAllowed(octagon(), -1)).toBe(false);
+    });
   });
 
-  it('allows the step that wraps round between the last and first vertex', () => {
-    expect(stepAllowed(octagon({ architectPosition: 0 }), 7)).toBe(true);
-    expect(stepAllowed(octagon({ architectPosition: 7 }), 0)).toBe(true);
-  });
+  // Variant B: a 10-vertex wall, 50 km (five edges) per day. Neighbours wrap at
+  // a different vertex and the day is one edge longer, so the same predicate
+  // gives different answers — it reads both off the board and the allowance.
+  describe('on the decagon', () => {
+    const decagon = boardOn(10);
+    const stepAllowed = (board, target: number) => isArchitectStepAllowed(board, target, 50);
 
-  it('rejects a jump across the polygon', () => {
-    expect(stepAllowed(octagon({ architectPosition: 0 }), 4)).toBe(false);
-    expect(stepAllowed(octagon({ architectPosition: 0 }), 2)).toBe(false);
-  });
+    it('wraps round at vertex 9, which is not a neighbour of A on the octagon', () => {
+      expect(stepAllowed(decagon({ architectPosition: 0 }), 9)).toBe(true);
+    });
 
-  it('rejects staying put', () => {
-    expect(stepAllowed(octagon({ architectPosition: 3 }), 3)).toBe(false);
-  });
+    it('allows the fifth edge of the day but not a sixth', () => {
+      expect(stepAllowed(decagon({ kmUsedToday: 40 }), 1)).toBe(true);
+      expect(stepAllowed(decagon({ kmUsedToday: 50 }), 1)).toBe(false);
+    });
 
-  it("allows the last edge of the day's allowance but not one more", () => {
-    expect(stepAllowed(octagon({ kmUsedToday: 30 }), 1)).toBe(true);
-    expect(stepAllowed(octagon({ kmUsedToday: 40 }), 1)).toBe(false);
-  });
-
-  it('rejects a vertex that is not on the wall', () => {
-    expect(stepAllowed(octagon(), 8)).toBe(false);
-    expect(stepAllowed(octagon(), -1)).toBe(false);
-  });
-
-  it('scales with the wall the board actually has', () => {
-    const decagon = { architectPosition: 0, towers: Array(10).fill(true), day: 1, kmUsedToday: 0 };
-    // 9 wraps round to 0 on a 10-gon, but is not a neighbour of 0 on an 8-gon
-    expect(isArchitectStepAllowed(decagon, 9, 50)).toBe(true);
-    expect(stepAllowed(octagon(), 9)).toBe(false);
+    it('rejects a vertex that is not on the wall', () => {
+      expect(stepAllowed(decagon(), 10)).toBe(false);
+    });
   });
 });
 
 describe('isDestructionAllowed', () => {
+  const octagon = boardOn(8);
+
   it('allows knocking down a standing tower', () => {
     expect(isDestructionAllowed(octagon(), 5)).toBe(true);
   });

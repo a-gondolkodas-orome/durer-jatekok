@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../../language';
 import type { Board } from './architect-and-bandits-a';
 import { GameBoard, type BoardClientProps } from '../../../strategy-game-factory';
+import { ARCHITECT } from '../helpers';
 
 const VERTEX_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -27,12 +28,12 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   // Hide towers during role selection (before the game actually begins)
   const gameStarted = ctx.isHumanVsHumanGame || ctx.chosenRoleIndex !== null;
 
-  const isClickable = (v: number) => (ctx.currentPlayer === 0
+  const isClickable = (v: number) => (ctx.currentPlayer === ARCHITECT
     ? moves.moveArchitect.isAllowed!(board, v)
     : moves.destroyTower.isAllowed!(board, v));
 
   const handleVertexClick = (v: number) => {
-    if (ctx.currentPlayer === 0) {
+    if (ctx.currentPlayer === ARCHITECT) {
       moves.moveArchitect(board, v);
     } else {
       moves.destroyTower(board, v);
@@ -120,7 +121,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
       {ctx.phase === 'play' && (
         <p>
-          {ctx.currentPlayer === 0
+          {ctx.currentPlayer === ARCHITECT
             ? t({
               hu: `${board.day}. nap · ${board.kmUsedToday}/40 km`,
               en: `Day ${board.day} · ${board.kmUsedToday}/40 km`
