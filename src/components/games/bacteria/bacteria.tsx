@@ -9,6 +9,7 @@ import {
   isShiftLeft,
   hasBacterium,
   moves,
+  ATTACKER,
   type Board
 } from "./helpers";
 import {
@@ -43,7 +44,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }: BoardClientProp
 
   const boardWidth = bacteria[0].length;
 
-  const isPlayerAttacker = ctx.currentPlayer === 0;
+  const isPlayerAttacker = ctx.currentPlayer === ATTACKER;
 
   // Which of the four attacks the second click means is decided by where it
   // lands relative to the first.
@@ -184,7 +185,7 @@ const BoardClient = ({ board: { bacteria, goals }, ctx, moves }: BoardClientProp
 };
 
 const getPlayerStepDescription = ({ ctx }) => {
-  if (ctx.currentPlayer === 0) {
+  if (ctx.currentPlayer === ATTACKER) {
     return {
       hu: "Kattints egy mezőre, amin van baktérium és hajtsd végre " +
         "a három lehetséges támadás egyikét egy további szabályos kattintással.",

@@ -11,7 +11,9 @@ import {
   isAttackAllowed,
   spreadChildren,
   isGoalCell,
-  topRowIdx
+  topRowIdx,
+  ATTACKER,
+  DEFENDER
 } from "./helpers";
 
 export type { AttackMove };
@@ -119,7 +121,7 @@ export const defenderMove = (board: Board): { row: number; col: number } => {
 };
 
 export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
-  if (ctx.chosenRoleIndex === 0) {
+  if (ctx.chosenRoleIndex === ATTACKER) {
     const { row, col } = defenderMove(board);
     moves.defend(board, { row, col });
   } else {
@@ -132,7 +134,7 @@ export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => 
 export const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
   const coords = bacteriaCoords(board);
 
-  if (ctx.currentPlayer === 1) {
+  if (ctx.currentPlayer === DEFENDER) {
     const [row, col] = sample(coords)!;
     moves.defend(board, { row, col });
     return;
