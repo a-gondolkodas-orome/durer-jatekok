@@ -3,7 +3,6 @@ import { POLICE, THIEF, VERTEX_COUNT } from './helpers';
 import { range } from 'lodash';
 import { makeCtx } from '../../../../test-utils';
 
-// Outcome-returning moves need no events: what a move causes is its return value.
 const meta = { ctx: makeCtx() };
 
 const chasingBoard = (overrides: Partial<Board> = {}): Board => ({
