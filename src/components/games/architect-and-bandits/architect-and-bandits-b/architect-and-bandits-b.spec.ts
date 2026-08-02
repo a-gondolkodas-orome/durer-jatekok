@@ -1,22 +1,19 @@
-import { moves as movesA } from './architect-and-bandits-a/architect-and-bandits-a';
-import { moves as movesB } from './architect-and-bandits-b/architect-and-bandits-b';
-import { ARCHITECT, BANDITS, type Board } from './helpers';
-import { makeCtx } from '../../../test-utils';
+import { moves } from './architect-and-bandits-b';
+import { ARCHITECT, BANDITS, type Board } from '../helpers';
+import { makeCtx } from '../../../../test-utils';
 
-// Both variants play the same game on a different polygon, so the end-of-game
-// rule is asserted for each: after the fourth day the architect wins exactly
-// when every vertex carries a tower.
+// After the fourth day the architect wins exactly when every vertex carries a
+// tower.
 const meta = { ctx: makeCtx({ currentPlayer: BANDITS }) };
+
+const VERTEX_COUNT = 10;
 
 const boardWith = (towers: boolean[], day: number): Board =>
   ({ architectPosition: 0, towers, day, kmUsedToday: 20 });
 
-describe.each([
-  ['a', movesA, 8],
-  ['b', movesB, 10]
-])('architect-and-bandits-%s end of game', (_name, moves, vertexCount) => {
-  const allStanding = () => Array(vertexCount).fill(true);
+const allStanding = () => Array(VERTEX_COUNT).fill(true);
 
+describe('architect-and-bandits-b end of game', () => {
   it('gives the game to the architect when day 4 ends with every tower standing', () => {
     const outcome = moves.endDay.apply(boardWith(allStanding(), 4));
     expect(outcome.gameEnd).toEqual({ winnerIndex: ARCHITECT });
@@ -25,7 +22,7 @@ describe.each([
 
   it('gives the game to the bandits when any tower is missing on day 4', () => {
     const towers = allStanding();
-    towers[vertexCount - 1] = false;
+    towers[VERTEX_COUNT - 1] = false;
     const outcome = moves.endDay.apply(boardWith(towers, 4));
     expect(outcome.gameEnd).toEqual({ winnerIndex: BANDITS });
   });
