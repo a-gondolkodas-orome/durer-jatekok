@@ -276,6 +276,9 @@ bound) for the `BoardClient`'s `disabled` state. Full contract in
   `ctx.isClientMoveAllowed` in for you.
 - `isAllowed` is not for bots: during the bot's turn `isClientMoveAllowed` is
   false by design, so bots enumerate legal moves via the raw `validate`/helpers.
+  That split is in the types too: `BoardClientProps.moves` is
+  `ClientGameMoves` (`isAllowed` guaranteed), `StrategyArgs.moves` is the wider
+  `GameMoves` (dispatch only).
 - `validate` is React-free, so a future authoritative/competition server could
   run the exact same predicate.
 - Worked examples: `coins-in-3-piles` (two-phase turn), `cube-coloring` (reuses

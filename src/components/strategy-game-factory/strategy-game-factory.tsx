@@ -10,7 +10,7 @@ import { useLocation } from 'react-router';
 import { useGameStats } from './hooks/use-game-stats';
 import { trackEvent } from '../../tracking';
 import type {
-  Mode, Ctx, Events, MoveOutcome, Gameplay, GameMoves,
+  Mode, Ctx, Events, MoveOutcome, Gameplay, GameMoves, ClientGameMoves,
   BoardClientProps, Variant as DisplayVariant, VariantInput
 } from './types';
 import { resolveVariants } from './helpers/resolve-variants';
@@ -225,17 +225,19 @@ export const strategyGameFactory = <TBoard,>({
     // Bots and the auto `endOfTurnMove` dispatch use `wrappedGameMoves` instead:
     // there an illegal move is a bug, and the validator fails loudly (see
     // `reportIllegalMove`).
-    const clientGameMoves: GameMoves<TBoard> = mapValues(moves, ({ validate }, name) => {
+    const clientGameMoves: ClientGameMoves<TBoard> = mapValues(moves, ({ validate }, name) => {
       const isAllowed = (moveBoard: TBoard, ...args: unknown[]) => {
         const liveCtx = buildCtx(store.getState(), resolvedPlayerNames);
         return liveCtx.isClientMoveAllowed
           && (!validate || validate(moveBoard, { ctx: liveCtx }, ...args));
       };
-      const clientWrapped: GameMoves<TBoard>[string] = (moveBoard: TBoard, ...args: unknown[]) =>
-        isAllowed(moveBoard, ...args)
-          ? wrappedGameMoves[name]!(moveBoard, ...args)
-          : { nextBoard: moveBoard };
-      clientWrapped.isAllowed = isAllowed;
+      const clientWrapped: ClientGameMoves<TBoard>[string] = Object.assign(
+        (moveBoard: TBoard, ...args: unknown[]) =>
+          isAllowed(moveBoard, ...args)
+            ? wrappedGameMoves[name]!(moveBoard, ...args)
+            : { nextBoard: moveBoard },
+        { isAllowed }
+      );
       return clientWrapped;
     });
 

@@ -31,8 +31,8 @@ export type MoveOutcome<TBoard> = {
   isTurnEnd?: boolean
   // undefined = turnState unchanged; null = cleared; anything else = new value.
   nextTurnState?: unknown
-  // Terminal: the game is over. The winner is always explicit — there is no
-  // "omitted = mover wins" shorthand in this contract.
+  // Terminal: the game is over, naming the winner explicitly (use
+  // `ctx.currentPlayer!` when the mover wins).
   gameEnd?: { winnerIndex: number }
   // Schedule gameplay.endOfTurnMove after a delay. Ignored when `gameEnd` is
   // present (contradiction; throws in dev).
@@ -41,7 +41,7 @@ export type MoveOutcome<TBoard> = {
 // A move is a pure reducer: board in, outcome out. It gets no `events`, so
 // purity is enforced by the type system rather than by convention — which is
 // what lets the same function run in a future authoritative server.
-export type PureMoveFunction<TBoard> = (
+export type MoveFunction<TBoard> = (
   board: TBoard, meta: { ctx: Ctx }, ...args: any[]
 ) => MoveOutcome<TBoard>
 // Pure, side-effect-free legality predicate for a single move, colocated with
@@ -52,7 +52,7 @@ type MoveValidator<TBoard> = (
   board: TBoard, meta: { ctx: Ctx }, ...args: any[]
 ) => boolean
 export type MoveDefinition<TBoard> = {
-  apply: PureMoveFunction<TBoard>
+  apply: MoveFunction<TBoard>
   validate?: MoveValidator<TBoard>
 }
 export interface Gameplay<TBoard> {
@@ -60,21 +60,29 @@ export interface Gameplay<TBoard> {
   // move name auto-executed (after a delay) following moves returning autoEndOfTurn: true
   endOfTurnMove?: string
 }
-// Engine-wrapped moves as seen by BoardClient and bots: callable to dispatch.
-// The BoardClient's copy exposes `isAllowed(board, ...args)` on every move —
-// `ctx.isClientMoveAllowed` (turn ownership) AND the move's `validate`, with
-// `ctx` already bound — which is what its `disabled` state should ask; the
-// same check silently gates every client dispatch, so handlers need no
-// `if (!allowed) return` guards. Not for bots: their copy carries no
-// `isAllowed` (during the bot's turn `isClientMoveAllowed` is false), so bots
-// use the raw `validate`/helpers to enumerate legal moves.
+// Engine-wrapped moves, callable to dispatch. This is the bot's view: a bot
+// enumerates legal moves through the raw `validate`/its own helpers, because
+// `isAllowed` would be false throughout its turn anyway (see below).
 export type GameMoves<TBoard> = Record<
   string,
+  (board: TBoard, ...args: any[]) => MoveOutcome<TBoard>
+>
+// The BoardClient's view: the same dispatchers, plus `isAllowed(board, ...args)`
+// on every move — `ctx.isClientMoveAllowed` (turn ownership) AND the move's
+// `validate`, with `ctx` already bound. That is what a `disabled` state should
+// ask; the same check silently gates every client dispatch, so handlers need no
+// `if (!allowed) return` guards. Assignable to GameMoves, so helpers shared with
+// a bot keep taking the wider type.
+export type ClientGameMoves<TBoard> = Record<
+  string,
   ((board: TBoard, ...args: any[]) => MoveOutcome<TBoard>)
-    & { isAllowed?: (board: TBoard, ...args: any[]) => boolean }
+    & { isAllowed: (board: TBoard, ...args: any[]) => boolean }
 >
 export type StrategyArgs<TBoard> = { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }
-export type BoardClientProps<TBoard> = StrategyArgs<TBoard> & { events: Events }
+export type BoardClientProps<TBoard> = Omit<StrategyArgs<TBoard>, 'moves'> & {
+  moves: ClientGameMoves<TBoard>
+  events: Events
+}
 
 export interface Variant {
   originalIndex: number

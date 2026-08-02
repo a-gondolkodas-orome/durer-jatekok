@@ -141,7 +141,11 @@ guards — keep one only when the handler couples local UI state to a successful
 move (see `cube-coloring`'s colour-selection reset). Not for bots: their
 `moves` copy carries no `isAllowed` (during the bot's turn
 `isClientMoveAllowed` is false by design), so bots enumerate legal moves via
-the raw `validate`/helpers instead.
+the raw `validate`/helpers instead. The two wrappings have two types:
+`ClientGameMoves` (what `BoardClientProps.moves` is — `isAllowed` guaranteed,
+so no `!` at the call site) and the wider `GameMoves` (what `StrategyArgs.moves`
+is — dispatch only). `ClientGameMoves` is assignable to `GameMoves`, so a
+helper shared between a `BoardClient` and a bot takes `GameMoves`.
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes

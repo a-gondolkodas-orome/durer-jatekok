@@ -63,7 +63,7 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
   // Asking about L = 1 asks whether these coins can be changed at all: it is the
   // most generous target, so value-1 coins fall out as unselectable.
   const selectValue = (v: number) => {
-    if (!moves.convert.isAllowed!(board, v, 1)) return;
+    if (!moves.convert.isAllowed(board, v, 1)) return;
     events.setTurnState(selectedValue === v ? null : v);
   };
 
@@ -81,7 +81,7 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
           return (
             <button
               key={v}
-              disabled={!moves.convert.isAllowed!(board, v, 1)}
+              disabled={!moves.convert.isAllowed(board, v, 1)}
               onClick={() => selectValue(v)}
               aria-pressed={isSelected}
               aria-label={t({
@@ -123,7 +123,7 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
           {range(1, selectedValue).map(l => (
             <button
               key={l}
-              disabled={!moves.convert.isAllowed!(board, selectedValue, l)}
+              disabled={!moves.convert.isAllowed(board, selectedValue, l)}
               onClick={() => chooseTarget(l)}
               aria-label={t({ hu: `${l} értékű érme`, en: `value ${l} coin` })}
               className="rounded-full transition-transform enabled:hocus:scale-110

@@ -508,8 +508,8 @@ describe('move validate enforcement', () => {
         <button data-testid="illegal-btn" onClick={() => moves.guarded(board, 'bad')}>illegal</button>
         <button data-testid="hand-over-btn" onClick={() => moves.handOver(board)}>hand over</button>
         <span data-testid="board">{board.join(',')}</span>
-        <span data-testid="can-ok">{String(moves.guarded.isAllowed!(board, 'ok'))}</span>
-        <span data-testid="can-bad">{String(moves.guarded.isAllowed!(board, 'bad'))}</span>
+        <span data-testid="can-ok">{String(moves.guarded.isAllowed(board, 'ok'))}</span>
+        <span data-testid="can-bad">{String(moves.guarded.isAllowed(board, 'bad'))}</span>
       </>
     ),
     gameplay: {
@@ -576,6 +576,24 @@ describe('move validate enforcement', () => {
     fireEvent.click(getByTestId('role-btn-0'));
     expect(getByTestId('can-ok').textContent).toBe('true');
     expect(getByTestId('can-bad').textContent).toBe('false');
+  });
+
+  // The bot's wrapping deliberately omits isAllowed (it would be false all
+  // through the bot's turn), which is what lets ClientGameMoves type it as
+  // required and BoardClients call it without a non-null assertion.
+  it('does not expose isAllowed on the moves a bot receives', () => {
+    vi.useFakeTimers();
+    try {
+      const botStrategy = vi.fn();
+      const { getByTestId } = renderGame(guardedConfig(botStrategy));
+      fireEvent.click(getByTestId('role-btn-0'));
+      fireEvent.click(getByTestId('hand-over-btn')); // → bot's turn
+      act(() => { vi.advanceTimersByTime(1500); });
+      expect(botStrategy.mock.calls[0]![0].moves.guarded.isAllowed).toBeUndefined();
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
   });
 
   it('dispatches a move with no validator unconditionally', () => {
