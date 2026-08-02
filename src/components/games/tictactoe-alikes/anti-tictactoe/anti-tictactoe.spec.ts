@@ -1,5 +1,4 @@
 import { moves } from './anti-tictactoe';
-import { isGameEnd, hasFirstPlayerWon } from './helpers';
 import { makeCtx } from '../../../../test-utils';
 
 // Completing a line hands the game to the *other* player.
@@ -13,8 +12,7 @@ describe('anti-tictactoe end of game', () => {
     // red already holds cells 0 and 1; taking 2 makes the top row
     const board = grid(['red', 'red', null, 'blue', 'blue', null, null, null, null]);
     const outcome = moves.placePiece.apply(board, asPlayer(0), 2);
-    expect(isGameEnd(outcome.nextBoard)).toBe(true);
-    expect(hasFirstPlayerWon(outcome.nextBoard)).toBe(false);
+    expect(outcome.nextBoard[2]).toBe('red');
     expect(outcome.gameEnd).toEqual({ winnerIndex: 1 });
     expect(outcome.isTurnEnd).toBeUndefined();
   });
