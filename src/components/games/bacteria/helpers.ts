@@ -99,7 +99,7 @@ export const isAttackAllowed = (board: Board, { type, row, col }: AttackMove): b
 const attackerMove = (type: MoveType) => ({
   validate: (board: Board, { ctx }, { row, col }) =>
     ctx.currentPlayer === ATTACKER && isAttackAllowed(board, { type, row, col }),
-  apply: (board: Board, { events }: { events: Events }, { row, col }) => {
+  legacyApply: (board: Board, { events }: { events: Events }, { row, col }) => {
     const { nextBoard, reachedGoal } = applyAttackMove(board, { type, row, col });
     events.endTurn();
     if (reachedGoal) events.endGame();
@@ -111,7 +111,7 @@ export const moves = {
   defend: {
     validate: (board: Board, { ctx }, cell) =>
       ctx.currentPlayer === DEFENDER && hasBacterium(board, cell),
-    apply: (board: Board, { events }: { events: Events }, { row, col }) => {
+    legacyApply: (board: Board, { events }: { events: Events }, { row, col }) => {
       const nextBoard = cloneDeep(board);
 
       nextBoard.bacteria[row][col] -= 1;

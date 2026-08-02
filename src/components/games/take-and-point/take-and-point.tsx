@@ -12,7 +12,7 @@ const moves = {
   takeStones: {
     validate: (board: Board, _, index: number, amount: number) =>
       isRemovalAllowed(board, index, amount),
-    apply: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }, index: number, amount: number) => {
+    legacyApply: (board: Board, { ctx, events }: { ctx: Ctx; events: Events }, index: number, amount: number) => {
       const nextBoard: Board = { piles: applyRemoval(board.piles, index, amount), pointed: null };
       if (isTerminal(nextBoard)) {
         // Whoever takes the last stone wins.
@@ -25,7 +25,7 @@ const moves = {
   // Point at the piles the other player will choose from, then hand over the turn.
   pointPiles: {
     validate: (board: Board, _, indices: number[]) => isPointingAllowed(board, indices),
-    apply: (board: Board, { events }: { ctx: Ctx; events: Events }, indices: number[]) => {
+    legacyApply: (board: Board, { events }: { ctx: Ctx; events: Events }, indices: number[]) => {
       const nextBoard: Board = { piles: board.piles, pointed: indices };
       events.endTurn();
       return { nextBoard };

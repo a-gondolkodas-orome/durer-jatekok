@@ -63,7 +63,7 @@ describe('moves', () => {
     ]);
     const board = { bacteria, goals: [1] };
     const events = makeEvents();
-    const { nextBoard } = moves.defend.apply(board, { events }, { row: 2, col: 0 });
+    const { nextBoard } = moves.defend.legacyApply(board, { events }, { row: 2, col: 0 });
     expect(nextBoard.bacteria[2][0]).toEqual(1);
     expect(events.endGame).not.toHaveBeenCalled();
   });
@@ -76,7 +76,7 @@ describe('moves', () => {
     ]);
     const board = { bacteria, goals: [1] };
     const events = makeEvents();
-    moves.defend.apply(board, { events }, { row: 2, col: 0 });
+    moves.defend.legacyApply(board, { events }, { row: 2, col: 0 });
     expect(events.endGame).toHaveBeenCalled();
   });
 
@@ -98,7 +98,7 @@ describe('moves', () => {
     for (const type of types) {
       const { nextBoard, reachedGoal } = applyAttackMove(makeBoard(), { type, row: 2, col: 1 });
       const events = makeEvents();
-      const viaMoves = moves[type].apply(makeBoard(), { events }, { row: 2, col: 1 });
+      const viaMoves = moves[type].legacyApply(makeBoard(), { events }, { row: 2, col: 1 });
       expect(viaMoves.nextBoard.bacteria).toEqual(nextBoard.bacteria);
       if (reachedGoal) {
         expect(events.endGame).toHaveBeenCalled();
