@@ -40,8 +40,6 @@ const driveBot = (set: Vals): Vals => {
   const board = [...set];
   let captured = board;
   const ctx = makeCtx();
-  // Outcome-returning moves ({ validate, apply }) expose their effect as `apply`,
-  // which takes no `events` — the outcome is entirely in its return value.
   const wrapped = mapValues(gameMoves, ({ apply }) => (b: number[], ...args: unknown[]) => {
     const res = (apply as (...a: unknown[]) => { nextBoard: number[] })(b, { ctx }, ...args);
     captured = res.nextBoard;
