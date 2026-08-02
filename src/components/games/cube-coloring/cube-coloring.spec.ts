@@ -1,6 +1,5 @@
-import { range, every, sample } from 'lodash';
 import { moves } from './cube-coloring';
-import { generateStartBoard, isAllowedStep, isColored, colors, type Board } from './helpers';
+import { generateStartBoard, type Board } from './helpers';
 import { makeCtx } from '../../../test-utils';
 
 // The first player wants all eight vertices coloured; the second wants the
@@ -8,37 +7,35 @@ import { makeCtx } from '../../../test-utils';
 // by the resulting position.
 const meta = { ctx: makeCtx() };
 
-const legalSteps = (board: Board) =>
-  range(0, 8).flatMap(vertex => colors
-    .filter(color => isAllowedStep(board, vertex, color))
-    .map(color => ({ vertex, color })));
-
+// Vertices 0-3 are the front face, 4-7 the back, i is joined to i+4, and 2-4 is
+// the drawn diagonal.
 describe('end of game', () => {
-  // The board is small enough to walk to the end many times over, which covers
-  // both endings without hand-building a stuck cube.
-  it.each(range(30))('ends exactly on the last legal step (run %i)', () => {
-    let board = generateStartBoard();
-    let outcome = moves.colorVertex.apply(board, meta, sample(legalSteps(board))!);
-
-    while (legalSteps(outcome.nextBoard).length > 0) {
-      expect(outcome.gameEnd).toBeUndefined();
-      expect(outcome.isTurnEnd).toBe(true);
-      board = outcome.nextBoard;
-      outcome = moves.colorVertex.apply(board, meta, sample(legalSteps(board))!);
-    }
-
-    const allColoured = every(range(0, 8), v => isColored(outcome.nextBoard, v));
-    expect(outcome.gameEnd).toEqual({ winnerIndex: allColoured ? 0 : 1 });
+  it('gives the game to the first player when the last vertex gets coloured', () => {
+    const board: Board = ['red', 'blue', 'yellow', 'blue', 'blue', 'red', 'blue', ''];
+    // 7 neighbours 6, 4 and 3, all blue, so red fits
+    const outcome = moves.colorVertex.apply(board, meta, { vertex: 7, color: 'red' });
+    expect(outcome.nextBoard)
+      .toEqual(['red', 'blue', 'yellow', 'blue', 'blue', 'red', 'blue', 'red']);
+    expect(outcome.gameEnd).toEqual({ winnerIndex: 0 });
     expect(outcome.isTurnEnd).toBeUndefined();
   });
 
-  it('gives the game to the first player when every vertex ends up coloured', () => {
-    // one uncoloured vertex left, and a colour that fits it
-    const board: Board = ['red', 'blue', 'blue', 'red', 'blue', 'red', 'red', ''];
-    const step = legalSteps(board)[0];
-    expect(step).toBeDefined();
-    const outcome = moves.colorVertex.apply(board, meta, step);
-    expect(every(range(0, 8), v => isColored(outcome.nextBoard, v))).toBe(true);
-    expect(outcome.gameEnd).toEqual({ winnerIndex: 0 });
+  it('gives the game to the second player when the colouring gets stuck', () => {
+    const board: Board = ['', 'red', '', 'blue', 'yellow', 'blue', 'yellow', ''];
+    const outcome = moves.colorVertex.apply(board, meta, { vertex: 7, color: 'red' });
+    // 0 (neighbours 1, 3, 4) and 2 (neighbours 1, 3, 4, 6) each face all three
+    // colours, so the cube is stuck two vertices short
+    expect(outcome.nextBoard).toEqual(['', 'red', '', 'blue', 'yellow', 'blue', 'yellow', 'red']);
+    expect(outcome.gameEnd).toEqual({ winnerIndex: 1 });
+    expect(outcome.isTurnEnd).toBeUndefined();
+  });
+
+  it('passes the turn while a colour still fits somewhere', () => {
+    const outcome = moves.colorVertex.apply(
+      generateStartBoard(), meta, { vertex: 0, color: 'red' }
+    );
+    expect(outcome.nextBoard).toEqual(['red', '', '', '', '', '', '', '']);
+    expect(outcome.gameEnd).toBeUndefined();
+    expect(outcome.isTurnEnd).toBe(true);
   });
 });
