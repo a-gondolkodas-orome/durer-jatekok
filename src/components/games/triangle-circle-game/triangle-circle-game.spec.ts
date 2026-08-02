@@ -3,7 +3,6 @@ import { LINE, CIRCLE, generateStartBoard, applyShade, applyCircle } from './hel
 import { TRIANGLES, TRIANGLE_COUNT } from './geometry';
 import { makeCtx } from '../../../test-utils';
 
-// Outcome-returning moves need no events: what a move causes is its return value.
 const meta = { ctx: makeCtx() };
 
 describe('moves.shadeEdge', () => {

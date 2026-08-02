@@ -6,7 +6,6 @@ import { makeCtx } from '../../../test-utils';
 // Both variants play the same game on a different polygon, so the end-of-game
 // rule is asserted for each: after the fourth day the architect wins exactly
 // when every vertex carries a tower.
-// `endDay` reads neither ctx nor events, so it takes the board alone.
 const meta = { ctx: makeCtx({ currentPlayer: BANDITS }) };
 
 const boardWith = (towers: boolean[], day: number): Board =>
