@@ -15,13 +15,6 @@ export interface Ctx {
   moveCount: number
 }
 
-// Mid-turn UI state a BoardClient needs to remember (which pile is selected,
-// which slot is being edited). Moves never see this: they express turn state
-// through `nextTurnState` in their returned MoveOutcome.
-export interface Events {
-  setTurnState: (state: unknown) => void
-}
-
 // Everything a move can cause, expressed as data: the engine interprets what
 // the move returns, so a move never reaches out and changes anything itself.
 export type MoveOutcome<TBoard> = {
@@ -38,9 +31,10 @@ export type MoveOutcome<TBoard> = {
   // present (contradiction; throws in dev).
   autoEndOfTurn?: boolean
 }
-// A move is a pure reducer: board in, outcome out. It gets no `events`, so
-// purity is enforced by the type system rather than by convention — which is
-// what lets the same function run in a future authoritative server.
+// A move is a pure reducer: board in, outcome out. It is handed nothing it
+// could cause an effect through, so purity is enforced by the type system
+// rather than by convention — which is what lets the same function run in a
+// future authoritative server.
 export type MoveFunction<TBoard> = (
   board: TBoard, meta: { ctx: Ctx }, ...args: any[]
 ) => MoveOutcome<TBoard>
@@ -81,7 +75,12 @@ export type ClientGameMoves<TBoard> = Record<
 export type StrategyArgs<TBoard> = { board: TBoard; ctx: Ctx; moves: GameMoves<TBoard> }
 export type BoardClientProps<TBoard> = Omit<StrategyArgs<TBoard>, 'moves'> & {
   moves: ClientGameMoves<TBoard>
-  events: Events
+  // Writes the mid-turn UI state a BoardClient needs to remember (which pile is
+  // selected, which slot is being edited), read back as `ctx.turnState`. The one
+  // path that writes engine state without going through a move: a selection is
+  // not a move, so it must not bump `moveCount` or take an undo snapshot. Moves
+  // never get this — they return `nextTurnState` in their MoveOutcome instead.
+  setTurnState: (state: unknown) => void
 }
 
 export interface Variant {

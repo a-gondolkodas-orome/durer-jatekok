@@ -55,7 +55,7 @@ const playerToMoveWins = (set: number[]): boolean => {
 // {1,2,3}, {1,4,5}, {2,3,4,5}, {1,2,3,4,5} for values 1..5. Everything else is a
 // first-player win, driven towards one of these (or merged to a single value).
 
-const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
+const BoardClient = ({ board, ctx, setTurnState, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const selectedValue = ctx.turnState as number | null;
   const presentValues = distinctValues(board);
@@ -64,12 +64,12 @@ const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => 
   // most generous target, so value-1 coins fall out as unselectable.
   const selectValue = (v: number) => {
     if (!moves.convert.isAllowed(board, v, 1)) return;
-    events.setTurnState(selectedValue === v ? null : v);
+    setTurnState(selectedValue === v ? null : v);
   };
 
   const chooseTarget = (l: number) => {
     moves.convert(board, selectedValue, l);
-    events.setTurnState(null);
+    setTurnState(null);
   };
 
   return (

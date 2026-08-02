@@ -13,8 +13,7 @@ const coords: { cx: number; cy: number }[] = range(FIELD_COUNT).map((i) => {
   };
 });
 
-export const BoardClient = ({ board, ctx, events, moves }: BoardClientProps<Board>) => {
-  const { setTurnState } = events;
+export const BoardClient = ({ board, ctx, setTurnState, moves }: BoardClientProps<Board>) => {
   const turnState = ctx.turnState as TurnState;
   const first = turnState?.first ?? null;
 

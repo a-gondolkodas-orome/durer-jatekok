@@ -221,9 +221,9 @@ in its return value (a `MoveOutcome`):
 - `autoEndOfTurn`: `true` asks the framework to auto-dispatch
   `gameplay.endOfTurnMove` after a short delay
 
-`apply` receives `{ ctx }` and no `events` — it is a pure function, which
-is what lets the same move logic run on a possible future authoritative
-competition server.
+`apply` receives `{ ctx }` and nothing it could cause an effect through — it is
+a pure function, which is what lets the same move logic run on a possible future
+authoritative competition server.
 
 You must always pass `board` as a first param to all moves (meaning you must
 pass the updated board to subsequent moves in case of multiple moves within a
@@ -295,8 +295,8 @@ Props passed by framework:
 
 - `board` (result of last move),
 - `ctx`, (i.e. to know whose turn it is)
-- `events` (i.e. to `setTurnState`) and
-- `moves`
+- `moves` and
+- `setTurnState`
 
 Additional state variables may be created within the `BoardClient` component
 that is relevant only during a turn, not between turns, such as reacting to
@@ -326,12 +326,13 @@ framework.
   remembered during a turn, i.e. to expose it from BoardClient to
   getPlayerStepDescription
 
-`events` holds a single function, for `BoardClient` components that keep
-mid-turn UI state in `ctx.turnState`:
-- `setTurnState`: a function to set `turnState`
+`setTurnState` is a `BoardClient`-only prop, for components that keep mid-turn
+UI state in `ctx.turnState`. It is the one path that writes engine state without
+going through a move, and deliberately so: a selection is not a move, so it must
+not bump `moveCount` or take an undo snapshot.
 
-Moves never receive `events`: they return `isTurnEnd`, `gameEnd` and
-`nextTurnState` instead.
+Moves never receive it: they return `isTurnEnd`, `gameEnd` and `nextTurnState`
+instead.
 </details>
 
 ## Things to look out for

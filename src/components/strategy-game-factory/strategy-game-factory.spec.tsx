@@ -867,6 +867,29 @@ describe('outcome-returning moves (apply)', () => {
       expect(getByTestId('board').textContent).toBe('initial');
       expect(getByTestId('ts').textContent).toBe('null');
     });
+
+    // The BoardClient's own path to turnState, next to the move-returned one
+    // above. It must not count as a move: an undo taken right after it has to
+    // find no snapshot to restore.
+    it('the setTurnState prop writes turnState without registering a move', () => {
+      const { getByTestId } = renderGame(makeConfig({
+        BoardClient: ({ ctx, setTurnState }: BoardClientProps<Board>) => (
+          <>
+            <button data-testid="select-btn" onClick={() => setTurnState({ pile: 2 })}>select</button>
+            <button data-testid="deselect-btn" onClick={() => setTurnState(null)}>deselect</button>
+            <span data-testid="ts">{JSON.stringify(ctx.turnState)}</span>
+            <span data-testid="moves">{ctx.moveCount}</span>
+          </>
+        )
+      }));
+      fireEvent.click(getByTestId('role-btn-0'));
+      fireEvent.click(getByTestId('select-btn'));
+      expect(getByTestId('ts').textContent).toBe('{"pile":2}');
+      expect(getByTestId('moves').textContent).toBe('0');
+      expect((getByTestId('undo-btn') as HTMLButtonElement).disabled).toBe(true);
+      fireEvent.click(getByTestId('deselect-btn'));
+      expect(getByTestId('ts').textContent).toBe('null');
+    });
   });
 
   // These two tests pin what the external store fixed: validators and chained
