@@ -50,7 +50,7 @@ Create `src/components/games/<game-name>/<game-name>.tsx`. Follow the `strategyG
 - Guard all player interactions with `ctx.isClientMoveAllowed`
 - `getPlayerStepDescription` should make it obvious what the current player should do
 - For user-facing text referring to the other participant, prefer "other player" / "másik játékos" over "opponent" / "ellenfél" — the latter reads as too harsh, especially in Hungarian
-- If the bot needs multiple moves in one turn, wrap subsequent moves in `setTimeout` to simulate thinking
+- A `botStrategy` is a pure function of the position: it *names* the move it wants — `({ board, ctx }) => ({ move, args })` — rather than playing it, and never schedules anything. When a turn is one decision made of several moves, name them all (`({ board, ctx }) => [{ move, args }, …]`); the engine plays them out with a pause between them so the bot appears to think. Naming only the first move is equally fine: while the turn is still the bot's, the engine asks again with the updated `board`/`ctx`
 - Pull `name`, `title`, `credit` from `gameList` rather than hardcoding them
 
 ### 5. Re-export the component from `src/components/games/index.ts`
@@ -64,6 +64,29 @@ automatically — no edit is needed there.
 Using the metadata collected in Step 1, add the entry in alphabetical order by key. Use `title` only if a longer display name is needed on the game page beyond the short name.
 
 ### 7. Run tests and verify
+If the optimal AI was implemented, write a spec that plays it rather than one
+that eyeballs a single decision. `runMatch` (from `strategy-game-factory`) plays
+a whole game headless through the real moves, validators and win detection:
+
+```typescript
+const { winnerIndex } = runMatch({
+  gameplay: { moves },
+  strategies: [smartBotStrategy, randomBotStrategy],
+  startBoard
+});
+```
+
+Assert what the checklist asks for: from every start board the mover can win,
+the smart bot wins as the mover; from every board it cannot, it wins as the
+replier (every move loses there, so a random opponent must lose). See
+`coins-in-3-piles/bot-strategy.spec.ts` and `remove-row-or-column`. Because a bot
+returns its move as data, a spec for a single decision needs no mock either —
+read it with `botArgs` from `test-utils`.
+
+For this to work, the game's `moves` must be importable without React: keep them
+in a `helpers.ts` (as `coins-in-3-piles` does) rather than beside the JSX rule
+text.
+
 ```bash
 npm run test
 ```
@@ -76,14 +99,14 @@ npm run dev
 Before declaring the game done, verify each item:
 - [ ] Works correctly in both `vsComputer` and `vsHuman` mode
 - [ ] Starting positions are representative of the game's complexity; each player wins with ~50% probability across random starting boards
-- [ ] If optimal AI is implemented: player cannot win with a non-winning strategy
+- [ ] If optimal AI is implemented: player cannot win with a non-winning strategy — proven by a `runMatch` spec, not by eyeballing (see step 7)
 - [ ] Moves return their consequences in the `MoveOutcome` rather than causing them
 - [ ] Moves with non-trivial legality define `validate`, and the `BoardClient` gates on `isAllowed`
 - [ ] `getPlayerStepDescription` makes the next move clear
 - [ ] Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
 - [ ] Mobile-friendly and keyboard-navigable
 - [ ] Player can undo within multi-move turns if applicable
-- [ ] AI appears to "think" in multi-move turns (uses `setTimeout`)
+- [ ] The bot names its moves and schedules nothing — the engine paces multi-move turns so the AI appears to "think"
 
 ### 9. Offer a test bot variant (only if optimal AI was implemented)
 If the optimal AI strategy was implemented in step 2, ask the user:
