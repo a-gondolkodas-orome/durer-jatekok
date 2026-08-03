@@ -68,7 +68,10 @@ export const moves = {
   }
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const smartBotStrategy: Bot = ({ board }) =>
   ({ move: 'take', args: [chooseSmartTake(board)] });
 
 const startBoard = (stones: number): Board => ({ stones, maxTake: OPENING_MAX });

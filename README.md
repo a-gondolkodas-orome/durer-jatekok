@@ -318,13 +318,16 @@ If the named moves leave the turn unfinished, the bot is simply asked again with
 the updated `board` and `ctx`, so naming one move at a time is equally fine —
 see `magic-box` (named as a whole) and `take-and-point` (asked again).
 
-A move name is a string, so by default a typo is caught only when the bot plays
-it (in development the engine throws, listing the move names the game does
-have). Pin the names to the game's own moves to get a typecheck error instead:
+A move name is a string, so a typo would be caught only when the bot plays it
+(in development the engine throws, listing the move names the game does have).
+Every game pins the names to its own moves, which makes a typo a typecheck
+error instead:
 
 ```ts
 import type { Board, moves } from './helpers';
-type Bot = BotStrategy<Board, keyof typeof moves>;
+
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 
 export const smartBotStrategy: Bot = ({ board }) =>
   ({ move: 'removeLine', args: [chooseLine(board)] });

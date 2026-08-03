@@ -41,10 +41,13 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   );
 };
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'coverNumber', args: [sample(getRemaining(board))] });
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
+export const smartBotStrategy: Bot = ({ board, ctx }) => {
   const botMove = getOptimalSmartBotMove({ board, currentPlayer: ctx.currentPlayer });
   return { move: 'coverNumber', args: [botMove] };
 };

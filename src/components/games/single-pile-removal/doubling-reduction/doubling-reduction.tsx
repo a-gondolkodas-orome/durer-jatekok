@@ -60,12 +60,15 @@ export const moves = {
   }
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const smartBotStrategy: Bot = ({ board }) =>
   ({ move: 'take', args: [chooseSmartTake(board)] });
 
 // Test bot: takes the whole pile if that wins immediately, otherwise a random
 // legal amount.
-const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+const randomBotStrategy: Bot = ({ board }) => {
   if (board.stones <= board.maxTake) {
     return { move: 'take', args: [board.stones] };
   }

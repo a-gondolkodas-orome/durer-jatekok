@@ -1,11 +1,15 @@
 import { last, random, sample } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import { getAllowedMoves, type Board, type Field } from './helpers';
+import type { moves } from './chess-rook';
 
-export const randomBotStrategy: BotStrategy<Board> = ({ board }) =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'moveRook', args: [sample(getAllowedMoves(board))] });
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+export const smartBotStrategy: Bot = ({ board }) => {
   const botMove = getOptimalSmartBotMove(board);
   return { move: 'moveRook', args: [botMove] };
 };

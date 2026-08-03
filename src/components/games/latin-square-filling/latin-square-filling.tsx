@@ -126,12 +126,15 @@ export const moves = {
   }
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const smartBotStrategy: Bot = ({ board }) => {
   const { cell, digit } = getSmartBotStep(board);
   return { move: 'placeDigit', args: [cell, digit] };
 };
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+const randomBotStrategy: Bot = ({ board }) => {
   const { cell, digit } = getRandomBotStep(board);
   return { move: 'placeDigit', args: [cell, digit] };
 };

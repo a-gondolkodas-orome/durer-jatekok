@@ -4,6 +4,10 @@ import { SYMMETRIES } from './board-data';
 import {
   type Board, CELL_COUNT, boardMasks, emptyCells, completesLine, linesThrough
 } from './helpers';
+import type { moves } from './modified-mill';
+
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 import strategyTable from './strategy.json';
 
 const STRATEGY: Record<string, number> = strategyTable;
@@ -92,7 +96,7 @@ const countBits = (mask: number): number => {
   return count;
 };
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
+export const smartBotStrategy: Bot = ({ board, ctx }) => {
   const { red, blue } = boardMasks(board);
   const node = ctx.currentPlayer === 0
     ? firstPlayerMove(red, blue)
@@ -102,7 +106,7 @@ export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
 
 // Test bot: plays a random empty cell, but grabs an immediate line-completing
 // win when one is available.
-export const randomBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
+export const randomBotStrategy: Bot = ({ board, ctx }) => {
   const { red, blue } = boardMasks(board);
   const myMask = ctx.currentPlayer === 0 ? red : blue;
   const empties = emptyCells(red, blue);

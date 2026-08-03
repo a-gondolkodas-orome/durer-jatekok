@@ -82,13 +82,16 @@ const isGameEnd = (board: Board) => {
   return possibleMoves.length === 0;
 }
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = ({ board }) => {
   const possibleMoves = range(1, board.numbersOnTable.length + 1)
     .filter(n => isAllowed(board, n));
   return { move: 'removeNumber', args: [sample(possibleMoves)] };
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+const smartBotStrategy: Bot = ({ board }) => {
   const numCount = board.numbersOnTable.length;
   const stateId = generateStateID(board);
   const optimalMoves = strategyDict[numCount]

@@ -1,6 +1,9 @@
 import { sample, sortBy, sum } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
-import type { Board } from './pile-union';
+import type { Board, moves } from './pile-union';
+
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 
 type MoveAction = { type: 'remove'; i: number } | { type: 'merge'; i: number; j: number }
 
@@ -32,7 +35,7 @@ const isLosing = (board: Board) => {
 P = Previous player wins (the player who just moved wins)
 N = Next player wins — the current player to move has a winning move available
 */
-export const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+export const smartBotStrategy: Bot = ({ board }) => {
   const T = sum(board) + board.length;
 
   if (T % 2 === 0) {
@@ -80,7 +83,7 @@ export const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
   }
 };
 
-export const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+export const randomBotStrategy: Bot = ({ board }) => {
   const winIn1: MoveAction[] = [];
   board.forEach((_, i) => {
     const next = board.filter((_, idx) => idx !== i);

@@ -143,10 +143,13 @@ export const moves = {
 
 const getAllowedMoves = (board: Board) => range(16).filter(i => board[i] === ALLOWED);
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'colorTriangle', args: [sample(getAllowedMoves(board))] });
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+const smartBotStrategy: Bot = ({ board }) => {
   const optimalMove = getOptimalSmartBotMove(board);
   return { move: 'colorTriangle', args: [optimalMove] };
 };

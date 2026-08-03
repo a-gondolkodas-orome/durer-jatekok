@@ -1,6 +1,10 @@
 import { sample } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import { allMoves, applyBreak, totalGrundy, hasSafeBreak, type Board, type Move } from './helpers';
+import type { moves } from './chocolate-breaking';
+
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 
 const winningMoves = (board: Board): Move[] =>
   allMoves(board.pieces).filter(m => totalGrundy(applyBreak(board, m).pieces) === 0);
@@ -28,8 +32,8 @@ export const getRandomBotMove = (board: Board): Move => {
   return sample(immediateWins.length > 0 ? immediateWins : moves)!;
 };
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board }) =>
+export const smartBotStrategy: Bot = ({ board }) =>
   ({ move: 'breakPiece', args: [getSmartBotMove(board)] });
 
-export const randomBotStrategy: BotStrategy<Board> = ({ board }) =>
+export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'breakPiece', args: [getRandomBotMove(board)] });

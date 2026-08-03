@@ -13,8 +13,12 @@ import {
   isGoalCell,
   topRowIdx,
   ATTACKER,
-  DEFENDER
+  DEFENDER,
+  type moves
 } from "./helpers";
+
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 
 export type { AttackMove };
 
@@ -120,7 +124,7 @@ export const defenderMove = (board: Board): { row: number; col: number } => {
   return { row, col };
 };
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
+export const smartBotStrategy: Bot = ({ board, ctx }) => {
   if (ctx.chosenRoleIndex === ATTACKER) {
     const { row, col } = defenderMove(board);
     return { move: 'defend', args: [{ row, col }] };
@@ -131,7 +135,7 @@ export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
 };
 
 // Test bot: plays randomly, but takes an immediate winning move when offered.
-export const randomBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
+export const randomBotStrategy: Bot = ({ board, ctx }) => {
   const coords = bacteriaCoords(board);
 
   if (ctx.currentPlayer === DEFENDER) {

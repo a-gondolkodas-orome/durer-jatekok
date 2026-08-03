@@ -106,7 +106,10 @@ export const moves = {
   }
 };
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = ({ board }) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
 
@@ -123,7 +126,7 @@ const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
   return { move: 'chooseDigit', args: [sample(availableDigits)] };
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+const smartBotStrategy: Bot = ({ board }) => {
   const turnsLeft = totalDigits - board.digits.length;
   const currentPlayer = (totalDigits - turnsLeft) % 2;
 

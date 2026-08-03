@@ -55,12 +55,15 @@ export const moves = {
   }
 };
 
-const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = ({ board }) => {
   const step = isValidStep(board) ? board : sample([...validSteps].filter(s => s < board))!;
   return { move: 'moveTo', args: [board - step] };
 };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+const smartBotStrategy: Bot = ({ board }) => {
   const remainder = board % 4;
   let step: number;
   if (remainder !== 0) {

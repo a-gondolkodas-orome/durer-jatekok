@@ -53,10 +53,13 @@ export const moves = {
   }
 };
 
-const randomBotStrategy: BotStrategy<Board> = () =>
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
+
+const randomBotStrategy: Bot = () =>
   random(0, 1) === 0 ? { move: 'add1' } : { move: 'subtract' };
 
-const smartBotStrategy: BotStrategy<Board> = ({ board }) => {
+const smartBotStrategy: Bot = ({ board }) => {
   const [a, b] = board;
   if (a <= b) {
     return { move: 'subtract' };
