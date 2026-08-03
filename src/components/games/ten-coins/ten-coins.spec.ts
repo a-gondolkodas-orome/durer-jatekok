@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { mapValues, uniq, range } from 'lodash';
-import { type GameMoves } from '../../strategy-game-factory';
-import { makeCtx } from '../../../test-utils';
+import { uniq, range } from 'lodash';
+import { botArgs, makeCtx } from '../../../test-utils';
 import { isConversionAllowed, moves as gameMoves, smartBotStrategy } from './ten-coins';
 
 describe('isConversionAllowed', () => {
@@ -67,17 +66,14 @@ const moverWins = (set: Vals): boolean => {
 
 const isWinningMove = (result: Vals) => result.length === 1 || !moverWins(result);
 
+// Ask the bot for its move, then play it through the game's own move.
 const driveBot = (set: Vals): Vals => {
   const board = [...set];
-  let captured = board;
   const ctx = makeCtx();
-  const wrapped = mapValues(gameMoves, ({ apply }) => (b: number[], ...args: unknown[]) => {
-    const res = (apply as (...a: unknown[]) => { nextBoard: number[] })(b, { ctx }, ...args);
-    captured = res.nextBoard;
-    return res;
-  }) as unknown as GameMoves<number[]>;
-  smartBotStrategy({ board, ctx, moves: wrapped });
-  return uniq(captured).sort((a, b) => a - b);
+  const named = smartBotStrategy({ board, ctx });
+  const { move } = Array.isArray(named) ? named[0]! : named;
+  const apply = gameMoves[move].apply as (...a: unknown[]) => { nextBoard: number[] };
+  return uniq(apply(board, { ctx }, ...botArgs(named)).nextBoard).sort((a, b) => a - b);
 };
 
 const botCandidates = (set: Vals): Vals[] => {

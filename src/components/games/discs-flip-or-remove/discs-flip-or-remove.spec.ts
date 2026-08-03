@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapValues } from 'lodash';
-import { type GameMoves } from '../../strategy-game-factory';
-import { makeCtx } from '../../../test-utils';
+import { botArgs, makeCtx } from '../../../test-utils';
 import { isFlipAllowed, isRemovalAllowed, moves as gameMoves, smartBotStrategy } from './discs-flip-or-remove';
 
 // board[0] = blue discs, board[1] = red discs.
@@ -72,16 +70,13 @@ const moverWins = (board: Board): boolean => {
   return wins;
 };
 
+// Ask the bot for its move, then play it through the game's own move.
 const driveBot = (board: Board): Board => {
-  let captured: Board = board;
   const ctx = makeCtx();
-  const wrapped = mapValues(gameMoves, ({ apply }) => (b: Board, ...args: unknown[]) => {
-    const res = (apply as (...a: unknown[]) => { nextBoard: Board })(b, { ctx }, ...args);
-    captured = res.nextBoard;
-    return res;
-  }) as unknown as GameMoves<Board>;
-  smartBotStrategy({ board, ctx, moves: wrapped });
-  return captured;
+  const named = smartBotStrategy({ board, ctx });
+  const { move } = Array.isArray(named) ? named[0]! : named;
+  const apply = gameMoves[move].apply as (...a: unknown[]) => { nextBoard: Board };
+  return apply(board, { ctx }, ...botArgs(named)).nextBoard;
 };
 
 const botCandidates = (board: Board): Board[] => {

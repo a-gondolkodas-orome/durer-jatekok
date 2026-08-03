@@ -51,7 +51,14 @@ must be covered by new unit tests. Prefer adding tests before or alongside the
 change, not as an afterthought.
 
 Game-specific logic is also worth testing when the winning strategy is
-non-trivial.
+non-trivial. Because bots name their moves, a spec can read a decision straight
+off the return value (`botArgs` in `test-utils`), and `runMatch`
+(`strategy-game-factory/engine/run-match.ts`) plays two strategies against each
+other through the real moves and the real reducer — no fake `moves` object, no
+hand-rolled game loop. That is what turns "the AI is truly optimal" into a test:
+the smart bot must win from every winning start board as the mover, and from
+every losing one as the replier (see `coins-in-3-piles`,
+`remove-row-or-column`).
 
 ## Planned future directions
 
@@ -139,14 +146,23 @@ ownership) AND the move's `validate` (when defined), with `ctx` already bound.
 Drive button `disabled` state with it. Because the engine applies the same
 check to every client dispatch, click handlers need no `if (!allowed) return`
 guards — keep one only when the handler couples local UI state to a successful
-move (see `cube-coloring`'s colour-selection reset). Not for bots: their
-`moves` copy carries no `isAllowed` (during the bot's turn
-`isClientMoveAllowed` is false by design), so bots enumerate legal moves via
-the raw `validate`/helpers instead. The two wrappings have two types:
-`ClientGameMoves` (what `BoardClientProps.moves` is — `isAllowed` guaranteed,
-so no `!` at the call site) and the wider `GameMoves` (what `StrategyArgs.moves`
-is — dispatch only). `ClientGameMoves` is assignable to `GameMoves`, so a
-helper shared between a `BoardClient` and a bot takes `GameMoves`.
+move (see `cube-coloring`'s colour-selection reset). Not for bots: a bot is
+handed no move wrappers at all (see the bot contract below), so it enumerates
+legal moves via the raw `validate`/helpers instead.
+
+**Bot contract** — a `botStrategy` is a pure function of the position,
+`({ board, ctx }) => BotMove | BotMove[]`, where a `BotMove` is
+`{ move: string, args?: unknown[] }`. It **names** the move it wants rather than
+playing it: no move wrappers, no board to thread, no `setTimeout`. Naming a
+whole turn at once is the right shape when the turn is one decision made of
+several moves (`pile-splitter`: discard a pile, split another; `magic-box`:
+place a stone, designate a line); naming one move and being asked again with
+the updated `board`/`ctx` is equally fine (`take-and-point`). The engine
+(`engine/bot-turn.ts`) plays the named moves out — with `BOT_STEP_DELAY`
+between them in the browser so the bot appears to think, immediately in a
+headless match — and asks the strategy again while the turn is still its own.
+Naming a move after the turn ended is a bug (dev: throw); naming moves the
+game-winning move made moot is fine (they are dropped).
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes
@@ -210,7 +226,8 @@ in-repo.
 - Clear what the player should do next (`getPlayerStepDescription`)
 - Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
 - Mobile-friendly and keyboard-navigable
-- AI appears to "think" in multi-move turns (use `setTimeout`)
+- The bot names its moves and schedules nothing: the engine paces multi-move
+  turns so the AI appears to "think"
 
 ### Bot / variant conventions
 

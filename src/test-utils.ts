@@ -1,4 +1,4 @@
-import type { Ctx } from './components/strategy-game-factory';
+import type { BotMove, Ctx } from './components/strategy-game-factory';
 
 // Mock `ctx` for testing move functions and bot strategies.
 export const makeCtx = (overrides: Partial<Ctx> = {}): Ctx => ({
@@ -13,3 +13,9 @@ export const makeCtx = (overrides: Partial<Ctx> = {}): Ctx => ({
   moveCount: 0,
   ...overrides
 });
+
+// A bot names its moves rather than playing them, so a spec reads its decision
+// straight off the return value. `botArgs` pulls the arguments of the move it
+// named (the first one, for a bot that named a whole turn).
+export const botArgs = (named: BotMove | BotMove[]): any[] =>
+  (Array.isArray(named) ? named[0]! : named).args ?? [];

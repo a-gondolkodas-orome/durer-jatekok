@@ -167,9 +167,9 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   </GameBoard>
 };
 
-const botStrategy = ({ board, moves }: StrategyArgs<Board>) => {
+const botStrategy: BotStrategy<Board> = ({ board }) => {
   const optimalStep = board % 3 === 0 ? 1 : (3 - board % 3)
-  moves.addNumber(board, optimalStep);
+  return { move: 'addNumber', args: [optimalStep] };
 };
 
 export const PlusOneTwo = strategyGameFactory({
@@ -274,11 +274,9 @@ bound) for the `BoardClient`'s `disabled` state. Full contract in
   fully opt-in and moves with trivial legality simply omit it.
 - Keep the "whose turn is it" check out of `validate` — `isAllowed` folds
   `ctx.isClientMoveAllowed` in for you.
-- `isAllowed` is not for bots: during the bot's turn `isClientMoveAllowed` is
-  false by design, so bots enumerate legal moves via the raw `validate`/helpers.
-  That split is in the types too: `BoardClientProps.moves` is
-  `ClientGameMoves` (`isAllowed` guaranteed), `StrategyArgs.moves` is the wider
-  `GameMoves` (dispatch only).
+- `isAllowed` is not for bots: a bot is handed no move wrappers at all (it
+  names moves, see below), so it enumerates legal moves via the raw
+  `validate`/helpers.
 - `validate` is React-free, so a future authoritative/competition server could
   run the exact same predicate.
 - Worked examples: `coins-in-3-piles` (two-phase turn), `cube-coloring` (reuses
@@ -304,11 +302,46 @@ hover events.
 
 ### Bot strategy
 
-Given `board` and `ctx` what move(s) should the bot make?
+Given `board` and `ctx`, what move(s) should the bot make? A bot *names* its
+moves rather than playing them: it returns `{ move, args }`, or an array of
+those when the turn is one decision made up of several moves. The engine plays
+them out — with a pause between them in the browser, so the bot appears to
+think, and instantly in a headless match. A bot therefore never calls a move,
+never threads a board and never uses `setTimeout`.
 
-To emulate thinking time for bot in case of multiple moves within a turn,
-subsequent moves must be wrapped in setTimeout, this is not (yet) handled by the
-framework.
+```ts
+const smartBotStrategy: BotStrategy<Board> = ({ board }) =>
+  ({ move: 'removeCoin', args: [coinToRemove(board)] });
+```
+
+If the named moves leave the turn unfinished, the bot is simply asked again with
+the updated `board` and `ctx`, so naming one move at a time is equally fine —
+see `magic-box` (named as a whole) and `take-and-point` (asked again).
+
+Because a bot is a pure function of the position, its spec can just read what it
+returned (`botArgs` in `test-utils`), and `runMatch` can play two of them
+against each other through the real engine — see below.
+
+### Testing a bot with runMatch
+
+`runMatch` (exported from `strategy-game-factory`) plays a whole game outside
+React: real moves, real validators, real win detection, no fake `moves` object
+and no hand-rolled game loop.
+
+```ts
+const { winnerIndex, history } = runMatch({
+  gameplay: { moves },
+  strategies: [smartBotStrategy, randomBotStrategy],
+  startBoard
+});
+```
+
+Use it to check the thing the checklist asks for — that the smart bot really is
+optimal: from every start board the mover can win, it must win as the mover, and
+from every board the mover cannot win, it must win as the replier. See
+`coins-in-3-piles` and `remove-row-or-column` for worked examples. The same
+function is the browser-free half of the match loop a competition server would
+need (`docs/real-competitions-plan.md`).
 
 ## state provided and handled by "framework" (strategyGameFactory)
 
@@ -347,8 +380,8 @@ instead.
 - is the game (mostly) mobile-friendly?
 - is the game usable only with keyboard (without a mouse)?
 - is it clear what the player should do next?
-- pretend the bot is thinking in turns with multiple moves (for one move it is
-  handled by framework)
+- the bot's thinking time (including between the moves of one turn) is handled
+  by the framework — a bot must never schedule anything itself
 
 ## Internationalisation (i18n)
 

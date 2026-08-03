@@ -1,27 +1,19 @@
 import { sum, isEqual, sample, range } from 'lodash';
-import type { StrategyArgs } from '../../../strategy-game-factory';
+import type { BotMove, BotStrategy } from '../../../strategy-game-factory';
 import type { Board } from './five-squares';
 
-export const randomBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
-  if (ctx.currentPlayer === 1) {
-    const { nextBoard } = moves.addPiece(board, sample(range(5)));
-    setTimeout(() => {
-      moves.addPiece(nextBoard, sample(range(5)));
-    }, 750);
-  } else {
-    moves.addPiece(board, sample(range(5)));
-  }
-};
+// The second player places two squares per turn, chosen together (see
+// bestPairs), so the turn is named as a whole.
+const asTurn = (squares: (number | undefined)[]): BotMove[] =>
+  squares.map(square => ({ move: 'addPiece', args: [square] }));
 
-export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => {
+export const randomBotStrategy: BotStrategy<Board> = ({ ctx }) =>
+  asTurn(ctx.currentPlayer === 1 ? [sample(range(5)), sample(range(5))] : [sample(range(5))]);
+
+export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
   const botPlayerIndex = ctx.currentPlayer!;
   if (botPlayerIndex === 1) {
-    const pairs = bestPairs(board, botPlayerIndex);
-    const pair = sample(pairs)!;
-    const { nextBoard } = moves.addPiece(board, pair[0]);
-    setTimeout(() => {
-      moves.addPiece(nextBoard, pair[1]);
-    }, 750);
+    return asTurn(sample(bestPairs(board, botPlayerIndex))!);
   } else {
     const scores = range(5).map(i => {
       const next = [...board] as Board;
@@ -30,7 +22,7 @@ export const smartBotStrategy = ({ board, ctx, moves }: StrategyArgs<Board>) => 
     });
     const best = Math.max(...scores);
     const bestTiles = range(5).filter(i => scores[i] === best);
-    moves.addPiece(board, sample(bestTiles));
+    return asTurn([sample(bestTiles)]);
   }
 };
 
