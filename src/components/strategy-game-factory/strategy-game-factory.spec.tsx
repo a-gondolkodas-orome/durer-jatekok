@@ -91,6 +91,18 @@ describe('Bot behavior by mode', () => {
     expect(botStrategy).not.toHaveBeenCalled();
   });
 
+  // A scheduled bot step must not outlive the game: the player may navigate
+  // away mid-turn, and a stray timer would move in a store nobody is rendering.
+  it('drops a scheduled bot turn when the game unmounts', () => {
+    const botStrategy = vi.fn((): BotMove => ({ move: 'mainMove' }));
+    const { getByTestId, unmount } = renderGame(ctxAwareConfig(botStrategy));
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn scheduled
+    unmount();
+    act(() => { vi.advanceTimersByTime(10_000); });
+    expect(botStrategy).not.toHaveBeenCalled();
+  });
+
   it('calls botStrategy when it becomes the computer turn', () => {
     const botStrategy = vi.fn((): BotMove => ({ move: 'mainMove' }));
     const { getByTestId } = renderGame(ctxAwareConfig(botStrategy));

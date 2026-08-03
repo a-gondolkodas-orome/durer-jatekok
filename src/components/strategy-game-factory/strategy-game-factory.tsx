@@ -81,6 +81,12 @@ export const strategyGameFactory = <TBoard,>({
       localStorage.setItem('durer-player-names', JSON.stringify(playerNames));
     }, [playerNames]);
 
+    // A bot step (or auto endOfTurnMove) scheduled when the player navigates
+    // away would otherwise still fire, moving in a game nobody is watching.
+    useEffect(() => () => {
+      if (botTimeoutRef.current !== null) clearTimeout(botTimeoutRef.current);
+    }, []);
+
     const isHumanVsHumanGame = mode === 'vsHuman';
 
     const gameId = useLocation().pathname.split('/').pop()!;
@@ -252,8 +258,12 @@ export const strategyGameFactory = <TBoard,>({
       const named = asBotMoves(botStrategy({
         board: state.board, ctx: buildCtx(state, resolvedPlayerNames)
       }));
+      // Naming nothing leaves the turn with the bot forever, so it is a bug in
+      // the strategy — loud in dev, and in prod a stalled bot beats a crash.
       if (!named.length) {
-        throw new Error('strategyGameFactory: botStrategy named no move to play');
+        const message = 'strategyGameFactory: botStrategy named no move to play';
+        if (import.meta.env.DEV) throw new Error(message);
+        console.warn(message);
       }
       return named;
     };
@@ -267,7 +277,9 @@ export const strategyGameFactory = <TBoard,>({
       botTimeoutRef.current = setTimeout(() => {
         botTimeoutRef.current = null;
         const playerBefore = store.getState().currentPlayer!;
-        const [{ move, args = [] }, ...rest] = queue.length ? queue : askBot(botStrategy!);
+        const named = queue.length ? queue : askBot(botStrategy!);
+        if (!named.length) return;
+        const [{ move, args = [] }, ...rest] = named;
         // The board comes from the store, so a bot has no board to pass and
         // therefore no way to pass a stale one.
         wrappedGameMoves[move]!(store.getState().board, ...args);
