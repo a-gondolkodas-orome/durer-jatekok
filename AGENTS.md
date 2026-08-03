@@ -56,9 +56,15 @@ off the return value (`botArgs` in `test-utils`), and `runMatch`
 (`strategy-game-factory/engine/run-match.ts`) plays two strategies against each
 other through the real moves and the real reducer — no fake `moves` object, no
 hand-rolled game loop. That is what turns "the AI is truly optimal" into a test:
-the smart bot must win from every winning start board as the mover, and from
-every losing one as the replier (see `coins-in-3-piles`,
-`remove-row-or-column`).
+the smart bot must win as the mover from a winning start board, and as the
+replier from a losing one (see `coins-in-3-piles`, `remove-row-or-column`).
+
+Size the sweep to what the strategy costs. Sweeping every start board is right
+for a cheap strategy over a small state space (`coins-in-3-piles`: 124 boards,
+~50 ms) and wrong for one that searches (`totem-poles`: ~3 s for a handful of
+playouts). For those, play a few representative boards and leave the exhaustive
+argument to cheap unit tests of the characterisation itself — the Grundy value,
+the parity invariant, the win/loss predicate.
 
 ## Planned future directions
 
@@ -217,7 +223,10 @@ Two conventions to keep in mind:
   `nextBoard` when chaining moves within a turn. The store board is
   authoritative regardless — in dev the engine **throws** on a mismatch
   ("stale board passed to move …", converting a chaining bug into a loud,
-  located error), in prod the store board silently wins.
+  located error), in prod the store board silently wins. The argument stays
+  because it keeps a move a pure function of its inputs, callable on
+  hypothetical boards outside a live game — bot look-ahead and specs both do
+  that.
 - The `engine/` modules are React-free by design — they are the seed of the
   headless engine a future server-authoritative competition mode needs (see
   `docs/real-competitions-plan.md` and issue #313). Don't import React (or
@@ -243,6 +252,9 @@ in-repo.
 - Clear what the player should do next (`getPlayerStepDescription`)
 - Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
 - Mobile-friendly and keyboard-navigable
+- Player can undo within a multi-move turn where that applies
+- Neither `board` nor `ctx` is ever modified in place
+- Watching the bot play does not give the winning strategy away outright
 - The bot names its moves and schedules nothing: the engine paces multi-move
   turns so the AI appears to "think"
 
