@@ -75,7 +75,7 @@ const { winnerIndex } = runMatch({
 Assert what the checklist asks for: the smart bot wins as the mover from a
 board the mover can win, and as the replier from one it cannot (every move
 loses there, so any opponent must lose). A spec for a single decision needs no
-mock either — read it with `botArgs` from `test-utils`.
+mock either — read it with `botNextMoveArgs` from `test-utils`.
 
 **How many boards to sweep depends on what the strategy costs** — exhaustive
 where it is cheap, a few representative boards where it searches, with the

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { uniq, range } from 'lodash';
-import { botArgs, makeCtx } from '../../../test-utils';
+import { playBotMove } from '../../../test-utils';
 import { isConversionAllowed, moves as gameMoves, smartBotStrategy } from './ten-coins';
 
 describe('isConversionAllowed', () => {
@@ -66,15 +66,8 @@ const moverWins = (set: Vals): boolean => {
 
 const isWinningMove = (result: Vals) => result.length === 1 || !moverWins(result);
 
-// Ask the bot for its move, then play it through the game's own move.
-const driveBot = (set: Vals): Vals => {
-  const board = [...set];
-  const ctx = makeCtx();
-  const named = smartBotStrategy({ board, ctx });
-  const { move } = Array.isArray(named) ? named[0]! : named;
-  const apply = gameMoves[move].apply as (...a: unknown[]) => { nextBoard: number[] };
-  return uniq(apply(board, { ctx }, ...botArgs(named)).nextBoard).sort((a, b) => a - b);
-};
+const driveBot = (set: Vals): Vals =>
+  uniq(playBotMove(smartBotStrategy, gameMoves, [...set])).sort((a, b) => a - b);
 
 const botCandidates = (set: Vals): Vals[] => {
   const seen = new Map<string, Vals>();

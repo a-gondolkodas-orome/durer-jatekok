@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { botArgs, makeCtx } from '../../../test-utils';
+import { playBotMove } from '../../../test-utils';
 import { isFlipAllowed, isRemovalAllowed, moves as gameMoves, smartBotStrategy } from './discs-flip-or-remove';
 
 // board[0] = blue discs, board[1] = red discs.
@@ -70,19 +70,10 @@ const moverWins = (board: Board): boolean => {
   return wins;
 };
 
-// Ask the bot for its move, then play it through the game's own move.
-const driveBot = (board: Board): Board => {
-  const ctx = makeCtx();
-  const named = smartBotStrategy({ board, ctx });
-  const { move } = Array.isArray(named) ? named[0]! : named;
-  const apply = gameMoves[move].apply as (...a: unknown[]) => { nextBoard: Board };
-  return apply(board, { ctx }, ...botArgs(named)).nextBoard;
-};
-
 const botCandidates = (board: Board): Board[] => {
   const seen = new Map<string, Board>();
   for (let i = 0; i < 40; i++) {
-    const next = driveBot(board);
+    const next = playBotMove(smartBotStrategy, gameMoves, board);
     seen.set(key(next), next);
   }
   return [...seen.values()];

@@ -1,5 +1,5 @@
 import { smartBotStrategy } from './bot-strategy';
-import { botArgs, makeCtx } from '../../../../test-utils';
+import { botNextMoveArgs, makeCtx } from '../../../../test-utils';
 
 describe('smartBotStrategy', () => {
   describe('new piece placing phase', () => {
@@ -9,7 +9,7 @@ describe('smartBotStrategy', () => {
         null, null, null,
         'blue', 'blue', null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(2);
     });
@@ -20,7 +20,7 @@ describe('smartBotStrategy', () => {
         null, null, null,
         'blue', 'blue', null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(0);
     });
@@ -31,7 +31,7 @@ describe('smartBotStrategy', () => {
         null, 'red', null,
         null, null, 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(6);
     });
@@ -42,7 +42,7 @@ describe('smartBotStrategy', () => {
         'blue', null, null,
         null, 'red', null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(6);
     });
@@ -53,7 +53,7 @@ describe('smartBotStrategy', () => {
         null, null, null,
         null, null, null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(4);
     });
@@ -64,7 +64,7 @@ describe('smartBotStrategy', () => {
         null, 'blue', null,
         null, null, null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect([0, 2, 6, 8]).toContain(played[0]);
     });
@@ -75,7 +75,7 @@ describe('smartBotStrategy', () => {
         null, 'blue', null,
         null, null, 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect([2, 6]).toContain(played[0]);
     });
@@ -88,7 +88,7 @@ describe('smartBotStrategy', () => {
         'red', 'blue', 'blue',
         'blue', 'red', 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(4);
     });
@@ -99,7 +99,7 @@ describe('smartBotStrategy', () => {
         'white', 'white', 'blue',
         'blue', 'red', 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
 
       expect(played).toContain(5);
     });
@@ -111,7 +111,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'blue',
           'blue', 'red', 'blue'
         ]
-        const played1 = botArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
+        const played1 = botNextMoveArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
 
         expect([3, 5]).toContain(played1[0]);
 
@@ -120,7 +120,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'red',
           'red', 'blue', 'blue'
         ]
-        const played2 = botArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
+        const played2 = botNextMoveArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
         expect([7, 1]).toContain(played2[0]);
       });
 
@@ -130,7 +130,7 @@ describe('smartBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'red', 'blue'
         ]
-        const played1 = botArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
+        const played1 = botNextMoveArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
         expect(played1).toContain(8);
 
         const board2 = [
@@ -138,7 +138,7 @@ describe('smartBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'white', 'blue'
         ]
-        const played2 = botArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
+        const played2 = botNextMoveArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
         expect(played2).toContain(8);
 
         const board3 = [
@@ -146,7 +146,7 @@ describe('smartBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'blue', 'red'
         ]
-        const played3 = botArgs(smartBotStrategy({ board: board3, ctx: makeCtx() }));
+        const played3 = botNextMoveArgs(smartBotStrategy({ board: board3, ctx: makeCtx() }));
         expect(played3).toContain(6);
 
         const board4 = [
@@ -154,7 +154,7 @@ describe('smartBotStrategy', () => {
           'red', 'red', 'blue',
           'blue', 'blue', 'white'
         ]
-        const played4 = botArgs(smartBotStrategy({ board: board4, ctx: makeCtx() }));
+        const played4 = botNextMoveArgs(smartBotStrategy({ board: board4, ctx: makeCtx() }));
         expect(played4).toContain(6);
 
         const board5 = [
@@ -162,7 +162,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'blue', 'red'
         ]
-        const played5 = botArgs(smartBotStrategy({ board: board5, ctx: makeCtx() }));
+        const played5 = botNextMoveArgs(smartBotStrategy({ board: board5, ctx: makeCtx() }));
         expect(played5).toContain(0);
 
         const board6 = [
@@ -170,7 +170,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'white',
           'white', 'blue', 'red'
         ]
-        const played6 = botArgs(smartBotStrategy({ board: board6, ctx: makeCtx() }));
+        const played6 = botNextMoveArgs(smartBotStrategy({ board: board6, ctx: makeCtx() }));
         expect(played6).toContain(0);
 
         const board7 = [
@@ -178,7 +178,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'white', 'blue'
         ]
-        const played7 = botArgs(smartBotStrategy({ board: board7, ctx: makeCtx() }));
+        const played7 = botNextMoveArgs(smartBotStrategy({ board: board7, ctx: makeCtx() }));
         expect(played7).toContain(2);
 
         const board8 = [
@@ -186,7 +186,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'red',
           'red', 'white', 'blue'
         ]
-        const played8 = botArgs(smartBotStrategy({ board: board8, ctx: makeCtx() }));
+        const played8 = botNextMoveArgs(smartBotStrategy({ board: board8, ctx: makeCtx() }));
         expect(played8).toContain(2);
       });
     });
@@ -198,7 +198,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'red',
           'blue', 'red', 'blue'
         ]
-        const played = botArgs(smartBotStrategy({ board, ctx: makeCtx() }));
+        const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }));
         expect([2, 6]).toContain(played[0]);
       });
 
@@ -208,7 +208,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'red',
           'blue', 'white', 'blue'
         ]
-        const played1 = botArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
+        const played1 = botNextMoveArgs(smartBotStrategy({ board: board1, ctx: makeCtx() }));
         expect(played1).toContain(3);
 
         const board2 = [
@@ -216,7 +216,7 @@ describe('smartBotStrategy', () => {
           'white', 'red', 'blue',
           'blue', 'red', 'white'
         ]
-        const played2 = botArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
+        const played2 = botNextMoveArgs(smartBotStrategy({ board: board2, ctx: makeCtx() }));
         expect(played2).toContain(1);
 
         const board3 = [
@@ -224,7 +224,7 @@ describe('smartBotStrategy', () => {
           'red', 'red', 'blue',
           'white', 'blue', 'red'
         ]
-        const played3 = botArgs(smartBotStrategy({ board: board3, ctx: makeCtx() }));
+        const played3 = botNextMoveArgs(smartBotStrategy({ board: board3, ctx: makeCtx() }));
         expect(played3).toContain(5);
 
         const board4 = [
@@ -232,7 +232,7 @@ describe('smartBotStrategy', () => {
           'blue', 'red', 'white',
           'red', 'blue', 'blue'
         ]
-        const played4 = botArgs(smartBotStrategy({ board: board4, ctx: makeCtx() }));
+        const played4 = botNextMoveArgs(smartBotStrategy({ board: board4, ctx: makeCtx() }));
         expect(played4).toContain(7);
       });
     });

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { type BotStrategy } from '../../strategy-game-factory';
-import { makeCtx } from '../../../test-utils';
+import { botNextMove, makeCtx } from '../../../test-utils';
 import {
   type Board,
   type Cell,
@@ -18,8 +18,7 @@ import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 // Run one strategy for `player` on `cells` and return the resulting cells.
 const decide = (strategy: BotStrategy<Board>, cells: Cell[], player: number): Cell[] => {
   const ctx = makeCtx({ currentPlayer: player, isClientMoveAllowed: true, phase: 'play' });
-  const named = strategy({ board: { cells }, ctx });
-  const { move, args = [] } = Array.isArray(named) ? named[0]! : named;
+  const { move, args = [] } = botNextMove(strategy({ board: { cells }, ctx }));
   if (move === 'pass') return [...cells];
   const asMove: Move = move === 'moveDisc'
     ? { type: 'move', from: args[0] as number, to: args[1] as number }
