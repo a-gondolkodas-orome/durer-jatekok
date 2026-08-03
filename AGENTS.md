@@ -178,14 +178,14 @@ error — follow suit in a new game:
 ```ts
 import type { Board, moves } from './helpers';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const smartBotStrategy: Bot = ({ board }) => ({ move: 'removeLine', args: [choice] });
 ```
 
-A helper that builds the moves narrows with them: `BotMove<MoveName>[]` (see
-`coins-in-3-piles`'s `asTurn`).
+Give the union its own `type MoveName = keyof typeof moves` alias only where
+something else names it too — a helper that builds a turn's moves returns
+`BotMove<MoveName>[]` (see `coins-in-3-piles`'s `asTurn`).
 
 **`ctx`** fields available in moves and `BoardClient`:
 - `currentPlayer`: 0/1 — use this for game logic in both modes

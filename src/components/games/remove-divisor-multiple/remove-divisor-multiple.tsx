@@ -82,8 +82,7 @@ const isGameEnd = (board: Board) => {
   return possibleMoves.length === 0;
 }
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) => {
   const possibleMoves = range(1, board.numbersOnTable.length + 1)

@@ -2,8 +2,7 @@ import { sum, isEqual, sample, range } from 'lodash';
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { Board, moves } from './two-times-two';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = () =>
   ({ move: 'addPiece', args: [sample(range(0, 4))] });

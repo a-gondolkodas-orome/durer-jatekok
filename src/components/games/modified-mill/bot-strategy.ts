@@ -6,8 +6,7 @@ import {
 } from './helpers';
 import type { moves } from './modified-mill';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 import strategyTable from './strategy.json';
 
 const STRATEGY: Record<string, number> = strategyTable;

@@ -129,8 +129,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   );
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) => {
   const validMoves = allPrimePowers.filter(e => e.value <= board);

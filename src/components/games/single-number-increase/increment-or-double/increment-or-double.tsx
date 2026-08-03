@@ -61,8 +61,7 @@ export const getBotNextNumber = (board: Board): number => {
   return sample([board + 1, board * 2])!;
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const smartBotStrategy: Bot = ({ board }) => {
   const next = getBotNextNumber(board);

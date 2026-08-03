@@ -11,8 +11,7 @@ import {
 } from './helpers';
 import type { moves } from './matches-on-edges';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 // A move is winning if it leaves the other player (who moves next) in a losing
 // position.

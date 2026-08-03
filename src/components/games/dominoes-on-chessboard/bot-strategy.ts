@@ -4,8 +4,7 @@ import {
   type Board, type Domino, type Field, type moves, ALL_FIELDS, BOARDSIZE, getPossibleMoves
 } from './dominoes-on-chessboard';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'placeDomino', args: [sample(getPossibleMoves(board))] });

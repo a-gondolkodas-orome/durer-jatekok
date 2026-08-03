@@ -3,8 +3,7 @@ import type { BotStrategy } from '../../strategy-game-factory';
 import { markForbiddenFields, getAllowedMoves, boardIndices, BISHOP, type Board, type Field } from './helpers';
 import type { moves } from './chess-bishops';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const HORIZONTAL = "h" as const;
 const VERTICAL = "v" as const;

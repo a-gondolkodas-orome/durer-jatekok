@@ -10,8 +10,7 @@ import { makeMoveEvaluator } from './search';
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { moves } from '../triangle-circle-game';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 // Smart bot.
 //

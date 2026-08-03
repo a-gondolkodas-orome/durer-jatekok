@@ -106,8 +106,7 @@ export const moves = {
   }
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) => {
   const turnsLeft = totalDigits - board.digits.length;

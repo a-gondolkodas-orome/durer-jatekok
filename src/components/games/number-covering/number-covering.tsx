@@ -41,8 +41,7 @@ const BoardClient = ({ board, moves }: BoardClientProps<Board>) => {
   );
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'coverNumber', args: [sample(getRemaining(board))] });

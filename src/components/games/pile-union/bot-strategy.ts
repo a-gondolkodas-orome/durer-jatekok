@@ -2,8 +2,7 @@ import { sample, sortBy, sum } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import type { Board, moves } from './pile-union';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 type MoveAction = { type: 'remove'; i: number } | { type: 'merge'; i: number; j: number }
 

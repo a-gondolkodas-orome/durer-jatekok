@@ -5,8 +5,7 @@ import {
 } from './helpers';
 import type { moves } from './amor-and-cupido';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 // Game value of a position, memoised by canonical (isomorphism-reduced) key.
 // Shared across calls/tests: the value depends only on the position and who is

@@ -70,8 +70,7 @@ export const moves = {
   }
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) => {
   if (board % 2 === 0 && random(0, 1) === 0) {

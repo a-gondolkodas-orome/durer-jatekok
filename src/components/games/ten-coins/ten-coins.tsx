@@ -176,8 +176,7 @@ export const moves = {
 // Smart bot: play the winning move when one exists (drive towards a losing
 // position, or merge to a single value). In a losing position, make the reply
 // that leaves the opponent with the most ways to blunder.
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const smartBotStrategy: Bot = ({ board }) => {
   const candidateMoves = movesFromSet(distinctValues(board));

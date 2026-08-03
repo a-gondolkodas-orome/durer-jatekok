@@ -17,8 +17,7 @@ import {
   type moves
 } from "./helpers";
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export type { AttackMove };
 

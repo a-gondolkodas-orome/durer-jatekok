@@ -3,8 +3,7 @@ import type { BotStrategy } from '../../strategy-game-factory';
 import { getAllowedMoves, isTarget, type Board, type Field } from './helpers';
 import type { moves } from './rook-to-corner';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'moveRook', args: [getRandomBotMove(board)] });

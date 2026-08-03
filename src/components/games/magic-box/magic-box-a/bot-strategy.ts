@@ -3,8 +3,7 @@ import { isGameEnd, placeStone, type Board } from './helpers';
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { moves } from './magic-box-a';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'placeStone', args: [sample(emptyCells(board))] });

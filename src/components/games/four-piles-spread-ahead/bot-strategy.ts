@@ -2,8 +2,7 @@ import { random, sample, range } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import type { Board, moves } from './four-piles-spread-ahead';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) => {
   const validMoves: { pileId: number; pieceCount: number }[] = [];

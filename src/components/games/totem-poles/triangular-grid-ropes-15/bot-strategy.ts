@@ -4,8 +4,7 @@ import { findWinningMove } from './solver';
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { moves } from './triangular-grid-ropes-15';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 //         0
 //        1 2

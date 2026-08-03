@@ -2,8 +2,7 @@ import { random, sample } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import type { Board, moves } from './bank-robbers';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const smartBotStrategy: Bot = ({ board }) => {
   let bankIndex = 0;

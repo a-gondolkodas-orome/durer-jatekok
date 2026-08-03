@@ -2,8 +2,7 @@ import { random } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import { SULTAN, type Board, type SoldierColor, type Soldier, type moves } from './helpers';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const smartBotStrategy: Bot = ({ board, ctx }) => {
   if (ctx.chosenRoleIndex === SULTAN) {

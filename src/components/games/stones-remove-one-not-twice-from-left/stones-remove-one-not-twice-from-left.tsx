@@ -95,8 +95,7 @@ const isGameEnd = (board, ctx) => {
   return false;
 }
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board, ctx }) =>
   ({ move: 'removeStone', args: [getPileOfRandomAllowedMove(board, ctx)] });

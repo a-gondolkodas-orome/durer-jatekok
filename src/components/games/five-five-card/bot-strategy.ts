@@ -2,8 +2,7 @@ import { sample, range } from 'lodash';
 import type { BotStrategy } from '../../strategy-game-factory';
 import { type Board, getWinnerIndex, type moves } from './five-five-card';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board, ctx }) => {
   const opponentIdx = ctx.chosenRoleIndex!;

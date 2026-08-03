@@ -2,8 +2,7 @@ import { getBoardIndices, withDuckPlaced, getAllowedMoves, type Board, type Fiel
 import { type BotStrategy } from "../../strategy-game-factory";
 import { shuffle, sample } from "lodash";
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 /* This strategy file is relevant for the 4x7 case */
 const [ROWS, COLS] = [4, 7];

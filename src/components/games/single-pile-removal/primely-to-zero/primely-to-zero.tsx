@@ -55,8 +55,7 @@ export const moves = {
   }
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const randomBotStrategy: Bot = ({ board }) => {
   const step = isValidStep(board) ? board : sample([...validSteps].filter(s => s < board))!;

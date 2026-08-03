@@ -4,8 +4,7 @@ import { roleColors, hasFirstPlayerWon, isGameEnd, type Board } from './helpers'
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { moves } from './anti-tictactoe';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'placePiece', args: [sample(emptyCells(board))] });

@@ -5,8 +5,7 @@ import {
 } from './helpers';
 import type { moves } from './polynomial-building';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 // Weak bot: plays a random legal move, but completes to a win on the last move
 // when it can (only the first player, who always makes the final move, can win in 1).

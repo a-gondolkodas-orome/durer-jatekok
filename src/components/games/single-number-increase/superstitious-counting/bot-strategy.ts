@@ -2,8 +2,7 @@ import { random } from 'lodash';
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { Board, moves } from './superstitious-counting';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'step', args: [randomStep(board.restricted)] });

@@ -52,8 +52,7 @@ export const moves = {
   }
 };
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 const smartBotStrategy: Bot = ({ board }) => {
   const nextBoard = board % (1 + maxStep) !== 0

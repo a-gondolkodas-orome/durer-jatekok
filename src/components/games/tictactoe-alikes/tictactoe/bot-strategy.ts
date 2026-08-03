@@ -3,8 +3,7 @@ import { pColor, botColor, inPlacingPhase, isGameEnd, type Board } from './helpe
 import type { BotStrategy } from '../../../strategy-game-factory';
 import type { moves } from './tictactoe';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) => {
   const allowedPlaces = getAllowedPlaces({ board, amIBot: true });

@@ -3,8 +3,7 @@ import { Sheriff, Thief, hasWinningTriple, getUntakenCards, type Board } from '.
 import { type BotStrategy } from '../../../strategy-game-factory';
 import { applyTakeCard, CARD_COUNT, type moves } from './moves';
 
-type MoveName = keyof typeof moves
-type Bot = BotStrategy<Board, MoveName>
+type Bot = BotStrategy<Board, keyof typeof moves>
 
 export const randomBotStrategy: Bot = ({ board }) =>
   ({ move: 'takeCard', args: [sample(getUntakenCards(board, CARD_COUNT))] });
