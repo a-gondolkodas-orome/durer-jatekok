@@ -221,7 +221,10 @@ Two conventions to keep in mind:
   `nextBoard` when chaining moves within a turn. The store board is
   authoritative regardless — in dev the engine **throws** on a mismatch
   ("stale board passed to move …", converting a chaining bug into a loud,
-  located error), in prod the store board silently wins.
+  located error), in prod the store board silently wins. The argument stays
+  because it keeps a move a pure function of its inputs, callable on
+  hypothetical boards outside a live game — bot look-ahead and specs both do
+  that.
 - The `engine/` modules are React-free by design — they are the seed of the
   headless engine a future server-authoritative competition mode needs (see
   `docs/real-competitions-plan.md` and issue #313). Don't import React (or
@@ -247,6 +250,9 @@ in-repo.
 - Clear what the player should do next (`getPlayerStepDescription`)
 - Interactions disabled during the other player's turn (`ctx.isClientMoveAllowed`)
 - Mobile-friendly and keyboard-navigable
+- Player can undo within a multi-move turn where that applies
+- Neither `board` nor `ctx` is ever modified in place
+- Watching the bot play does not give the winning strategy away outright
 - The bot names its moves and schedules nothing: the engine paces multi-move
   turns so the AI appears to "think"
 
