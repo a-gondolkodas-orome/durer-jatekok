@@ -51,6 +51,7 @@ Create `src/components/games/<game-name>/<game-name>.tsx`. Follow the `strategyG
 - `getPlayerStepDescription` should make it obvious what the current player should do
 - For user-facing text referring to the other participant, prefer "other player" / "másik játékos" over "opponent" / "ellenfél" — the latter reads as too harsh, especially in Hungarian
 - A `botStrategy` is a pure function of the position: it *names* the move it wants — `({ board, ctx }) => ({ move, args })` — rather than playing it, and never schedules anything. When a turn is one decision made of several moves, name them all (`({ board, ctx }) => [{ move, args }, …]`); the engine plays them out with a pause between them so the bot appears to think. Naming only the first move is equally fine: while the turn is still the bot's, the engine asks again with the updated `board`/`ctx`
+- Pin the move names to the game's own moves so a typo is a typecheck error rather than a runtime one: `type Bot = BotStrategy<Board, keyof typeof moves>` with `import type { Board, moves } from './helpers'` (see `remove-row-or-column`)
 - Pull `name`, `title`, `credit` from `gameList` rather than hardcoding them
 
 ### 5. Re-export the component from `src/components/games/index.ts`

@@ -13,6 +13,12 @@ import type { CoreState } from './store';
 export const asBotMoves = (named: BotMove | BotMove[]): BotMove[] =>
   Array.isArray(named) ? named : [named];
 
+// A move name is a string, so a typo in a strategy only shows up here. Say
+// which names existed instead of letting `moves[name]` blow up as undefined.
+export const unknownMoveMessage = (name: string, moves: object) =>
+  `strategyGameFactory: botStrategy named unknown move '${name}' `
+    + `(this game has: ${Object.keys(moves).join(', ')})`;
+
 // Whether the strategy owes more moves: its turn is still open, so a bot that
 // named only the first move of a multi-phase turn gets asked for the rest.
 export const isBotTurnUnfinished = <TBoard>(

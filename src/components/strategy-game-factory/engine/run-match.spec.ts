@@ -169,6 +169,17 @@ describe('runMatch', () => {
     })).toThrow(/named moves after take ended its turn/);
   });
 
+  // A move name is only a string, so a typo survives typechecking and lands here.
+  it('throws naming the moves that exist when a strategy names one that does not', () => {
+    const typo: BotStrategy<Board> = () => ({ move: 'tkae', args: [1] });
+
+    expect(() => runMatch({
+      gameplay: singleMoveGame,
+      strategies: [typo, takes(1)],
+      startBoard: { stones: 5 }
+    })).toThrow(/named unknown move 'tkae' \(this game has: take\)/);
+  });
+
   it('throws on an illegal move instead of silently ignoring it', () => {
     expect(() => runMatch({
       gameplay: singleMoveGame,

@@ -74,7 +74,7 @@ export type ClientGameMoves<TBoard> = Record<
 >
 export type StrategyArgs<TBoard> = { board: TBoard; ctx: Ctx }
 // A move a bot wants played, named rather than dispatched.
-export type BotMove = { move: string; args?: unknown[] }
+export type BotMove<TMoveName extends string = string> = { move: TMoveName; args?: unknown[] }
 // A bot is a pure function of the position: it names the move it wants, or the
 // whole sequence when the turn is planned as one decision, and the engine plays
 // them out — paced in the browser so the bot appears to think, immediately in a
@@ -83,7 +83,8 @@ export type BotMove = { move: string; args?: unknown[] }
 // board to thread, so the same function can run on an authoritative server.
 // If the turn is still the bot's once its moves are played, it is asked again
 // (see engine/bot-turn.ts), so naming one move at a time is equally fine.
-export type BotStrategy<TBoard> = (args: StrategyArgs<TBoard>) => BotMove | BotMove[]
+export type BotStrategy<TBoard, TMoveName extends string = string> =
+  (args: StrategyArgs<TBoard>) => BotMove<TMoveName> | BotMove<TMoveName>[]
 export type BoardClientProps<TBoard> = Omit<StrategyArgs<TBoard>, 'moves'> & {
   moves: ClientGameMoves<TBoard>
   // Writes the mid-turn UI state a BoardClient needs to remember (which pile is

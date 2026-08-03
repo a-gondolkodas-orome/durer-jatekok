@@ -1,6 +1,6 @@
 import type { BotStrategy, Gameplay } from '../types';
 import { buildCtx } from './build-ctx';
-import { asBotMoves, isBotTurnUnfinished } from './bot-turn';
+import { asBotMoves, isBotTurnUnfinished, unknownMoveMessage } from './bot-turn';
 import { reduceMove } from './reducer';
 import { createInitialCoreState, type CoreState } from './store';
 
@@ -53,6 +53,7 @@ export const runMatch = <TBoard>({
   const history: MatchMove<TBoard>[] = [];
 
   const play = (name: string, args: unknown[]) => {
+    if (!moves[name]) throw new Error(unknownMoveMessage(name, moves));
     const transition = reduceMove(state, moves[name]!, name, args, PLAYER_NAMES);
     if (transition.illegal) {
       throw new Error(`runMatch: illegal move ${name}(${JSON.stringify(args)}) `

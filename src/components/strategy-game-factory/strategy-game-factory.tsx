@@ -16,7 +16,7 @@ import type {
 import { resolveVariants } from './helpers/resolve-variants';
 import { createGameStore, createInitialCoreState } from './engine/store';
 import { buildCtx } from './engine/build-ctx';
-import { asBotMoves, isBotTurnUnfinished } from './engine/bot-turn';
+import { asBotMoves, isBotTurnUnfinished, unknownMoveMessage } from './engine/bot-turn';
 import { reduceMove } from './engine/reducer';
 
 // Pause between the moves of a bot's multi-phase turn, and before the auto
@@ -280,6 +280,11 @@ export const strategyGameFactory = <TBoard,>({
         const named = queue.length ? queue : askBot(botStrategy!);
         if (!named.length) return;
         const [{ move, args = [] }, ...rest] = named;
+        if (!moves[move]) {
+          if (import.meta.env.DEV) throw new Error(unknownMoveMessage(move, moves));
+          console.warn(unknownMoveMessage(move, moves));
+          return;
+        }
         // The board comes from the store, so a bot has no board to pass and
         // therefore no way to pass a stale one.
         wrappedGameMoves[move]!(store.getState().board, ...args);

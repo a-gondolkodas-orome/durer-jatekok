@@ -1,21 +1,25 @@
 import { findIndex, sample, range } from 'lodash';
 import type { BotMove, BotStrategy } from '../../strategy-game-factory';
-import type { Board } from './helpers';
+import type { Board, moves } from './helpers';
+
+// Naming the game's own move names makes a typo in a bot a typecheck error.
+type MoveName = keyof typeof moves
+type Bot = BotStrategy<Board, MoveName>
 
 // A turn is one decision — which coin to take, which to place back — so it is
 // named as a whole. Taking a 1-pengő coin has no place-back half at all.
-const asTurn = ({ remove, add }: TurnPlan): BotMove[] => {
-  const removal = { move: 'removeCoin', args: [remove] };
+const asTurn = ({ remove, add }: TurnPlan): BotMove<MoveName>[] => {
+  const removal: BotMove<MoveName> = { move: 'removeCoin', args: [remove] };
   if (remove === 1) return [removal];
   return [removal, add === null ? { move: 'passAddition' } : { move: 'addCoin', args: [add] }];
 };
 
-export const randomBotStrategy: BotStrategy<Board> = ({ board }) => {
+export const randomBotStrategy: Bot = ({ board }) => {
   const remove = sample([1, 2, 3].filter(value => board[value - 1] > 0))!;
   return asTurn({ remove, add: sample([null, ...range(1, remove)]) ?? null });
 };
 
-export const smartBotStrategy: BotStrategy<Board> = ({ board }) => asTurn(planTurn(board));
+export const smartBotStrategy: Bot = ({ board }) => asTurn(planTurn(board));
 
 type TurnPlan = { remove: number; add: number | null }
 

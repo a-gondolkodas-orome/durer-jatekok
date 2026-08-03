@@ -103,6 +103,14 @@ describe('Bot behavior by mode', () => {
     expect(botStrategy).not.toHaveBeenCalled();
   });
 
+  it('throws in dev when the bot names a move the game does not have', () => {
+    const { getByTestId } = renderGame(ctxAwareConfig(() => ({ move: 'mianMove' })));
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('move-btn')); // endTurn → bot's turn
+    expect(() => act(() => { vi.advanceTimersByTime(1500); }))
+      .toThrow(/named unknown move 'mianMove' \(this game has: mainMove\)/);
+  });
+
   it('calls botStrategy when it becomes the computer turn', () => {
     const botStrategy = vi.fn((): BotMove => ({ move: 'mainMove' }));
     const { getByTestId } = renderGame(ctxAwareConfig(botStrategy));
