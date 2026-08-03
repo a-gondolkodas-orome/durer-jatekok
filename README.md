@@ -330,38 +330,11 @@ export const smartBotStrategy: Bot = ({ board }) =>
   ({ move: 'removeLine', args: [chooseLine(board)] });
 ```
 
-Because a bot is a pure function of the position, its spec can just read what it
-returned (`botArgs` in `test-utils`), and `runMatch` can play two of them
-against each other through the real engine — see below.
-
-### Testing a bot with runMatch
-
-`runMatch` (exported from `strategy-game-factory`) plays a whole game outside
-React: real moves, real validators, real win detection, no fake `moves` object
-and no hand-rolled game loop.
-
-```ts
-const { winnerIndex, history } = runMatch({
-  gameplay: { moves },
-  strategies: [smartBotStrategy, randomBotStrategy],
-  startBoard
-});
-```
-
-Use it to check the thing the checklist asks for — that the smart bot really is
-optimal: it wins as the mover from a board the mover can win, and as the replier
-from one the mover cannot. See `coins-in-3-piles` and `remove-row-or-column` for
-worked examples.
-
-How many boards to run depends on what the strategy costs. `coins-in-3-piles`
-sweeps its whole small-board space in ~50 ms; a searching strategy like
-`totem-poles`' takes seconds for a handful of playouts, so there a few
-representative boards are enough and the exhaustive argument belongs in cheap
-unit tests of the characterisation (Grundy value, invariant, win/loss
-predicate).
-
-The same function is the browser-free half of the match loop a competition
-server would need (`docs/real-competitions-plan.md`).
+Because a bot is a pure function of the position, a spec can read its decision
+straight off the return value, and `runMatch` can play two strategies against
+each other through the real engine — see
+[AGENTS.md § Testing](AGENTS.md#testing) for how to write those specs and how
+far to sweep.
 
 ## state provided and handled by "framework" (strategyGameFactory)
 
