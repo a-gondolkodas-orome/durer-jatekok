@@ -77,12 +77,21 @@ const { winnerIndex } = runMatch({
 });
 ```
 
-Assert what the checklist asks for: from every start board the mover can win,
-the smart bot wins as the mover; from every board it cannot, it wins as the
-replier (every move loses there, so a random opponent must lose). See
-`coins-in-3-piles/bot-strategy.spec.ts` and `remove-row-or-column`. Because a bot
-returns its move as data, a spec for a single decision needs no mock either —
-read it with `botArgs` from `test-utils`.
+Assert what the checklist asks for: the smart bot wins as the mover from a
+board the mover can win, and as the replier from one it cannot (every move
+loses there, so any opponent must lose).
+
+**Size that sweep to what the strategy costs.** A cheap strategy over a small
+state space can take every board: `coins-in-3-piles` plays all 124 boards up to
+4 coins per pile, three times each, in ~50 ms. A strategy that searches is a
+different matter — `totem-poles` spends ~3 s on a handful of playouts — so there
+pick a few representative start boards (one per case the solution distinguishes)
+and keep the exhaustive argument in cheap unit tests of the characterisation
+itself: the Grundy value, the invariant, the win/loss predicate. Those are what
+the whole-game test would be re-deriving anyway, one slow playout at a time.
+
+Because a bot returns its move as data, a spec for a single decision needs no
+mock either — read it with `botArgs` from `test-utils`.
 
 For this to work, the game's `moves` must be importable without React: keep them
 in a `helpers.ts` (as `coins-in-3-piles` does) rather than beside the JSX rule
@@ -100,7 +109,7 @@ npm run dev
 Before declaring the game done, verify each item:
 - [ ] Works correctly in both `vsComputer` and `vsHuman` mode
 - [ ] Starting positions are representative of the game's complexity; each player wins with ~50% probability across random starting boards
-- [ ] If optimal AI is implemented: player cannot win with a non-winning strategy — proven by a `runMatch` spec, not by eyeballing (see step 7)
+- [ ] If optimal AI is implemented: player cannot win with a non-winning strategy — backed by a `runMatch` spec sized to what the strategy costs, not by eyeballing (see step 7)
 - [ ] Moves return their consequences in the `MoveOutcome` rather than causing them
 - [ ] Moves with non-trivial legality define `validate`, and the `BoardClient` gates on `isAllowed`
 - [ ] `getPlayerStepDescription` makes the next move clear

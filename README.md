@@ -349,11 +349,19 @@ const { winnerIndex, history } = runMatch({
 ```
 
 Use it to check the thing the checklist asks for — that the smart bot really is
-optimal: from every start board the mover can win, it must win as the mover, and
-from every board the mover cannot win, it must win as the replier. See
-`coins-in-3-piles` and `remove-row-or-column` for worked examples. The same
-function is the browser-free half of the match loop a competition server would
-need (`docs/real-competitions-plan.md`).
+optimal: it wins as the mover from a board the mover can win, and as the replier
+from one the mover cannot. See `coins-in-3-piles` and `remove-row-or-column` for
+worked examples.
+
+How many boards to run depends on what the strategy costs. `coins-in-3-piles`
+sweeps its whole small-board space in ~50 ms; a searching strategy like
+`totem-poles`' takes seconds for a handful of playouts, so there a few
+representative boards are enough and the exhaustive argument belongs in cheap
+unit tests of the characterisation (Grundy value, invariant, win/loss
+predicate).
+
+The same function is the browser-free half of the match loop a competition
+server would need (`docs/real-competitions-plan.md`).
 
 ## state provided and handled by "framework" (strategyGameFactory)
 

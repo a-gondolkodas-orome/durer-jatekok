@@ -56,9 +56,15 @@ off the return value (`botArgs` in `test-utils`), and `runMatch`
 (`strategy-game-factory/engine/run-match.ts`) plays two strategies against each
 other through the real moves and the real reducer — no fake `moves` object, no
 hand-rolled game loop. That is what turns "the AI is truly optimal" into a test:
-the smart bot must win from every winning start board as the mover, and from
-every losing one as the replier (see `coins-in-3-piles`,
-`remove-row-or-column`).
+the smart bot must win as the mover from a winning start board, and as the
+replier from a losing one (see `coins-in-3-piles`, `remove-row-or-column`).
+
+Size the sweep to what the strategy costs. Sweeping every start board is right
+for a cheap strategy over a small state space (`coins-in-3-piles`: 124 boards,
+~50 ms) and wrong for one that searches (`totem-poles`: ~3 s for a handful of
+playouts). For those, play a few representative boards and leave the exhaustive
+argument to cheap unit tests of the characterisation itself — the Grundy value,
+the parity invariant, the win/loss predicate.
 
 ## Planned future directions
 
