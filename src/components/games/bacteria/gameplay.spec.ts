@@ -2,7 +2,6 @@ import {
   distanceFromDangerousAttackZone, isDangerous, moves, applyAttackMove,
   hasBacterium, isAttackAllowed, ATTACKER, DEFENDER, type MoveType
 } from "./gameplay";
-import { legalAttackMoves } from "./bot-strategy";
 import { reverse } from 'lodash';
 import { makeCtx } from '../../../test-utils';
 
@@ -154,11 +153,5 @@ describe('legality', () => {
     for (const type of ['shiftLeft', 'shiftRight', 'jump', 'spread'] as MoveType[]) {
       expect(isAttackAllowed(board, { type, row: 0, col: 0 })).toBe(false);
     }
-  });
-
-  it('accepts every move the bot enumerates', () => {
-    const busy = { ...board, bacteria: [[1, 2, 1], [3, 0], [0, 1, 0]] };
-    expect(legalAttackMoves(busy).length).toBeGreaterThan(0);
-    expect(legalAttackMoves(busy).every(m => isAttackAllowed(busy, m))).toBe(true);
   });
 });

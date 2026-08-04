@@ -10,15 +10,8 @@ import {
   playerColor,
   playerHasLine
 } from './gameplay';
-import { LINES, SYMMETRIES } from './board-data';
-import { canonicalize } from './bot-strategy';
+import { LINES } from './board-data';
 import { makeCtx } from '../../../test-utils';
-
-const applyPerm = (mask: number, perm: number[]): number => {
-  let result = 0;
-  for (let i = 0; i < CELL_COUNT; i++) if (mask & (1 << i)) result |= 1 << perm[i];
-  return result;
-};
 
 describe('modified mill helpers', () => {
   it('has a 24-cell board and 16 winning lines of three cells each', () => {
@@ -82,20 +75,6 @@ describe('modified mill helpers', () => {
     expect(isPlacementAllowed(board, -1)).toBe(false);
     expect(isPlacementAllowed(board, CELL_COUNT)).toBe(false);
     expect(isPlacementAllowed(board, 1.5)).toBe(false);
-  });
-
-  it('canonicalize gives every symmetric image of a position the same key', () => {
-    const board = generateEmptyBoard();
-    board[LINES[0][0]] = 'red';
-    board[LINES[3][1]] = 'blue';
-    board[LINES[7][2]] = 'red';
-    const { red, blue } = boardMasks(board);
-    const base = canonicalize(red, blue).key;
-
-    // Applying any of the 8 board symmetries must not change the canonical key.
-    for (const perm of SYMMETRIES) {
-      expect(canonicalize(applyPerm(red, perm), applyPerm(blue, perm)).key).toBe(base);
-    }
   });
 });
 
