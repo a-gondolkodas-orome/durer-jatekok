@@ -52,8 +52,6 @@ export const moves = {
   }
 };
 
-// The moves as a type, so a bot can name them: `BotStrategy<Board, Moves>`
-// pins both the move name and the arguments it takes.
 export type Moves = typeof moves;
 
 const rule = {

@@ -88,8 +88,6 @@ export const moves = {
   }
 };
 
-// The moves as a type, so a bot can name them: `BotStrategy<Board, Moves>`
-// pins both the move name and the arguments it takes.
 export type Moves = typeof moves;
 
 // Every legal move: for each rectangle, one move per row and one per column.

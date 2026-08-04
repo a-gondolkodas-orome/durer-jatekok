@@ -60,8 +60,6 @@ export const moves = {
   }
 }
 
-// The moves as a type, so a bot can name them: `BotStrategy<Board, Moves>`
-// pins both the move name and the arguments it takes.
 export type Moves = typeof moves
 
 // Shared second half of the place-back phase: whether a coin was added or the
