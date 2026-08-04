@@ -1,4 +1,5 @@
-import { isCoveringAllowed, smartBotStrategy, moves, COVERED, type Board } from './number-covering';
+import { smartBotStrategy } from './number-covering';
+import { isCoveringAllowed, moves, COVERED, type Board } from './gameplay';
 import { botNextMoveArgs, makeCtx } from '../../../test-utils';
 
 const meta = { ctx: makeCtx() };

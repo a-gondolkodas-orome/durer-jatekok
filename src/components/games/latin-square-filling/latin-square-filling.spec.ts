@@ -1,5 +1,4 @@
-import { moves } from './latin-square-filling';
-import { isFull, legalMoves, type Board } from './helpers';
+import { isFull, legalMoves, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // Two different endings: filling the ninth cell wins for the first player,

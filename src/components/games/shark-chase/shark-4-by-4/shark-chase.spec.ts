@@ -1,6 +1,5 @@
-import { moves } from './shark-chase';
-import { isGameEnd } from './helpers';
-import { RESEARCHERS, SHARK, type Board } from '../helpers';
+import { isGameEnd, moves } from './gameplay';
+import { RESEARCHERS, SHARK, type Board } from '../gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // The researchers win by moving a submarine onto the shark (or steering the

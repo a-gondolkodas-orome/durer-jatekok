@@ -1,4 +1,4 @@
-import { moves } from './triangular-grid-ropes-10';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // A rope may not pass a pole another rope already touches, so the grid runs out

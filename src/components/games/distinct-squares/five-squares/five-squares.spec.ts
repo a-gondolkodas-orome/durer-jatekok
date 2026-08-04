@@ -1,4 +1,4 @@
-import { moves } from './five-squares';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // The game always ends on the tenth square; the second player wins only if the

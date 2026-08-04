@@ -1,5 +1,4 @@
-import { moves } from './four-connected-fields';
-import { hasAnyMove, type Board } from './helpers';
+import { hasAnyMove, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // The player who places the last coin wins: the game ends once no field is

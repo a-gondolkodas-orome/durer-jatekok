@@ -1,4 +1,4 @@
-import { isRobbable, moves, type Board } from './bank-robbers';
+import { isRobbable, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

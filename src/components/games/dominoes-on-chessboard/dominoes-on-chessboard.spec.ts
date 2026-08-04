@@ -1,6 +1,4 @@
-import {
-  isDominoAllowed, moves, getPossibleMoves, type Board, type Domino
-} from './dominoes-on-chessboard';
+import { isDominoAllowed, moves, getPossibleMoves, type Board, type Domino } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

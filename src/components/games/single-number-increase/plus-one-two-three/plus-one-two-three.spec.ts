@@ -1,4 +1,4 @@
-import { moves, isIncreaseValid } from './plus-one-two-three';
+import { moves, isIncreaseValid } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 describe('isIncreaseValid', () => {

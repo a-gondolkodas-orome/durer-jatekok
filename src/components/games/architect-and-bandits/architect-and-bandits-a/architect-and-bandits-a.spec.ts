@@ -1,5 +1,5 @@
-import { moves } from './architect-and-bandits-a';
-import { ARCHITECT, BANDITS, type Board } from '../helpers';
+import { moves } from './gameplay';
+import { ARCHITECT, BANDITS, type Board } from '../gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // After the fourth day the architect wins exactly when every vertex carries a

@@ -1,4 +1,4 @@
-import { isSubtractableDigit, moves } from './digit-subtraction';
+import { isSubtractableDigit, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

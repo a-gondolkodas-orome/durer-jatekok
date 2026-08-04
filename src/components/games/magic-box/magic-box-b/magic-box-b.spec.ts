@@ -1,5 +1,4 @@
-import { moves } from './magic-box-b';
-import { LINES, isLineFull } from './helpers';
+import { LINES, isLineFull, moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // Designating an already-full line wins, because the opponent cannot answer it.

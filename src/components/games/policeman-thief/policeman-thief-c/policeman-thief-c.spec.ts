@@ -1,5 +1,4 @@
-import { moves, generateStartBoard, pickCopCount, type Board } from './policeman-thief-c';
-import { POLICE, THIEF, VERTEX_COUNT } from './helpers';
+import { POLICE, THIEF, VERTEX_COUNT, generateStartBoard, moves, pickCopCount, type Board } from './gameplay';
 import { range } from 'lodash';
 import { makeCtx } from '../../../../test-utils';
 

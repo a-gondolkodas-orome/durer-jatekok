@@ -1,4 +1,4 @@
-import { isDigitChoiceAllowed, moves } from './ten-digit-number';
+import { isDigitChoiceAllowed, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const meta = { ctx: makeCtx() };

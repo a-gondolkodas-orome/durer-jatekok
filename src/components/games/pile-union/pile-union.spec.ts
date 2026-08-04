@@ -1,4 +1,4 @@
-import { isPile, isMergeAllowed, moves } from './pile-union';
+import { isPile, isMergeAllowed, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

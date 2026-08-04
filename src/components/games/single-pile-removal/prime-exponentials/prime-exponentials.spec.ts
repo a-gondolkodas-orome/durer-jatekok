@@ -1,4 +1,4 @@
-import { moves, isSubtractionAllowed } from './prime-exponentials';
+import { moves, isSubtractionAllowed } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 describe('isSubtractionAllowed', () => {

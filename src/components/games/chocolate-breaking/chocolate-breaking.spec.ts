@@ -1,5 +1,4 @@
-import { moves } from './chocolate-breaking';
-import { hasSafeBreak, type Board } from './helpers';
+import { hasSafeBreak, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // The player forced to break off the first 1×1 loses, so the game ends on the

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { playBotMove } from '../../../test-utils';
-import { isFlipAllowed, isRemovalAllowed, moves as gameMoves, smartBotStrategy } from './discs-flip-or-remove';
+import { smartBotStrategy } from './discs-flip-or-remove';
+import { moves as gameMoves, isFlipAllowed, isRemovalAllowed } from './gameplay';
 
 // board[0] = blue discs, board[1] = red discs.
 type Board = [number, number];

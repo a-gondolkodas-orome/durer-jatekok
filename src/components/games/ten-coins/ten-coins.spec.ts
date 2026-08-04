@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { uniq, range } from 'lodash';
 import { playBotMove } from '../../../test-utils';
-import { isConversionAllowed, moves as gameMoves, smartBotStrategy } from './ten-coins';
+import { smartBotStrategy } from './ten-coins';
+import { moves as gameMoves, isConversionAllowed } from './gameplay';
 
 describe('isConversionAllowed', () => {
   // Four 3s and six 1s: the values 1 and 3 are on the table, 2 and 4 are not.

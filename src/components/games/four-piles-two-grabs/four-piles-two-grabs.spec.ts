@@ -1,5 +1,4 @@
-import { moves } from './four-piles-two-grabs';
-import { isTerminal } from './helpers';
+import { isTerminal, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A move takes from exactly two piles, so a position with fewer than two

@@ -1,4 +1,4 @@
-import { moves, isMoveValid } from './primely-to-zero';
+import { moves, isMoveValid } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 describe('isMoveValid', () => {

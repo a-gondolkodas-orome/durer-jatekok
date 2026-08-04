@@ -1,5 +1,4 @@
-import { moves } from './six-fields-circle';
-import { hasLegalMove } from './helpers';
+import { hasLegalMove, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A move needs two non-empty fields that are not opposite each other, so two

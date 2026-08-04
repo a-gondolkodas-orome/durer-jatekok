@@ -1,4 +1,4 @@
-import { isTransferAllowed, moves } from './add-reduce-double';
+import { isTransferAllowed, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

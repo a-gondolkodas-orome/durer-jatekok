@@ -1,4 +1,4 @@
-import { isRemovalAllowed, moves, type Board } from './rock-paper-scissor';
+import { isRemovalAllowed, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

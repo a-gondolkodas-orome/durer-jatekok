@@ -1,4 +1,4 @@
-import { isRemovalAllowed, moves } from './stones-remove-one-not-twice-from-left';
+import { isRemovalAllowed, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

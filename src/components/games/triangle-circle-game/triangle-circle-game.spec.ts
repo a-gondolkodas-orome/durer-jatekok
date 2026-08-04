@@ -1,5 +1,4 @@
-import { moves } from './triangle-circle-game';
-import { LINE, CIRCLE, generateStartBoard, applyShade, applyCircle } from './helpers';
+import { CIRCLE, LINE, applyCircle, applyShade, generateStartBoard, moves } from './gameplay';
 import { TRIANGLES, TRIANGLE_COUNT } from './geometry';
 import { makeCtx } from '../../../test-utils';
 

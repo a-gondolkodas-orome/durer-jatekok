@@ -1,5 +1,5 @@
 import { firstPlayerMove, heuristicMove } from './bot-strategy';
-import { emptyCells, hasLine, CELL_COUNT } from './helpers';
+import { emptyCells, hasLine, CELL_COUNT } from './gameplay';
 
 describe('modified mill bot strategy', () => {
   it('the first-player table wins against every possible second-player line', () => {

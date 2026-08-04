@@ -1,5 +1,4 @@
-import { moves } from './three-piles-rebuild';
-import { isTerminal } from './helpers';
+import { isTerminal, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A turn keeps one pile and rebuilds three from it; the opponent loses when

@@ -1,4 +1,4 @@
-import { moves } from './number-pyramid';
+import { moves } from './gameplay';
 import { isCombineAllowed, applyMoveToBoard, type Board, type Slot } from './strategy';
 import { makeCtx } from '../../../test-utils';
 

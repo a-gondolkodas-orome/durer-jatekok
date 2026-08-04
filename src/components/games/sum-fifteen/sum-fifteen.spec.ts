@@ -1,5 +1,4 @@
-import { moves } from './sum-fifteen';
-import { hasSum15, numbersOwnedBy, type Board } from './helpers';
+import { hasSum15, moves, numbersOwnedBy, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A player wins by owning three numbers summing to 15; if all nine are claimed

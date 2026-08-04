@@ -1,4 +1,4 @@
-import { moves } from './pile-splitter';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // A turn is two moves: empty one pile, then split another into it. The game

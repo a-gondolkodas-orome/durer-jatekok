@@ -5,7 +5,7 @@ import {
   bacteriaCoords,
   removeOne,
   totalBacteria
-} from "./helpers";
+} from "./gameplay";
 import {
   simulate,
   legalAttackMoves,

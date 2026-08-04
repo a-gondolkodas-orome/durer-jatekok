@@ -1,5 +1,4 @@
-import { moves } from './recolouring-discs';
-import { RED, BLUE, type Board } from './helpers';
+import { BLUE, RED, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // Red wins on strictly more than half the cells, blue on half or more; if

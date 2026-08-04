@@ -1,4 +1,4 @@
-import { moves } from './take-1-or-halve';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

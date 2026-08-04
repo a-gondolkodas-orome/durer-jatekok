@@ -1,4 +1,5 @@
-import { moves, lowestPow2, cap, isWinningTake, chooseSmartTake } from './doubling-reduction';
+import { lowestPow2, cap, isWinningTake, chooseSmartTake } from './doubling-reduction';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 type Board = { stones: number; maxTake: number };

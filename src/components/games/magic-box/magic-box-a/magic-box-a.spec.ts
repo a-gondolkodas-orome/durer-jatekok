@@ -1,5 +1,4 @@
-import { moves } from './magic-box-a';
-import { generateEmptyBoard, hasFullLine } from './helpers';
+import { generateEmptyBoard, hasFullLine, moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // The player whose stone bursts the box loses, so the ending credits the

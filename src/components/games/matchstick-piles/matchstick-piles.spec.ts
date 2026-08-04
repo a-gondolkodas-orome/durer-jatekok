@@ -1,4 +1,4 @@
-import { isRemovalAllowed, isSplitAllowed, moves, type Board } from './matchstick-piles';
+import { isRemovalAllowed, isSplitAllowed, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

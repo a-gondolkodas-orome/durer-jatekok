@@ -1,4 +1,5 @@
-import { moves, cap, moverWins, isWinningTake, chooseSmartTake } from './three-more';
+import { cap, moverWins, isWinningTake, chooseSmartTake } from './three-more';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 type Board = { stones: number; maxTake: number };

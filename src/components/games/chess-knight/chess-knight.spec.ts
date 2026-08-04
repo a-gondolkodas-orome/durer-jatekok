@@ -1,5 +1,4 @@
-import { moves } from './chess-knight';
-import { generateStartBoard, getAllowedMoves } from './helpers';
+import { generateStartBoard, getAllowedMoves, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // The knight may never revisit a square, so the tour dies out on its own; the

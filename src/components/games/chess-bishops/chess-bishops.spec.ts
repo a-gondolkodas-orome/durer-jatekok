@@ -1,5 +1,4 @@
-import { moves } from './chess-bishops';
-import { generateStartBoard, getAllowedMoves } from './helpers';
+import { generateStartBoard, getAllowedMoves, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // Bishops fill the board until no unattacked square is left; the player who

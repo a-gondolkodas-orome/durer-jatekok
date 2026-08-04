@@ -1,5 +1,4 @@
-import { moves, type Board } from './policeman-thief-ab';
-import { POLICE, THIEF } from './helpers';
+import { POLICE, THIEF, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

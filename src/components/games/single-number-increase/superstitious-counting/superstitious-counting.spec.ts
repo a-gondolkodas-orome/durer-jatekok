@@ -1,4 +1,4 @@
-import { moves, isStepAllowed, type Board } from './superstitious-counting';
+import { moves, isStepAllowed, type Board } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 const boardWith = (restricted: number | null): Board => ({ current: 10, target: 50, restricted });

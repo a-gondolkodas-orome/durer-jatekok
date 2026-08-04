@@ -1,4 +1,4 @@
-import { moves } from './anti-tictactoe';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // Completing a line hands the game to the *other* player.

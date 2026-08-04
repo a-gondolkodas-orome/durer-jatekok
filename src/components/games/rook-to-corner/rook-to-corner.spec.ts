@@ -1,5 +1,4 @@
-import { moves } from './rook-to-corner';
-import { isTarget, boardSize } from './helpers';
+import { boardSize, isTarget, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // Unlike the other rook game, this one has an explicit goal square: reaching

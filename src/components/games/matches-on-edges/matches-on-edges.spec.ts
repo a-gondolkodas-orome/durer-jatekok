@@ -1,5 +1,4 @@
-import { moves } from './matches-on-edges';
-import { emptyBoard, legalMoves, isTerminal, type Board } from './helpers';
+import { emptyBoard, isTerminal, legalMoves, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // The move size is forced (always the largest legal window), so a position runs

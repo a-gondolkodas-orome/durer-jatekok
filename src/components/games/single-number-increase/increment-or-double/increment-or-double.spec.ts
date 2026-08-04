@@ -1,4 +1,4 @@
-import { moves } from './increment-or-double';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // The player who passes 99 *loses*, so every ending credits the mover's

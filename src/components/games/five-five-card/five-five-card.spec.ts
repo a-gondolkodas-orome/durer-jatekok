@@ -1,4 +1,4 @@
-import { isRemovalAllowed, moves, type Board } from './five-five-card';
+import { isRemovalAllowed, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

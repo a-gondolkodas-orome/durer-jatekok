@@ -1,5 +1,4 @@
-import { moves } from './modified-mill';
-import { generateEmptyBoard, playerColor, playerHasLine, isBoardFull, CELL_COUNT } from './helpers';
+import { CELL_COUNT, generateEmptyBoard, isBoardFull, moves, playerColor, playerHasLine } from './gameplay';
 import { LINES } from './board-data';
 import { makeCtx } from '../../../test-utils';
 

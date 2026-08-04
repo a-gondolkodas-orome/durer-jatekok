@@ -1,4 +1,4 @@
-import { moves } from './pairs-of-numbers';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // Whoever first writes a pair that is not all-positive wins, which happens

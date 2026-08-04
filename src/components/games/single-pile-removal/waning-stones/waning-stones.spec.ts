@@ -1,4 +1,5 @@
-import { moves, lowestPow2, cap, isWinningTake, chooseSmartTake } from './waning-stones';
+import { lowestPow2, cap, isWinningTake, chooseSmartTake } from './waning-stones';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 type Board = { stones: number; maxTake: number };

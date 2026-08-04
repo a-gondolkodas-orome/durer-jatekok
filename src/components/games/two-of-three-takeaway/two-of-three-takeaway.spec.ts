@@ -1,5 +1,4 @@
-import { moves } from './two-of-three-takeaway';
-import { isTerminal } from './helpers';
+import { isTerminal, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A move takes one chip from each of two distinct non-empty piles, so a

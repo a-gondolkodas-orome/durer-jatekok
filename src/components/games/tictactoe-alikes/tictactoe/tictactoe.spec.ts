@@ -1,4 +1,4 @@
-import { moves } from './tictactoe';
+import { moves } from './gameplay';
 import { makeCtx } from '../../../../test-utils';
 
 // 'red' is player 0, 'blue' is player 1, in board order.

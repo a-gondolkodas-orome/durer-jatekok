@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { isAllowed, moves } from './remove-divisor-multiple';
+import { isAllowed, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });

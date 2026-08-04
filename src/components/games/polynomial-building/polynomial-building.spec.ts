@@ -1,5 +1,4 @@
-import { moves } from './polynomial-building';
-import { hasThreeIntegerRoots, type Board } from './helpers';
+import { hasThreeIntegerRoots, moves, type Board } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // The game ends when the third coefficient of x³ + ax² + bx + c is fixed;

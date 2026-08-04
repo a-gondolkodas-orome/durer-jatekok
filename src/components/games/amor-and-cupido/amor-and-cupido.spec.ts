@@ -1,5 +1,4 @@
-import { moves } from './amor-and-cupido';
-import { TRIANGLES, generateStartBoard, completesTriangle } from './helpers';
+import { TRIANGLES, completesTriangle, generateStartBoard, moves } from './gameplay';
 import { makeCtx } from '../../../test-utils';
 
 // A player wins the moment they own all three edges of one triangle, so the
