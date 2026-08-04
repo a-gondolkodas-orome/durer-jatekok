@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { STEP_DELAY } from '../engine/timing';
+import { stepDelay } from '../engine/timing';
 
 // A few games submit a two-part turn from one click — discard a pile, then
 // split another — and play the second move a beat later so the board reads as
@@ -35,6 +35,6 @@ export const useDeferredMove = (moveCount: number) => {
       timeoutRef.current = null;
       scheduledAfterRef.current = null;
       playSecondMove();
-    }, STEP_DELAY);
+    }, stepDelay());
   };
 };

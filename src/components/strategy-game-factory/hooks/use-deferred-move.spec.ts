@@ -1,12 +1,18 @@
 // @vitest-environment jsdom
 import { renderHook, act } from '@testing-library/react';
 import { useDeferredMove } from './use-deferred-move';
-import { STEP_DELAY } from '../engine/timing';
+
+// stepDelay() spreads the beat over 750-1250ms so the bot does not answer like
+// a metronome; pinning Math.random makes the timing here exact.
+const BEAT = 750;
 
 const render = (moveCount = 0) =>
   renderHook(({ count }) => useDeferredMove(count), { initialProps: { count: moveCount } });
 
-beforeEach(() => vi.useFakeTimers());
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.spyOn(Math, 'random').mockReturnValue(0);
+});
 afterEach(() => vi.useRealTimers());
 
 describe('useDeferredMove', () => {
@@ -19,7 +25,7 @@ describe('useDeferredMove', () => {
 
     // the first move of the turn has landed by now
     rerender({ count: 1 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY));
+    act(() => vi.advanceTimersByTime(BEAT));
     expect(playSecondMove).toHaveBeenCalledOnce();
   });
 
@@ -32,7 +38,7 @@ describe('useDeferredMove', () => {
 
     act(() => result.current(playSecondMove));
     rerender({ count: 0 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY * 2));
+    act(() => vi.advanceTimersByTime(BEAT * 2));
 
     expect(playSecondMove).not.toHaveBeenCalled();
   });
@@ -43,7 +49,7 @@ describe('useDeferredMove', () => {
 
     act(() => result.current(playSecondMove));
     rerender({ count: 5 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY * 2));
+    act(() => vi.advanceTimersByTime(BEAT * 2));
 
     expect(playSecondMove).not.toHaveBeenCalled();
   });
@@ -58,7 +64,7 @@ describe('useDeferredMove', () => {
     act(() => result.current(playSecondMove));
     rerender({ count: 1 });
     rerender({ count: 0 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY * 2));
+    act(() => vi.advanceTimersByTime(BEAT * 2));
 
     expect(playSecondMove).not.toHaveBeenCalled();
   });
@@ -69,7 +75,7 @@ describe('useDeferredMove', () => {
 
     act(() => result.current(playSecondMove));
     unmount();
-    act(() => vi.advanceTimersByTime(STEP_DELAY * 2));
+    act(() => vi.advanceTimersByTime(BEAT * 2));
 
     expect(playSecondMove).not.toHaveBeenCalled();
   });
@@ -82,7 +88,7 @@ describe('useDeferredMove', () => {
     act(() => result.current(first));
     act(() => result.current(second));
     rerender({ count: 1 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY));
+    act(() => vi.advanceTimersByTime(BEAT));
 
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledOnce();
@@ -94,11 +100,11 @@ describe('useDeferredMove', () => {
 
     act(() => result.current(playSecondMove));
     rerender({ count: 1 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY));
+    act(() => vi.advanceTimersByTime(BEAT));
 
     act(() => result.current(playSecondMove));
     rerender({ count: 3 });
-    act(() => vi.advanceTimersByTime(STEP_DELAY));
+    act(() => vi.advanceTimersByTime(BEAT));
 
     expect(playSecondMove).toHaveBeenCalledTimes(2);
   });
