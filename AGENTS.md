@@ -15,7 +15,7 @@ competition's games as they are held.
 
 ## Tech stack
 
-- **React 19** with **React Router 7** — SPA, client-side only
+- **React 19** with **React Router 8** — SPA, client-side only
 - **Vite** — build tool
 - **Tailwind CSS 4** — styling
 - **Vitest** + **@testing-library/react** — unit and component tests
@@ -29,12 +29,14 @@ No backend, no database, no auth. Deployed as a static build to GitHub Pages.
 Games live under `src/components/games/`, one folder per game. The game list is
 registered in `gameList.ts`.
 
-**Shared infrastructure:**
+**Shared infrastructure** (in `src/components/strategy-game-factory/`, a
+sibling of `games/`):
 - `game-parts/` — common UI elements (rules section, role chooser, restart
   button, etc.)
 - `strategy-game-factory.tsx` — game flow engine via `strategyGameFactory`: handles
   turn-taking, end-of-game detection, restart/clean state. Defines a
-  well-specified API that every game must implement.
+  well-specified API that every game must implement. Games import everything
+  through the `strategy-game-factory` barrel (`index.ts`) — no deep imports.
 
 **Per-game responsibility:**
 Each game folder implements the optimal strategy (computer AI) and game-specific
@@ -364,7 +366,7 @@ for its own sake.
 
 See [README.md § Internationalisation
 (i18n)](README.md#internationalisation-i18n). Use the `t()` helper from
-`translate.js`.
+`translate.ts`.
 
 ## Comments
 

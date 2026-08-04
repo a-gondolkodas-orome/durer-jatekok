@@ -91,7 +91,7 @@ the **opposite** role.
 ## Scope-limiting insight
 
 Each competition uses **new games**, so competition mode does **not** need to be
-retrofitted onto all ~40 existing games. We build the backend framework **once**
+retrofitted onto all 76 existing games. We build the backend framework **once**
 against a **pilot game**, then each future competition game ships a server engine
 + smart bot as it is authored. The `new-game` workflow grows accordingly (see
 Phase 5).
@@ -218,15 +218,16 @@ Open questions before choosing this path:
 - Keeping the **smart bot server-only** still applies, but the monorepo may
   already have a pattern for it.
 
-This is a genuine fork in the road: **build the engine here** (Phases 1–5 above)
+This was a genuine fork in the road: **build the engine here** (Phases 1–5 above)
 vs. **contribute the engine to `durer-aion`** and let it own the competition
-runtime. Deciding this early changes almost everything downstream.
+runtime. As the status note at the top says, it has since been decided in
+favour of reuse.
 
 ## Biggest risks / decisions to make early
 
-- **Build vs. reuse `durer-aion`.** The single biggest decision (see section
-  above): stand up a new backend in this repo, or move the engine into the
-  existing competition monorepo and replace its `boardgame.io` package.
+- **Build vs. reuse `durer-aion`.** Was the single biggest decision (see
+  section above); decided in favour of reuse — the engine moves into the
+  existing competition monorepo and replaces its `boardgame.io` package.
 - **Hosting.** GitHub Pages cannot run a backend. Either keep Pages for the
   static site plus a separate backend host, or migrate to a platform that serves
   both. (Largely moot if we reuse `durer-aion`.)
