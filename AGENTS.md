@@ -51,6 +51,11 @@ moves stored in a JSON file when performance requires it.
 | `board-client.tsx` | `BoardClient` (split out once the JSX outgrows the game file) | yes |
 | `<game>.tsx` | `rule`, `getPlayerStepDescription`, `variants`, the `strategyGameFactory` call | yes |
 
+Specs are named after what they test: `gameplay.spec.ts` for the rules,
+`bot-strategy.spec.ts` for the strategy, and a topical name
+(`solver.spec.ts`, `geometry.spec.ts`) where one part of the strategy is worth
+testing on its own. There is no `<game>.spec.ts`.
+
 `gameplay.ts` is the **framework-free half of a game**: the same module a
 server-authoritative competition mode would validate moves with, so it has to
 run in plain Node (see `docs/real-competitions-plan.md` and issue #313). ESLint
