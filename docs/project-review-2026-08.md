@@ -29,17 +29,20 @@ Items marked ✅ were fixed on the branch that introduced this document.
   AGENTS.md warns against (an unannotated `apply` argument, no `Moves` export).
 - ✅ README stale bits: `<game-name>-en.ts` advice nothing uses, dead
   PR-`/changes/` links, "[optional] vitest".
-- ✅ `docs/real-competitions-plan.md`: "~40 games" (76), and the
-  build-here-vs-reuse-`durer-aion` fork still read as open in the body while
-  the status banner says decided.
+- ✅ `docs/real-competitions-plan.md` was superseded by the decision to reuse
+  `durer-aion` for the competition runtime; deleted on review feedback, with
+  the references it anchored (AGENTS.md, README, engine comments) now pointing
+  at issue #313.
 
 ## 2. Migration leftovers in the toolchain ✅ (done)
 
 `src/` has zero `.js`/`.jsx` files, but the toolchain still catered for them:
 `index.html` loading `/src/main.js`, `allowJs`/`checkJs` in tsconfig, `{js,jsx}`
-lint globs (and a spec override that missed `.spec.tsx`), a dead Tailwind-v3
-`tailwind.config.js`, commented-out `rollup-plugin-visualizer` code in
-`vite.config.js` plus its `stats.html` gitignore entry. All removed.
+lint globs (and a spec override that missed `.spec.tsx`), and a dead
+Tailwind-v3 `tailwind.config.js`. All removed. (The commented-out
+`rollup-plugin-visualizer` lines in `vite.config.js` and the `stats.html`
+gitignore entry are *not* leftovers: they document an occasionally-used,
+uncommitted bundle-analysis tool and stay.)
 
 ## 3. Type-safety: the pinning is silently hollow for ~40% of moves
 
@@ -53,12 +56,12 @@ least one untyped move argument (e.g.
 `cube-coloring/gameplay.ts` `{ vertex, color }`,
 `totem-poles/*/gameplay.ts` `{ from, to }`), plus 11 `validate` declarations.
 
-**Plan (2 PRs):**
-1. Mechanical sweep: annotate the ~49 untyped parameters. No behaviour change;
-   typecheck is the review.
-2. Flip `"noImplicitAny": true` (delete the line — `strict` implies it), fixing
-   whatever else surfaces. The compiler then enforces the convention forever
-   and AGENTS.md's "annotate them" warning can be deleted.
+**Plan:** a mechanical sweep annotating the ~49 untyped parameters. No
+behaviour change; typecheck is the review. Whether to then flip
+`"noImplicitAny": true` repo-wide is a separate, open decision — outside move
+signatures the flag may be more noise than value (utils, specs), and annotated
+moves plus review may be enough. Decide after the sweep, when the remaining
+fallout is visible.
 
 ## 4. Test gaps in core logic
 
@@ -110,7 +113,7 @@ rules specs relative to module size.
   is likewise duplicated. Only three helpers are shared via `engine/bot-turn.ts`.
   Extracting one shared turn-runner parameterised by a scheduler would make the
   headless path *provably* the browser path — which is the property the
-  competition plan relies on.
+  competition effort (issue #313) relies on.
 - `engine/run-match.ts` rewrites `ctx.chosenRoleIndex` every turn; in the
   browser it is fixed for the whole game. A bot consulting it behaves
   differently headless. Decide the semantics and align.
@@ -168,11 +171,11 @@ rules specs relative to module size.
 
 ## 7. Tooling / CI / DX
 
-- **Prettier is configured but not installed**: `package.json` carries a
-  `prettier` key, the devcontainer recommends the extension, but there is no
-  dependency, no `format` script, no CI check. Either install + script + CI,
-  or delete the config key. Related lint gaps: no `quotes` rule (would settle
-  §6's split), no `eslint-plugin-react-hooks` (`rules-of-hooks` /
+- The `prettier` key in `package.json` is deliberate despite prettier not
+  being a dependency: it tames the prettier *extension* a contributor may have
+  installed, so it does not rewrite files annoyingly. Prettier adoption is not
+  planned. Real lint gaps remain though: no `quotes` rule (would settle §6's
+  split), no `eslint-plugin-react-hooks` (`rules-of-hooks` /
   `exhaustive-deps` unenforced despite custom hooks and contexts), `no-var`
   is `warn` with no `--max-warnings 0` so it can never fail.
 - Nothing outside `src/` is linted or typechecked (`vite.config.js`,
@@ -198,11 +201,11 @@ rules specs relative to module size.
 | # | Item | Size |
 |---|---|---|
 | 1 | ✅ Docs sync (§1) + toolchain leftovers (§2) | done on this branch |
-| 2 | Annotate untyped move args, then flip `noImplicitAny` (§3) | 2 mechanical PRs |
+| 2 | Annotate untyped move args (§3); CI concurrency + cache and a SessionStart hook (§7) | mechanical PRs, in flight |
 | 3 | Bot specs for the four zero-coverage variants (§4a) | 3 small PRs |
 | 4 | Specs for `test-utils`, `translate`, `use-game-stats`, `bot-turn`, `build-ctx` (§4c) | 1–2 small PRs |
 | 5 | Unify the bot turn loop; settle `chosenRoleIndex` semantics (§5) | 1 design PR |
 | 6 | `games/shared/`: win/loss solver, mex, `Field`, `asTurn`; migrate by family (§6) | design PR + sweeps |
 | 7 | Route the 6 hand-gated BoardClients through `isAllowed`; fix the 4 `setTimeout` pacers (§6) | 2 small PRs |
-| 8 | Prettier decision, react-hooks lint, quotes rule, CI concurrency + cache (§7) | small PRs |
+| 8 | react-hooks lint, quotes rule (§7) | small PRs |
 | 9 | Factory component/spec split, `turnState` generic, table-storage convergence, naming sweeps | opportunistic |

@@ -247,7 +247,7 @@ and never imports React — ESLint enforces that. The rest (`bot-strategy.ts`,
 `board-client.tsx`, `<game>.tsx` with the rule text and the factory call) sits
 on the React side. The split exists because a future server-authoritative
 competition mode has to validate moves in plain Node with the very same module
-(see [docs/real-competitions-plan.md](docs/real-competitions-plan.md)); it also
+(a future server-authoritative competition mode, see issue #313); it also
 lets specs and the bot's move pinning import the rules without dragging in JSX.
 Details in [AGENTS.md § Files in a game folder](AGENTS.md#architecture).
 

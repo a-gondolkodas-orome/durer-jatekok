@@ -67,7 +67,7 @@ from anywhere but `gameplay.spec.ts`.
 
 `gameplay.ts` is the **framework-free half of a game**: the same module a
 server-authoritative competition mode would validate moves with, so it has to
-run in plain Node (see `docs/real-competitions-plan.md` and issue #313). ESLint
+run in plain Node (see issue #313). ESLint
 enforces that — a `react` import, or a value import from the
 `strategy-game-factory` barrel, is an error there; types from the barrel are
 fine, since `import type` is erased. A game whose gameplay is a handful of lines
@@ -127,11 +127,8 @@ the parity invariant, the win/loss predicate.
   effort. `a-gondolkodas-orome/durer-aion` already runs real competitions
   (server-authoritative match state, team identity, timers, results); the plan
   is for `strategyGameFactory` to take over its game-engine slot rather than
-  build a competition backend here. See
-  [docs/real-competitions-plan.md](docs/real-competitions-plan.md) — that
-  document's "build here vs. reuse `durer-aion`" fork is decided in favour of
-  reuse, so the phases describing a new backend in this repo no longer apply.
-  What does apply is the engine work they share: a game's rules and its bot
+  build a competition backend here (see issue #313). What this repo owes that
+  effort is the engine work they share: a game's rules and its bot
   each importable with no React, which is why `gameplay.ts` and
   `bot-strategy.ts` are separate files.
 - **Add Dürer competition games** — the games of each new competition, plus the
@@ -305,7 +302,7 @@ Two conventions to keep in mind:
   that.
 - The `engine/` modules are React-free by design — they are the seed of the
   headless engine a future server-authoritative competition mode needs (see
-  `docs/real-competitions-plan.md` and issue #313). Don't import React (or
+  issue #313). Don't import React (or
   anything React-flavoured) there; ESLint enforces it, as it does for each
   game's `gameplay.ts`.
 

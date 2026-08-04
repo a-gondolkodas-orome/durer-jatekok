@@ -6,5 +6,6 @@ npm-debug.log*
 .parcel-cache
 .vscode
 # rollup-plugin-visualizer output
+stats.html
 tmp_*
 .claude/settings.local.json
