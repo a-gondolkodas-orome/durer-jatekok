@@ -4,11 +4,13 @@ import type { Board } from './five-squares';
 
 // The second player places two squares per turn, chosen together (see
 // bestPairs), so the turn is named as a whole.
-const asTurn = (squares: (number | undefined)[]): BotMove[] =>
+const asTurn = (squares: number[]): BotMove[] =>
   squares.map(square => ({ move: 'addPiece', args: [square] }));
 
+const randomSquare = () => sample(range(5))!;
+
 export const randomBotStrategy: BotStrategy<Board> = ({ ctx }) =>
-  asTurn(ctx.currentPlayer === 1 ? [sample(range(5)), sample(range(5))] : [sample(range(5))]);
+  asTurn(ctx.currentPlayer === 1 ? [randomSquare(), randomSquare()] : [randomSquare()]);
 
 export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
   const botPlayerIndex = ctx.currentPlayer!;
@@ -22,7 +24,7 @@ export const smartBotStrategy: BotStrategy<Board> = ({ board, ctx }) => {
     });
     const best = Math.max(...scores);
     const bestTiles = range(5).filter(i => scores[i] === best);
-    return asTurn([sample(bestTiles)]);
+    return asTurn([sample(bestTiles)!]);
   }
 };
 

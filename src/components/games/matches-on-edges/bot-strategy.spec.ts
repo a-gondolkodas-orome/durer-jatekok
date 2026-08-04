@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { sample } from 'lodash';
+import { botNextMoveArgs, makeCtx } from '../../../test-utils';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import {
   type Board,
@@ -17,7 +18,7 @@ const runBot = (
   strategy: typeof smartBotStrategy,
   board: Board
 ): { a: number; b: number } => {
-  const [a, b] = (strategy({ board, ctx: {} as any }) as { args: number[] }).args;
+  const [a, b] = botNextMoveArgs(strategy({ board, ctx: makeCtx() }));
   return { a, b };
 };
 
