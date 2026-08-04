@@ -52,6 +52,10 @@ export const moves = {
   }
 };
 
+// The moves as a type, so a bot can name them: `BotStrategy<Board, Moves>`
+// pins both the move name and the arguments it takes.
+export type Moves = typeof moves;
+
 const rule = {
   hu: <>
     Egy sorban <i>n</i> mező van (itt legfeljebb 12); kezdetben a bal szélső mezőben egy piros, a jobb szélső
