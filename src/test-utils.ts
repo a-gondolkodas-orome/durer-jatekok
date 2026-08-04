@@ -1,4 +1,5 @@
-import type { BotMove, Ctx } from './components/strategy-game-factory';
+import type { BotMove, BotStrategy, Ctx, MoveDefinition } from './components/strategy-game-factory';
+import { asBotMoves } from './components/strategy-game-factory/engine/bot-turn';
 
 // Mock `ctx` for testing move functions and bot strategies.
 export const makeCtx = (overrides: Partial<Ctx> = {}): Ctx => ({
@@ -15,7 +16,22 @@ export const makeCtx = (overrides: Partial<Ctx> = {}): Ctx => ({
 });
 
 // A bot names its moves rather than playing them, so a spec reads its decision
-// straight off the return value. `botArgs` pulls the arguments of the move it
-// named (the first one, for a bot that named a whole turn).
-export const botArgs = (named: BotMove | BotMove[]): any[] =>
-  (Array.isArray(named) ? named[0]! : named).args ?? [];
+// straight off the return value. A strategy that named a whole turn returns
+// several; the one it would play next is the first.
+export const botNextMove = (named: BotMove | BotMove[]): BotMove => asBotMoves(named)[0]!;
+
+export const botNextMoveArgs = (named: BotMove | BotMove[]): any[] =>
+  botNextMove(named).args ?? [];
+
+// Ask a strategy for its turn and play its next move through the game's own
+// move, as the engine would. Lets a spec step a position forward by one bot
+// move without standing up a whole match.
+export const playBotMove = <TBoard>(
+  strategy: BotStrategy<TBoard>,
+  moves: Record<string, MoveDefinition<TBoard>>,
+  board: TBoard,
+  ctx: Ctx = makeCtx()
+): TBoard => {
+  const { move, args = [] } = botNextMove(strategy({ board, ctx }));
+  return moves[move]!.apply(board, { ctx }, ...args).nextBoard;
+};

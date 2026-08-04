@@ -1,5 +1,5 @@
 import { smartBotStrategy } from './bot-strategy';
-import { botArgs, makeCtx } from '../../../../test-utils';
+import { botNextMoveArgs, makeCtx } from '../../../../test-utils';
 
 describe('Double starter TicTacToe strategy', () => {
   describe('AI is the first to move', () => {
@@ -9,7 +9,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null,
         null, null, null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
       expect(played).toContain(4);
     });
 
@@ -19,7 +19,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'red', null,
         null, null, 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
       expect(played).toContain(6);
     });
 
@@ -29,7 +29,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, null,
         null, 'blue', 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
       expect(played).toContain(6);
     });
   });
@@ -41,7 +41,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, null, 'red',
         null, 'blue', 'blue'
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
       expect(played).toContain(6);
     });
 
@@ -51,7 +51,7 @@ describe('Double starter TicTacToe strategy', () => {
         null, 'red', null,
         null, null, null
       ];
-      const played = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
+      const played = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
       expect(played).toContain(8);
     });
   });

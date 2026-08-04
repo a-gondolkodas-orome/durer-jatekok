@@ -1,13 +1,11 @@
-import { makeCtx } from '../../../test-utils';
+import { botNextMoveArgs, makeCtx } from '../../../test-utils';
 import { smartBotStrategy, randomBotStrategy, isWinningForPlayerToMove } from './bot-strategy';
 import { getPossibleMoves, type Board, type Domino, type Field } from './dominoes-4x4';
 
 const fieldKey = ({ row, col }: Field) => `${row},${col}`;
 
-const captureMove = (board: Board, player: number, strategy: typeof smartBotStrategy): Domino => {
-  const named = strategy({ board, ctx: makeCtx({ currentPlayer: player }) });
-  return (named as { args: unknown[] }).args[0] as Domino;
-};
+const captureMove = (board: Board, player: number, strategy: typeof smartBotStrategy): Domino =>
+  botNextMoveArgs(strategy({ board, ctx: makeCtx({ currentPlayer: player }) }))[0] as Domino;
 
 describe('isWinningForPlayerToMove', () => {
   it('the empty 4x4 board is a win for Árgyélus (the vertical player to move)', () => {

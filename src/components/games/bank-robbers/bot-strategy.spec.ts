@@ -1,8 +1,8 @@
 import { smartBotStrategy } from "./bot-strategy";
 import type { Board } from './bank-robbers';
-import { botArgs, makeCtx } from '../../../test-utils';
+import { botNextMoveArgs, makeCtx } from '../../../test-utils';
 
-const robbedBank = (board: Board): number => botArgs(smartBotStrategy({ board, ctx: makeCtx() }))[0];
+const robbedBank = (board: Board): number => botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }))[0];
 
 describe('smartBotStrategy', () => {
   it('moves symmetrically for even number of banks', () => {

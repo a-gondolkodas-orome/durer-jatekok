@@ -52,7 +52,7 @@ change, not as an afterthought.
 
 Game-specific logic is also worth testing when the winning strategy is
 non-trivial. Because bots name their moves, a spec can read a decision straight
-off the return value (`botArgs` in `test-utils`), and `runMatch`
+off the return value (`botNextMoveArgs` in `test-utils`), and `runMatch`
 (`strategy-game-factory/engine/run-match.ts`) plays two strategies against each
 other through the real moves and the real reducer — no fake `moves` object, no
 hand-rolled game loop. That is what turns "the AI is truly optimal" into a test:
@@ -312,6 +312,24 @@ return { nextBoard, isTurnEnd: true };
 This applies with particular force to moves on the outcome-returning `apply`
 contract: `gameEnd: { winnerIndex }` already names the winner, so prose
 narrating who won earns nothing.
+
+## Pull request size
+
+Reviewer time is the scarcest resource here, so plan the split **before**
+starting, not after the diff has grown. Two rules cover most cases:
+
+- **Separate the design from the sweep.** A change to the `strategyGameFactory`
+  contract touches every game, but only the engine, the new shape and a pilot
+  game or two carry decisions worth reviewing; the rest is mechanical. Land the
+  design first with 2–3 games converted, the bulk conversion after.
+- **Migrate a contract with a legacy path, not in one commit.** The engine can
+  accept the old and new shape at once, which turns "every game must change
+  together" into themed batches. This is how the move contract went: #361 added
+  the outcome-returning `apply` alongside the old one, ~10 batches migrated the
+  games by family, #385 dropped the legacy path. Follow that shape.
+
+A mechanical sweep that follows a merged design PR is fine at any size — it is
+skimmable precisely because the pattern was already reviewed.
 
 ## Maintenance philosophy
 

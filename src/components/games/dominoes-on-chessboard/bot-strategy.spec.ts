@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { botArgs, makeCtx } from '../../../test-utils';
+import { botNextMoveArgs, makeCtx } from '../../../test-utils';
 import { getExactWinningMove, smartBotStrategy } from './bot-strategy';
 import { ALL_FIELDS, BOARDSIZE, type Board, type Domino, type Field } from './dominoes-on-chessboard';
 
@@ -85,7 +85,7 @@ describe('getExactWinningMove', () => {
 describe('smartBotStrategy', () => {
   it('always mirrors through the board center when playing second, regardless of position', () => {
     const board: Board = [[{ row: 0, col: 0 }, { row: 0, col: 1 }]];
-    const [placed] = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
+    const [placed] = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 0 }) }));
     expect(new Set((placed as Domino).map(fieldKey))).toEqual(new Set([
       fieldKey({ row: BOARDSIZE - 1, col: BOARDSIZE - 1 }),
       fieldKey({ row: BOARDSIZE - 1, col: BOARDSIZE - 2 })
@@ -98,7 +98,7 @@ describe('smartBotStrategy', () => {
       { row: 2, col: 2 }, { row: 2, col: 3 }, { row: 3, col: 2 }, { row: 3, col: 3 }
     ];
     const board = coverEverythingExcept([...isolatedDomino, ...square2x2]);
-    const [named] = botArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
+    const [named] = botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ chosenRoleIndex: 1 }) }));
     const placed = named as Domino;
 
     expect(placed).toBeDefined();
