@@ -71,14 +71,13 @@ describe('buildCtx: isClientMoveAllowed', () => {
       .toBe(false);
   });
 
-  // The vsComputer arm compares the two seats directly, so two unset seats
-  // match and the board reads as interactive. Nothing can reach that state
-  // today — startGame is the only way into the play phase and always sets
-  // currentPlayer — so this pins the coupling rather than blessing it: a future
-  // path into `play` that left currentPlayer null would hand the client a live
-  // board, and this test is where that would show up.
-  it('leans on currentPlayer being set once the play phase begins', () => {
+  // Two unset seats would compare equal, so without its own null check the
+  // vsComputer arm would call an unstarted game interactive. Nothing reaches
+  // that state today — startGame is the only way into the play phase and
+  // always sets currentPlayer — so this guards a future path in that forgets.
+  it('is false while no player is to move, in either mode', () => {
     expect(allowed({ phase: 'play', mode: 'vsComputer', currentPlayer: null, chosenRoleIndex: null }))
-      .toBe(true);
+      .toBe(false);
+    expect(allowed({ phase: 'play', mode: 'vsHuman', currentPlayer: null })).toBe(false);
   });
 });
