@@ -1,15 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  type Board,
   applyMove,
   blockMultiset,
   currentWindowSize,
   emptyBoard,
+  isTerminal,
   isWindowAllowed,
   legalMoves,
   moverWins,
-  secondPlayerWins
+  moves,
+  secondPlayerWins,
+  type Board
 } from './gameplay';
+import { makeCtx } from '../../../test-utils';
 
 // ---------------------------------------------------------------------------
 // Independent oracle: enumerate legal moves straight from the raw rules (no
@@ -160,5 +163,42 @@ describe('isWindowAllowed', () => {
     const board = { n: 3, edges: [true, true] };
     expect(currentWindowSize(board)).toBe(null);
     expect(isWindowAllowed(board, 0, 0)).toBe(false);
+  });
+});
+
+// The move size is forced (always the largest legal window), so a position runs
+// out of moves on its own; the mover who leaves none wins.
+const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });
+
+// Play the first legal move over and over, collecting each outcome.
+const playToTheEnd = (start: Board) => {
+  const outcomes: ReturnType<typeof moves.placeWindow.apply>[] = [];
+  let board = start;
+  let player = 0;
+  while (!isTerminal(board)) {
+    const { a, b } = legalMoves(board)[0];
+    const outcome = moves.placeWindow.apply(board, asPlayer(player), a, b);
+    outcomes.push(outcome);
+    board = outcome.nextBoard;
+    player = 1 - player;
+  }
+  return outcomes;
+};
+
+describe('end of game', () => {
+  it.each([5, 6, 8, 9])('ends exactly on the last legal move (n = %i)', n => {
+    const outcomes = playToTheEnd(emptyBoard(n));
+    expect(outcomes.length).toBeGreaterThan(0);
+
+    const last = outcomes[outcomes.length - 1];
+    expect(isTerminal(last.nextBoard)).toBe(true);
+    // outcomes alternate players starting from 0, so the last mover is known
+    expect(last.gameEnd).toEqual({ winnerIndex: (outcomes.length - 1) % 2 });
+    expect(last.isTurnEnd).toBeUndefined();
+
+    for (const outcome of outcomes.slice(0, -1)) {
+      expect(outcome.gameEnd).toBeUndefined();
+      expect(outcome.isTurnEnd).toBe(true);
+    }
   });
 });
