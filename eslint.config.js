@@ -4,7 +4,7 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    files: ['src/**/*.{js,ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     plugins: { '@eslint-react': reactPlugin },
     rules: {
       'comma-dangle': ['error', 'never'],
@@ -63,12 +63,12 @@ export default [
   },
   {
     // SVG files contain inline path data that cannot be meaningfully reformatted
-    files: ['src/**/*-svg.{js,ts,tsx,jsx}'],
+    files: ['src/**/*-svg.{ts,tsx}'],
     rules: { 'max-len': 'off' }
   },
   {
     // test files may contain nicely formatted arrays such as for tictactoe
-    files: ['src/**/*spec.{js,ts}'],
+    files: ['src/**/*spec.{ts,tsx}'],
     rules: { 'array-element-newline': 'off' }
   }
 ];
