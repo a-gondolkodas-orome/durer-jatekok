@@ -47,7 +47,6 @@ Create `src/components/games/<game-name>/<game-name>.tsx`. The contract you are 
 - For user-facing text referring to the other participant, prefer "other player" / "másik játékos" over "opponent" / "ellenfél" — the latter reads as too harsh, especially in Hungarian
 - `getPlayerStepDescription` should make it obvious what the current player should do — it is the game's instruction line, not a status label
 - Keep the game's `moves` (and the `Board` type) in a React-free `helpers.ts` when the game is more than trivial: it is what lets a spec and the bot's move pinning import them without pulling in JSX
-- Export the moves as a type next to them (`export type Moves = typeof moves`) and give the bots `BotStrategy<Board, Moves>`, which makes a mistyped move name or a wrong argument list a typecheck error. Annotate every `apply` parameter — an unannotated one types as `any` and checks nothing
 - Pull `name`, `title`, `credit` from `gameList` rather than hardcoding them
 
 ### 5. Re-export the component from `src/components/games/index.ts`
