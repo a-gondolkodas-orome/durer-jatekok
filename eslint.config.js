@@ -5,14 +5,8 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    // Hook rules, on as errors. `rules-of-hooks` had nothing to fix; the other
-    // two are what the move-scoped-state work (#409/#410) cleared the way for —
-    // state derived from a prop belongs in the render, not in an effect that
-    // repairs it one frame later. The single remaining suppression is in
-    // language-context.tsx, which says why it earns one.
     files: ['src/**/*.{ts,tsx}'],
     plugins: { 'react-hooks': reactHooks },
-    languageOptions: { parser: tsParser, parserOptions: { ecmaFeatures: { jsx: true } } },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
@@ -60,7 +54,6 @@ export default [
     // run in plain Node. See issue #313.
     files: ['src/components/games/**/gameplay.ts', 'src/components/strategy-game-factory/engine/**/*.ts'],
     plugins: { '@typescript-eslint': tsPlugin },
-    languageOptions: { parser: tsParser },
     rules: {
       '@typescript-eslint/no-restricted-imports': ['error', {
         patterns: [
