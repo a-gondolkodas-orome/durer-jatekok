@@ -1,8 +1,24 @@
 import reactPlugin from '@eslint-react/eslint-plugin';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
+  {
+    // Hook rules, on as errors. `rules-of-hooks` had nothing to fix; the other
+    // two are what the move-scoped-state work (#409/#410) cleared the way for —
+    // state derived from a prop belongs in the render, not in an effect that
+    // repairs it one frame later. The single remaining suppression is in
+    // language-context.tsx, which says why it earns one.
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks },
+    languageOptions: { parser: tsParser, parserOptions: { ecmaFeatures: { jsx: true } } },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react-hooks/set-state-in-effect': 'error'
+    }
+  },
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { '@eslint-react': reactPlugin },
