@@ -219,7 +219,7 @@ export const PileUnion = strategyGameFactory({
       label: { hu: 'Teszt', en: 'Test' }
     },
     {
-      // smart bot: verified as optimal
+      // smart bot: searches for a move that leaves the opponent a lost board
       botStrategy: smartBotStrategy,
       generateStartBoard: () => {
         const numPiles = random(2, 4);
