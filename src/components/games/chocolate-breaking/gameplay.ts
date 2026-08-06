@@ -39,9 +39,12 @@ export const safeBreaks = ({ w, h }: { w: number; h: number }): Split[] => {
   return breaks;
 };
 
-// Sprague–Grundy value of a single rectangular piece under safe breaks. The
-// board is a disjunctive sum of independent pieces, so the whole position is
-// losing for the player to move iff the XOR of the piece values is 0.
+// Sprague–Grundy value of a single rectangular piece under safe breaks. This
+// sits here rather than with the bot because `generateStartBoard` below needs
+// it to balance who wins — the accepted exception in AGENTS.md § Architecture,
+// the same one `coins-in-3-piles`'s `isLostForMover` takes. Unlike the sibling
+// `remove-row-or-column`, there is no closed form to use instead: the values
+// are irregular (`grundy(5, 10) === 2`).
 const grundyCache = new Map<string, number>();
 export const grundy = (w: number, h: number): number => {
   const key = w <= h ? `${w}x${h}` : `${h}x${w}`;
@@ -59,9 +62,6 @@ export const grundy = (w: number, h: number): number => {
   return mex;
 };
 
-export const totalGrundy = (pieces: Piece[]): number =>
-  pieces.reduce((acc, p) => acc ^ grundy(p.w, p.h), 0);
-
 export const allMoves = (pieces: Piece[]): Move[] =>
   pieces.flatMap(p => safeBreaks(p).map(br => ({ id: p.id, dir: br.dir, pos: br.pos })));
 
@@ -69,7 +69,7 @@ export const allMoves = (pieces: Piece[]): Move[] =>
 // a break that would snap off a 1×1 is not a move, it is the loss condition.
 // Both players break from the same table, so whose turn it is does not enter
 // into legality.
-export const isBreakAllowed = (board: Board, move: Move): boolean => {
+const isBreakAllowed = (board: Board, move: Move): boolean => {
   if (!move) return false;
   const piece = board.pieces.find(p => p.id === move.id);
   if (piece === undefined) return false;

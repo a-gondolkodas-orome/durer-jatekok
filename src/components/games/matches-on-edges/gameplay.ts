@@ -32,7 +32,7 @@ export const blocks = (board: Board): { start: number; length: number }[] => {
 // Largest allowed window size (1, or a multiple of 4) that fits *strictly*
 // inside a block of length `maxBlockLength`. Returns null when no block can host
 // any window, i.e. the game is over.
-export const allowedWindowSize = (maxBlockLength: number): number | null => {
+const allowedWindowSize = (maxBlockLength: number): number | null => {
   if (maxBlockLength < 2) return null;
   let k = 1;
   for (let c = 4; c < maxBlockLength; c += 4) k = c;
@@ -69,7 +69,7 @@ export const legalMoves = (board: Board): Move[] => {
 // single match-free block — so this is not a bounds check but the game's whole
 // move rule. Matching against the generated list keeps the two definitions from
 // drifting; there are only O(n) legal moves.
-export const isWindowAllowed = (board: Board, a: number, b: number): boolean =>
+const isWindowAllowed = (board: Board, a: number, b: number): boolean =>
   legalMoves(board).some(m => m.a === a && m.b === b);
 
 // The bounding edges of window [a, b] that are still free and would receive a
