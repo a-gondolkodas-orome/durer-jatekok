@@ -27,8 +27,8 @@ export const ThiefSheriffMean9 = strategyGameFactory({
   presentation: {
     rule,
     roleLabels: [
-      { hu: 'Nyomozó', en: "Sheriff" },
-      { hu: 'Tolvaj', en: "Thief" }
+      { hu: 'Nyomozó', en: 'Sheriff' },
+      { hu: 'Tolvaj', en: 'Thief' }
     ],
     getPlayerStepDescription: () => ({ hu: 'Válassz egy kártyát.', en: 'Pick a card.' })
   },
