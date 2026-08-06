@@ -8,10 +8,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -32,6 +28,9 @@ jobs:
 
   deploy:
     needs: build
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
