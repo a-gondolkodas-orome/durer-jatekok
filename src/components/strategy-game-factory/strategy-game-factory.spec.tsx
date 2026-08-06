@@ -2,7 +2,9 @@
 import { render, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { strategyGameFactory, type StrategyGameConfig } from './strategy-game-factory';
-import type { BoardClientProps, BotMove, BotStrategy, Ctx, Gameplay, StrategyArgs } from './types';
+import type {
+  BoardClientProps, BotMove, BotStrategy, Ctx, Gameplay, StrategyArgs, VariantInput
+} from './types';
 
 type Board = string[];
 
@@ -35,16 +37,18 @@ const defaultGameplay: Gameplay<Board> = {
 const makeConfig = ({
   BoardClient = MinimalBoardClient,
   gameplay = defaultGameplay,
-  botStrategy = (() => []) as BotStrategy<Board>
+  botStrategy = (() => []) as BotStrategy<Board>,
+  variants
 }: {
   BoardClient?: StrategyGameConfig<Board>['BoardClient']
   gameplay?: Gameplay<Board>
   botStrategy?: BotStrategy<Board>
+  variants?: VariantInput<Board>[]
 } = {}): StrategyGameConfig<Board> => ({
   presentation: { rule: <></>, getPlayerStepDescription: () => '' },
   BoardClient,
   gameplay,
-  variants: [{ botStrategy, generateStartBoard: (): Board => ['initial'] }]
+  variants: variants ?? [{ botStrategy, generateStartBoard: (): Board => ['initial'] }]
 });
 
 const minimalConfig = (gameplay: Gameplay<Board>) => makeConfig({ gameplay });
@@ -137,6 +141,82 @@ describe('switchMode', () => {
     fireEvent.click(getByTestId('move-btn'));
     fireEvent.click(getByTestId('mode-vsComputer'));
     expect(getByTestId('role-btn-0')).toBeTruthy();
+  });
+});
+
+// The two halves of a variant decide which mode can host it: a variant with no
+// `generateStartBoard` has no position to deal two humans, and one with no
+// `botStrategy` has nobody to play the other side against a single player.
+describe('variant availability by mode', () => {
+  const startBoard = (): Board => ['initial'];
+  const named = (name: string) => ({ hu: name, en: name });
+
+  // 'Gamma' borrows the default variant's start board, so it can only be played
+  // against the bot.
+  const mixedVariants = () => makeConfig({
+    variants: [
+      { label: named('Alpha'), isDefault: true, botStrategy: () => [], generateStartBoard: startBoard },
+      { label: named('Beta'), botStrategy: () => [], generateStartBoard: startBoard },
+      { label: named('Gamma'), botStrategy: () => [] }
+    ]
+  });
+
+  // No variant names a botStrategy, so resolveVariants has none to fall back on
+  // either and the whole game is two-players-only.
+  const botlessVariants = () => makeConfig({
+    variants: [
+      { label: named('Alpha'), isDefault: true, generateStartBoard: startBoard },
+      { label: named('Beta'), generateStartBoard: startBoard }
+    ]
+  });
+
+  const variantRadio = (view: ReturnType<typeof renderGame>, label: string) =>
+    view.getByLabelText(label) as HTMLInputElement;
+
+  it('offers every variant in vsComputer mode', () => {
+    const view = renderGame(mixedVariants());
+    ['Alpha', 'Beta', 'Gamma'].forEach(label => expect(view.queryByLabelText(label)).toBeTruthy());
+  });
+
+  it('hides a variant that generates no start board from vsHuman mode', () => {
+    const view = renderGame(mixedVariants());
+    fireEvent.click(view.getByTestId('mode-vsHuman'));
+
+    expect(view.queryByLabelText('Gamma')).toBeNull();
+    expect(view.queryByLabelText('Alpha')).toBeTruthy();
+    expect(view.queryByLabelText('Beta')).toBeTruthy();
+  });
+
+  it('disables every variant in vsComputer mode when the game defines no bot', () => {
+    const view = renderGame(botlessVariants());
+
+    expect(variantRadio(view, 'Alpha').disabled).toBe(true);
+    expect(variantRadio(view, 'Beta').disabled).toBe(true);
+  });
+
+  it('enables those same variants in vsHuman mode, which needs no bot', () => {
+    const view = renderGame(botlessVariants());
+    fireEvent.click(view.getByTestId('mode-vsHuman'));
+
+    expect(variantRadio(view, 'Alpha').disabled).toBe(false);
+    expect(variantRadio(view, 'Beta').disabled).toBe(false);
+  });
+
+  it('falls back to the default variant when switching to vsHuman would leave none selected', () => {
+    const view = renderGame(mixedVariants());
+    fireEvent.click(variantRadio(view, 'Gamma'));
+    expect(variantRadio(view, 'Gamma').checked).toBe(true);
+
+    fireEvent.click(view.getByTestId('mode-vsHuman'));
+    expect(variantRadio(view, 'Alpha').checked).toBe(true);
+  });
+
+  it('keeps the selected variant when switching to vsHuman can host it', () => {
+    const view = renderGame(mixedVariants());
+    fireEvent.click(variantRadio(view, 'Beta'));
+
+    fireEvent.click(view.getByTestId('mode-vsHuman'));
+    expect(variantRadio(view, 'Beta').checked).toBe(true);
   });
 });
 
