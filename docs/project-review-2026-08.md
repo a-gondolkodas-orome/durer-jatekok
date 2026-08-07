@@ -291,7 +291,15 @@ rules specs relative to module size.
 - Nothing outside `src/` is linted or typechecked (`vite.config.js`,
   `eslint.config.js`, `scripts/`).
 - No coverage tooling (`@vitest/coverage-v8` + a `coverage` script would make
-  §4 measurable), no dependabot/renovate despite exact-pinned deps.
+  §4 measurable). ~~No dependabot/renovate despite exact-pinned deps~~ ✅ —
+  resolved, but not the way the line assumed. Both were evaluated and turned
+  down: with reviewer time the scarce resource, a five-issue tracker and a
+  static site whose advisories threaten a build rather than a visitor, a PR
+  stream costs more than it returns, and majors want the `#168` checklist
+  treatment either way. What was actually missing was a *reminder*, so
+  `.github/workflows/dependency_report.yml` posts one monthly issue naming
+  what is behind (npm packages, actions and Node), and closes it when nothing
+  is. Security urgency stays with Dependabot alerts, which need no config file.
 - `package.json`: `postcss` sits in `dependencies` (build-only); `playwright`
   is a devDependency no code uses — it exists to bake Chromium into the
   devcontainer, worth a comment where it's declared.
@@ -321,7 +329,8 @@ rules specs relative to module size.
 | 7 | Bot turn loop and `chosenRoleIndex` (§5) | ✅ #408 — both premises were false; landed as an agreement test |
 | 8 | `games/shared/`: win/loss solver, mex, `Field`, `asTurn`; migrate by family (§6) | ✅ solver only, 3 games — `mex`, `Field` and `asTurn` rejected on the evidence (§6) |
 | 9 | react-hooks lint, quotes rule (§7) | open, small PRs |
-| 10 | Factory component/spec split, `turnState` generic, table-storage convergence, naming sweeps | opportunistic |
+| 10 | Dependency staleness reporting (§7) | ✅ a monthly nag issue — dependabot/renovate evaluated and rejected (§7) |
+| 11 | Factory component/spec split, `turnState` generic, table-storage convergence, naming sweeps | opportunistic |
 
 Remaining open items worth a line: `game-controls.tsx`'s ⓘ marker (§4c), the
 bots with real search but no spec (§4b), thin rules specs (§4d), and everything
