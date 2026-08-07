@@ -298,10 +298,11 @@ rules specs relative to module size.
   **removed**, not moved: `vite` and `@tailwindcss/postcss` both depend on it,
   so the declaration bought nothing that the lockfile did not already. A `"//"`
   key covers `playwright`. Note the section was not a slip: 20db5d79 (2022)
-  deliberately moved the build deps into `dependencies`, and `tailwindcss` /
-  `@tailwindcss/postcss` still sit there for that reason. Both workflows now run
-  a plain `npm ci`, so that rationale is dead — moving those two is a separate,
-  purely cosmetic call, left open.
+  deliberately moved the build deps into `dependencies`, back when the build ran
+  off a prod-only install. Both workflows run a plain `npm ci` now, so that
+  rationale is dead and `tailwindcss` / `@tailwindcss/postcss` moved to
+  `devDependencies` too. `dependencies` is now exactly the five packages `src/`
+  imports.
 - CI: ~~`pr_test.yml` has no `concurrency` group (stacked runs on busy PRs) and
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.
