@@ -368,14 +368,29 @@ React Router works.
   one number here that carries information (§4b).
 
   Same posture as stryker, deliberately: a script, no CI step, no thresholds.
-- No dependabot/renovate despite exact-pinned deps.
+- ~~No dependabot/renovate despite exact-pinned deps~~ ✅ — resolved, but not the
+  way the line assumed. Both were evaluated and turned down: with reviewer time
+  the scarce resource, a five-issue tracker and a static site whose advisories
+  threaten a build rather than a visitor, a PR stream costs more than it returns,
+  and majors want the `#168` checklist treatment either way. What was actually
+  missing was a *reminder*, so `.github/workflows/dependency_report.yml` posts
+  one monthly issue naming what is behind (npm packages, actions and Node), and
+  closes it when nothing is. Security urgency stays with Dependabot alerts,
+  which need no config file.
 - `package.json`: `postcss` sits in `dependencies` (build-only); `playwright`
   is a devDependency no code uses — it exists to bake Chromium into the
   devcontainer, worth a comment where it's declared.
 - CI: ~~`pr_test.yml` has no `concurrency` group (stacked runs on busy PRs) and
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.
-- No path alias for `test-utils` — 97 specs import `../../../test-utils`.
+- ~~No path alias for `test-utils` — 97 specs import `../../../test-utils`.~~ ✅
+  — `test-utils`, `strategy-game-factory` and `language` are now aliases
+  (`vite.config.js` + tsconfig `paths`), covering 107 spec imports, 262 barrel
+  imports and 52 i18n imports. Every alias is anchored, so
+  `strategy-game-factory/engine/…` does not resolve — the no-deep-imports rule
+  now enforces itself. What is left relative is the imports that are genuinely
+  local: within `src/language/`, within the factory folder, and `test-utils.ts`
+  reaching into `./components/`.
 - ~~7 `console.*` calls in shipped game code (`triangular-grid-ropes-10`,
   `stones-remove-one-not-twice-from-left`, `cube-coloring`) as "unexpected
   state" fallbacks — arguably should throw in dev like the engine does.~~ ✅
@@ -407,6 +422,7 @@ React Router works.
 | 9 | react-hooks lint, quotes rule (§7) | open, small PRs |
 | 10 | Factory component/spec split, `turnState` generic, table-storage convergence, naming sweeps | opportunistic |
 | 11 | Coverage tooling (§7) + specs for what it found (§4e) | ✅ — premise false, kept for a different reason |
+| 12 | Dependency staleness reporting (§7) | ✅ a monthly nag issue — dependabot/renovate evaluated and rejected (§7) |
 
 Remaining open items worth a line: the bots with real search but no spec (§4b,
 list now regenerable), thin rules specs (§4d), and everything in §5 below the

@@ -4,7 +4,7 @@ import {
   isRemovalAllowed, moves
 } from './gameplay';
 import { isWinningForMover } from './bot-strategy';
-import { makeCtx } from '../../../test-utils';
+import { makeCtx } from 'test-utils';
 
 const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });
 

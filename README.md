@@ -303,7 +303,8 @@ it is fine to add new games with Hungarian only.
 
 The `t()` helper from `translate.ts` resolves a value to the active language.
 The value can be a plain string if there are no translations available, or a
-`{ hu, en }` object.
+`{ hu, en }` object. It is reached through the `language` barrel, which is a
+path alias — `import { useTranslation } from 'language';`, no `../../../`.
 
 Check the [Dürer Archive](https://durerinfo.hu/archivum/feladatsorok/) for
 existing translations.
@@ -325,6 +326,18 @@ For an example of internationalizing an existing game, see
 - [self-hosted umami](https://umami.durerinfo.hu) as usage tracker
 
 </details>
+
+## Dependency updates
+
+Every version is pinned exactly (`save-exact=true`), so nothing drifts on its own
+— and nothing goes stale loudly either. `.github/workflows/dependency_report.yml`
+runs monthly and keeps one `OPS` issue in sync with whatever is behind (npm
+packages, actions, the Node in `.nvmrc`); `npm run report:outdated` prints the
+same table on demand. It opens no pull requests — upgrading stays deliberate,
+majors one at a time as in
+[#168](https://github.com/a-gondolkodas-orome/durer-jatekok/issues/168). Why a
+report rather than dependabot or renovate: the header comment of
+`scripts/dependency-report.mjs`, and `docs/project-review-2026-08.md` §7.
 
 # License
 

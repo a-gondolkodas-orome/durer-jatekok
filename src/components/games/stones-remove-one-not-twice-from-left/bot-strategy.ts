@@ -1,4 +1,4 @@
-import type { BotStrategy } from '../../strategy-game-factory';
+import type { BotStrategy } from 'strategy-game-factory';
 import { sample } from 'lodash';
 import {
   PILE_IDS, boardAfterRemoval, isRemovalAllowed, type Board, type Moves

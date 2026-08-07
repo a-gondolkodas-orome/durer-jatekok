@@ -1,4 +1,4 @@
-import type { Ctx, MoveOutcome } from '../../strategy-game-factory';
+import type { Ctx, MoveOutcome } from 'strategy-game-factory';
 import { sample } from 'lodash';
 
 export type Board = { piles: [number, number], leftRestriction: [boolean, boolean] }

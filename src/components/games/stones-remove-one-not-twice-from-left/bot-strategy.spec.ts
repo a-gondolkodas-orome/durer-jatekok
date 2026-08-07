@@ -1,5 +1,5 @@
-import { runMatch } from '../../strategy-game-factory';
-import { botNextMoveArgs, makeCtx, moveValidator } from '../../../test-utils';
+import { runMatch } from 'strategy-game-factory';
+import { botNextMoveArgs, makeCtx, moveValidator } from 'test-utils';
 import { type Board, hasNoLegalMove, moves } from './gameplay';
 import { isWinningForMover, randomBotStrategy, smartBotStrategy } from './bot-strategy';
 
