@@ -294,8 +294,14 @@ rules specs relative to module size.
   §4 measurable), no dependabot/renovate despite exact-pinned deps.
 - ~~`package.json`: `postcss` sits in `dependencies` (build-only); `playwright`
   is a devDependency no code uses — it exists to bake Chromium into the
-  devcontainer, worth a comment where it's declared.~~ ✅ `postcss` moved to
-  `devDependencies`; a `"//"` key above the block explains both.
+  devcontainer, worth a comment where it's declared.~~ ✅ — but `postcss` was
+  **removed**, not moved: `vite` and `@tailwindcss/postcss` both depend on it,
+  so the declaration bought nothing that the lockfile did not already. A `"//"`
+  key covers `playwright`. Note the section was not a slip: 20db5d79 (2022)
+  deliberately moved the build deps into `dependencies`, and `tailwindcss` /
+  `@tailwindcss/postcss` still sit there for that reason. Both workflows now run
+  a plain `npm ci`, so that rationale is dead — moving those two is a separate,
+  purely cosmetic call, left open.
 - CI: ~~`pr_test.yml` has no `concurrency` group (stacked runs on busy PRs) and
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.

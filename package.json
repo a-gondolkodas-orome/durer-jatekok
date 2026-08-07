@@ -28,9 +28,7 @@
     "tailwindcss": "4.3.3"
   },
   "//": [
-    "Two of the devDependencies below are imported by no code here, so npm keys are the only place to say why they are declared.",
-    "playwright: the devcontainer bakes its Chromium into the image at build time, so the version has to be written down somewhere the Dockerfile can be checked against — see ARG PLAYWRIGHT_VERSION there, which `npm run check:versions` compares this entry to.",
-    "postcss: build-only, and already a transitive dependency of @tailwindcss/postcss. Pinned directly so the version running the `postcss` config block at the bottom of this file is exact rather than whatever that range resolves to."
+    "playwright is imported by no code here, so this is the only place to say why it is a dependency at all: the devcontainer bakes its Chromium into the image at build time, which means the version has to be written down somewhere the Dockerfile can be checked against — see ARG PLAYWRIGHT_VERSION there, which `npm run check:versions` compares this entry to."
   ],
   "devDependencies": {
     "@eslint-react/eslint-plugin": "5.18.0",
@@ -47,7 +45,6 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "jsdom": "29.1.1",
     "playwright": "1.62.0",
-    "postcss": "8.5.23",
     "typescript": "6.0.3",
     "vite": "8.1.5",
     "vitest": "4.1.10"
