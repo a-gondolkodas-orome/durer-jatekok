@@ -37,6 +37,8 @@ sibling of `games/`):
   turn-taking, end-of-game detection, restart/clean state. Defines a
   well-specified API that every game must implement. Games import everything
   through the `strategy-game-factory` barrel (`index.ts`) — no deep imports.
+  `strategy-game-factory` is a path alias, so no `../../` either; it is anchored
+  to the barrel, which is what makes the no-deep-imports rule self-enforcing.
 
 **Per-game responsibility:**
 Each game folder implements the optimal strategy (computer AI) and game-specific
@@ -100,7 +102,8 @@ change, not as an afterthought.
 
 Game-specific logic is also worth testing when the winning strategy is
 non-trivial. Because bots name their moves, a spec can read a decision straight
-off the return value (`botNextMoveArgs` in `test-utils`), and `runMatch`
+off the return value (`botNextMoveArgs` in `test-utils`, imported by specs as
+`from 'test-utils'` — an alias, so no `../../../`), and `runMatch`
 (`strategy-game-factory/engine/run-match.ts`) plays two strategies against each
 other through the real moves and the real reducer — no fake `moves` object, no
 hand-rolled game loop. That is what turns "the AI is truly optimal" into a test:
@@ -123,6 +126,19 @@ for a cheap strategy over a small state space (`coins-in-3-piles`: 124 boards,
 playouts). For those, play a few representative boards and leave the exhaustive
 argument to cheap unit tests of the characterisation itself — the Grundy value,
 the parity invariant, the win/loss predicate.
+
+**Coverage is on demand and has no threshold** (`npm run coverage`), and should
+stay that way. Those two sweeps execute ~94% of the source — that is how much of
+this repo is `games/` — while asserting only that a match ends and a board
+renders, so the global percentage reads high whatever the tests are worth, and a
+CI gate on it would be satisfied by registering another game. What the report is
+good for is the question grep cannot answer: which modules **no spec loads at
+all**. That is why `coverage.include` in `vite.config.js` names every file under
+`src/` rather than letting Vitest report only what a test imported. Run
+`npm run coverage:unswept` for the other half — with the sweeps excluded, what
+drops to near zero is the game logic nothing but a sweep touches. Neither one is
+a measure of whether the bots are right; that is what a bot's own spec, and
+`npx stryker run` for the engine, are for.
 
 ## Planned future directions
 
@@ -280,6 +296,35 @@ the name; a game that has not been converted yet keeps compiling.
 - `turnState`: use for multi-stage turns or other state that needs to be
   remembered during a turn if needed, i.e. to expose it from BoardClient to
   getPlayerStepDescription
+
+**Pinning the turn state.** Left unpinned, `ctx.turnState` is `unknown`, and
+every reader casts. A multi-stage game names the shape instead, next to the
+moves that produce it:
+
+```ts
+// gameplay.ts — the payload only; the engine adds the `| null` every turn
+// starts and ends in
+export type TurnState = { firstSelectedPile: number };
+```
+
+```tsx
+// board-client.tsx — annotating the props is what pins the whole game
+const BoardClient = ({ ctx, setTurnState }: BoardClientProps<Board, TurnState>) => {
+  const { turnState } = ctx;   // TurnState | null, no cast
+```
+
+The factory infers `TTurnState` from the config, so the game file's
+`getPlayerStepDescription` takes `StrategyArgs<Board, TurnState>`, each move's
+meta takes `{ ctx: Ctx<TurnState> }` and its `apply` returns
+`MoveOutcome<Board, TurnState>` — annotate all of them, since inference reads
+every one of those sites and a leftover bare `Ctx` contradicts the rest. A spec
+that builds a ctx names it too: `makeCtx<TurnState>({ … })`. Games with no
+mid-turn state say nothing and keep compiling.
+
+Bots are deliberately left out: a bot is asked again with a fresh `ctx` for
+every move it still owes, so it plans a whole turn rather than reading its own
+half-made selection back. `BotStrategy` therefore stays
+`BotStrategy<Board, Moves>` and sees `turnState` as `unknown`.
 
 **`setTurnState(stage)`** — a `BoardClient`-only prop, for components that keep
 mid-turn UI state in `ctx.turnState`. It is the one path that writes engine

@@ -113,6 +113,20 @@ npm run lint:fix
 
 `npx stryker run` mutation-tests the engine on demand — not part of `npm run test` or CI, never fails a build, scope it with `--mutate "path/to/file.ts:120-160"`.
 
+```bash
+npm run coverage         # line coverage, on demand
+npm run coverage:unswept # the same, without the two all-games sweeps
+```
+
+Also on demand, also never part of `npm run test` or CI, and with no threshold
+to pass. The plain report is for finding code **no spec loads at all** — it
+lists every file under `src/`, not only the ones a test imported. The global
+percentage is not a target: `plays-to-an-end.spec.ts` and `renders.spec.tsx`
+execute nearly every line under `games/` while asserting almost nothing, so it
+reads high whatever the state of the tests. `coverage:unswept` drops those two,
+and what falls to near zero there is the game logic those sweeps are the only
+thing touching.
+
 ### Build for prod
 
 (some problems only appear in prod build, not while testing, for example using a
@@ -260,6 +274,12 @@ by the framework in `ctx`: `currentPlayer`, `isClientMoveAllowed` (guard every
 player interaction with it), `isHumanVsHumanGame`, `chosenRoleIndex`, and
 `turnState` for multi-stage turns. Never modify either in place.
 
+A multi-stage game pins what its `turnState` holds — `export type TurnState` in
+`gameplay.ts`, `BoardClientProps<Board, TurnState>` on the component — and the
+factory infers the rest of the config from there, so nothing has to cast it
+back. See [AGENTS.md § Pinning the turn
+state](AGENTS.md#strategygamefactory-api).
+
 Always pass the current `board` as a move's first argument, including to
 subsequent moves within the same turn. The framework's own state is
 authoritative — it lives in a synchronous store outside React — so the argument
@@ -283,7 +303,8 @@ it is fine to add new games with Hungarian only.
 
 The `t()` helper from `translate.ts` resolves a value to the active language.
 The value can be a plain string if there are no translations available, or a
-`{ hu, en }` object.
+`{ hu, en }` object. It is reached through the `language` barrel, which is a
+path alias — `import { useTranslation } from 'language';`, no `../../../`.
 
 Check the [Dürer Archive](https://durerinfo.hu/archivum/feladatsorok/) for
 existing translations.
@@ -305,6 +326,18 @@ For an example of internationalizing an existing game, see
 - [self-hosted umami](https://umami.durerinfo.hu) as usage tracker
 
 </details>
+
+## Dependency updates
+
+Every version is pinned exactly (`save-exact=true`), so nothing drifts on its own
+— and nothing goes stale loudly either. `.github/workflows/dependency_report.yml`
+runs monthly and keeps one `OPS` issue in sync with whatever is behind (npm
+packages, actions, the Node in `.nvmrc`); `npm run report:outdated` prints the
+same table on demand. It opens no pull requests — upgrading stays deliberate,
+majors one at a time as in
+[#168](https://github.com/a-gondolkodas-orome/durer-jatekok/issues/168). Why a
+report rather than dependabot or renovate: the header comment of
+`scripts/dependency-report.mjs`, and `docs/project-review-2026-08.md` §7.
 
 # License
 

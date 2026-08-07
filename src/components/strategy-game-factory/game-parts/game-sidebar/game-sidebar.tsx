@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from '@headlessui/react';
-import { useTranslation, type I18nString } from '../../../../language';
+import { useTranslation, type I18nString } from 'language';
 import { ModeSelector, DifficultySelector } from '../common/game-controls';
 import { getCtaText } from '../common/cta-text';
 import type { Ctx, Mode, Variant } from '../../types';
@@ -42,7 +42,8 @@ export const GameSidebar = ({
 }: GameSidebarProps) => {
   const { t } = useTranslation();
   const isNewGameAllowed = ctx.phase !== 'play' || ctx.isClientMoveAllowed;
-  const activeVariantHasBotStrategy = !!variants.find(v => v.originalIndex === selectedVariantIndex)?.botStrategy;
+  const activeVariantHasBotStrategy =
+    !!variants.find(v => v.originalIndex === selectedVariantIndex)?.hasBotStrategy;
 
   const selectedVariant = variants.find(v => v.originalIndex === selectedVariantIndex);
   const modeSummaryLabel = t(ctx.isHumanVsHumanGame

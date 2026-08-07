@@ -1,8 +1,8 @@
 import {
-  type Board, type Grid, type Move,
+  type Board, type Grid, type Move, type TurnState,
   getRectangleAt, getRectangles, applyMove, isEmpty, getAllMoves, isRemovalAllowed, moves
 } from './gameplay';
-import { makeCtx } from '../../../test-utils';
+import { makeCtx } from 'test-utils';
 
 const g = (rows: number[][]): Grid => rows.map(r => r.map(Boolean));
 
@@ -116,7 +116,7 @@ describe('isRemovalAllowed', () => {
 // Whoever takes the last disc off the board wins; the selected disc parked in
 // ctx.turnState is cleared either way.
 describe('end of game', () => {
-  const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) });
+  const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx<TurnState>({ currentPlayer }) });
   const board = (grid: boolean[][]): Board => ({ grid });
 
   it.each([0, 1])('ends for the mover (player %i) when the last discs come off', p => {

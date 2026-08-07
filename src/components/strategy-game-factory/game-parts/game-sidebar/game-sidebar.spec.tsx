@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { GameSidebar, type SidebarMoves } from './game-sidebar';
 import type { Ctx } from '../../types';
-import { makeCtx } from '../../../../test-utils';
+import { makeCtx } from 'test-utils';
 
 beforeAll(() => {
   const { unmount } = renderSidebar();
@@ -30,7 +30,7 @@ const renderSidebar = (ctxOverrides: Partial<Ctx> = {}) => {
         ctx={ctx}
         playerNames={[]}
         moves={defaultMoves}
-        variants={[{ botStrategy: () => {}, originalIndex: 0, disabled: false }]}
+        variants={[{ hasBotStrategy: true, originalIndex: 0, disabled: false }]}
         selectedVariantIndex={0}
       />
     </MemoryRouter>
