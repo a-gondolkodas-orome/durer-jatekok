@@ -90,42 +90,6 @@ machine shares the same login state.
 
 </details>
 
-## Dependency updates
-
-Every version here is pinned exactly (`save-exact=true` in `.npmrc`, plus the
-lockfile), so nothing ever drifts on its own — and nothing goes stale loudly
-either. `.github/workflows/dependency_report.yml` runs on the 1st of each month
-and keeps a single `OPS` issue titled **Dependency update report** in sync with
-what is behind: the npm packages, the GitHub Actions in `.github/workflows`, and
-the Node in `.nvmrc`. It opens the issue when something falls behind, edits it in
-place while that stays true (an edit sends no notification, so a still-stale
-month is silent), and closes it once everything is current again.
-
-It opens no pull requests and merges nothing. Upgrading stays a deliberate act:
-patch and minor bumps batch into one PR gated by `npm run test` and the build,
-while a major goes one at a time against the upstream upgrade guide — see
-[#168](https://github.com/a-gondolkodas-orome/durer-jatekok/issues/168) for the
-shape. Dependabot and Renovate were both evaluated and turned down; the reasoning
-is in `docs/project-review-2026-08.md` §7.
-
-```bash
-npm run report:outdated   # the same table, on demand
-```
-
-Security advisories are a separate channel — GitHub's Dependabot **alerts** cover
-them with no config file in the repository, and arrive with an urgency a monthly
-digest would only dilute.
-
-Two rows in the report come with a warning, because they are written down in more
-than one file: `playwright` (also `.devcontainer/Dockerfile`) and Node (five
-places, listed in the devcontainer details above). `npm run check:versions` fails
-until they agree — where this report compares the repository against upstream,
-that script compares it against itself.
-
-Note that GitHub disables a scheduled workflow after 60 days without repository
-activity. That should never come up here, but it is the explanation for a month
-that passes with no issue and no run.
-
 ## Useful npm commands
 <details>
 <summary>The commands</summary>
@@ -341,6 +305,18 @@ For an example of internationalizing an existing game, see
 - [self-hosted umami](https://umami.durerinfo.hu) as usage tracker
 
 </details>
+
+## Dependency updates
+
+Every version is pinned exactly (`save-exact=true`), so nothing drifts on its own
+— and nothing goes stale loudly either. `.github/workflows/dependency_report.yml`
+runs monthly and keeps one `OPS` issue in sync with whatever is behind (npm
+packages, actions, the Node in `.nvmrc`); `npm run report:outdated` prints the
+same table on demand. It opens no pull requests — upgrading stays deliberate,
+majors one at a time as in
+[#168](https://github.com/a-gondolkodas-orome/durer-jatekok/issues/168). Why a
+report rather than dependabot or renovate: the header comment of
+`scripts/dependency-report.mjs`, and `docs/project-review-2026-08.md` §7.
 
 # License
 
