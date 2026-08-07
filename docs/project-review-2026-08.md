@@ -298,7 +298,9 @@ rules specs relative to module size.
 - CI: ~~`pr_test.yml` has no `concurrency` group (stacked runs on busy PRs) and
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.
-- No path alias for `test-utils` — 97 specs import `../../../test-utils`.
+- ~~No path alias for `test-utils` — 97 specs import `../../../test-utils`.~~ ✅
+  — a `test-utils` alias (`vite.config.js` + tsconfig `paths`) now serves all
+  107 spec imports.
 - 7 `console.*` calls in shipped game code (`triangular-grid-ropes-10`,
   `stones-remove-one-not-twice-from-left`, `cube-coloring`) as "unexpected
   state" fallbacks — arguably should throw in dev like the engine does.

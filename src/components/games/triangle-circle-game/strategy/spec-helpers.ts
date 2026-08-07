@@ -1,5 +1,5 @@
 import { type Board, applyShade, applyCircle } from '../gameplay';
-import { botNextMove, makeCtx } from '../../../../test-utils';
+import { botNextMove, makeCtx } from 'test-utils';
 import type { BotStrategy } from '../../../strategy-game-factory';
 
 // Ask a bot for one turn and report what it named, applying the move so tests

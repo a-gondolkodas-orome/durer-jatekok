@@ -1,5 +1,5 @@
 import { getLegalMoves, hasLegalMove, isOpposite, isRemovalAllowed, moves, type Board } from './gameplay';
-import { makeCtx } from '../../../test-utils';
+import { makeCtx } from 'test-utils';
 
 describe('isRemovalAllowed', () => {
   const board: Board = [2, 1, 0, 3, 1, 1];

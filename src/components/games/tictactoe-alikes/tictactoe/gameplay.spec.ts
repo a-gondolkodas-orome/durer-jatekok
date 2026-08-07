@@ -1,4 +1,4 @@
-import { makeCtx } from '../../../../test-utils';
+import { makeCtx } from 'test-utils';
 import type { Ctx } from '../../../strategy-game-factory';
 import { inPlacingPhase, moves, type Board } from './gameplay';
 

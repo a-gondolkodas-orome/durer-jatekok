@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 // import { visualizer } from 'rollup-plugin-visualizer';
@@ -7,6 +8,14 @@ export default defineConfig(() => ({
     react()
     // visualizer({ open: true })
   ],
+  resolve: {
+    alias: {
+      // Specs sit three or four folders deep under src/, so without this every
+      // one of them reaches its shared helpers through a wall of `../`.
+      // Mirrored in tsconfig.json's `paths` — keep the two in sync.
+      'test-utils': fileURLToPath(new URL('./src/test-utils.ts', import.meta.url))
+    }
+  },
   base: '/',
   build: {
     rollupOptions: {

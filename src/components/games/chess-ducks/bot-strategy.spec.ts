@@ -6,7 +6,7 @@ import {
 import {
   smartBotStrategy, randomBotStrategy, smartBotOptimalSecondSteps, smartBotOptimalThirdSteps
 } from './bot-strategy';
-import { botNextMoveArgs, makeCtx } from '../../../test-utils';
+import { botNextMoveArgs, makeCtx } from 'test-utils';
 
 const emptyBoard = (rows: number, cols: number): Board =>
   range(rows).map(() => range(cols).map(() => null));
