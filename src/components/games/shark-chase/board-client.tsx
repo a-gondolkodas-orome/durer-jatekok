@@ -78,19 +78,19 @@ export const makeBoardClient = (maxTurn: number) =>
                 ? 'ring-2 ring-inset ring-red-600' : ''}
             `}
           >
-            {possibleMoves.includes(id) && isCurrentPlayerResearcher && (
-              <OptionalNextSubmarine existingSubmarineCount={board.submarines[id]} />
-            )}
-            {possibleMoves.includes(id) && isCurrentPlayerShark && (
-              <OptionalNextShark />
-            )}
             {board.submarines[id] >= 1 && (
               <SubmarinesInCell count={board.submarines[id]} />
+            )}
+            {possibleMoves.includes(id) && isCurrentPlayerResearcher && (
+              <OptionalNextSubmarine existingSubmarineCount={board.submarines[id]} />
             )}
             {board.shark === id && (
               <svg className="aspect-square top-0 absolute z-10">
                 <use xlinkHref="#shark" />
               </svg>
+            )}
+            {possibleMoves.includes(id) && isCurrentPlayerShark && (
+              <OptionalNextShark />
             )}
             {board.shark === id && isCurrentPlayerShark && ctx.isClientMoveAllowed && (
               <button
@@ -111,10 +111,21 @@ const OptionalNextShark = () => {
 };
 
 const OptionalNextSubmarine = ({ existingSubmarineCount }) => (
-  <svg className={`aspect-square absolute z-40 opacity-50 ${existingSubmarineCount === 1 ? 'top-[10%]' : 'top-0'}`}>
+  <svg
+    className={`
+      aspect-square absolute z-40 opacity-50
+      ${optionalNextTopByCount[existingSubmarineCount]}
+    `}>
     <use xlinkHref="#submarine" />
   </svg>
 );
+
+const optionalNextTopByCount: Record<number, string> = {
+  0: 'top-0',
+  1: 'top-[10%]',
+  2: 'top-0',
+  3: 'top-[25]%'
+}
 
 const topsByCount: Record<number, string[]> = {
   1: ['top-0'],
