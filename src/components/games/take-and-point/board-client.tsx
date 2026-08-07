@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { useTranslation } from '../../../language';
+import { useTranslation } from 'language';
 import { GameBoard, type BoardClientProps, useMoveScopedState } from 'strategy-game-factory';
 import { type Board, requiredPointCount } from './gameplay';
 

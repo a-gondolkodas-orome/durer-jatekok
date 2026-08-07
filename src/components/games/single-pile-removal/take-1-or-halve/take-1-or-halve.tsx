@@ -5,7 +5,7 @@ import {
   useHoverPreview
 } from 'strategy-game-factory';
 import { random, range } from 'lodash';
-import { useTranslation } from '../../../../language';
+import { useTranslation } from 'language';
 import { moves, type Board, type HoveredAction } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 

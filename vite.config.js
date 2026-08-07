@@ -23,6 +23,10 @@ export default defineConfig(() => ({
       {
         find: /^strategy-game-factory$/,
         replacement: fileURLToPath(new URL('./src/components/strategy-game-factory/index.ts', import.meta.url))
+      },
+      {
+        find: /^language$/,
+        replacement: fileURLToPath(new URL('./src/language/index.ts', import.meta.url))
       }
     ]
   },

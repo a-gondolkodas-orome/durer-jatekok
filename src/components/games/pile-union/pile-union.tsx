@@ -1,7 +1,7 @@
 import { useState, type ComponentProps } from 'react';
 import { range, random } from 'lodash';
 import { strategyGameFactory, type BoardClientProps, GameBoard, useHoverPreview } from 'strategy-game-factory';
-import { useTranslation } from '../../../language';
+import { useTranslation } from 'language';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import { moves, type Board, type MoveType, type TurnState } from './gameplay';
 

@@ -1,4 +1,4 @@
-import { useTranslation } from '../../../language';
+import { useTranslation } from 'language';
 import { GameBoard, type BoardClientProps, useHoverPreview } from 'strategy-game-factory';
 import { BOARD_OUTLINE, EDGES, TRIANGLES, type Edge } from './geometry';
 import { type Board } from './gameplay';

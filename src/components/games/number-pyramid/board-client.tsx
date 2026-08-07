@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { useTranslation } from '../../../language';
+import { useTranslation } from 'language';
 import { hasActivePair, type Board } from './gameplay';
 import { GameBoard, type BoardClientProps } from 'strategy-game-factory';
 

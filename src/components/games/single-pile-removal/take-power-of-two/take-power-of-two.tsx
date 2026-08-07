@@ -4,7 +4,7 @@ import {
   GameBoard,
   useHoverPreview
 } from 'strategy-game-factory';
-import { useTranslation } from '../../../../language';
+import { useTranslation } from 'language';
 import { generateStartBoard, generateTestStartBoard, getAvailableExponents, moves, type Board } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 

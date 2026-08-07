@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { useTranslation, type I18nString } from '../../../../language';
+import { useTranslation, type I18nString } from 'language';
 import { GameBoard, type BoardClientProps } from 'strategy-game-factory';
 import { LINES, type Board } from './gameplay';
 

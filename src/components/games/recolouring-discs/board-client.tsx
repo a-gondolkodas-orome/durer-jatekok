@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { range } from 'lodash';
-import { useTranslation } from '../../../language';
+import { useTranslation } from 'language';
 import { GameBoard, type BoardClientProps, useMoveScopedState } from 'strategy-game-factory';
 import { type Board, type Cell, colorOf } from './gameplay';
 
