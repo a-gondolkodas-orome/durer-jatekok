@@ -292,9 +292,10 @@ rules specs relative to module size.
   `eslint.config.js`, `scripts/`).
 - No coverage tooling (`@vitest/coverage-v8` + a `coverage` script would make
   §4 measurable), no dependabot/renovate despite exact-pinned deps.
-- `package.json`: `postcss` sits in `dependencies` (build-only); `playwright`
+- ~~`package.json`: `postcss` sits in `dependencies` (build-only); `playwright`
   is a devDependency no code uses — it exists to bake Chromium into the
-  devcontainer, worth a comment where it's declared.
+  devcontainer, worth a comment where it's declared.~~ ✅ `postcss` moved to
+  `devDependencies`; a `"//"` key above the block explains both.
 - CI: ~~`pr_test.yml` has no `concurrency` group (stacked runs on busy PRs) and
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.
