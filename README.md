@@ -113,6 +113,20 @@ npm run lint:fix
 
 `npx stryker run` mutation-tests the engine on demand — not part of `npm run test` or CI, never fails a build, scope it with `--mutate "path/to/file.ts:120-160"`.
 
+```bash
+npm run coverage         # line coverage, on demand
+npm run coverage:unswept # the same, without the two all-games sweeps
+```
+
+Also on demand, also never part of `npm run test` or CI, and with no threshold
+to pass. The plain report is for finding code **no spec loads at all** — it
+lists every file under `src/`, not only the ones a test imported. The global
+percentage is not a target: `plays-to-an-end.spec.ts` and `renders.spec.tsx`
+execute nearly every line under `games/` while asserting almost nothing, so it
+reads high whatever the state of the tests. `coverage:unswept` drops those two,
+and what falls to near zero there is the game logic those sweeps are the only
+thing touching.
+
 ### Build for prod
 
 (some problems only appear in prod build, not while testing, for example using a
@@ -259,6 +273,12 @@ Details in [AGENTS.md § Files in a game folder](AGENTS.md#architecture).
 by the framework in `ctx`: `currentPlayer`, `isClientMoveAllowed` (guard every
 player interaction with it), `isHumanVsHumanGame`, `chosenRoleIndex`, and
 `turnState` for multi-stage turns. Never modify either in place.
+
+A multi-stage game pins what its `turnState` holds — `export type TurnState` in
+`gameplay.ts`, `BoardClientProps<Board, TurnState>` on the component — and the
+factory infers the rest of the config from there, so nothing has to cast it
+back. See [AGENTS.md § Pinning the turn
+state](AGENTS.md#strategygamefactory-api).
 
 Always pass the current `board` as a move's first argument, including to
 subsequent moves within the same turn. The framework's own state is
