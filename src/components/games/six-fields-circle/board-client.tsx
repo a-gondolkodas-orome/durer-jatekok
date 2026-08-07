@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { GameBoard, type BoardClientProps } from '../../strategy-game-factory';
+import { GameBoard, type BoardClientProps } from 'strategy-game-factory';
 import { type Board, FIELD_COUNT, OPPOSITE_PAIRS } from './gameplay';
 
 type TurnState = { first: number } | null

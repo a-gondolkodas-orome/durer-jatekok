@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type BoardClientProps, GameBoard } from '../../strategy-game-factory';
+import { type BoardClientProps, GameBoard } from 'strategy-game-factory';
 import { useTranslation } from '../../../language';
 import { type Board, type Coef, COEFS, integerRoots } from './gameplay';
 

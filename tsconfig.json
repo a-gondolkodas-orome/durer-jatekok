@@ -9,8 +9,9 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "paths": {
-      // Mirrors the alias in vite.config.js — keep the two in sync.
-      "test-utils": ["./src/test-utils.ts"]
+      // Mirrors the aliases in vite.config.js — keep the two in sync.
+      "test-utils": ["./src/test-utils.ts"],
+      "strategy-game-factory": ["./src/components/strategy-game-factory/index.ts"]
     },
     "skipLibCheck": true,
     "types": ["vitest/globals", "vite/client"]

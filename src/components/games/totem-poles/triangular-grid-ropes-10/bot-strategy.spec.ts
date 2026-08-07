@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { runMatch, type MatchResult } from '../../../strategy-game-factory';
+import { runMatch, type MatchResult } from 'strategy-game-factory';
 import {
   getAllowedMoves, isAllowed, edgeDirection, mirrorNodes, moves, type Board, type Edge
 } from './gameplay';

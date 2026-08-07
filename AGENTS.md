@@ -37,6 +37,8 @@ sibling of `games/`):
   turn-taking, end-of-game detection, restart/clean state. Defines a
   well-specified API that every game must implement. Games import everything
   through the `strategy-game-factory` barrel (`index.ts`) — no deep imports.
+  `strategy-game-factory` is a path alias, so no `../../` either; it is anchored
+  to the barrel, which is what makes the no-deep-imports rule self-enforcing.
 
 **Per-game responsibility:**
 Each game folder implements the optimal strategy (computer AI) and game-specific

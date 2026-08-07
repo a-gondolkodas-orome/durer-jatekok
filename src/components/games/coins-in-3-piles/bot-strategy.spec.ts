@@ -1,4 +1,4 @@
-import { runMatch } from '../../strategy-game-factory';
+import { runMatch } from 'strategy-game-factory';
 import { isLostForMover, moves, type Board } from './gameplay';
 import { makeCtx } from 'test-utils';
 import { planTurn, smartBotStrategy, randomBotStrategy } from './bot-strategy';

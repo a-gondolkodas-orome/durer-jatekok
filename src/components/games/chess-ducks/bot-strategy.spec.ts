@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { runMatch, type MatchResult } from '../../strategy-game-factory';
+import { runMatch, type MatchResult } from 'strategy-game-factory';
 import {
   getAllowedMoves, isPlacementAllowed, withDuckPlaced, moves, type Board, type Field
 } from './gameplay';

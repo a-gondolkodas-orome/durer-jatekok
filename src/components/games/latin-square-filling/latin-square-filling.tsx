@@ -1,6 +1,6 @@
 import {
   strategyGameFactory, useMoveScopedState, type BoardClientProps, type Ctx, GameBoard
-} from '../../strategy-game-factory';
+} from 'strategy-game-factory';
 import { useTranslation } from '../../../language';
 import { generateStartBoard, moves, type Board } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';

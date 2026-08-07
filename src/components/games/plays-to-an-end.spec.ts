@@ -1,5 +1,5 @@
 import * as games from './index';
-import { runMatch, type StrategyGame } from '../strategy-game-factory';
+import { runMatch, type StrategyGame } from 'strategy-game-factory';
 
 // Plays every registered game headlessly, through the real moves, the real
 // validators and the real reducer. `runMatch` throws on everything this is

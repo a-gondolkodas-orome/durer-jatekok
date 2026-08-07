@@ -1,6 +1,6 @@
 import {
   strategyGameFactory, type BoardClientProps, type Ctx, GameBoard, useHoverPreview
-} from '../../strategy-game-factory';
+} from 'strategy-game-factory';
 import { CastleSvg } from './assets/castle-svg';
 import { SoldierSvg } from './assets/soldier-svg';
 import { smartBotStrategy } from './bot-strategy';

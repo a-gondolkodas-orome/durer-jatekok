@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { GameBoard, useHoverPreview, type BoardClientProps } from '../../strategy-game-factory';
+import { GameBoard, useHoverPreview, type BoardClientProps } from 'strategy-game-factory';
 import { useTranslation } from '../../../language';
 import { cap, type Board } from './gameplay';
 

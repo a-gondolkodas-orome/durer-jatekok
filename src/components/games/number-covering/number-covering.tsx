@@ -1,4 +1,4 @@
-import { strategyGameFactory, type BoardClientProps, GameBoard } from '../../strategy-game-factory';
+import { strategyGameFactory, type BoardClientProps, GameBoard } from 'strategy-game-factory';
 import { range, sum } from 'lodash';
 import { useTranslation } from '../../../language';
 import { generateTestStartBoard, getRemaining, moves, type Board, COVERED } from './gameplay';

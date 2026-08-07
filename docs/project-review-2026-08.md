@@ -299,8 +299,10 @@ rules specs relative to module size.
   no npm cache~~ ✅ (#401); the two workflows still duplicate their build block
   verbatim.
 - ~~No path alias for `test-utils` — 97 specs import `../../../test-utils`.~~ ✅
-  — a `test-utils` alias (`vite.config.js` + tsconfig `paths`) now serves all
-  107 spec imports.
+  — `test-utils` and `strategy-game-factory` are now aliases (`vite.config.js` +
+  tsconfig `paths`), covering 107 spec imports and 262 barrel imports. The
+  barrel alias is anchored, so `strategy-game-factory/engine/…` does not
+  resolve — the no-deep-imports rule now enforces itself.
 - 7 `console.*` calls in shipped game code (`triangular-grid-ropes-10`,
   `stones-remove-one-not-twice-from-left`, `cube-coloring`) as "unexpected
   state" fallbacks — arguably should throw in dev like the engine does.
