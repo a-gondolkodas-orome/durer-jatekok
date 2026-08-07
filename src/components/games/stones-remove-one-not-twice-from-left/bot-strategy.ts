@@ -1,13 +1,8 @@
 import type { BotStrategy } from 'strategy-game-factory';
 import { sample } from 'lodash';
-import {
-  PILE_IDS, boardAfterRemoval, isRemovalAllowed, type Board, type Moves
-} from './gameplay';
+import { boardAfterRemoval, openPiles, type Board, type Moves } from './gameplay';
 
 type Bot = BotStrategy<Board, Moves>
-
-const legalPiles = (board: Board, player: number): number[] =>
-  PILE_IDS.filter(pileId => isRemovalAllowed(board, player, pileId));
 
 // A position is decided by the two pile sizes plus who is currently barred from
 // the left pile — the seat numbers themselves say nothing, so both seats share
@@ -30,7 +25,7 @@ export const isWinningForMover = (board: Board, player: number): boolean => {
   const key = cacheKey(board, player);
   const cached = cache.get(key);
   if (cached !== undefined) return cached;
-  const result = legalPiles(board, player).some(
+  const result = openPiles(board, player).some(
     pileId => isWinningRemoval(board, player, pileId)
   );
   cache.set(key, result);
@@ -43,11 +38,11 @@ const isWinningRemoval = (board: Board, player: number, pileId: number): boolean
 
 export const smartBotStrategy: Bot = ({ board, ctx }) => {
   const player = ctx.currentPlayer!;
-  const options = legalPiles(board, player);
+  const options = openPiles(board, player);
   const winning = options.filter(pileId => isWinningRemoval(board, player, pileId));
   // From a lost position every move loses, so play on and let the opponent err.
   return { move: 'removeStone', args: [sample(winning.length ? winning : options)!] };
 };
 
 export const randomBotStrategy: Bot = ({ board, ctx }) =>
-  ({ move: 'removeStone', args: [sample(legalPiles(board, ctx.currentPlayer!))!] });
+  ({ move: 'removeStone', args: [sample(openPiles(board, ctx.currentPlayer!))!] });

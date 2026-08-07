@@ -12,7 +12,9 @@ export const isRemovalAllowed = (board: Board, player: number, pileId: number): 
     && board.piles[pileId] > 0
     && !(pileId === 0 && board.leftRestriction[player]);
 
-export const PILE_IDS = [0, 1];
+// The piles a player may still take from.
+export const openPiles = (board: Board, player: number): number[] =>
+  board.piles.flatMap((_, pileId) => isRemovalAllowed(board, player, pileId) ? [pileId] : []);
 
 // "The player who cannot move loses" spelled out: both piles are shut to them,
 // which happens when the right one is empty and the left one is either empty
@@ -20,7 +22,7 @@ export const PILE_IDS = [0, 1];
 // only terminal condition, which is what lets the bot's search treat "no legal
 // move" as a plain loss rather than a special case.
 export const hasNoLegalMove = (board: Board, player: number): boolean =>
-  !PILE_IDS.some(pileId => isRemovalAllowed(board, player, pileId));
+  openPiles(board, player).length === 0;
 
 // The rule half of `removeStone`, without the outcome the engine reads: taking
 // a stone also arms (or clears) the mover's own left-pile restriction. Shared

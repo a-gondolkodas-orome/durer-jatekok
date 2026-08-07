@@ -1,7 +1,7 @@
 import { times, uniqWith, isEqual } from 'lodash';
 import {
   type Board, boardAfterRemoval, generateStartBoard, generateTestStartBoard, hasNoLegalMove,
-  isRemovalAllowed, moves
+  isRemovalAllowed, moves, openPiles
 } from './gameplay';
 import { isWinningForMover } from './bot-strategy';
 import { makeCtx } from 'test-utils';
@@ -45,6 +45,18 @@ describe('isRemovalAllowed', () => {
     const b = board([3, 4]);
     expect(isRemovalAllowed(b, 0, 2)).toBe(false);
     expect(isRemovalAllowed(b, 0, -1)).toBe(false);
+  });
+});
+
+describe('openPiles', () => {
+  it('lists both piles when nobody is restricted', () => {
+    expect(openPiles(board([3, 4]), 0)).toEqual([0, 1]);
+  });
+
+  it('drops an empty pile and a pile closed off to the mover', () => {
+    expect(openPiles(board([0, 4]), 0)).toEqual([1]);
+    expect(openPiles(board([3, 4], [true, false]), 0)).toEqual([1]);
+    expect(openPiles(board([3, 0]), 0)).toEqual([0]);
   });
 });
 
