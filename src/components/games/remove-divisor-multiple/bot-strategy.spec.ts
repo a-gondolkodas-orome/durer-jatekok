@@ -48,6 +48,17 @@ describe('smartBotStrategy', () => {
     }
   });
 
+  it('does not crash on a state the book leaves out of a size it covers', () => {
+    // The generator drops the states that have no legal move, so a covered
+    // table size can still miss a state. Unreachable in play — the game has
+    // ended by the time a position looks like this, so the bot is never asked
+    // — but the lookup must not read `.length` off the miss.
+    const board = table(6, 5, [1, 5]);
+    expect(range(1, 7).some(n => isAllowed(board, n))).toBe(false);
+
+    expect(() => numberNamed(board)).not.toThrow();
+  });
+
   it('only ever names a number that is still on the table and divides or multiplies the last', () => {
     const boards = range(6, 10).flatMap(size =>
       [table(size), ...range(1, size + 1).map(n => table(size, n, [n]))]
