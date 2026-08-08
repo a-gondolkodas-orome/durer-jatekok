@@ -192,7 +192,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // under the default shallow fetch there is no common ancestor to find.
     mergeBase = git('merge-base', base, 'HEAD').trim();
   } catch {
-    console.error(`Could not find the merge base of ${base} and HEAD. Fetch it first, or pass --base <ref>.`);
+    // git's own error is on stderr above; naming one cause here would have sent the first CI
+    // failure of this job hunting a shallow fetch when the problem was file ownership.
+    console.error(`Could not find the merge base of ${base} and HEAD — see git's error above.`);
     process.exit(1);
   }
   // No second commit, so the working tree is what gets compared: run this before committing and it

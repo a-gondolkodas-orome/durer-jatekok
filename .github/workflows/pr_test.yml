@@ -66,6 +66,12 @@ jobs:
           # The merge base has to exist locally for `<base>...HEAD` to resolve; the default shallow
           # fetch gives one commit and the diff would come out as the whole repository.
           fetch-depth: 0
+      # actions/checkout marks the workspace safe itself, but under a HOME it overrides for the
+      # duration of its own steps, so in a container job the setting is gone by the time a later
+      # `run:` calls git — which fails with "detected dubious ownership" rather than anything about
+      # ownership being fine. The other jobs never notice: they run npm, not git.
+      - name: Let git read the checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Cache npm downloads
         uses: actions/cache@v6
         with:
