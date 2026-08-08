@@ -18,6 +18,15 @@ export const isTerminal = (board: Board): boolean => !canMove(board);
 export const applyMove = (board: Board, move: Move): Board =>
   board.map((v, i) => v - move[i]);
 
+// A move takes from exactly two piles, at least one stone and at most the whole
+// pile from each. Checked directly rather than as membership in getLegalMoves,
+// which enumerates a quadratic number of moves.
+const isMoveLegal = (board: Board, move: Move): boolean =>
+  Array.isArray(move)
+    && move.length === board.length
+    && move.every((removed, i) => Number.isInteger(removed) && removed >= 0 && removed <= board[i])
+    && move.filter(removed => removed > 0).length === 2;
+
 // Every legal move: pick two non-empty piles, remove between 1 and the whole
 // pile from each. Amounts removed from the two piles are independent.
 export const getLegalMoves = (board: Board): Move[] => {
@@ -95,14 +104,7 @@ export const generateStartBoard = (): Board => {
 
 export const moves = {
   takeStones: {
-    // A move takes from exactly two piles, at least one stone and at most the
-    // whole pile from each. Checked directly rather than as membership in
-    // getLegalMoves, which enumerates a quadratic number of moves.
-    validate: (board: Board, _, move: Move) =>
-      Array.isArray(move)
-        && move.length === board.length
-        && move.every((removed, i) => Number.isInteger(removed) && removed >= 0 && removed <= board[i])
-        && move.filter(removed => removed > 0).length === 2,
+    validate: (board: Board, _, move: Move) => isMoveLegal(board, move),
     apply: (board: Board, { ctx }: { ctx: Ctx }, move: Move): MoveOutcome<Board> => {
       const nextBoard = applyMove(board, move);
       if (isTerminal(nextBoard)) {

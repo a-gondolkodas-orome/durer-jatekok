@@ -7,6 +7,13 @@ export type Board = number[];
 const isPileId = (board: Board, pileId: number): boolean =>
   Number.isInteger(pileId) && pileId >= 0 && pileId < board.length;
 
+// A split has to leave both halves non-empty.
+const isSplitAllowed = (board: Board, pileId: number, firstPart: number): boolean =>
+  isPileId(board, pileId)
+    && Number.isInteger(firstPart)
+    && firstPart >= 1
+    && firstPart <= board[pileId] - 1;
+
 export const moves = {
   removeMatch: {
     // Empty piles are dropped from the board, so every pile has a match to give up.
@@ -23,12 +30,8 @@ export const moves = {
     }
   },
   splitPile: {
-    // A split has to leave both halves non-empty.
     validate: (board: Board, _, pileId: number, firstPart: number) =>
-      isPileId(board, pileId)
-        && Number.isInteger(firstPart)
-        && firstPart >= 1
-        && firstPart <= board[pileId] - 1,
+      isSplitAllowed(board, pileId, firstPart),
     apply: (board: Board, _, pileId: number, firstPart: number): MoveOutcome<Board> => {
       const size = board[pileId];
       const nextBoard = board.flatMap((n, i) =>

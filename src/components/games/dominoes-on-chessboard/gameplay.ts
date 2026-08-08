@@ -24,14 +24,16 @@ export const getPossibleMoves = (board: Board) => {
   return possibleMoves;
 }
 
+// A domino is legal when it covers two uncovered neighbouring fields, which is
+// what `getPossibleMoves` enumerates. The player picks the two fields in either
+// order, so the pair is matched unordered.
+const isDominoAllowed = (board: Board, domino: Domino): boolean =>
+  Array.isArray(domino) && domino.length === 2
+    && getPossibleMoves(board).some(m => isEqual(m, domino) || isEqual(m, [domino[1], domino[0]]));
+
 export const moves = {
   placeDomino: {
-    // A domino is legal when it covers two uncovered neighbouring fields, which
-    // is what `getPossibleMoves` enumerates. The player picks the two fields in
-    // either order, so the pair is matched unordered.
-    validate: (board: Board, _, domino: Domino) =>
-      Array.isArray(domino) && domino.length === 2
-        && getPossibleMoves(board).some(m => isEqual(m, domino) || isEqual(m, [domino[1], domino[0]])),
+    validate: (board: Board, _, domino: Domino) => isDominoAllowed(board, domino),
     apply: (board: Board, { ctx }: { ctx: Ctx }, domino: Domino): MoveOutcome<Board> => {
       const nextBoard = cloneDeep(board);
       nextBoard.push(domino);

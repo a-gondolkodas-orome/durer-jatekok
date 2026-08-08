@@ -45,16 +45,29 @@ export const generateStartBoard = (): Board => {
   return { piles: shuffle(piles), pointed: null };
 };
 
+// The two halves of a turn are told apart by the board alone: `pointed` is null
+// until someone has pointed, and `takeStones` clears it again. Pointing means
+// naming exactly the required number of distinct non-empty piles.
+const isPointingAllowed = (board: Board, indices: number[]): boolean =>
+  board.pointed === null
+    && Array.isArray(indices)
+    && indices.length === requiredPointCount(board.piles)
+    && uniq(indices).length === indices.length
+    && indices.every(i => board.piles[i] > 0);
+
+// Taking means removing between one stone and the whole pile from one of the
+// piles the other player pointed at.
+const isRemovalAllowed = (board: Board, index: number, amount: number): boolean =>
+  board.pointed !== null
+    && board.pointed.includes(index)
+    && Number.isInteger(amount) && amount >= 1 && amount <= board.piles[index];
+
 export const moves = {
   // Take `amount` stones from a pointed pile. The turn does NOT end here: the
   // same player then points at piles for the other player (see `pointPiles`).
   takeStones: {
-    // Taking means removing between one stone and the whole pile from one of the
-    // piles the other player pointed at.
     validate: (board: Board, _, index: number, amount: number) =>
-      board.pointed !== null
-        && board.pointed.includes(index)
-        && Number.isInteger(amount) && amount >= 1 && amount <= board.piles[index],
+      isRemovalAllowed(board, index, amount),
     apply: (
       board: Board, { ctx }: { ctx: Ctx }, index: number, amount: number
     ): MoveOutcome<Board> => {
@@ -68,15 +81,7 @@ export const moves = {
 
   // Point at the piles the other player will choose from, then hand over the turn.
   pointPiles: {
-    // The two halves of a turn are told apart by the board alone: `pointed` is
-    // null until someone has pointed, and `takeStones` clears it again. Pointing
-    // means naming exactly the required number of distinct non-empty piles.
-    validate: (board: Board, _, indices: number[]) =>
-      board.pointed === null
-        && Array.isArray(indices)
-        && indices.length === requiredPointCount(board.piles)
-        && uniq(indices).length === indices.length
-        && indices.every(i => board.piles[i] > 0),
+    validate: (board: Board, _, indices: number[]) => isPointingAllowed(board, indices),
     apply: (board: Board, _, indices: number[]): MoveOutcome<Board> =>
       ({ nextBoard: { piles: board.piles, pointed: indices }, isTurnEnd: true })
   }
