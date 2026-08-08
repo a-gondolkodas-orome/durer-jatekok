@@ -31,20 +31,12 @@ export const placeStoneAt = (stones: boolean[], cellId: number): boolean[] =>
 // itself carries — a designated line is waiting for a stone, and only once that
 // stone is placed may the next line be designated. So neither half needs turn
 // state to know whether it is its moment.
-export const isPlacementAllowed = (board: Board, cellId: number): boolean =>
-  board.pendingLine !== null
-    && LINES[board.pendingLine].includes(cellId)
-    && !board.stones[cellId];
-
-const isDesignationAllowed = (board: Board, lineIndex: number): boolean =>
-  board.pendingLine === null
-    && Number.isInteger(lineIndex)
-    && lineIndex >= 0
-    && lineIndex < LINES.length;
-
 export const moves = {
   placeStone: {
-    validate: (board: Board, _, cellId: number) => isPlacementAllowed(board, cellId),
+    validate: (board: Board, _, cellId: number) =>
+      board.pendingLine !== null
+        && LINES[board.pendingLine].includes(cellId)
+        && !board.stones[cellId],
     // First half of the turn: place a stone, then designate a line — the turn
     // stays open in between.
     apply: (board: Board, _, cellId: number): MoveOutcome<Board> => {
@@ -54,7 +46,11 @@ export const moves = {
   },
 
   designateLine: {
-    validate: (board: Board, _, lineIndex: number) => isDesignationAllowed(board, lineIndex),
+    validate: (board: Board, _, lineIndex: number) =>
+      board.pendingLine === null
+        && Number.isInteger(lineIndex)
+        && lineIndex >= 0
+        && lineIndex < LINES.length,
     apply: (board: Board, { ctx }: { ctx: Ctx }, lineIndex: number): MoveOutcome<Board> => {
       const nextBoard: Board = { stones: board.stones, pendingLine: lineIndex };
       // A full designated line leaves the other player nowhere to place.

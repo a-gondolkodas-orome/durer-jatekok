@@ -1,4 +1,9 @@
-import { type Board, isArchitectStepAllowed, isDestructionAllowed } from './gameplay';
+import { type Board, BANDITS, isArchitectStepAllowed, makeMoves } from './gameplay';
+import { makeCtx, moveValidator } from 'test-utils';
+
+const isDestructionAllowed = moveValidator(
+  makeMoves(40).destroyTower, makeCtx({ currentPlayer: BANDITS })
+);
 
 // A fresh day on a regular polygon with `vertexCount` towers, all standing, the
 // architect at A(0).

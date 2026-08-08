@@ -7,20 +7,17 @@ export type Piece = { pileId: number; pieceId: number };
 export const generateStartBoard = (): Board => ([random(0, 9), random(0, 9), random(0, 9), random(4, 9)]);
 export const generateTestStartBoard = (): Board => ([random(0, 6), random(0, 6), random(0, 6), random(4, 6)]);
 
-// A move takes `pieceCount` pieces off pile `pileId` and puts one on each of the
-// `pieceCount` piles immediately in front of it, so it can never reach past the
-// first pile — hence the cap at `pileId`.
-const isSpreadAllowed = (board: Board, pileId: number, pieceCount: number): boolean =>
-  Number.isInteger(pileId) && pileId >= 0 && pileId < board.length
-    && Number.isInteger(pieceCount)
-    && pieceCount >= 1
-    && pieceCount <= pileId
-    && pieceCount <= board[pileId];
-
 export const moves = {
   spreadPieces: {
+    // A move takes `pieceCount` pieces off pile `pileId` and puts one on each of
+    // the `pieceCount` piles immediately in front of it, so it can never reach
+    // past the first pile — hence the cap at `pileId`.
     validate: (board: Board, _, { pileId, pieceCount }: { pileId: number; pieceCount: number }) =>
-      isSpreadAllowed(board, pileId, pieceCount),
+      Number.isInteger(pileId) && pileId >= 0 && pileId < board.length
+        && Number.isInteger(pieceCount)
+        && pieceCount >= 1
+        && pieceCount <= pileId
+        && pieceCount <= board[pileId],
     apply: (
       board: Board,
       { ctx }: { ctx: Ctx },

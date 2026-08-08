@@ -53,14 +53,6 @@ export const [SULTAN, HUNYADI] = [0, 1];
 // colour being present on the staircase is not part of legality.
 const isColor = (group: string): group is SoldierColor => group === 'blue' || group === 'red';
 
-// A soldier reference points at an actual soldier on the staircase, and the
-// group it is assigned to is one of the two colours the sultan splits into.
-const isSoldierAssignmentAllowed = (board: Board, soldiers: Soldier[]): boolean =>
-  Array.isArray(soldiers) && soldiers.every(
-    ({ rowIndex, pieceIndex, group }) =>
-      isColor(group) && board[rowIndex]?.[pieceIndex] !== undefined
-  );
-
 export const moves = {
   killGroup: {
     validate: (_board: Board, { ctx }, group: SoldierColor) =>
@@ -79,8 +71,14 @@ export const moves = {
     apply: (board: Board) => ({ nextBoard: board, isTurnEnd: true })
   },
   setGroupOfSoldiers: {
+    // A soldier reference points at an actual soldier on the staircase, and the
+    // group it is assigned to is one of the two colours the sultan splits into.
     validate: (board: Board, { ctx }, soldiers: Soldier[]) =>
-      ctx.currentPlayer === SULTAN && isSoldierAssignmentAllowed(board, soldiers),
+      ctx.currentPlayer === SULTAN
+        && Array.isArray(soldiers) && soldiers.every(
+          ({ rowIndex, pieceIndex, group }) =>
+            isColor(group) && board[rowIndex]?.[pieceIndex] !== undefined
+        ),
     apply: (board: Board, _, soldiers: Soldier[]) => {
       const nextBoard = cloneDeep(board);
       for (const soldier of soldiers) {
