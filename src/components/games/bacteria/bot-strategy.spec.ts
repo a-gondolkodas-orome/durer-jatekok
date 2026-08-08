@@ -352,13 +352,10 @@ describe('bacteria bot behaviour', () => {
 });
 
 describe('legal move enumeration', () => {
-  it('only enumerates attacks the rules allow', () => {
+  it('starts every attack from a cell that holds a bacterium', () => {
     const busy = { bacteria: [[1, 2, 1], [3, 0], [0, 1, 0]], goals: [1] };
     const options = legalAttackMoves(busy, asAttacker);
     expect(options.length).toBeGreaterThan(0);
-    // Agreement with the engine is now by construction — the enumeration asks
-    // the moves themselves. What is still worth pinning is that it starts every
-    // attack from a cell that actually holds a bacterium.
     expect(options.every(({ row, col }) => busy.bacteria[row][col] >= 1)).toBe(true);
   });
 });
