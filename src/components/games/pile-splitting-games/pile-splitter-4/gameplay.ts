@@ -1,62 +1,43 @@
-import { range, random } from 'lodash';
+import { random, range, times } from 'lodash';
 import type { Board } from '../gameplay';
 
 // Played on four piles; the rules are the shared pile-splitting ones unchanged.
 export { moves, type Board, type Piece, type Moves } from '../gameplay';
 
-export const generateStartBoard = (): Board => {
-  if (random(0, 1)) return generateWinningStartBoard();
-  return generateLosingStartBoard();
-};
+// Both roles get a start board they can win from about half the time.
+export const generateStartBoard = (): Board => generateStartBoardWonBy(random(0, 1) === 1);
 
-export const generateTestStartBoard = (): Board => {
-  if (random(0, 1)) return generateWinningStartBoard(5, 3, 6);
-  return generateLosingStartBoard(5, 3, 6);
-};
+// The test variant plays out faster: smaller piles, and fewer trials spent
+// hunting for a board of the wanted kind.
+export const generateTestStartBoard = (): Board =>
+  generateStartBoardWonBy(random(0, 1) === 1, { pileMin: 3, pileMax: 6, remainingTrials: 5 });
 
+type BoardOptions = { pileMin?: number; pileMax?: number; remainingTrials?: number };
 
-const generateWinningStartBoard = (remainingTrials = 50, pileMin = 5, pileMax = 12): Board => {
-  const board = [
-    random(pileMin, pileMax),
-    random(pileMin, pileMax),
-    random(pileMin, pileMax),
-    random(pileMin, pileMax)
-  ];
-  if (!canWin(board)) {
-    if (remainingTrials > 0) {
-      return generateWinningStartBoard(remainingTrials - 1);
-    }
-    return board;
+// Draw boards until one falls on the wanted side of `canWin`, then vary its
+// shape: doubling, and doubling with one piece taken off, both leave the
+// win/loss class untouched (see `canWin`), so they widen the pool for free.
+// Every option has to be threaded through the retry — a retry that fell back to
+// the defaults is how the test variant used to end up with full-size boards.
+const generateStartBoardWonBy = (
+  moverWins: boolean,
+  { pileMin = 5, pileMax = 12, remainingTrials = 50 }: BoardOptions = {}
+): Board => {
+  const board = times(4, () => random(pileMin, pileMax));
+
+  if (canWin(board) !== moverWins) {
+    if (remainingTrials === 0) return board;
+    return generateStartBoardWonBy(
+      moverWins, { pileMin, pileMax, remainingTrials: remainingTrials - 1 }
+    );
   }
 
-  const r = random(0, 2);
-  if (r === 0) return board;
-  if (r === 1) return board.map(x => x * 2);
-  const modifiedBoard = board.map(x => x * 2);
-  modifiedBoard[random(0, 3)] -= 1;
-  return modifiedBoard;
-};
-
-const generateLosingStartBoard = (remainingTrials = 50, pileMin = 5, pileMax = 12): Board => {
-  const board = [
-    random(pileMin, pileMax),
-    random(pileMin, pileMax),
-    random(pileMin, pileMax),
-    random(pileMin, pileMax)
-  ];
-  if (canWin(board)) {
-    if (remainingTrials > 0) {
-      return generateLosingStartBoard(remainingTrials - 1);
-    }
-    return board;
-  }
-
-  const r = random(0, 2);
-  if (r === 0) return board;
-  if (r === 1) return board.map(x => x * 2);
-  const modifiedBoard = board.map(x => x * 2);
-  modifiedBoard[random(0, 3)] -= 1;
-  return modifiedBoard;
+  const variation = random(0, 2);
+  if (variation === 0) return board;
+  const doubled = board.map(x => x * 2);
+  if (variation === 1) return doubled;
+  doubled[random(0, 3)] -= 1;
+  return doubled;
 };
 
 // Can the player to move force a win? Recursive parity normalisation.
