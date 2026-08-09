@@ -6,14 +6,14 @@ import { GameSidebar } from './game-parts/game-sidebar/game-sidebar';
 import { GameEndDialog } from './game-parts/game-end-dialog';
 import { mapValues, isEqual } from 'lodash';
 import { useTranslation, type TranslatableNode, type I18nString } from 'language';
-import { useLocation } from 'react-router';
+import { useLocation, useSearchParams } from 'react-router';
 import { useGameStats } from './hooks/use-game-stats';
 import { trackEvent } from '../../tracking';
 import type {
   Mode, Ctx, MoveOutcome, Gameplay, GameMoves, ClientGameMoves, BotStrategy, BotMove,
   BoardClientProps, StrategyArgs, Variant as DisplayVariant, VariantInput
 } from './types';
-import { resolveVariants } from './helpers/resolve-variants';
+import { resolveVariants, variantKey } from './helpers/resolve-variants';
 import { createGameStore, createInitialCoreState } from './engine/store';
 import { buildCtx } from './engine/build-ctx';
 import { asBotMoves, isBotTurnUnfinished, unknownMoveMessage } from './engine/bot-turn';
@@ -53,10 +53,19 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
   const { rule, roleLabels, getPlayerStepDescription } = presentation;
   const { moves, endOfTurnMove } = gameplay;
   const { defaultVariantIndex, defaultVariant, resolvedVariants } = resolveVariants(variants);
+  const variantKeys = resolvedVariants.map((variant, index) => variantKey(variant, index));
 
   const Game = () => {
     const { t } = useTranslation();
-    const [selectedVariantIndex, setSelectedVariantIndex] = useState(defaultVariantIndex);
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Read once, on mount. Unlike `?lang=`, this is not kept in sync with later
+    // param changes: selecting a variant restarts the game, so a back/forward
+    // navigation must not be able to throw away a game in progress.
+    const [selectedVariantIndex, setSelectedVariantIndex] = useState(() => {
+      const requested = searchParams.get('variant');
+      const index = requested === null ? -1 : variantKeys.indexOf(requested);
+      return index === -1 ? defaultVariantIndex : index;
+    });
     const activeVariant = resolvedVariants[selectedVariantIndex] ?? defaultVariant;
     const defaultGenerateStartBoard = defaultVariant.generateStartBoard!;
     const activeGenerateStartBoard = activeVariant.generateStartBoard ?? defaultGenerateStartBoard;
@@ -179,6 +188,14 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
         boardGenerator = defaultGenerateStartBoard;
       }
       setSelectedVariantIndex(finalVariantIndex);
+      // The default variant is the absence of the param, the way `hu` is for
+      // `?lang=`, so a shared link carries a variant only when it says something.
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        if (finalVariantIndex === defaultVariantIndex) next.delete('variant');
+        else next.set('variant', variantKeys[finalVariantIndex]);
+        return next;
+      }, { replace: true });
       store.setState(createInitialCoreState(boardGenerator(), newMode));
       setIsGameEndDialogOpen(false);
       setGameUuid(crypto.randomUUID());

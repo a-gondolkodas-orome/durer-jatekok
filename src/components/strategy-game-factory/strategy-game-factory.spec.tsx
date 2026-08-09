@@ -185,6 +185,71 @@ describe('variant availability by mode', () => {
   });
 });
 
+describe('variant in the URL', () => {
+  const startBoard = (): Board => ['initial'];
+  const named = (name: string) => ({ hu: name, en: name });
+
+  // Alpha is the default and carries no id, so it is addressed by its index;
+  // Beta names one, the way a variant worth a durable link does.
+  const identifiedVariants = () => makeConfig({
+    variants: [
+      { label: named('Alpha'), isDefault: true, botStrategy: () => [], generateStartBoard: startBoard },
+      { id: 'beta', label: named('Beta'), botStrategy: () => [], generateStartBoard: startBoard },
+      { label: named('Gamma'), botStrategy: () => [], generateStartBoard: startBoard }
+    ]
+  });
+
+  const variantRadio = (view: ReturnType<typeof renderGame>, label: string) =>
+    view.getByLabelText(label) as HTMLInputElement;
+  const search = (view: ReturnType<typeof renderGame>) => view.getByTestId('search').textContent;
+
+  it('starts on the variant the URL names by id', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+    expect(variantRadio(view, 'Beta').checked).toBe(true);
+  });
+
+  it('starts on the variant the URL names by index when it declares no id', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=2');
+    expect(variantRadio(view, 'Gamma').checked).toBe(true);
+  });
+
+  it('falls back to the default variant when the URL names an unknown one', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=nonsense');
+    expect(variantRadio(view, 'Alpha').checked).toBe(true);
+  });
+
+  it('writes the chosen variant to the URL', () => {
+    const view = renderGame(identifiedVariants());
+    fireEvent.click(variantRadio(view, 'Beta'));
+
+    expect(search(view)).toBe('?variant=beta');
+  });
+
+  it('drops the param when the default variant is chosen back, as ?lang= does for hu', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+    fireEvent.click(variantRadio(view, 'Alpha'));
+
+    expect(search(view)).toBe('');
+  });
+
+  it('leaves other params alone', () => {
+    const view = renderGame(identifiedVariants(), '/?lang=en');
+    fireEvent.click(variantRadio(view, 'Beta'));
+
+    expect(search(view)).toBe('?lang=en&variant=beta');
+  });
+
+  // A variant switch restarts the game, so the param is read once rather than
+  // synced: a later navigation must not be able to wipe a game in progress.
+  it('does not re-read the param after mount', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+    fireEvent.click(variantRadio(view, 'Gamma'));
+
+    expect(variantRadio(view, 'Gamma').checked).toBe(true);
+    expect(search(view)).toBe('?variant=2');
+  });
+});
+
 describe('strategyGameFactory endOfTurnMove', () => {
   beforeAll(() => { vi.useFakeTimers(); });
   afterAll(() => { vi.useRealTimers(); });

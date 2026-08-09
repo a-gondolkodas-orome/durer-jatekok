@@ -1,4 +1,7 @@
-import type { BotMove, BotStrategy, Ctx, MoveDefinition } from './components/strategy-game-factory';
+import {
+  runMatch,
+  type BotMove, type BotStrategy, type Ctx, type Gameplay, type MoveDefinition
+} from './components/strategy-game-factory';
 import { asBotMoves } from './components/strategy-game-factory/engine/bot-turn';
 
 // Mock `ctx` for testing move functions and bot strategies. A game that pins
@@ -47,4 +50,38 @@ export const playBotMove = <TBoard, TTurnState = unknown>(
 ): TBoard => {
   const { move, args = [] } = botNextMove(strategy({ board, ctx }));
   return moves[move]!.apply(board, { ctx }, ...args).nextBoard;
+};
+
+// Which role can force the win from `startBoard`, read off the game's own
+// optimal bot playing both sides. A curated start board has to be *decisive* —
+// one role wins against best play — which is what makes choosing a role a real
+// decision rather than a coin flip, so this is the assertion a `startBoards`
+// list is worth committing behind.
+//
+// Bots shuffle among equally-optimal moves, so one playout samples one line;
+// several disagreeing means the board is not decisive, or the bot it was
+// verified against is not optimal. Either way the list is not what it claims,
+// so this throws rather than returning a winner nobody can trust.
+export const forcedWinnerIndex = <TBoard, TTurnState = unknown>({
+  gameplay,
+  botStrategy,
+  startBoard,
+  playouts = 5
+}: {
+  gameplay: Gameplay<TBoard, TTurnState>
+  botStrategy: BotStrategy<TBoard>
+  startBoard: TBoard
+  playouts?: number
+}): number => {
+  const winners = new Set(Array.from({ length: playouts }, () => runMatch({
+    gameplay,
+    strategies: [botStrategy, botStrategy],
+    startBoard
+  }).winnerIndex));
+  if (winners.size !== 1) {
+    throw new Error(`forcedWinnerIndex: optimal play reached both outcomes over ${playouts} `
+      + `playouts from ${JSON.stringify(startBoard)} — the board is not decisive, `
+      + 'or the bot is not optimal');
+  }
+  return [...winners][0];
 };

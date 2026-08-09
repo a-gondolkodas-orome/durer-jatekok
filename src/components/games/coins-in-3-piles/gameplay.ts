@@ -34,13 +34,13 @@ export const generateArbitraryStartBoard = (): Board =>
   random(0, 1) ? generateWinningStartBoard() : generateLosingStartBoard();
 
 // "Fixed" sub-game (the original "Change 15 coins"): 3×1, 5×2, 7×3.
-export const generateFixedStartBoard = (): Board => [3, 5, 7];
+export const fixedStartBoards: Board[] = [[3, 5, 7]];
 
 // Test variant covers both sub-games: a small arbitrary heap, or the fixed 3-5-7 setup.
 export const generateTestStartBoard = (): Board =>
   sample([
     (): Board => [random(0, 2), random(0, 2), random(1, 3)],
-    generateFixedStartBoard
+    (): Board => [...fixedStartBoards[0]]
   ])!();
 
 export const moves = {

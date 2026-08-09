@@ -31,12 +31,49 @@ strategyGameFactory({
 })
 ```
 
-**`variants`** — array of `{ botStrategy?, generateStartBoard?, label?,
-isDefault? }`. The default variant (marked `isDefault: true`, or the only entry
-if there is just one) must define `generateStartBoard`. If `botStrategy` is
-omitted on a variant, the default variant's `botStrategy` is used as fallback.
-If multiple variants are provided, exactly one must be `isDefault: true`. A
-single-entry array needs no `isDefault` flag.
+**`variants`** — array of `{ id?, botStrategy?, generateStartBoard?,
+startBoards?, label?, isDefault? }`. The default variant (marked
+`isDefault: true`, or the
+only entry if there is just one) must state its start position. If
+`botStrategy` is omitted on a variant, the default variant's `botStrategy` is
+used as fallback. If multiple variants are provided, exactly one must be
+`isDefault: true`. A single-entry array needs no `isDefault` flag.
+
+A variant states that start position **either** as `generateStartBoard`
+(`() => Board`) **or** as `startBoards` (`Board[]`, a curated list the engine
+picks from at random) — declaring both throws, as does an empty list.
+`startBoards` is the declarative form: the engine derives the generator from
+it, so nothing downstream distinguishes the two. Reach for it whenever the
+positions are enumerable rather than sampled — a competition hands out one
+entry per attempt (#314), so the list order is part of the contract (append,
+never reorder), and a spec can judge every entry instead of calling the
+generator a few hundred times until they have all come up. Each pick is cloned,
+so a curated board is as freshly owned by its match as a generated one.
+
+Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
+the game's own optimal bot against itself and returns the role that forces the
+win, throwing when playouts disagree. Assert the *role*, not just that the game
+ends — that is the property a competition depends on, since the team's role
+**Variants are addressable in the URL** as `?variant=`, alongside `?lang=` —
+`#/game/CoinsIn3Piles?variant=3-5-7`. The param is read once, on mount, and
+rewritten whenever the variant changes, with the default variant represented by
+the param's *absence* (as `hu` is for `?lang=`). It is deliberately not synced
+back after mount: selecting a variant restarts the game, so a back/forward
+navigation must not be able to discard a game in progress.
+
+`id` is what the param names. It is optional — a variant without one is
+addressed by its index, which is enough for most games — and is worth declaring
+where variants are really separate games and a link should survive them being
+reordered (`coins-in-3-piles`, `chess-ducks`, `ten-coins`). Ids must be unique,
+and must not read as another variant's index; both throw. Adding ids everywhere
+is not a goal: do it case by case, when a durable link is actually wanted.
+
+See `coins-in-3-piles`, and
+`stones-remove-one-not-twice-from-left`, which uses it to cross-check the win
+predicate its own balance test relies on. A game whose bot searches too deeply
+to play out repeatedly verifies its list against a characterisation instead —
+`bacteria` judges every curated board with `deficiency` and an independent
+brute-force solver.
 
 **`moves`** — every move is `{ apply, validate? }`: an optional legality
 predicate paired with an outcome-returning

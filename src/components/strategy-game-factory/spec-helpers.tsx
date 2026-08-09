@@ -6,7 +6,7 @@
 // board that is just a list of strings, a one-move gameplay, and a BoardClient
 // with a single button.
 import { render, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, useLocation } from 'react-router';
 import { strategyGameFactory, type StrategyGameConfig } from './strategy-game-factory';
 import type { BoardClientProps, BotStrategy, Gameplay, VariantInput } from './types';
 
@@ -54,9 +54,18 @@ export const minimalConfig = (gameplay: Gameplay<Board>) => makeConfig({ gamepla
 export const ctxAwareConfig = (botStrategy: BotStrategy<Board> = () => []) =>
   makeConfig({ BoardClient: CtxAwareBoardClient, botStrategy });
 
-export const renderGame = (config: StrategyGameConfig<Board>) => {
+// The factory both reads and writes `?variant=`, so the harness shows the URL
+// next to the game — the same shape language-context.spec.tsx uses.
+const SearchProbe = () => <span data-testid="search">{useLocation().search}</span>;
+
+export const renderGame = (config: StrategyGameConfig<Board>, entry = '/') => {
   const Game = strategyGameFactory(config);
-  return render(<MemoryRouter><Game /></MemoryRouter>);
+  return render(
+    <MemoryRouter initialEntries={[entry]}>
+      <Game />
+      <SearchProbe />
+    </MemoryRouter>
+  );
 };
 
 // Headless UI's PlayerNameSetup is slow on its very first render, enough to
