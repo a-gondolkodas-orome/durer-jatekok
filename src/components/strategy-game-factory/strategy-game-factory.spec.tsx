@@ -401,6 +401,19 @@ describe('win/loss tracking', () => {
     expect(localStorage.getItem('stats__0')).toBeNull();
   });
 
+  // Keyed by the variant's key, so a game that declares ids keeps its tallies
+  // where reordering its variants cannot shuffle them.
+  it('keys the tally by the variant id when there is one', () => {
+    const variants = [
+      { id: 'alpha', isDefault: true, botStrategy: () => [], generateStartBoard: (): Board => [] }
+    ];
+    const { getByTestId } = renderGame(gameEndingConfig(variants));
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('end-win-btn'));
+
+    expect(JSON.parse(localStorage.getItem('stats__alpha')!)).toEqual({ win: 1, loss: 0 });
+  });
+
   it('accumulates results across multiple games', () => {
     const { getByTestId, unmount } = renderGame(gameEndingConfig());
     fireEvent.click(getByTestId('role-btn-0'));

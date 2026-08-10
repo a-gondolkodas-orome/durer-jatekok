@@ -106,7 +106,7 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
     const isHumanVsHumanGame = mode === 'vsHuman';
 
     const gameId = useLocation().pathname.split('/').pop()!;
-    const { stats, recordResult, resetStats } = useGameStats(gameId, selectedVariantIndex);
+    const { stats, recordResult, resetStats } = useGameStats(gameId, variantKeys[selectedVariantIndex]);
 
     useEffect(() => {
       if (!isHumanVsHumanGame && phase === 'play' && currentPlayer === (1 - chosenRoleIndex!)) {
