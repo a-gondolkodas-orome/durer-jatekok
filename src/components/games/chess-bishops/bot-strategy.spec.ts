@@ -1,11 +1,11 @@
 import lodash, { cloneDeep } from 'lodash';
 import { smartBotStrategy } from './bot-strategy';
-import { startBoards, BISHOP, markForbiddenFields, type Board, type Field } from './gameplay'
+import { startBoard, BISHOP, markForbiddenFields, type Board, type Field } from './gameplay'
 import { botNextMoveArgs, makeCtx } from 'test-utils';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 const smartBotPlacement = (board: Board): Field =>
   botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx() }))[0];

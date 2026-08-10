@@ -1,11 +1,11 @@
 import { isEqual, cloneDeep } from 'lodash';
 import { runMatch, type MatchResult } from 'strategy-game-factory';
-import { type Board, startBoards, moves } from './gameplay';
+import { type Board, startBoard, moves } from './gameplay';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 // Six squares are placed in all, and only the final board decides: player 1
 // wins if the four counts end up all distinct (0,1,2,3), player 0 otherwise.

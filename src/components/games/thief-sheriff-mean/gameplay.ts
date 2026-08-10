@@ -35,7 +35,7 @@ export const getUntakenCards = (board: Board, total: number) => {
 export const isCardAvailable = (board: Board, total: number, index: number): boolean =>
   getUntakenCards(board, total).includes(index);
 
-export const startBoards: Board[] = [{
-  cards: [[], []],
-  numTurns: 0
-}]
+export const startBoard: Board = {
+cards: [[], []],
+numTurns: 0
+};

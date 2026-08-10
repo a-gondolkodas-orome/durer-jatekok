@@ -1,10 +1,10 @@
 import { cloneDeep } from 'lodash';
-import { FORBIDDEN, startBoards, getAllowedMoves, markForbiddenFields, moves } from './gameplay';
+import { FORBIDDEN, startBoard, getAllowedMoves, markForbiddenFields, moves } from './gameplay';
 import { makeCtx } from 'test-utils';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 describe('markForbiddenFields', () => {
   it('should mark forbidden fields', () => {

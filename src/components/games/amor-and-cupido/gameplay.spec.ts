@@ -5,15 +5,15 @@ import {
   completesTriangle,
   edgeIndex,
   findWinningTriangle,
-  startBoards,
+  startBoard,
   getAllowedMoves,
   moves
 } from './gameplay';
 import { makeCtx, moveValidator } from 'test-utils';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 const isClaimAllowed = moveValidator(moves.claimEdge);
 

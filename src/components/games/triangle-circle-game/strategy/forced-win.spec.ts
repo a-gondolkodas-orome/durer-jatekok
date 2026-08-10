@@ -2,16 +2,16 @@ import { cloneDeep } from 'lodash';
 import { EDGES, TRIANGLES, TRIANGLE_COUNT } from '../geometry';
 import {
   type Board, LINE,
-  startBoards, applyShade, applyCircle,
+  startBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, liveThreats, freeTriangles
 } from '../gameplay';
 import { OPENING_EDGE, OPENING_EDGES, isLineTurnWon, marchEdges, winningPairHeatEdges } from './forced-win';
 import { makeSmartBotStrategy } from './bot-strategy';
 import { playBotTurn } from './spec-helpers';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 // The centrepiece: a complete-branching certificate that the LINE player wins
 // the side-6 board. Soundness rests on the March Lemma (see forced-win.ts);

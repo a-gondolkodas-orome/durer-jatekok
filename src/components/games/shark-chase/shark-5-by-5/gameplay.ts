@@ -11,18 +11,18 @@ export const isGameEnd = (board: Board): boolean =>
 export const getWinnerIndex = (board: Board): number =>
   board.submarines[board.shark] >= 1 ? 0 : 1;
 
-export const startBoards: Board[] = [{
-  submarines: [
-    [0, 0, 0, 1, 1],
-    [0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0]
-  ].flat(),
-  shark: 20,
-  turn: 1,
-  sharkMovesInTurn: 0
-}];
+export const startBoard: Board = {
+submarines: [
+  [0, 0, 0, 1, 1],
+  [0, 0, 0, 1, 1],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0]
+].flat(),
+shark: 20,
+turn: 1,
+sharkMovesInTurn: 0
+};
 
 export const moves = {
   moveSubmarine: {

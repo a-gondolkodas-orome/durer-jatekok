@@ -1,6 +1,6 @@
 import { strategyGameFactory, type BoardClientProps, GameBoard } from 'strategy-game-factory';
 import { useTranslation } from 'language';
-import { allNumbers, findWinningTriple, startBoards, moves, numbersOwnedBy, type Board } from './gameplay';
+import { allNumbers, findWinningTriple, startBoard, moves, numbersOwnedBy, type Board } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 
 const ownedLabel = (owner: Board['owner'], player: 0 | 1): string => {
@@ -103,7 +103,7 @@ export const SumFifteen = strategyGameFactory({
     },
     {
       botStrategy: smartBotStrategy,
-      startBoards,
+      startBoards: [startBoard],
       label: { hu: 'Teljes', en: 'Full' },
       isDefault: true
     }

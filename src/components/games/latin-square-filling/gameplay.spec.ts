@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import {
   applyMove,
-  startBoards,
+  startBoard,
   isFull,
   isTerminal,
   legalDigits,
@@ -12,9 +12,9 @@ import {
 } from './gameplay';
 import { makeCtx, moveValidator } from 'test-utils';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 const isLegalPlacement = moveValidator(moves.placeDigit);
 

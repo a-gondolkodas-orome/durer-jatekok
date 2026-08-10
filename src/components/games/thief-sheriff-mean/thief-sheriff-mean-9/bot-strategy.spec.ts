@@ -1,10 +1,10 @@
 import { cloneDeep } from 'lodash';
 import { getBotCard, getBotScore } from './bot-strategy';
-import { Sheriff, Thief, startBoards, type Board } from '../gameplay';
+import { Sheriff, Thief, startBoard, type Board } from '../gameplay';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 describe('thief-sheriff-mean-9 smart bot', () => {
   describe('as Sheriff', () => {

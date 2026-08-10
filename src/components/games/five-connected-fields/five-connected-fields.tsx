@@ -1,5 +1,5 @@
 import { strategyGameFactory } from 'strategy-game-factory';
-import { startBoards, moves } from './gameplay';
+import { startBoard, moves } from './gameplay';
 import { smartBotStrategy } from './bot-strategy';
 import { BoardClient } from './board-client';
 
@@ -30,5 +30,5 @@ export const FiveConnectedFields = strategyGameFactory({
   },
   BoardClient,
   gameplay: { moves },
-  variants: [{ botStrategy: smartBotStrategy, startBoards }]
+  variants: [{ botStrategy: smartBotStrategy, startBoards: [startBoard] }]
 });

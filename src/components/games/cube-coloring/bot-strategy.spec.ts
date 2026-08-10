@@ -1,11 +1,11 @@
 import { range, uniq, cloneDeep } from 'lodash';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
-import { colors, startBoards, isAllowedStep, moves, type Board } from './gameplay';
+import { colors, startBoard, isAllowedStep, moves, type Board } from './gameplay';
 import { botNextMoveArgs, makeCtx, moveValidator } from 'test-utils';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 type Step = { vertex: number; color: string };
 

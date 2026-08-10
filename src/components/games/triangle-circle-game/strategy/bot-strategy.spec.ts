@@ -2,15 +2,15 @@ import { cloneDeep } from 'lodash';
 import { EDGES, TRIANGLES } from '../geometry';
 import {
   LINE, CIRCLE,
-  startBoards, applyShade, applyCircle,
+  startBoard, applyShade, applyCircle,
   isLineWin, isCircleWin, isWinningShade, liveThreats, preThreatEdges
 } from '../gameplay';
 import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
 import { playBotTurn } from './spec-helpers';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 // Cheap search budget so full-game simulations stay fast in CI.
 const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });

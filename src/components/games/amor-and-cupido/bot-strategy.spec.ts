@@ -1,11 +1,11 @@
 import { cloneDeep } from 'lodash';
-import { edgeIndex, startBoards } from './gameplay';
+import { edgeIndex, startBoard } from './gameplay';
 import { makeCtx } from 'test-utils';
 import { getBotScore, smartBotStrategy } from './bot-strategy';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 describe('optimal solver (negamax)', () => {
   it('recognises an immediate winning position', () => {

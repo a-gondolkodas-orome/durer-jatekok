@@ -3,15 +3,15 @@ import { chooseSmartMove, chooseTestMove, winnerOptimal } from './bot-strategy';
 import {
   currentPlayerFromOwner,
   freeNumbers,
-  startBoards,
+  startBoard,
   hasSum15,
   numbersOwnedBy,
   type Owner
 } from './gameplay';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 describe('winnerOptimal', () => {
   it('declares the second player the winner from the empty board (optimal play is a draw)', () => {

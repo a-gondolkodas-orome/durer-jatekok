@@ -2,13 +2,13 @@ import { cloneDeep } from 'lodash';
 import { EDGES, TRIANGLES, TRIANGLE_COUNT } from '../geometry';
 import {
   type Board, LINE, CIRCLE,
-  startBoards, applyShade
+  startBoard, applyShade
 } from '../gameplay';
 import { evaluatePosition } from './search';
 
-// `startBoards` is shared module data; a spec that steps a board forward
-// needs its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoards[0]);
+// `startBoard` is shared module data; a spec that steps a board forward needs
+// its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoard);
 
 const otherEdge = (t: number, notEdge: number) => TRIANGLES[t].edgeIds.find(e => e !== notEdge)!;
 

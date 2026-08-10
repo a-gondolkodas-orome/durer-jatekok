@@ -1,7 +1,7 @@
 import { range } from 'lodash';
 import { strategyGameFactory, type BoardClientProps, GameBoard } from 'strategy-game-factory';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
-import { startBoards, moves, type Board } from './gameplay';
+import { startBoard, moves, type Board } from './gameplay';
 
 const BoardClient = ({ board, moves }: BoardClientProps<Board>) => (
   <GameBoard>
@@ -58,6 +58,6 @@ export const TwoTimesTwo = strategyGameFactory({
   gameplay: { moves },
   variants: [
     { botStrategy: randomBotStrategy, label: { hu: 'Teszt', en: 'Test' } },
-    { botStrategy: smartBotStrategy, startBoards, label: { hu: 'Teljes', en: 'Full' }, isDefault: true }
+    { botStrategy: smartBotStrategy, startBoards: [startBoard], label: { hu: 'Teljes', en: 'Full' }, isDefault: true }
   ]
 });
