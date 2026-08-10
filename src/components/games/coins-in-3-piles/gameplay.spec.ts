@@ -1,4 +1,4 @@
-import { fixedStartBoards, moves, type Board, type TurnState } from './gameplay';
+import { startBoardOfCategoryA, moves, type Board, type TurnState } from './gameplay';
 import { smartBotStrategy } from './bot-strategy';
 import { forcedWinnerIndex, makeCtx } from 'test-utils';
 
@@ -92,15 +92,14 @@ describe('coins-in-3-piles move outcomes', () => {
   });
 });
 
-// The curated board of the "Fixed" variant. A competition hands out a board
-// like this one and lets the team pick a role, so what has to hold is not just
-// that the game ends but that a *named* role forces the win — here the replier,
-// since 3-5-7 is all-odd and so lost for the mover.
-describe('fixedStartBoards', () => {
+// A competition hands out a board like this one and lets the team pick a role,
+// so what has to hold is not just that the game ends but that a *named* role
+// forces the win — here the replier, since 3-5-7 is all-odd and so lost for the
+// mover.
+describe('startBoardOfCategoryA', () => {
   it('is won by the replier against optimal play', () => {
-    for (const startBoard of fixedStartBoards) {
-      expect(forcedWinnerIndex({ gameplay: { moves }, botStrategy: smartBotStrategy, startBoard }))
-        .toBe(1);
-    }
+    expect(forcedWinnerIndex({
+      gameplay: { moves }, botStrategy: smartBotStrategy, startBoard: startBoardOfCategoryA
+    })).toBe(1);
   });
 });

@@ -52,11 +52,18 @@ so a curated board is as freshly owned by its match as a generated one.
 
 The commonest case is a list of one: a game that always starts from the same
 position — an empty board, a full deck, a rook in the corner — writes
-`startBoards: [emptyBoard]` rather than wrapping that constant in a function
+`startBoards: [startBoard]` rather than wrapping that constant in a function
 nobody varies. `generateStartBoard` is then what it says: for positions that are
 actually *generated*, by sampling or rejection.
 
-A spec that steps such a board forward needs its own copy — `startBoards` is
+**Name the boards, not the list.** A module exports the positions themselves —
+`startBoard`, `startBoardOfCategoryA`, `adjacentStartBoards` — and the variant
+assembles the list where it is used: `startBoards: [startBoardOfCategoryA]`. A
+single position stays singular rather than being pluralised into a one-entry
+export, and the name says which position it is instead of restating the field
+it feeds.
+
+A spec that steps such a board forward needs its own copy — an exported board is
 module-scope data shared by every match, and only the engine clones on the way
 in. The converted games keep a one-line `freshStartBoard()` helper for that.
 
@@ -64,6 +71,13 @@ Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
 the game's own optimal bot against itself and returns the role that forces the
 win, throwing when playouts disagree. Assert the *role*, not just that the game
 ends — that is the property a competition depends on, since the team's role
+choice is part of its strategy. See `coins-in-3-piles`, and
+`stones-remove-one-not-twice-from-left`, which uses it to cross-check the win
+predicate its own balance test relies on. A game whose bot searches too deeply
+to play out repeatedly verifies its list against a characterisation instead —
+`bacteria` judges every curated board with `deficiency` and an independent
+brute-force solver.
+
 **Variants are addressable in the URL** as `?variant=`, alongside `?lang=` —
 `#/game/CoinsIn3Piles?variant=3-5-7`. The param and the selected variant are
 kept in step both ways: choosing a variant rewrites the param, and a param that
@@ -93,13 +107,6 @@ link — it also keeps that game's tallies and its dashboard rows attached to th
 variant they belong to. Where no id is declared the key is the index, and all
 three only mean anything as long as that game's variant order holds; reordering
 hands a variant the tally of whichever one used to sit at its position.
-
-See `coins-in-3-piles`, and
-`stones-remove-one-not-twice-from-left`, which uses it to cross-check the win
-predicate its own balance test relies on. A game whose bot searches too deeply
-to play out repeatedly verifies its list against a characterisation instead —
-`bacteria` judges every curated board with `deficiency` and an independent
-brute-force solver.
 
 **`moves`** — every move is `{ apply, validate? }`: an optional legality
 predicate paired with an outcome-returning

@@ -53,15 +53,17 @@ export const playBotMove = <TBoard, TTurnState = unknown>(
 };
 
 // Which role can force the win from `startBoard`, read off the game's own
-// optimal bot playing both sides. A curated start board has to be *decisive* —
-// one role wins against best play — which is what makes choosing a role a real
-// decision rather than a coin flip, so this is the assertion a `startBoards`
-// list is worth committing behind.
+// optimal bot playing both sides. Every position of these games has such a
+// role: they are finite, deterministic, perfect-information and cannot end in
+// a draw (`gameEnd` always names a winner), so by Zermelo's theorem one side
+// can always force the win. What a curated board needs asserting is *which*
+// role that is — the team choosing it is the decision a competition is made of.
 //
-// Bots shuffle among equally-optimal moves, so one playout samples one line;
-// several disagreeing means the board is not decisive, or the bot it was
-// verified against is not optimal. Either way the list is not what it claims,
-// so this throws rather than returning a winner nobody can trust.
+// Bots shuffle among equally-optimal moves, so one playout samples one line.
+// Playouts that disagree therefore say nothing about the board: they mean the
+// bot is not optimal, having thrown the win away on some line. That is a bug in
+// the game rather than a fact about the position, so this throws instead of
+// returning a winner nobody can trust.
 export const forcedWinnerIndex = <TBoard, TTurnState = unknown>({
   gameplay,
   botStrategy,
@@ -79,9 +81,9 @@ export const forcedWinnerIndex = <TBoard, TTurnState = unknown>({
     startBoard
   }).winnerIndex));
   if (winners.size !== 1) {
-    throw new Error(`forcedWinnerIndex: optimal play reached both outcomes over ${playouts} `
-      + `playouts from ${JSON.stringify(startBoard)} — the board is not decisive, `
-      + 'or the bot is not optimal');
+    throw new Error(`forcedWinnerIndex: both roles won over ${playouts} playouts from `
+      + `${JSON.stringify(startBoard)} — one of them can force the win, so the bot `
+      + 'is throwing it away on some line and is not optimal');
   }
   return [...winners][0];
 };
