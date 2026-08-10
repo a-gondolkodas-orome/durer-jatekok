@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import {
   applyMove,
   startBoard,
@@ -11,10 +10,6 @@ import {
   type Board
 } from './gameplay';
 import { makeCtx, moveValidator } from 'test-utils';
-
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoard);
 
 const isLegalPlacement = moveValidator(moves.placeDigit);
 
@@ -56,7 +51,7 @@ describe('latin-square-filling gameplay', () => {
 
   describe('turn bookkeeping', () => {
     it('player 0 moves on even fill counts, player 1 on odd', () => {
-      expect(playerToMove(freshStartBoard())).toBe(0);
+      expect(playerToMove(startBoard)).toBe(0);
       expect(playerToMove([1, 0, 0, 0, 0, 0, 0, 0, 0])).toBe(1);
       expect(playerToMove([1, 2, 0, 0, 0, 0, 0, 0, 0])).toBe(0);
     });
@@ -71,21 +66,21 @@ describe('latin-square-filling gameplay', () => {
 
 describe('isLegalPlacement argument checks', () => {
   it('refuses a digit outside 1..3', () => {
-    const board = freshStartBoard();
+    const board = startBoard;
     expect(isLegalPlacement(board, 0, 0)).toBe(false);
     expect(isLegalPlacement(board, 0, 4)).toBe(false);
     expect(isLegalPlacement(board, 0, 1.5)).toBe(false);
   });
 
   it('refuses a cell outside the 3x3 grid', () => {
-    const board = freshStartBoard();
+    const board = startBoard;
     expect(isLegalPlacement(board, -1, 1)).toBe(false);
     expect(isLegalPlacement(board, 9, 1)).toBe(false);
     expect(isLegalPlacement(board, 0.5, 1)).toBe(false);
   });
 
   it('accepts exactly the moves the generator lists', () => {
-    const board = applyMove(applyMove(freshStartBoard(), { cell: 0, digit: 1 }), { cell: 4, digit: 2 });
+    const board = applyMove(applyMove(startBoard, { cell: 0, digit: 1 }), { cell: 4, digit: 2 });
     const listed = new Set(legalMoves(board).map(m => `${m.cell},${m.digit}`));
     for (let cell = 0; cell < 9; cell++) {
       for (const digit of [1, 2, 3]) {

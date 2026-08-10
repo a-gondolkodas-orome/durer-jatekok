@@ -1,15 +1,10 @@
-import { cloneDeep } from 'lodash';
 import { edgeIndex, startBoard } from './gameplay';
 import { makeCtx } from 'test-utils';
 import { getBotScore, smartBotStrategy } from './bot-strategy';
 
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoard);
-
 describe('optimal solver (negamax)', () => {
   it('recognises an immediate winning position', () => {
-    const board = freshStartBoard();
+    const board = startBoard;
     board[edgeIndex[0][1]] = 0;
     board[edgeIndex[0][2]] = 0;
     // Player 0 to move can close triangle {0,1,2}.
@@ -19,7 +14,7 @@ describe('optimal solver (negamax)', () => {
 
 describe('smartBotStrategy', () => {
   it('blocks an immediate threat even from a losing position', () => {
-    const board = freshStartBoard();
+    const board = startBoard;
     // Opponent (player 0) owns two edges of triangle {0,1,2}; bot (player 1)
     // is to move and is losing, but must claim edge 1-2 to avoid losing now.
     board[edgeIndex[0][1]] = 0;

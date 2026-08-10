@@ -1,11 +1,7 @@
-import { isEqual, cloneDeep } from 'lodash';
+import { isEqual } from 'lodash';
 import { runMatch, type MatchResult } from 'strategy-game-factory';
 import { type Board, startBoard, moves } from './gameplay';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
-
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoard);
 
 // Six squares are placed in all, and only the final board decides: player 1
 // wins if the four counts end up all distinct (0,1,2,3), player 0 otherwise.
@@ -29,13 +25,13 @@ describe('smartBotStrategy', () => {
   // the bot never loses the win later.
   it('wins as the first player from the start board, against a random opponent', () => {
     for (let trial = 0; trial < 60; trial++) {
-      expect(play(freshStartBoard(), [smartBotStrategy, randomBotStrategy]).winnerIndex).toBe(0);
+      expect(play(startBoard, [smartBotStrategy, randomBotStrategy]).winnerIndex).toBe(0);
     }
   });
 
   it('wins as the first player even against optimal play', () => {
     for (let trial = 0; trial < 20; trial++) {
-      expect(play(freshStartBoard(), [smartBotStrategy, smartBotStrategy]).winnerIndex).toBe(0);
+      expect(play(startBoard, [smartBotStrategy, smartBotStrategy]).winnerIndex).toBe(0);
     }
   });
 
@@ -65,7 +61,7 @@ describe('smartBotStrategy', () => {
 describe('randomBotStrategy', () => {
   it('only ever names squares that exist', () => {
     for (let trial = 0; trial < 40; trial++) {
-      const { history } = play(freshStartBoard(), [randomBotStrategy, randomBotStrategy]);
+      const { history } = play(startBoard, [randomBotStrategy, randomBotStrategy]);
       for (const { args } of history) {
         expect(args[0]).toBeTypeOf('number');
         expect(args[0] as number).toBeGreaterThanOrEqual(0);

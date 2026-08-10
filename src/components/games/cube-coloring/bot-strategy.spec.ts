@@ -3,8 +3,7 @@ import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 import { colors, startBoard, isAllowedStep, moves, type Board } from './gameplay';
 import { botNextMoveArgs, makeCtx, moveValidator } from 'test-utils';
 
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
+// This spec steps the board forward, so it needs its own copy of the shared one.
 const freshStartBoard = () => cloneDeep(startBoard);
 
 type Step = { vertex: number; color: string };

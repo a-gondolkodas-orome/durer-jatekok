@@ -1,11 +1,6 @@
-import { cloneDeep } from 'lodash';
 import { startBoard, moves } from './gameplay';
 import { ARCHITECT, BANDITS, KM_PER_EDGE, type Board } from '../gameplay';
 import { makeCtx } from 'test-utils';
-
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoard);
 
 // After the fourth day the architect wins exactly when every vertex carries a
 // tower.
@@ -80,7 +75,7 @@ describe('architect-and-bandits-b tower building', () => {
   });
 
   it('starts day 1 with a tower already on the architect\'s vertex', () => {
-    const board = freshStartBoard();
+    const board = startBoard;
     expect(board.towers).toHaveLength(VERTEX_COUNT);
     expect(board.architectPosition).toBe(0);
     expect(board.towers[0]).toBe(true);

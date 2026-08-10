@@ -1,4 +1,4 @@
-import { range, cloneDeep } from 'lodash';
+import { range } from 'lodash';
 import { chooseSmartMove, chooseTestMove, winnerOptimal } from './bot-strategy';
 import {
   currentPlayerFromOwner,
@@ -9,13 +9,9 @@ import {
   type Owner
 } from './gameplay';
 
-// `startBoard` is shared module data; a spec that steps a board forward needs
-// its own copy, the way the engine takes one per match.
-const freshStartBoard = () => cloneDeep(startBoard);
-
 describe('winnerOptimal', () => {
   it('declares the second player the winner from the empty board (optimal play is a draw)', () => {
-    expect(winnerOptimal(freshStartBoard().owner)).toBe(1);
+    expect(winnerOptimal(startBoard.owner)).toBe(1);
   });
 
   it('lets the current player win when a triple summing to 15 is one move away', () => {
@@ -30,7 +26,7 @@ describe('winnerOptimal', () => {
 // Play out full games; assert the smart bot never loses as the second player,
 // which — since the game has no draws in the players' favour — means it wins.
 const playSmartBotVsRandom = (botPlayer: 0 | 1, rng: () => number): 0 | 1 => {
-  let owner: Owner = freshStartBoard().owner;
+  let owner: Owner = startBoard.owner;
   while (true) {
     const cp = currentPlayerFromOwner(owner);
     const move = cp === botPlayer
