@@ -5,7 +5,7 @@ import {
   makeConfig, minimalConfig, ctxAwareConfig, renderGame, warmUpPlayerNameSetup,
   MinimalBoardClient, CtxAwareBoardClient, defaultGameplay, type Board
 } from './spec-helpers';
-import type { BoardClientProps, BotMove, BotStrategy, Ctx, Gameplay, StrategyArgs } from './types';
+import type { BoardClientProps, BotMove, BotStrategy, Ctx, Gameplay, StrategyArgs, VariantInput } from './types';
 
 beforeAll(warmUpPlayerNameSetup);
 
@@ -350,7 +350,8 @@ describe('strategyGameFactory endOfTurnMove', () => {
   });
 });
 
-const gameEndingConfig = () => makeConfig({
+const gameEndingConfig = (variants?: VariantInput<Board>[]) => makeConfig({
+  variants,
   BoardClient: ({ board, moves }: BoardClientProps<Board>) => (
     <>
       <button data-testid="end-win-btn" onClick={() => moves.endWin(board)}>win</button>
@@ -506,6 +507,27 @@ describe('umami game-finished event', () => {
     expect(lastEvent()[0]).toBe('game-finished');
     expect(lastEvent()[1]).toMatchObject({ mode: 'vsHuman' });
     expect(lastEvent()[1]).not.toHaveProperty('result');
+  });
+
+  // Reported by the same key the URL uses, so a dashboard row and a shared
+  // link name a variant the same way.
+  const identifiedVariants: VariantInput<Board>[] = [
+    { id: 'alpha', isDefault: true, botStrategy: () => [], generateStartBoard: (): Board => [] },
+    { label: { hu: 'Beta', en: 'Beta' }, botStrategy: () => [], generateStartBoard: (): Board => [] }
+  ];
+
+  it('reports the variant by its id', () => {
+    const { getByTestId } = renderGame(gameEndingConfig(identifiedVariants));
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('end-win-btn'));
+    expect(lastEvent()[1]).toMatchObject({ variant: 'alpha' });
+  });
+
+  it('reports the index for a variant that declares no id', () => {
+    const { getByTestId } = renderGame(gameEndingConfig(identifiedVariants), '/?variant=1');
+    fireEvent.click(getByTestId('role-btn-0'));
+    fireEvent.click(getByTestId('end-win-btn'));
+    expect(lastEvent()[1]).toMatchObject({ variant: '1' });
   });
 });
 

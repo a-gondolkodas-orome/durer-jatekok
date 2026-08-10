@@ -75,6 +75,15 @@ reordered (`coins-in-3-piles`, `chess-ducks`, `ten-coins`). Ids must be unique,
 and must not read as another variant's index; both throw. Adding ids everywhere
 is not a goal: do it case by case, when a durable link is actually wanted.
 
+The `game-finished` analytics event reports the same key, so a variant reads the
+same in a dashboard as in a link (`variant: '3-5-7'` rather than `variant: 2`).
+Declaring an id therefore improves the analytics for that game too — and for a
+game without one the reported index only means anything as long as the variant
+order holds, which is a second reason to declare ids where the variants matter.
+The per-visitor win/loss counts in `localStorage` are the one thing still keyed
+by index (`stats_<gameId>_<index>`); moving them would reset everyone's counts
+for no gain, since nobody reads that key but the browser that wrote it.
+
 See `coins-in-3-piles`, and
 `stones-remove-one-not-twice-from-left`, which uses it to cross-check the win
 predicate its own balance test relies on. A game whose bot searches too deeply

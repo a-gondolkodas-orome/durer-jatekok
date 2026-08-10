@@ -146,7 +146,10 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
       trackEvent('game-finished', {
         game: gameId,
         mode: s.mode,
-        variant: selectedVariantIndex,
+        // The same key the URL uses, so a variant reads the same in a dashboard
+        // as in a link. Games that declare no id still report their index, and
+        // for those the value only means anything as long as the order holds.
+        variant: variantKeys[selectedVariantIndex],
         ...(s.mode === 'vsHuman' ? {} : { result: resolvedWinner === s.chosenRoleIndex ? 'win' : 'loss' })
       });
     };
