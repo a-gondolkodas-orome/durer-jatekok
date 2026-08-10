@@ -58,12 +58,15 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
   const Game = () => {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
-    // Read once, on mount. Unlike `?lang=`, this is not kept in sync with later
-    // param changes: selecting a variant restarts the game, so a back/forward
-    // navigation must not be able to throw away a game in progress.
+    // The variant the URL asks for, or the default — which the param's absence
+    // means, the way it means `hu` for `?lang=`. `-1` is a param naming no
+    // variant of this game, which is ignored rather than obeyed.
+    const requestedVariantIndex = (params: URLSearchParams) => {
+      const requested = params.get('variant');
+      return requested === null ? defaultVariantIndex : variantKeys.indexOf(requested);
+    };
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(() => {
-      const requested = searchParams.get('variant');
-      const index = requested === null ? -1 : variantKeys.indexOf(requested);
+      const index = requestedVariantIndex(searchParams);
       return index === -1 ? defaultVariantIndex : index;
     });
     const activeVariant = resolvedVariants[selectedVariantIndex] ?? defaultVariant;
@@ -204,6 +207,28 @@ export const strategyGameFactory = <TBoard, TTurnState = unknown>({
     const setDifficulty = (index: number) => {
       resetGameState({ newVariantIndex: index });
     };
+
+    // A shared `?variant=` link has to work even when it points at the game
+    // already open — a same-route hash navigation remounts nothing, so without
+    // this the URL would change and the board would not. Following it restarts
+    // the game, which is what choosing a variant means everywhere else.
+    //
+    // Guarded on the index rather than run unconditionally: `resetGameState`
+    // writes the param itself, so an unguarded effect would re-enter. An index
+    // of -1 — a param naming no variant of this game — is left alone.
+    //
+    // Deriving this during render is not an option: it has to *restart the
+    // game*, which is an event, not a projection of the URL. `searchParams`
+    // alone in the deps for the same reason the language provider does it —
+    // re-running when the selection changes would fight the write path.
+    /* eslint-disable react-hooks/exhaustive-deps */
+    useEffect(() => {
+      const index = requestedVariantIndex(searchParams);
+      if (index !== -1 && index !== selectedVariantIndex) {
+        resetGameState({ newVariantIndex: index });
+      }
+    }, [searchParams]);
+    /* eslint-enable react-hooks/exhaustive-deps */
 
     const getVariantsForMode = (m: Mode): DisplayVariant[] => {
       const humanVsHuman = m === 'vsHuman';

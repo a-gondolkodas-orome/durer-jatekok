@@ -239,14 +239,40 @@ describe('variant in the URL', () => {
     expect(search(view)).toBe('?lang=en&variant=beta');
   });
 
-  // A variant switch restarts the game, so the param is read once rather than
-  // synced: a later navigation must not be able to wipe a game in progress.
-  it('does not re-read the param after mount', () => {
+  it('writes the param on a variant switch made after another one', () => {
     const view = renderGame(identifiedVariants(), '/?variant=beta');
     fireEvent.click(variantRadio(view, 'Gamma'));
 
     expect(variantRadio(view, 'Gamma').checked).toBe(true);
     expect(search(view)).toBe('?variant=2');
+  });
+
+  // The reason the param is followed rather than read once: a same-route hash
+  // navigation remounts nothing, so a link to a variant of the game already
+  // open would otherwise change the URL and leave the board alone.
+  it('follows the param when it changes without a remount', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+    expect(variantRadio(view, 'Beta').checked).toBe(true);
+
+    fireEvent.click(view.getByTestId('go-to-gamma'));
+
+    expect(variantRadio(view, 'Gamma').checked).toBe(true);
+  });
+
+  it('goes back to the default variant when the param is dropped', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+
+    fireEvent.click(view.getByTestId('go-to-no-variant'));
+
+    expect(variantRadio(view, 'Alpha').checked).toBe(true);
+  });
+
+  it('stays put when the param names no variant of this game', () => {
+    const view = renderGame(identifiedVariants(), '/?variant=beta');
+
+    fireEvent.click(view.getByTestId('go-to-nonsense'));
+
+    expect(variantRadio(view, 'Beta').checked).toBe(true);
   });
 });
 

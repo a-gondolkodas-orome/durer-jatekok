@@ -55,11 +55,18 @@ the game's own optimal bot against itself and returns the role that forces the
 win, throwing when playouts disagree. Assert the *role*, not just that the game
 ends — that is the property a competition depends on, since the team's role
 **Variants are addressable in the URL** as `?variant=`, alongside `?lang=` —
-`#/game/CoinsIn3Piles?variant=3-5-7`. The param is read once, on mount, and
-rewritten whenever the variant changes, with the default variant represented by
-the param's *absence* (as `hu` is for `?lang=`). It is deliberately not synced
-back after mount: selecting a variant restarts the game, so a back/forward
-navigation must not be able to discard a game in progress.
+`#/game/CoinsIn3Piles?variant=3-5-7`. The param and the selected variant are
+kept in step both ways: choosing a variant rewrites the param, and a param that
+changes without a remount is followed. The default variant is the param's
+*absence* (as `hu` is for `?lang=`), so dropping it selects the default; a param
+naming no variant of that game is ignored rather than obeyed.
+
+Following the param matters because of the one case that is easy to miss: the
+app is hash-routed, so navigating to a `?variant=` link for the game **already
+open** remounts nothing. Read once on mount, such a link would change the URL
+and leave the board untouched — which is exactly the link people share. The
+cost is that following it restarts the game, but that is what choosing a variant
+means everywhere else in the UI, so the URL should not be the exception.
 
 `id` is what the param names. It is optional — a variant without one is
 addressed by its index, which is enough for most games — and is worth declaring
