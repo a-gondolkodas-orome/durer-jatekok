@@ -1,7 +1,7 @@
 import { strategyGameFactory, type BoardClientProps, GameBoard, useHoverPreview } from 'strategy-game-factory';
 import { range } from 'lodash';
 import { useTranslation } from 'language';
-import { startBoards, testStartBoards, moves, type Board } from './gameplay';
+import { fullStartBoards, testStartBoards, moves, type Board } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 
 const StonePile = ({ count, onClick, disabled, restricted, hovered, hoverProps }) => {
@@ -90,7 +90,7 @@ export const StonesRemoveOneNotTwiceFromLeft = strategyGameFactory({
     },
     {
       botStrategy: smartBotStrategy,
-      startBoards,
+      startBoards: fullStartBoards,
       label: { hu: 'Teljes', en: 'Full' },
       isDefault: true
     }

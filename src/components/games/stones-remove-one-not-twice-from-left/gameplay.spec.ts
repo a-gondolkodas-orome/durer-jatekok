@@ -1,5 +1,5 @@
 import {
-  type Board, boardAfterRemoval, startBoards, testStartBoards, hasNoLegalMove,
+  type Board, boardAfterRemoval, fullStartBoards, testStartBoards, hasNoLegalMove,
   moves, openPiles
 } from './gameplay';
 import { isWinningForMover, smartBotStrategy } from './bot-strategy';
@@ -138,7 +138,7 @@ describe('end of game', () => {
 });
 
 describe.each([
-  ['startBoards', startBoards],
+  ['fullStartBoards', fullStartBoards],
   ['testStartBoards', testStartBoards]
 ] as const)('%s', (_name, boards) => {
   it('starts everyone unrestricted, with both piles stocked', () => {
