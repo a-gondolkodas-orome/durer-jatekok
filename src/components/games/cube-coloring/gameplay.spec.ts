@@ -1,11 +1,16 @@
-import { generateStartBoard, moves, neighbours, type Board } from './gameplay';
+import { cloneDeep } from 'lodash';
+import { startBoards, moves, neighbours, type Board } from './gameplay';
 import { makeCtx, moveValidator } from 'test-utils';
+
+// `startBoards` is shared module data; a spec that steps a board forward
+// needs its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoards[0]);
 
 const isAllowedStep = (board: Board, vertex: number, color: string | null): boolean =>
   moveValidator(moves.colorVertex)(board, { vertex, color });
 
 describe('cube-coloring isAllowedStep', () => {
-  const empty = (): Board => generateStartBoard();
+  const empty = (): Board => freshStartBoard();
 
   it('allows colouring an uncoloured vertex on an empty board', () => {
     expect(isAllowedStep(empty(), 0, 'red')).toBe(true);
@@ -67,7 +72,7 @@ describe('end of game', () => {
 
   it('passes the turn while a colour still fits somewhere', () => {
     const outcome = moves.colorVertex.apply(
-      generateStartBoard(), meta, { vertex: 0, color: 'red' }
+      freshStartBoard(), meta, { vertex: 0, color: 'red' }
     );
     expect(outcome.nextBoard).toEqual(['red', '', '', '', '', '', '', '']);
     expect(outcome.gameEnd).toBeUndefined();

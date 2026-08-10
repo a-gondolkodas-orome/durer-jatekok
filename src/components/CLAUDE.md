@@ -50,6 +50,16 @@ never reorder), and a spec can judge every entry instead of calling the
 generator a few hundred times until they have all come up. Each pick is cloned,
 so a curated board is as freshly owned by its match as a generated one.
 
+The commonest case is a list of one: a game that always starts from the same
+position — an empty board, a full deck, a rook in the corner — writes
+`startBoards: [emptyBoard]` rather than wrapping that constant in a function
+nobody varies. `generateStartBoard` is then what it says: for positions that are
+actually *generated*, by sampling or rejection.
+
+A spec that steps such a board forward needs its own copy — `startBoards` is
+module-scope data shared by every match, and only the engine clones on the way
+in. The converted games keep a one-line `freshStartBoard()` helper for that.
+
 Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
 the game's own optimal bot against itself and returns the role that forces the
 win, throwing when playouts disagree. Assert the *role*, not just that the game

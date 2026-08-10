@@ -1,9 +1,14 @@
-import { FORBIDDEN, generateStartBoard, getAllowedMoves, markForbiddenFields, moves } from './gameplay';
+import { cloneDeep } from 'lodash';
+import { FORBIDDEN, startBoards, getAllowedMoves, markForbiddenFields, moves } from './gameplay';
 import { makeCtx } from 'test-utils';
+
+// `startBoards` is shared module data; a spec that steps a board forward
+// needs its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoards[0]);
 
 describe('markForbiddenFields', () => {
   it('should mark forbidden fields', () => {
-    const board = generateStartBoard();
+    const board = freshStartBoard();
     markForbiddenFields(board, { row: 2, col: 3 });
     const expectedBoard = [
       [null     , FORBIDDEN, null     , null  , null     , FORBIDDEN, null     , null     ],
@@ -26,7 +31,7 @@ const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) }
 
 describe('end of game', () => {
   it('ends exactly on the placement that saturates the board', () => {
-    let board = generateStartBoard();
+    let board = freshStartBoard();
     let player = 0;
     let outcome = moves.placeBishop.apply(board, asPlayer(player), getAllowedMoves(board)[0]);
 

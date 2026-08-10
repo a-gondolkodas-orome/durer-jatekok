@@ -4,7 +4,7 @@ import { isPlacementAllowed } from '../gameplay';
 
 export type Board = number[]
 
-export const generateStartBoard = (): Board => [0, 0, 0, 0];
+export const startBoards: Board[] = [[0, 0, 0, 0]];
 
 export const moves = {
   addPiece: {

@@ -2,7 +2,7 @@ import {
   strategyGameFactory, useMoveScopedState, type BoardClientProps, type Ctx, GameBoard
 } from 'strategy-game-factory';
 import { useTranslation } from 'language';
-import { generateStartBoard, moves, type Board } from './gameplay';
+import { startBoards, moves, type Board } from './gameplay';
 import { randomBotStrategy, smartBotStrategy } from './bot-strategy';
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
@@ -133,12 +133,12 @@ export const LatinSquareFilling = strategyGameFactory({
   variants: [
     {
       botStrategy: randomBotStrategy,
-      generateStartBoard,
+      startBoards,
       label: { hu: 'Teszt', en: 'Test' }
     },
     {
       botStrategy: smartBotStrategy,
-      generateStartBoard,
+      startBoards,
       label: { hu: 'Teljes', en: 'Full' },
       isDefault: true
     }

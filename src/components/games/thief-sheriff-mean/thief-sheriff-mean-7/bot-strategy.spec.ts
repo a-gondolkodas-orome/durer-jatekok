@@ -1,10 +1,15 @@
+import { cloneDeep } from 'lodash';
 import { getBotCard, getBotScore } from './bot-strategy';
-import { Sheriff, Thief, generateStartBoard, type Board } from '../gameplay';
+import { Sheriff, Thief, startBoards, type Board } from '../gameplay';
+
+// `startBoards` is shared module data; a spec that steps a board forward
+// needs its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoards[0]);
 
 describe('thief-sheriff-mean-7 smart bot', () => {
   describe('as Sheriff', () => {
     it('wins from the starting position', () => {
-      expect(getBotScore(generateStartBoard(), Sheriff)).toBe(1);
+      expect(getBotScore(freshStartBoard(), Sheriff)).toBe(1);
     });
 
     it('picks 4 when holding [5] and Thief holds [2] — the unique winning second move', () => {

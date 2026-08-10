@@ -1,9 +1,14 @@
-import { generateStartBoard, getAllowedMoves, markVisitedFields, moves } from './gameplay';
+import { cloneDeep } from 'lodash';
+import { startBoards, getAllowedMoves, markVisitedFields, moves } from './gameplay';
 import { makeCtx } from 'test-utils';
+
+// `startBoards` is shared module data; a spec that steps a board forward
+// needs its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoards[0]);
 
 describe('markVisitedFields', () => {
   it('should mark visited fields', () => {
-    const board = generateStartBoard();
+    const board = freshStartBoard();
     markVisitedFields(board, { row: 0, col: 0 }, { row: 6, col: 0 });
     expect(board.chessBoard[0][0]).toEqual('visited');
     expect(board.chessBoard[1][0]).toEqual('visited');
@@ -14,7 +19,7 @@ describe('markVisitedFields', () => {
 
 describe('getAllowedMoves', () => {
   it('should return right and down moves from starting position', () => {
-    const board = generateStartBoard();
+    const board = freshStartBoard();
     const moves = getAllowedMoves(board);
     expect(moves).toHaveLength(14);
     expect(moves).toEqual(expect.arrayContaining([
@@ -24,7 +29,7 @@ describe('getAllowedMoves', () => {
   });
 
   it('should be blocked by visited squares', () => {
-    const board = generateStartBoard();
+    const board = freshStartBoard();
     markVisitedFields(board, { row: 0, col: 0 }, { row: 0, col: 3 });
     board.chessBoard[0][3] = 'rook';
     board.rookPosition = { row: 0, col: 3 };
@@ -41,7 +46,7 @@ describe('getAllowedMoves', () => {
   });
 
   it('should return no moves when all paths are blocked', () => {
-    const board = generateStartBoard();
+    const board = freshStartBoard();
     board.chessBoard[0][1] = 'visited';
     board.chessBoard[1][0] = 'visited';
 
@@ -55,7 +60,7 @@ const asPlayer = (currentPlayer: number) => ({ ctx: makeCtx({ currentPlayer }) }
 
 describe('end of game', () => {
   it('ends exactly on the move that strands the rook', () => {
-    let board = generateStartBoard();
+    let board = freshStartBoard();
     let player = 0;
     let outcome = moves.moveRook.apply(board, asPlayer(player), getAllowedMoves(board)[0]);
 

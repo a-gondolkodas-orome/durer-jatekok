@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import {
   getRandomBotStep,
   getSmartBotStep,
@@ -5,7 +6,7 @@ import {
 } from './bot-strategy';
 import {
   applyMove,
-  generateStartBoard,
+  startBoards,
   isFull,
   isTerminal,
   legalMoves,
@@ -16,6 +17,10 @@ import {
 } from './gameplay';
 import { moveValidator } from 'test-utils';
 
+// `startBoards` is shared module data; a spec that steps a board forward
+// needs its own copy, the way the engine takes one per match.
+const freshStartBoard = () => cloneDeep(startBoards[0]);
+
 const isLegalPlacement = moveValidator(moves.placeDigit);
 
 describe('latin-square-filling bot', () => {
@@ -23,7 +28,7 @@ describe('latin-square-filling bot', () => {
 const playGame = (
   step0: (b: Board) => Move,
   step1: (b: Board) => Move,
-  start: Board = generateStartBoard()
+  start: Board = freshStartBoard()
 ): number => {
   let board = start;
   // safety bound: at most 9 placements
@@ -39,7 +44,7 @@ const playGame = (
 
   describe('optimal winner (minimax)', () => {
     it('is a forced first-player win from the empty board', () => {
-      expect(optimalWinner(generateStartBoard())).toBe(0);
+      expect(optimalWinner(freshStartBoard())).toBe(0);
     });
 
     it('credits a completed Latin square to the first player', () => {
@@ -47,7 +52,7 @@ const playGame = (
     });
 
     it('every legal first move preserves the first player win', () => {
-      const start = generateStartBoard();
+      const start = freshStartBoard();
       for (const move of legalMoves(start)) {
         expect(optimalWinner(applyMove(start, move))).toBe(0);
       }
@@ -87,7 +92,7 @@ const playGame = (
       // predicted by the minimax value — for both winning and losing sides.
       const positions: Board[] = [];
       for (let i = 0; i < 60; i++) {
-        let board = generateStartBoard();
+        let board = freshStartBoard();
         while (!isTerminal(board)) {
           positions.push([...board]);
           board = applyMove(board, getRandomBotStep(board));
