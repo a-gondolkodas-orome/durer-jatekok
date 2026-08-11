@@ -9,6 +9,45 @@ fi
 
 cd "$CLAUDE_PROJECT_DIR"
 
+# Attribution for web sessions: the agent writes the code, so it is the author,
+# and the human rides along as a co-author. GitHub counts a co-author towards
+# the contribution graph the same as an author, so nothing is lost by the split,
+# and `git log` stays honest about which commits an agent wrote. Set before the
+# Node block below so a failed install cannot leave commits misattributed.
+git config user.name "Claude"
+git config user.email "noreply@anthropic.com"
+git config claude.coauthor \
+  "${CLAUDE_COMMIT_COAUTHOR:-Ildikó Czeller <czeildi@users.noreply.github.com>}"
+
+# `git commit -m` ignores commit.template and every commit here is made with -m,
+# so the trailer has to be appended by a hook instead. .git/hooks is not part of
+# the checkout, so it is written per session rather than committed. The hook
+# reads the co-author back out of git config so that this heredoc stays quoted.
+mkdir -p .git/hooks
+cat > .git/hooks/prepare-commit-msg << 'HOOK'
+#!/bin/bash
+set -euo pipefail
+
+# $2 is the message source. Merges and squashes take their message from git
+# rather than from the agent, so they are left alone; an amend re-runs this hook
+# over a message that already carries the trailer, which addIfDifferent skips.
+case "${2:-}" in
+  merge|squash) exit 0 ;;
+esac
+
+coauthor=$(git config claude.coauthor || true)
+[ -n "$coauthor" ] || exit 0
+
+# addIfDifferent rather than doNothing: a Co-authored-by trailer naming Claude
+# is often already present, and doNothing keys off the token alone, which would
+# drop the human's line whenever it is.
+git interpret-trailers --in-place --if-exists addIfDifferent \
+  --trailer "Co-authored-by: $coauthor" "$1" ||
+  # Attribution is not worth blocking a commit over.
+  echo "prepare-commit-msg: could not append the co-author trailer" >&2
+HOOK
+chmod +x .git/hooks/prepare-commit-msg
+
 # The web container is not the devcontainer, so nothing there pins Node: it
 # ships whatever its image has, and an npm of the wrong major resolves this
 # lockfile differently and fails `npm ci` outright. nvm is in the image, so
