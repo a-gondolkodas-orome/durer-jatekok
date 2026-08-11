@@ -9,15 +9,21 @@ fi
 
 cd "$CLAUDE_PROJECT_DIR"
 
-# Attribution for web sessions: the agent writes the code, so it is the author,
-# and the human rides along as a co-author. GitHub counts a co-author towards
-# the contribution graph the same as an author, so nothing is lost by the split,
-# and `git log` stays honest about which commits an agent wrote. Set before the
-# Node block below so a failed install cannot leave commits misattributed.
+# Attribution for web sessions: the agent writes the code, so it is the author.
+# Set before the Node block below so a failed install cannot leave commits
+# misattributed.
 git config user.name "Claude"
 git config user.email "noreply@anthropic.com"
-git config claude.coauthor \
-  "${CLAUDE_COMMIT_COAUTHOR:-Ildikó Czeller <czeildi@users.noreply.github.com>}"
+
+# Whoever wants the credit names themselves in CLAUDE_COMMIT_COAUTHOR, in their
+# own cloud environment. There is deliberately no default: a name hardcoded here
+# would be appended to every other contributor's web session too, crediting them
+# for work they did not do. Unset first, so that a reused container cannot carry
+# a previous session's value into one that sets nothing.
+git config --unset claude.coauthor 2> /dev/null || true
+if [ -n "${CLAUDE_COMMIT_COAUTHOR:-}" ]; then
+  git config claude.coauthor "$CLAUDE_COMMIT_COAUTHOR"
+fi
 
 # `git commit -m` ignores commit.template and every commit here is made with -m,
 # so the trailer has to be appended by a hook instead. .git/hooks is not part of
