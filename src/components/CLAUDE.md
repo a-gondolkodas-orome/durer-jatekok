@@ -262,40 +262,19 @@ state without going through a move, deliberately: a selection is not a move, so
 it must not bump `moveCount` or take an undo snapshot. Moves never get it; they
 return `nextTurnState` instead.
 
-**`useMoveScopedState(ctx.moveCount, initial)`** — for a `BoardClient`'s own
-mid-turn UI state: a half-made selection, a pending set of removals. The value
-is stamped with the `moveCount` at which it was set and exposed only while that
-stamp holds, so any move discards it during the next render.
+Three hooks in `strategy-game-factory/hooks/` cover the rest; each carries its
+own usage notes and footguns in its JSDoc, so reach for them rather than
+re-deriving the pattern:
 
-Do not clear such state with `useEffect(() => setX(initial), [ctx.moveCount])`.
-That repairs it one render too late — the browser paints a frame with the old
-selection over the advanced board — and it is a reset every component has to
-remember rather than a property of the state itself.
-
-```tsx
-const [selectedCell, setSelectedCell] = useMoveScopedState<number | null>(ctx.moveCount, null);
-```
-
-Two things to get right: `initial` is handed back on every stale render, so a
-non-primitive must be one stable reference (hoist it to module scope, never
-`[]` inline); and mid-turn state the *engine* has to see — anything
-`getPlayerStepDescription` reads — belongs in `ctx.turnState` instead, since
-this hook is local to the component.
-
-`useHoverPreview(ctx.moveCount)` is this hook plus pointer/focus plumbing, so
-board previews get the same invalidation for free.
-
-**`useDeferredMove(ctx.moveCount)`** — for a `BoardClient` whose single click
-submits a whole turn made of two moves (`pile-splitter`, `three-piles-rebuild`).
-Dispatch the first move, then hand the second to the returned function: it plays
-a `STEP_DELAY` later, so the board reads as two actions rather than one jump —
-the same beat the engine gives a bot's multi-move turn.
-
-Do not schedule that beat with a bare `setTimeout`. The callback closes over the
-board the first move produced, so a restart, a variant switch or an undo inside
-the window fires the move at a position that is gone — in dev that throws
-"stale board passed to move". The hook cancels on all of those (they rewind
-`moveCount`) and on unmount.
+- **`useMoveScopedState(ctx.moveCount, initial)`** — the `BoardClient`'s own
+  mid-turn UI state (a half-made selection, a pending set of removals),
+  discarded by the next move without a `useEffect` reset.
+- **`useHoverPreview(ctx.moveCount)`** — that hook plus pointer/focus plumbing,
+  so board previews get the same invalidation for free.
+- **`useDeferredMove(ctx.moveCount)`** — for a single click that submits a
+  two-move turn (`pile-splitter`, `three-piles-rebuild`): it plays the second
+  move a beat later, cancelling if a restart, variant switch or undo takes the
+  position away. Never schedule that beat with a bare `setTimeout`.
 
 ```tsx
 const deferMove = useDeferredMove(ctx.moveCount);
