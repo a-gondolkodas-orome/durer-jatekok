@@ -20,7 +20,7 @@ across every spec file in a worker — so `const board = startBoard` followed by
 an in-place edit used to corrupt that board for every later file, surfacing as a
 failure in an unrelated game and only in some file orderings. One reached a
 deploy that way. The engine takes its own copy of a start board, so freezing
-costs the games nothing; specs take theirs with `freshBoard` (test-utils).
+costs the games nothing; specs take theirs with `cloneDeep`.
 
 Frozen here rather than at each export so it stays test-only, and so a board
 added later is covered without anyone remembering to opt in.

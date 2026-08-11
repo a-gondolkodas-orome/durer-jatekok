@@ -6,7 +6,6 @@ import {
 } from '../gameplay';
 import { smartBotStrategy, randomBotStrategy, makeSmartBotStrategy } from './bot-strategy';
 import { playBotTurn } from './spec-helpers';
-import { freshBoard } from 'test-utils';
 
 // Cheap search budget so full-game simulations stay fast in CI.
 const fastBot = makeSmartBotStrategy({ depth: 6, budget: 2000 });
@@ -27,7 +26,7 @@ describe('line-player bot', () => {
   it('creates a double threat when it can (plays a pre-threat edge)', () => {
     const edge = EDGES.find(e => e.triangleIds.length === 2)!;
     const [t1, t2] = edge.triangleIds;
-    let board = freshBoard(startBoard);
+    let board = startBoard;
     board = applyShade(board, otherEdge(t1, edge.id));
     board = applyShade(board, otherEdge(t2, edge.id));
     // No immediate win available, but shading `edge` makes two live threats.
@@ -58,7 +57,7 @@ describe('circle-player bot', () => {
   it('defuses a pre-threat edge by circling one of its triangles', () => {
     const edge = EDGES.find(e => e.triangleIds.length === 2)!;
     const [t1, t2] = edge.triangleIds;
-    let board = freshBoard(startBoard);
+    let board = startBoard;
     board = applyShade(board, otherEdge(t1, edge.id));
     board = applyShade(board, otherEdge(t2, edge.id));
     expect(liveThreats(board)).toHaveLength(0);
@@ -87,7 +86,7 @@ describe('test bot', () => {
 
 describe('full playthroughs terminate with a valid winner', () => {
   const simulate = (lineStrategy: typeof smartBotStrategy, circleStrategy: typeof smartBotStrategy) => {
-    let board = freshBoard(startBoard);
+    let board = startBoard;
     let player = LINE;
     for (let turn = 0; turn < 200; turn++) {
       const played = playBotTurn(board, player, player === LINE ? lineStrategy : circleStrategy);

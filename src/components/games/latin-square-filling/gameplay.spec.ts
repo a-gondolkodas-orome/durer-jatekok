@@ -9,7 +9,7 @@ import {
   playerToMove,
   type Board
 } from './gameplay';
-import { makeCtx, moveValidator, freshBoard } from 'test-utils';
+import { makeCtx, moveValidator } from 'test-utils';
 
 const isLegalPlacement = moveValidator(moves.placeDigit);
 
@@ -66,14 +66,14 @@ describe('latin-square-filling gameplay', () => {
 
 describe('isLegalPlacement argument checks', () => {
   it('refuses a digit outside 1..3', () => {
-    const board = freshBoard(startBoard);
+    const board = startBoard;
     expect(isLegalPlacement(board, 0, 0)).toBe(false);
     expect(isLegalPlacement(board, 0, 4)).toBe(false);
     expect(isLegalPlacement(board, 0, 1.5)).toBe(false);
   });
 
   it('refuses a cell outside the 3x3 grid', () => {
-    const board = freshBoard(startBoard);
+    const board = startBoard;
     expect(isLegalPlacement(board, -1, 1)).toBe(false);
     expect(isLegalPlacement(board, 9, 1)).toBe(false);
     expect(isLegalPlacement(board, 0.5, 1)).toBe(false);

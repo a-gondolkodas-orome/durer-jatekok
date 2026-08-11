@@ -14,7 +14,7 @@ import {
   type Board,
   type Move
 } from './gameplay';
-import { moveValidator, freshBoard } from 'test-utils';
+import { moveValidator } from 'test-utils';
 
 const isLegalPlacement = moveValidator(moves.placeDigit);
 
@@ -23,7 +23,7 @@ describe('latin-square-filling bot', () => {
 const playGame = (
   step0: (b: Board) => Move,
   step1: (b: Board) => Move,
-  start: Board = freshBoard(startBoard)
+  start: Board = startBoard
 ): number => {
   let board = start;
   // safety bound: at most 9 placements
@@ -47,7 +47,7 @@ const playGame = (
     });
 
     it('every legal first move preserves the first player win', () => {
-      const start = freshBoard(startBoard);
+      const start = startBoard;
       for (const move of legalMoves(start)) {
         expect(optimalWinner(applyMove(start, move))).toBe(0);
       }
@@ -87,7 +87,7 @@ const playGame = (
       // predicted by the minimax value — for both winning and losing sides.
       const positions: Board[] = [];
       for (let i = 0; i < 60; i++) {
-        let board = freshBoard(startBoard);
+        let board = startBoard;
         while (!isTerminal(board)) {
           positions.push([...board]);
           board = applyMove(board, getRandomBotStep(board));

@@ -1,12 +1,13 @@
+import { cloneDeep } from 'lodash';
 import { startBoard, moves, neighbours, type Board } from './gameplay';
-import { makeCtx, moveValidator, freshBoard } from 'test-utils';
+import { makeCtx, moveValidator } from 'test-utils';
 
 
 const isAllowedStep = (board: Board, vertex: number, color: string | null): boolean =>
   moveValidator(moves.colorVertex)(board, { vertex, color });
 
 describe('cube-coloring isAllowedStep', () => {
-  const empty = (): Board => freshBoard(startBoard);
+  const empty = (): Board => cloneDeep(startBoard);
 
   it('allows colouring an uncoloured vertex on an empty board', () => {
     expect(isAllowedStep(empty(), 0, 'red')).toBe(true);
@@ -68,7 +69,7 @@ describe('end of game', () => {
 
   it('passes the turn while a colour still fits somewhere', () => {
     const outcome = moves.colorVertex.apply(
-      freshBoard(startBoard), meta, { vertex: 0, color: 'red' }
+      startBoard, meta, { vertex: 0, color: 'red' }
     );
     expect(outcome.nextBoard).toEqual(['red', '', '', '', '', '', '', '']);
     expect(outcome.gameEnd).toBeUndefined();

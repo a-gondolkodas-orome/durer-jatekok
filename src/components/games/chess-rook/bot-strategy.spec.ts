@@ -1,6 +1,6 @@
 import { smartBotStrategy } from './bot-strategy';
 import { startBoard, markVisitedFields, type Board, type Field } from './gameplay';
-import { botNextMoveArgs, makeCtx, freshBoard } from 'test-utils';
+import { botNextMoveArgs, makeCtx } from 'test-utils';
 import { cloneDeep, isEqual } from 'lodash';
 
 const smartBotTarget = (board: Board): Field =>
@@ -17,7 +17,7 @@ describe('chess rook', () => {
     });
 
     it('should create a narrow rectangle if possible', () => {
-      const board = freshBoard(startBoard);
+      const board = startBoard;
 
       const nextBoard = cloneDeep(board);
       markVisitedFields(nextBoard, nextBoard.rookPosition, { row: 0, col: 5 });

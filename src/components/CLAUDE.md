@@ -63,22 +63,20 @@ single position stays singular rather than being pluralised into a one-entry
 export, and the name says which position it is instead of restating the field
 it feeds.
 
-**A spec never reads an exported board directly — it takes `freshBoard(startBoard)`**
-(`test-utils`). An exported board is module-scope data, and `isolate: false`
+**A spec never edits an exported board — it works on `cloneDeep(startBoard)`.**
+An exported board is module-scope data, and `isolate: false`
 (vite.config.js) shares one module registry across every spec file in a worker,
 so `const board = startBoard` followed by an in-place edit corrupts that board
 for every later file. It surfaces as a failure in an unrelated game, in some
 file orderings only — which is how it reached a deploy once.
 
-Do this for every read, not only where a mutation is obvious: whether a spec
-mutates cannot be told from whether it passes. The spec that caused that
-failure asserted against the board it had just mutated, so it went green while
-breaking its neighbour.
-
-You do not have to remember, though: `test-setup.ts` deep-freezes every exported
-start board, so an in-place edit throws where it happens instead of surfacing
-somewhere else later. That is also why the rule needs no per-game upkeep — a
-board added tomorrow is covered without opting in.
+Reading one is fine; only an edit needs the copy. You do not have to work out
+which is which, and you should not try: `test-setup.ts` deep-freezes every
+exported start board, so an edit throws where it happens rather than surfacing
+somewhere else later. Judging it by eye is what failed before — the spec that
+broke the deploy asserted against the board it had just mutated, so it went
+green while breaking its neighbour. The freeze needs no per-game upkeep either:
+a board added tomorrow is covered without opting in.
 
 Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
 the game's own optimal bot against itself and returns the role that forces the

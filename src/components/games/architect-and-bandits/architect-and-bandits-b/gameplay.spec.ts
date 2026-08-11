@@ -1,6 +1,6 @@
 import { startBoard, moves } from './gameplay';
 import { ARCHITECT, BANDITS, KM_PER_EDGE, type Board } from '../gameplay';
-import { makeCtx, freshBoard } from 'test-utils';
+import { makeCtx } from 'test-utils';
 
 // After the fourth day the architect wins exactly when every vertex carries a
 // tower.
@@ -75,7 +75,7 @@ describe('architect-and-bandits-b tower building', () => {
   });
 
   it('starts day 1 with a tower already on the architect\'s vertex', () => {
-    const board = freshBoard(startBoard);
+    const board = startBoard;
     expect(board.towers).toHaveLength(VERTEX_COUNT);
     expect(board.architectPosition).toBe(0);
     expect(board.towers[0]).toBe(true);

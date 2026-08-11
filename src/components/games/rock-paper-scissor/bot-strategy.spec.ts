@@ -1,6 +1,6 @@
 import { smartBotStrategy } from './bot-strategy';
 import { CARDS, startBoard, moves, type Board, type Card } from './gameplay';
-import { botNextMoveArgs, makeCtx, moveValidator, freshBoard } from 'test-utils';
+import { botNextMoveArgs, makeCtx, moveValidator } from 'test-utils';
 
 const smartBotRemoval = (board: Board, currentPlayer: number): Card =>
   botNextMoveArgs(smartBotStrategy({ board, ctx: makeCtx({ currentPlayer }) }))[0];
@@ -37,7 +37,7 @@ const optimalWinner = (board: Board, player: number): number => {
   return winner;
 };
 
-const START = freshBoard(startBoard);
+const START = startBoard;
 
 // Every position reachable from the start, paired with the player to move.
 const reachablePositions = (): { board: Board; player: number }[] => {
