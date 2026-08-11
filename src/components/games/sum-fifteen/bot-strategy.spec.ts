@@ -8,6 +8,7 @@ import {
   numbersOwnedBy,
   type Owner
 } from './gameplay';
+import { freshBoard } from 'test-utils';
 
 describe('winnerOptimal', () => {
   it('declares the second player the winner from the empty board (optimal play is a draw)', () => {
@@ -26,7 +27,7 @@ describe('winnerOptimal', () => {
 // Play out full games; assert the smart bot never loses as the second player,
 // which — since the game has no draws in the players' favour — means it wins.
 const playSmartBotVsRandom = (botPlayer: 0 | 1, rng: () => number): 0 | 1 => {
-  let owner: Owner = startBoard.owner;
+  let owner: Owner = freshBoard(startBoard).owner;
   while (true) {
     const cp = currentPlayerFromOwner(owner);
     const move = cp === botPlayer

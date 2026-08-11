@@ -16,14 +16,14 @@ import {
   shadedCount,
   type Board
 } from './gameplay';
-import { makeCtx, moveValidator } from 'test-utils';
+import { makeCtx, moveValidator, freshBoard } from 'test-utils';
 
 const isShadeAllowed = moveValidator(moves.shadeEdge, makeCtx({ currentPlayer: LINE }));
 const isCirclePlacementAllowed = moveValidator(moves.placeCircle, makeCtx({ currentPlayer: CIRCLE }));
 
 // Shade the three edges of a triangle on a fresh board.
 const boardWithFullTriangle = (t: number): Board => {
-  let board = startBoard;
+  let board = freshBoard(startBoard);
   for (const e of TRIANGLES[t].edgeIds) board = applyShade(board, e);
   return board;
 };
@@ -34,7 +34,7 @@ const preThreatSetup = () => {
   const edge = EDGES.find(e => e.triangleIds.length === 2)!;
   const [t1, t2] = edge.triangleIds;
   const otherEdge = (t: number) => TRIANGLES[t].edgeIds.find(e => e !== edge.id)!;
-  let board = startBoard;
+  let board = freshBoard(startBoard);
   board = applyShade(board, otherEdge(t1));
   board = applyShade(board, otherEdge(t2));
   return { board, edge: edge.id, t1, t2 };
@@ -42,7 +42,7 @@ const preThreatSetup = () => {
 
 describe('start board', () => {
   it('has no shaded edges and no circles', () => {
-    const board = startBoard;
+    const board = freshBoard(startBoard);
     expect(board.edges).toHaveLength(63);
     expect(board.circles).toHaveLength(36);
     expect(board.edges.some(Boolean)).toBe(false);
@@ -65,7 +65,7 @@ describe('win detection', () => {
   });
 
   it('circle wins only once every triangle is circled', () => {
-    let board = startBoard;
+    let board = freshBoard(startBoard);
     expect(isCircleWin(board)).toBe(false);
     board = { edges: board.edges, circles: new Array(36).fill(true) };
     expect(isCircleWin(board)).toBe(true);
@@ -82,7 +82,7 @@ describe('threat vocabulary', () => {
   it('isWinningShade is true exactly for the third edge of an un-circled 2-edge triangle', () => {
     const t = 5;
     const [e0, e1, e2] = TRIANGLES[t].edgeIds;
-    let board = startBoard;
+    let board = freshBoard(startBoard);
     board = applyShade(board, e0);
     board = applyShade(board, e1);
     expect(isWinningShade(board, e2)).toBe(true);

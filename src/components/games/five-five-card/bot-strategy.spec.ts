@@ -1,6 +1,7 @@
 import { runMatch, type MatchResult } from 'strategy-game-factory';
 import { type Board, startBoard, moves } from './gameplay';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
+import { freshBoard } from 'test-utils';
 
 // Each player takes cards from the *other* hand, so over the eight moves each
 // side decides which single card its opponent is left with. The second player
@@ -10,7 +11,7 @@ type Bot = typeof smartBotStrategy
 const play = (startBoard: Board, strategies: [Bot, Bot]): MatchResult<Board> =>
   runMatch({ gameplay: { moves }, strategies, startBoard });
 
-const START = startBoard;
+const START = freshBoard(startBoard);
 
 // Solved offline against the real getWinnerIndex: the opening is a second-player
 // win, and so is every position still holding four cards a side — the first

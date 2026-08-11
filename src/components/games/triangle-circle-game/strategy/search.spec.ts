@@ -4,6 +4,7 @@ import {
   startBoard, applyShade
 } from '../gameplay';
 import { evaluatePosition } from './search';
+import { freshBoard } from 'test-utils';
 
 const otherEdge = (t: number, notEdge: number) => TRIANGLES[t].edgeIds.find(e => e !== notEdge)!;
 
@@ -24,7 +25,7 @@ describe('bounded minimax search', () => {
   it('sees a forced line win via a double threat (line to move on a pre-threat edge)', () => {
     const edge = EDGES.find(e => e.triangleIds.length === 2)!;
     const [t1, t2] = edge.triangleIds;
-    let board = startBoard;
+    let board = freshBoard(startBoard);
     board = applyShade(board, otherEdge(t1, edge.id));
     board = applyShade(board, otherEdge(t2, edge.id));
     // Line has no immediate win, but shading `edge` makes two live threats.
@@ -37,14 +38,14 @@ describe('bounded minimax search', () => {
     const upTris = TRIANGLES.filter(t => t.dir === 'up');
     const a = upTris[0].id;
     const b = upTris[upTris.length - 1].id;
-    let board = startBoard;
+    let board = freshBoard(startBoard);
     for (const e of TRIANGLES[a].edgeIds.slice(0, 2)) board = applyShade(board, e);
     for (const e of TRIANGLES[b].edgeIds.slice(0, 2)) board = applyShade(board, e);
     expect(evaluatePosition(board, CIRCLE)).toBe('lineWins');
   });
 
   it('degrades to unknown on the wide-open board within a small budget', () => {
-    const board = startBoard;
+    const board = freshBoard(startBoard);
     expect(evaluatePosition(board, LINE, { depth: 6, budget: 1500 })).toBe('unknown');
   });
 });

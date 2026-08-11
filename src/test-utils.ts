@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import {
   runMatch,
   type BotMove, type BotStrategy, type Ctx, type Gameplay, type MoveDefinition
@@ -51,6 +52,18 @@ export const playBotMove = <TBoard, TTurnState = unknown>(
   const { move, args = [] } = botNextMove(strategy({ board, ctx }));
   return moves[move]!.apply(board, { ctx }, ...args).nextBoard;
 };
+
+// Your own copy of a board a game module exports. Those are module-scope data
+// shared by every match, and `isolate: false` (vite.config.js) shares one module
+// registry across every spec file in a worker — so a spec that steps an exported
+// board forward corrupts it for every later file, in a way that surfaces as an
+// unrelated failure in an unrelated game and only in some file orderings.
+//
+// The engine takes its own copy on the way in, which is why nothing but specs
+// needs this. Use it for *every* read of an exported board, not only where a
+// mutation is obvious: whether a spec mutates cannot be told from whether it
+// passes — one that mutates can assert against the board it just changed.
+export const freshBoard = <TBoard>(board: TBoard): TBoard => cloneDeep(board);
 
 // Which role can force the win from `startBoard`, read off the game's own
 // optimal bot playing both sides. Every position of these games has such a

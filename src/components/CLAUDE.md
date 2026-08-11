@@ -63,9 +63,18 @@ single position stays singular rather than being pluralised into a one-entry
 export, and the name says which position it is instead of restating the field
 it feeds.
 
-A spec that steps such a board forward needs its own copy — an exported board is
-module-scope data shared by every match, and only the engine clones on the way
-in. The converted games keep a one-line `freshStartBoard()` helper for that.
+**A spec never reads an exported board directly — it takes `freshBoard(startBoard)`**
+(`test-utils`). An exported board is module-scope data, and `isolate: false`
+(vite.config.js) shares one module registry across every spec file in a worker,
+so `const board = startBoard` followed by an in-place edit corrupts that board
+for every later file. It surfaces as a failure in an unrelated game, in some
+file orderings only — which is how it reached a deploy once.
+
+Do this for every read, not only where a mutation is obvious: whether a spec
+mutates cannot be told from whether it passes. The spec that caused that
+failure asserted against the board it had just mutated, so it went green while
+breaking its neighbour. Only the engine's own `cloneDeep` protects the game
+itself; nothing protects a spec from another spec.
 
 Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
 the game's own optimal bot against itself and returns the role that forces the
