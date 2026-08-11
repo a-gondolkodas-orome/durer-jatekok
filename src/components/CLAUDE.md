@@ -73,8 +73,12 @@ file orderings only — which is how it reached a deploy once.
 Do this for every read, not only where a mutation is obvious: whether a spec
 mutates cannot be told from whether it passes. The spec that caused that
 failure asserted against the board it had just mutated, so it went green while
-breaking its neighbour. Only the engine's own `cloneDeep` protects the game
-itself; nothing protects a spec from another spec.
+breaking its neighbour.
+
+You do not have to remember, though: `test-setup.ts` deep-freezes every exported
+start board, so an in-place edit throws where it happens instead of surfacing
+somewhere else later. That is also why the rule needs no per-game upkeep — a
+board added tomorrow is covered without opting in.
 
 Curated boards want `forcedWinnerIndex` (`test-utils`) in their spec: it plays
 the game's own optimal bot against itself and returns the role that forces the
