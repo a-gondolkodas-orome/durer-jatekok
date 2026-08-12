@@ -40,13 +40,13 @@ const optionalNextTopByCount: Record<number, string> = {
   0: 'top-0',
   1: 'top-[10%]',
   2: 'top-0',
-  3: 'top-[25%]'
+  3: 'top-[20%]'
 };
 
 const OptionalNextSubmarine = ({ existingSubmarineCount }: { existingSubmarineCount: number }) => (
   <Piece
     symbol="submarine"
-    className={`z-40 opacity-50 ${optionalNextTopByCount[existingSubmarineCount] ?? 'top-[25%]'}`}
+    className={`z-40 opacity-50 ${optionalNextTopByCount[existingSubmarineCount]}`}
   />
 );
 
