@@ -35,6 +35,48 @@ practice site is served from the same repo.
 4. **offline-frontend is kept and ported** to the new engine (in-browser bot,
    localStorage persistence, competition chrome).
 
+## Competition secrecy: the yearly private-repo flow
+
+A hard requirement the architecture must keep serving: **a new competition's
+game must stay secret until after the competition**, when it becomes a public
+practice game. Today this works through a per-year **synced private repo**:
+`sync.yml` in the public repo mirrors any pushed `sync-*` branch into the
+year's private repo (`PRIVATE_REPO_NAME`/`PRIVATE_PAT` secrets, merging with
+`-X ours` so public content wins — PR #180 made syncing intentional).
+Framework development happens in the public repo; the actual competition game
+is developed and deployed **from the private repo**; after the competition a
+merge-back PR publishes it (PR #177 / issue #178, the 19th competition).
+
+The migration preserves and improves this flow:
+
+- **`sync.yml` is branch-level and repo-shape-agnostic** — the subtree merge
+  and workspace changes don't break it. It stays green on the
+  must-keep-working checklist throughout.
+- **The new architecture makes the secret smaller and the merge-back
+  trivial.** A competition game becomes one self-contained folder under
+  `packages/games` (gameplay, bot, curated start boards, BoardClient, specs)
+  plus a registration line. The private repo's delta over public shrinks to
+  exactly that folder; the post-competition PR (the #177 of the year) drops it
+  into the public monorepo and registers it on the practice site **in the
+  form the practice site already uses** — no porting step, which is the
+  secondary goal's payoff.
+- **Everything secret is in that folder**: rules, curated start boards and
+  the optimal bot are all pre-competition secrets (the server-only bot at
+  runtime protects only against bundle-sniffing, not against reading the
+  public repo). Nothing about the new game may leak into public commits —
+  including engine changes phrased around the new game's needs; those land
+  generically or wait.
+- **Private play-testing gets better**: once practice is in the monorepo, the
+  private repo can register the secret game on its own practice-site build
+  and play-test it internally before the competition.
+
+**Timing constraint this adds**: the heavy repo-shape phases (0–1, and the
+Phase 3/4 backend/frontend swaps) should not run while a year's private repo
+is active with an unmerged game — `-X ours` public-wins syncs into a
+diverged private repo make the game team rebase over refactors repeatedly.
+Sequence each year's private-repo cut *after* the disruptive phases of the
+moment, and sync (`sync-*` push) right before cutting it.
+
 **Board UI decision**: both live competition games (`19ocd` =
 `remove-divisor-multiple`, `stones` = `stones-remove-one-not-twice-from-left`)
 reuse this repo's implementations — gameplay, bot **and** `BoardClient` —
@@ -109,6 +151,12 @@ deliberately retired by a later phase (noted inline).
 **Offline practice build**
 - The gh-pages build serves the competition games with in-browser bot and
   localStorage persistence surviving reload.
+
+**Competition secrecy flow**
+- Pushing a `sync-*` branch mirrors it into the year's private repo
+  (`sync.yml`); a competition game can be developed and deployed from the
+  private repo with zero trace in public; the post-competition merge-back PR
+  publishes it as a practice game.
 
 ## Target architecture (end state)
 
@@ -415,6 +463,13 @@ tasks, pinned Node) arrives alongside the existing setup, not instead of it.
 10. **Volunteer bandwidth**: every phase boundary is a safe stop with both
     rounds playable; only the two rehearsals are hard gates before a real
     competition.
+11. **Migration churn vs an active private repo**: refactoring the repo shape
+    while a year's private repo carries an unmerged secret game forces the
+    game team to absorb the refactors through `-X ours` syncs repeatedly.
+    Mitigation: schedule the disruptive phases between private-repo cycles,
+    sync right before each year's cut, and keep the secret delta to the one
+    game folder so merge-backs stay small. The rehearsal competitions
+    themselves exercise the private-repo flow end to end.
 
 ## Ordering rationale
 
