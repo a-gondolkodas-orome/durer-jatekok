@@ -75,6 +75,41 @@ admin "add minutes" push, an offline mode, and a headless test client.
 Consciously dropped: secret state/playerView (unused), plugins, stages, the
 lobby REST flow (already bypassed), undo/redo (server-side), websockets.
 
+## What must keep working (the standing checklist)
+
+Every phase's verification points back to this list; a phase is done only when
+each item still holds. It is committed to durer-aion as
+`docs/must-keep-working.md` in PR 0.0 and updated only when a capability is
+deliberately retired by a later phase (noted inline).
+
+**Practice site (this repo, then `apps/practice`)**
+- `jatek.durerinfo.hu` serves the site; deploy-on-main works; every game
+  playable in both modes; existing CI gates (lint, typecheck, unit tests,
+  patch coverage) stay green.
+
+**Online competition round**
+- Team login by join code; disclaimer → chooser flow; a team can start,
+  play, and finish a strategy match against the server bot (test and live),
+  with role choice, streak scoring and the 30-minute countdown.
+- Relay: start, receive problems, submit answers with 3 tries and decreasing
+  points, 60-minute clock.
+- Reload/disconnect mid-match resumes without loss; a second tab cannot
+  corrupt a match; the clock cannot be gamed client-side.
+- Final score = relay + strategy shows on the finished screen.
+
+**Admin / operations**
+- TSV team import (HTTP and CLI script); admin team list, per-team detail,
+  per-match state and log dumps, add-minutes on running matches, relay/strategy
+  reset, soft team delete, per-category stats.
+- `scripts/admin.py` pulls all teams and match data for post-competition
+  scoring (payload shape changes at Phase 3 — admin.py is updated with it).
+- Deployment runbook works: `docker compose up` from `DEPLOYMENT.md` yields a
+  serving stack; team import runs in the container; Sentry receives events.
+
+**Offline practice build**
+- The gh-pages build serves the competition games with in-browser bot and
+  localStorage persistence surviving reload.
+
 ## Target architecture (end state)
 
 ```
@@ -106,8 +141,30 @@ encodes.
 Sizing: S ≈ <150 review lines, M ≈ <500, L = large but isolated or mechanical.
 **Every PR leaves both sites shippable**; each phase boundary is a safe stop.
 
-### Phase 0 — Repo merge
+### Phase 0 — Baseline + repo merge
 
+The migration starts by making durer-aion safe to change: today its CI runs
+lint at `--max-warnings=107` through a third-party action, the test job is
+commented out even though four jest test files and per-package `test` scripts
+exist, there is no typecheck gate, jobs pin different Node versions (24 vs 22)
+on outdated action versions, and no `.nvmrc`/`engines` pins the toolchain.
+Every later PR is reviewed against this net, so it comes first.
+
+- **PR 0.0 (M)** durer-aion baseline:
+  - Pin the toolchain: `.nvmrc` + root `engines` (Node 24, matching the
+    Dockerfile), and align every CI job on it with current
+    `actions/checkout`/`setup-node` + npm caching.
+  - Rewrite CI as plain npm scripts (drop the lint-action wrapper): `lint`,
+    `build`, `i18n:check`, and an **enabled** `test` job running the existing
+    jest suites (fix or explicitly skip any that no longer pass — the
+    `gamewrapper.test.ts` suite in particular must run, since Phase 2's golden
+    parity tests build on that harness). Add a root `typecheck` script
+    (`tsc --noEmit` per workspace via turbo) and gate on it.
+  - Fix the Dockerfile `CMD` to run the built server (`node dist/src/server.js`)
+    instead of tsx watch mode; verify with `docker compose up`.
+  - Commit the "what must keep working" checklist (below) as
+    `docs/must-keep-working.md` in durer-aion — the regression checklist every
+    phase's verification points back to.
 - **PR 0.1 (S)** durer-aion hygiene: delete the dead root `src/`, rename the
   root package `bgio-tutorial` → `durer-aion`, `private: true`.
 - **PR 0.2 (M)** `git subtree add --prefix=apps/practice <this repo> main`.
@@ -263,8 +320,10 @@ Sizing: S ≈ <150 review lines, M ≈ <500, L = large but isolated or mechanica
 
 ## Testing strategy
 
-- Phase 0: both CI pipelines green on the merged repo; the Pages deploy
-  verified with a throwaway commit.
+- Phase 0: durer-aion's jest suites and typecheck run in CI (PR 0.0); both CI
+  pipelines green on the merged repo; the Pages deploy verified with a
+  throwaway commit; the must-keep-working checklist walked once against the
+  merged repo to establish the baseline.
 - Phase 1: existing engine/game specs move unchanged and stay green;
   three-host bot-turn agreement; the JSON round-trip sweep;
   `forcedWinnerIndex` on every competition start board.
@@ -308,7 +367,10 @@ Sizing: S ≈ <150 review lines, M ≈ <500, L = large but isolated or mechanica
 
 ## Ordering rationale
 
-Merge first so engine hardening lands once, reviewed under this repo's CI
+Baseline before anything else: pinned toolchain, running tests and the
+must-keep-working checklist are what make "everything keeps working" a checked
+property instead of an assertion, and every later PR is reviewed against that
+net. Merge next so engine hardening lands once, reviewed under this repo's CI
 culture. Engine extraction before any competition code because the server API
 and the serialization contract are prerequisites for both the backend and the
 offline work. The competition state machine before transport so scoring parity
