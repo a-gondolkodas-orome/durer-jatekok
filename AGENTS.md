@@ -263,6 +263,10 @@ diff:
 A mechanical sweep that follows a merged design PR is fine at any size — it is
 skimmable precisely because the pattern was already reviewed.
 
+When an agent opens a pull request, it should assign `czeildi` to it (the
+`assignees` field via the GitHub API), so agent-opened PRs land in their review
+queue instead of going unnoticed.
+
 ## Maintenance philosophy
 
 This is a volunteer side-project with limited time. Prefer simple, consistent,
