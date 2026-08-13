@@ -150,10 +150,22 @@ exist, there is no typecheck gate, jobs pin different Node versions (24 vs 22)
 on outdated action versions, and no `.nvmrc`/`engines` pins the toolchain.
 Every later PR is reviewed against this net, so it comes first.
 
+**Developer-experience principle for all of Phase 0**: existing durer-aion
+developer workflows are broken only where unavoidable — everything else is
+additive. `npm ci` at the root, `npm run dev:server` / `dev:online` /
+`dev:offline`, the docker-compose dev flow and the README setup steps keep
+working unchanged throughout the phase; new tooling (devcontainer, turbo
+tasks, pinned Node) arrives alongside the existing setup, not instead of it.
+
 - **PR 0.0 (M)** durer-aion baseline:
   - Pin the toolchain: `.nvmrc` + root `engines` (Node 24, matching the
     Dockerfile), and align every CI job on it with current
-    `actions/checkout`/`setup-node` + npm caching.
+    `actions/checkout`/`setup-node` + npm caching. `engines` stays a warning,
+    not an enforcement (no `engine-strict`) — a developer on another Node
+    minor is nudged, not blocked.
+  - Offer a reproducible environment as a **new, optional**
+    `.devcontainer/` (modeled on this repo's), rather than changing the
+    documented local setup; developers who ignore it lose nothing.
   - Rewrite CI as plain npm scripts (drop the lint-action wrapper): `lint`,
     `build`, `i18n:check`, and an **enabled** `test` job running the existing
     jest suites (fix or explicitly skip any that no longer pass — the
@@ -194,11 +206,22 @@ Every later PR is reviewed against this net, so it comes first.
     for the monorepo; `apps/practice/CLAUDE.md` keeps loading automatically
     when working under it, since memory files nest by directory — settings do
     not.
+  - Devcontainers nest like settings, not like memory files: VS Code only
+    auto-detects them at the opened folder root, so this repo's
+    `.devcontainer` (landing at `apps/practice/.devcontainer`) keeps working
+    when opening that folder directly, and root-level named configs
+    (`.devcontainer/practice/`, `.devcontainer/aion/` from PR 0.0) surface
+    both for whoever opens the monorepo root.
 - **PR 0.3 (M)** Join npm workspaces: add to `workspaces`, drop the practice
   lockfile, regenerate the root lockfile (npm nests the conflicting React 19/18,
   Vite, TS, ESLint versions per workspace). Verify both dev servers, builds and
   test suites — nothing else in this PR. Wire practice `test`/`lint`/`build`
-  into `turbo.json`.
+  into `turbo.json`. Existing commands are untouched: the one visible change
+  for durer-aion developers is that the root `npm ci` now also installs
+  practice's dependencies (slower, not different); practice developers switch
+  from repo-root commands to `apps/practice`-rooted ones — the one workflow
+  break the merge genuinely forces, called out in the practice README and
+  CLAUDE.md in the same PR.
 
 ### Phase 1 — Engine hardening + extraction (practice behavior unchanged)
 
