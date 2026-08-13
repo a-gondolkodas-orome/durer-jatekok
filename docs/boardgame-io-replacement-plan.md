@@ -167,11 +167,18 @@ tasks, pinned Node) arrives alongside the existing setup, not instead of it.
     `.devcontainer/` (modeled on this repo's), rather than changing the
     documented local setup; developers who ignore it lose nothing.
   - Rewrite CI as plain npm scripts (drop the lint-action wrapper): `lint`,
-    `build`, `i18n:check`, and an **enabled** `test` job running the existing
-    jest suites (fix or explicitly skip any that no longer pass — the
-    `gamewrapper.test.ts` suite in particular must run, since Phase 2's golden
-    parity tests build on that harness). Add a root `typecheck` script
-    (`tsc --noEmit` per workspace via turbo) and gate on it.
+    `build`, `i18n:check`, and a working `test` job. The existing test setup
+    is not merely disabled — **no runner is installed**: `jest` is not a
+    dependency anywhere (only `@types/jest` and a leftover config block), the
+    per-package `test` scripts fail with `jest: not found`, and the
+    commented-out CI job is a CRA-era fossil pinned to Node 16. Adopt
+    **vitest** (ESM/TS-native, and what the practice repo uses, so the merged
+    repo converges on one test stack) and port the three real suites:
+    `gamewrapper.test.ts` (verified 9/9 green under vitest with a two-line
+    `jest → vi` shim — the harness Phase 2's golden parity tests build on),
+    `team_import.test.ts` (`jest.mock` → `vi.mock`), `Main.test.tsx` (needs
+    jsdom). Delete the placeholder `App.test.tsx`. Add a root `typecheck`
+    script (`tsc --noEmit` per workspace via turbo) and gate on it.
   - Fix the Dockerfile `CMD` to run the built server (`node dist/src/server.js`)
     instead of tsx watch mode; verify with `docker compose up`.
   - Commit the "what must keep working" checklist (below) as
