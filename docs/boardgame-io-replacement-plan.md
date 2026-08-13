@@ -173,6 +173,27 @@ Every later PR is reviewed against this net, so it comes first.
   recreate the `github-pages` environment and `pages` concurrency group on
   durer-aion; the CNAME already lives in `public/`, so the URL is unchanged.
   This repo gets a README banner; archival waits until Phase 7.
+
+  Merge the two `.claude/` setups — after the merge only the root
+  `.claude/settings.json` loads for sessions opened at the monorepo root, so
+  `apps/practice/.claude/settings.json` goes inert rather than conflicting:
+  - Union the permissions into the root file: keep durer-aion's `gh`
+    allows/denies + `WebSearch`; re-add practice's npm-script allowlist in the
+    shapes the monorepo actually uses (root `turbo run …` /
+    `npm run -w apps/practice …` — permission rules match literal command
+    strings, so the entries follow whatever PR 0.3 wires into `turbo.json`).
+  - Move practice's `SessionStart` hook to the root `.claude/hooks/`: its
+    three jobs (web-session git attribution, nvm Node pinning off `.nvmrc`,
+    `npm ci` when the tree is unsound) are all monorepo-root concerns — PR 0.0
+    provides the root `.nvmrc` it reads; until PR 0.3 unifies the lockfiles it
+    installs in both root and `apps/practice`.
+  - Commands/skills stay put: `new-game` and `play-game-in-browser` are
+    practice-specific and remain under `apps/practice/.claude/` (surfaced
+    directory-scoped); `draft-issue` stays at root.
+  - Rename durer-aion's lowercase `claude.md` to `CLAUDE.md` and rewrite it
+    for the monorepo; `apps/practice/CLAUDE.md` keeps loading automatically
+    when working under it, since memory files nest by directory — settings do
+    not.
 - **PR 0.3 (M)** Join npm workspaces: add to `workspaces`, drop the practice
   lockfile, regenerate the root lockfile (npm nests the conflicting React 19/18,
   Vite, TS, ESLint versions per workspace). Verify both dev servers, builds and
