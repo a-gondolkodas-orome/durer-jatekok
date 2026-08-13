@@ -111,10 +111,14 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   };
 
   // A piece stands in for the pile as a whole until one has been picked to
-  // discard, and for the pile it was picked from afterwards — so what it is
-  // called, and whether it is worth stopping at while tabbing, both depend on
-  // where in the turn it is read. Where the header button says the same thing,
-  // the pieces stay out of the tab order rather than repeating it once per piece.
+  // discard, and for the pile it was picked from afterwards: either way the
+  // click discards or un-discards the pile, and the piece under the pointer has
+  // nothing to do with it. What it is called, whether it lights up under the
+  // pointer and whether it is worth stopping at while tabbing all follow from
+  // that.
+  const standsForThePile = (pileId: number) =>
+    removedPileId === null || pileId === removedPileId;
+
   const pieceLabel = ({ pileId, pieceId }: Piece) => {
     if (removedPileId === null) {
       return t({
@@ -128,12 +132,13 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
 
   const pieceProps = ({ pileId, pieceId }: Piece) => {
     const disabled = isDisabled({ pileId, pieceId });
-    const standsForThePile = removedPileId === null || pileId === removedPileId;
 
     return {
       disabled,
       'aria-label': pieceLabel({ pileId, pieceId }),
-      tabIndex: standsForThePile ? -1 : undefined,
+      // where the header button says the same thing, the pieces stay out of the
+      // tab order rather than repeating it once per piece
+      tabIndex: standsForThePile(pileId) ? -1 : undefined,
       onClick: (e: MouseEvent) => { e.stopPropagation(); clickPiece({ pileId, pieceId }); },
       ...(disabled ? {} : previewProps({ pileId, pieceId }, preview))
     };
@@ -170,6 +175,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
             discard={discardState(pileId)}
             splitAfter={previewedSplitAt(pileId)}
             headerAction={discardButton(pileId)}
+            piecesStandForThePile={standsForThePile(pileId)}
             pieceProps={pieceId => pieceProps({ pileId, pieceId })}
             cardProps={{
               onClick: () => clickPile(pileId),

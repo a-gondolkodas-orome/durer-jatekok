@@ -17,6 +17,10 @@ type PileCardProps = {
   // previews nothing.
   splitAfter?: number | null;
   headerAction?: ReactNode;
+  // Set while a click on a piece acts on the pile rather than on that piece —
+  // the discard half of a turn. The pieces then answer the pointer as the pile
+  // they stand for, without one of them lighting up as if it were the target.
+  piecesStandForThePile?: boolean;
   pieceProps: (pieceId: number) => ComponentPropsWithoutRef<'button'>;
   // spread onto the card itself, for a game where the pile as a whole is a
   // click target
@@ -94,8 +98,8 @@ const cutRing = 'ring-2 ring-blue-800 dark:ring-blue-300 ring-offset-1 ring-offs
  * every row one length.
  *
  * The split preview is a colour and a ring on the piece cut at, and never a
- * gap: pieces the two halves would be laid out in stay in the one grid, in the
- * slots they already occupy. Moving them is what would put a different piece
+ * gap: the pieces the two halves would be laid out in stay in the one grid, in
+ * the slots they already occupy. Moving them is what would put a different piece
  * under a stationary pointer, and — since a piece would change parent — drop
  * the focus of anyone walking the pile by keyboard.
  */
@@ -105,6 +109,7 @@ export const PileCard = ({
   discard = 'no',
   splitAfter = null,
   headerAction,
+  piecesStandForThePile = false,
   pieceProps,
   cardProps
 }: PileCardProps) => {
@@ -115,7 +120,7 @@ export const PileCard = ({
   return (
     <div
       className={`
-        w-full min-w-0 rounded-lg border-2 px-2 pt-1 pb-2 bg-surface-elevated
+        w-full min-w-0 flex flex-col rounded-lg border-2 px-2 pt-1 pb-2 bg-surface-elevated
         ${discard === 'chosen' ? 'border-blue-500' : ''}
         ${isDiscarded ? 'opacity-60' : ''}
       `}
@@ -134,15 +139,24 @@ export const PileCard = ({
       {/* `auto-fill` is what makes the board fluid: a row takes as many pieces
           as fit at their smallest size and shares the remainder between them, so
           a wider card spends the width on more pieces per row rather than on
-          emptiness, and a narrower one drops to fewer instead of overflowing. */}
-      <div className={`grid gap-0.5 min-h-7 ${pieceColumns}`}>
+          emptiness, and a narrower one drops to fewer instead of overflowing.
+
+          Flipping the grid stacks the pile from the floor of the card up, which
+          leaves the short row on top where a real pile is uneven, and puts the
+          lower half of a split below the upper one. The pieces are discs, so
+          nothing has to be flipped back. `mt-auto` is the floor itself: cards in
+          a row stretch to the tallest, so without it a small pile would hang
+          from the caption rather than resting where the others rest. */}
+      <div className={`grid gap-0.5 min-h-7 mt-auto -scale-y-100 ${pieceColumns}`}>
         {range(size).map(pieceId => (
           <button
             key={pieceId}
             type="button"
             className={`
               aspect-square w-full flex items-center justify-center rounded-full
-              enabled:hocus:bg-slate-200 dark:enabled:hocus:bg-slate-700
+              ${piecesStandForThePile
+                ? ''
+                : 'enabled:hocus:bg-slate-200 dark:enabled:hocus:bg-slate-700'}
             `}
             {...pieceProps(pieceId)}
           >
