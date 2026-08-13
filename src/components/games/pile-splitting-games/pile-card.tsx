@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, FocusEvent, PointerEvent, ReactNode } from 'react';
 
 // How the pile reads while a discard is being aimed at it: `preview` is a pile
 // the pointer is merely over, `chosen` one already picked this turn. Two piles
@@ -22,6 +22,48 @@ type PileCardProps = {
   // click target
   cardProps?: ComponentPropsWithoutRef<'div'>;
 };
+
+/**
+ * Whether this device can preview a piece before the click that plays it. Where
+ * it can, a click plays the turn outright, as this family always has; where it
+ * cannot, the first tap previews and the second plays (see either client's
+ * `clickPiece`), which is what replaces the split the pieces used to be
+ * labelled with.
+ *
+ * Asking the device rather than reading the preview back is what keeps the
+ * mouse a single click: hover and click can land in one frame, and the click
+ * handler then still closes over the render before the preview.
+ */
+export const previewsByHover = () =>
+  typeof window === 'undefined'
+    || typeof window.matchMedia !== 'function'
+    || window.matchMedia('(hover: hover)').matches;
+
+/**
+ * `useHoverPreview`'s `hoverProps`, narrowed to the input that actually carries
+ * a hover: a mouse previews by hovering and a keyboard by tabbing, and a tap
+ * previews nothing, so that the tap the pieces are left to preview with is not
+ * also read as the tap that confirms.
+ *
+ * A tap focuses the button too, which is why the focus handler asks for
+ * `:focus-visible` — without it the tap meant to preview would confirm in the
+ * same breath, on the browsers that focus a button on tap.
+ */
+export const previewProps = <T, >(value: T, { set, clear }: PreviewControls<T>) => {
+  const onMouseOnly = (e: PointerEvent, react: () => void) => {
+    if (e.pointerType === 'mouse') react();
+  };
+
+  return {
+    onPointerEnter: (e: PointerEvent) => onMouseOnly(e, () => set(value)),
+    onPointerMove: (e: PointerEvent) => onMouseOnly(e, () => set(value)),
+    onPointerLeave: (e: PointerEvent) => onMouseOnly(e, clear),
+    onFocus: (e: FocusEvent) => { if (e.target.matches(':focus-visible')) set(value); },
+    onBlur: clear
+  };
+};
+
+type PreviewControls<T> = { set: (value: T) => void; clear: () => void };
 
 const pieceColor = (isDiscarded: boolean, isInFirstHalf: boolean) => {
   if (isDiscarded) return 'bg-slate-400 dark:bg-slate-600';

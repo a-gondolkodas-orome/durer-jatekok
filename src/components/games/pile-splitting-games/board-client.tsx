@@ -8,7 +8,7 @@ import {
   useDeferredMove,
   useMoveScopedState
 } from 'strategy-game-factory';
-import { PileArea, PileCard, type DiscardState } from './pile-card';
+import { PileArea, PileCard, previewProps, previewsByHover, type DiscardState } from './pile-card';
 import { isSplitAllowed, withPileRemoved, type Board, type Piece } from './gameplay';
 
 // The three- and four-pile siblings are played identically: click the pile to
@@ -19,7 +19,7 @@ import { isSplitAllowed, withPileRemoved, type Board, type Piece } from './gamep
 export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
   const [removedPileId, setRemovedPileId] = useMoveScopedState<number | null>(ctx.moveCount, null);
-  const { value: validHoveredPiece, hoverProps } = useHoverPreview<Piece>(ctx.moveCount);
+  const { value: validHoveredPiece, ...preview } = useHoverPreview<Piece>(ctx.moveCount);
   const { value: validHoveredPileId, hoverProps: pileHoverProps } = useHoverPreview<number>(ctx.moveCount);
   const deferMove = useDeferredMove(ctx.moveCount);
   // said by the header button of the pile picked to discard and by its pieces
@@ -49,6 +49,14 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
     }
     if (removedPileId === null) {
       setRemovedPileId(pileId);
+      return;
+    }
+
+    // Where nothing hovers, the first tap previews the split and the second
+    // plays it; a mouse or a keyboard has previewed it already, so a single
+    // click or keypress plays the turn as it always has.
+    if (!previewsByHover() && previewedSplitAt(pileId) !== pieceId) {
+      preview.set({ pileId, pieceId });
       return;
     }
 
@@ -127,7 +135,7 @@ export const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       'aria-label': pieceLabel({ pileId, pieceId }),
       tabIndex: standsForThePile ? -1 : undefined,
       onClick: (e: MouseEvent) => { e.stopPropagation(); clickPiece({ pileId, pieceId }); },
-      ...(disabled ? {} : hoverProps({ pileId, pieceId }))
+      ...(disabled ? {} : previewProps({ pileId, pieceId }, preview))
     };
   };
 

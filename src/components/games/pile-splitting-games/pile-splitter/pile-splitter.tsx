@@ -7,13 +7,13 @@ import {
   useHoverPreview,
   useDeferredMove
 } from 'strategy-game-factory';
-import { PileArea, PileCard, type DiscardState } from '../pile-card';
+import { PileArea, PileCard, previewProps, previewsByHover, type DiscardState } from '../pile-card';
 import { smartBotStrategy, randomBotStrategy } from './bot-strategy';
 import { isSplitAllowed, moves, withPileRemoved, type Board, type Piece } from './gameplay';
 
 const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
   const { t } = useTranslation();
-  const { value: validHoveredPiece, hoverProps } = useHoverPreview<Piece>(ctx.moveCount);
+  const { value: validHoveredPiece, ...preview } = useHoverPreview<Piece>(ctx.moveCount);
   const deferMove = useDeferredMove(ctx.moveCount);
 
   // One click performs the whole turn, so a piece is clickable only if both
@@ -23,13 +23,21 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
       || !isSplitAllowed(withPileRemoved(board, 1 - pileId), pileId, pieceId + 1);
 
   const clickPiece = ({ pileId, pieceId }: Piece) => {
+    // Where nothing hovers, the first tap previews the split and the second
+    // plays it; a mouse or a keyboard has previewed it already, so a single
+    // click or keypress plays the turn as it always has.
+    if (!previewsByHover() && previewedSplitAt(pileId) !== pieceId) {
+      preview.set({ pileId, pieceId });
+      return;
+    }
+
     const { nextBoard } = moves.removePile(board, 1 - pileId);
 
     deferMove(() => moves.splitPile(nextBoard, { pileId, pieceCount: pieceId + 1 }));
   };
 
-  // The pile the pointer is in is the one being split; the other is the one the
-  // same click discards.
+  // The previewed pile is the one being split; the other is the one the same
+  // click discards.
   const previewedSplitAt = (pileId: number): number | null => {
     if (!ctx.isClientMoveAllowed || validHoveredPiece === null) return null;
     return validHoveredPiece.pileId === pileId ? validHoveredPiece.pieceId : null;
@@ -64,7 +72,7 @@ const BoardClient = ({ board, ctx, moves }: BoardClientProps<Board>) => {
         en: `split after piece ${pieceId + 1}`
       }),
       onClick: () => clickPiece({ pileId, pieceId }),
-      ...(disabled ? {} : hoverProps({ pileId, pieceId }))
+      ...(disabled ? {} : previewProps({ pileId, pieceId }, preview))
     };
   };
 
