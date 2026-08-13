@@ -70,6 +70,11 @@ const pieceColor = (isDiscarded: boolean, isInFirstHalf: boolean) => {
   return isInFirstHalf ? 'bg-blue-600' : 'bg-green-600';
 };
 
+// The smallest a piece may be drawn, and so what decides how many go in a row.
+// It is a tap target as much as a disc, which is what keeps it this side of the
+// size the pieces could otherwise shrink to on a phone.
+const pieceColumns = 'grid-cols-[repeat(auto-fill,minmax(2.5rem,1fr))]';
+
 // The ring sits a pixel off the piece, so its offset has to be painted in the
 // card's own colour — `bg-surface-elevated` has no ring-offset counterpart.
 const cutRing = 'ring-2 ring-blue-800 dark:ring-blue-300 ring-offset-1 ring-offset-slate-50 dark:ring-offset-slate-800';
@@ -80,9 +85,13 @@ const cutRing = 'ring-2 ring-blue-800 dark:ring-blue-300 ring-offset-1 ring-offs
  * count and any pile size, where a shared board with dividers between the piles
  * has to keep answering it as the sizes shift.
  *
- * The pieces sit five to a row and every card is the same width, so a pile is
- * read as full rows plus a remainder rather than counted piece by piece, and
- * two piles compare at a glance.
+ * Nothing here is sized in pixels. The card fills the column the board gives
+ * it, and the pieces fill the card: as many to a row as fit at a piece's
+ * smallest legible size, each piece then stretching into whatever the division
+ * left over. So the same board is a pair of dense little cards on a phone and
+ * the full width of the board area on a desktop, without a breakpoint deciding
+ * either — and two piles compare at a glance, since every card is one width and
+ * every row one length.
  *
  * The split preview is a colour and a ring on the piece cut at, and never a
  * gap: pieces the two halves would be laid out in stay in the one grid, in the
@@ -106,7 +115,7 @@ export const PileCard = ({
   return (
     <div
       className={`
-        w-36 sm:w-40 rounded-lg border-2 px-2 pt-1 pb-2 bg-surface-elevated
+        w-full min-w-0 rounded-lg border-2 px-2 pt-1 pb-2 bg-surface-elevated
         ${discard === 'chosen' ? 'border-blue-500' : ''}
         ${isDiscarded ? 'opacity-60' : ''}
       `}
@@ -122,19 +131,23 @@ export const PileCard = ({
         </span>
         <span className="absolute right-0">{headerAction}</span>
       </div>
-      <div className="grid grid-cols-5 justify-items-center min-h-7">
+      {/* `auto-fill` is what makes the board fluid: a row takes as many pieces
+          as fit at their smallest size and shares the remainder between them, so
+          a wider card spends the width on more pieces per row rather than on
+          emptiness, and a narrower one drops to fewer instead of overflowing. */}
+      <div className={`grid gap-0.5 min-h-7 ${pieceColumns}`}>
         {range(size).map(pieceId => (
           <button
             key={pieceId}
             type="button"
             className={`
-              p-0.5 rounded-full
+              aspect-square w-full flex items-center justify-center rounded-full
               enabled:hocus:bg-slate-200 dark:enabled:hocus:bg-slate-700
             `}
             {...pieceProps(pieceId)}
           >
             <span className={`
-              block w-5 h-5 sm:w-6 sm:h-6 rounded-full
+              block w-[85%] aspect-square rounded-full
               ${pieceColor(isDiscarded, splitAfter === null || pieceId <= splitAfter)}
               ${pieceId === splitAfter ? cutRing : ''}
             `} />
@@ -145,22 +158,24 @@ export const PileCard = ({
   );
 };
 
-// Wrapping the cards as they happen to fit leaves four piles as a row of three
-// and a stray fourth, so the column count is spelled out per pile count
-// instead: two piles side by side, three in a row once there is room for one,
-// four as a square. Four in a line is not among them — the board shares its
-// width with the sidebar, and even a 1440px window leaves it too narrow.
+// How the piles share the board's width. Wrapping them as they happen to fit
+// leaves four piles as a row of three and a stray fourth, so the column count is
+// spelled out per pile count instead: two side by side, three in a row once
+// there is room for one, four as a square. Four in a line is not among them —
+// the board shares its width with the sidebar, and even a wide window leaves
+// each pile too narrow to be worth the row.
 const columnClass: Record<number, string> = {
   2: 'grid-cols-2',
   3: 'grid-cols-2 sm:grid-cols-3',
   4: 'grid-cols-2'
 };
 
+// The columns divide the width rather than being carved out of it at a fixed
+// size: whatever the board is given, the piles have it between them, and no
+// card can be pushed past its neighbour by content it cannot shrink below.
 export const PileArea = ({ pileCount, children }: { pileCount: number; children: ReactNode }) => (
-  // `w-fit` so the columns are as wide as a card rather than a share of the
-  // board: the piles read as one block whatever is left of the width.
   <div className={`
-    grid w-fit mx-auto justify-items-center gap-2 sm:gap-3 p-1
+    grid w-full gap-2 sm:gap-3 p-1
     ${columnClass[pileCount] ?? 'grid-cols-2'}
   `}>
     {children}
