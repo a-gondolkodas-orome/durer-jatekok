@@ -1,5 +1,25 @@
 # durer-jatekok
 
+> [!IMPORTANT]
+> **Development has moved to
+> [durer-aion](https://github.com/a-gondolkodas-orome/durer-aion).**
+>
+> This code now lives there as `apps/practice`, with its history intact — `git
+> log` and `git blame` traverse every commit made here, so this repository is a
+> mirror of the past rather than the place to read it.
+>
+> - **Open issues and pull requests there**, not here.
+> - **Start new discussions there** too. The
+>   [six existing ones](https://github.com/a-gondolkodas-orome/durer-jatekok/discussions)
+>   stay readable here; GitHub cannot move discussions between repositories.
+> - **The site is still served from here** for now. `jatek.durerinfo.hu` keeps
+>   working, and moves to durer-aion's Pages deploy in a later step.
+>
+> Why: the engine built here is replacing boardgame.io in the competition app,
+> and doing that across two repositories meant every engine change landing
+> twice. The plan is
+> [docs/boardgame-io-replacement-plan.md](https://github.com/a-gondolkodas-orome/durer-aion/blob/main/docs/boardgame-io-replacement-plan.md).
+
 Code for the online, client-side versions of past strategy games at the Dürer
 Math Competition.
 
