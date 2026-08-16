@@ -45,10 +45,14 @@ jobs:
       - name: Build
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run build
+      # `redirect`, not `dist`: this site moved to durer-aion's Pages deploy, and what
+      # jatek.durerinfo.hu serves now is the stub that forwards there. The build above is
+      # kept as a check rather than deleted — its output is simply not published. Reverting
+      # this one line puts the real site back.
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: redirect
 
   deploy:
     needs: build
