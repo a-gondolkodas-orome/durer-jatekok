@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Átköltöztünk — Dürer játékok</title>
+    <link rel="canonical" href="https://gyakorlo.durerinfo.hu/jatekok/" />
+    <script>
+      // location.hash is the whole point: a fragment never reaches the server, so no
+      // server-side redirect can preserve it. Every deep link on this site is a
+      // fragment (#/game/PileSplitter), so carrying it across in the browser is what
+      // keeps them all working — one line covering every game.
+      //
+      // `replace`, not `assign`: the old address should not sit in history behind the
+      // new one, or Back from the new site lands here and bounces forward again.
+      location.replace('https://gyakorlo.durerinfo.hu/jatekok/' + location.hash);
+    </script>
+    <meta http-equiv="refresh" content="3; url=https://gyakorlo.durerinfo.hu/jatekok/" />
+    <style>
+      body {
+        margin: 0; padding: 3rem 1.25rem;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.6; color: #0f172a; background: #f8fafc;
+      }
+      main { max-width: 34rem; margin: 0 auto; }
+      a { color: #1d4ed8; }
+      @media (prefers-color-scheme: dark) {
+        body { color: #f1f5f9; background: #0f172a; }
+        a { color: #93c5fd; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Átköltöztünk</h1>
+      <p>
+        A Dürer játékok új címe:
+        <a href="https://gyakorlo.durerinfo.hu/jatekok/">gyakorlo.durerinfo.hu/jatekok/</a>.
+        Néhány másodpercen belül automatikusan odairányítunk.
+      </p>
+      <p>
+        The Dürer practice games have moved to
+        <a href="https://gyakorlo.durerinfo.hu/jatekok/">gyakorlo.durerinfo.hu/jatekok/</a>.
+        You are being redirected.
+      </p>
+    </main>
+  </body>
+</html>
